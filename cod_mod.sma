@@ -15,8 +15,6 @@
 #define MAX_NAME 64
 #define MAX_DESC 256
 
-#define STANDARD_SPEED 250.0
-
 #define TASK_SHOW_INFO 672
 #define TASK_SHOW_AD 768
 #define TASK_SET_SPEED 832
