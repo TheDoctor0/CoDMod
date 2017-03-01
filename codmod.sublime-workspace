@@ -19,7 +19,55 @@
 			"file": "cod_mod.sma",
 			"settings":
 			{
-				"buffer_size": 84240,
+				"buffer_size": 84210,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/Dawid/Desktop/ruletka/inna.sma",
+			"settings":
+			{
+				"buffer_size": 21918,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/Dawid/Desktop/ruletka/dice_items_global.sma",
+			"settings":
+			{
+				"buffer_size": 23820,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/Dawid/Desktop/ruletka/ruletka (1).sma",
+			"settings":
+			{
+				"buffer_size": 113546,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/Dawid/Desktop/ruletka/ruletka.sma",
+			"settings":
+			{
+				"buffer_size": 25001,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/Dawid/Desktop/ruletka/ruletka4fun.sma",
+			"settings":
+			{
+				"buffer_size": 22353,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/Dawid/Desktop/ruletka/scripting/roulette_building_amateur.sma",
+			"settings":
+			{
+				"buffer_size": 5328,
 				"line_ending": "Windows"
 			}
 		}
@@ -31,16 +79,40 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 392.0,
+		"height": 354.0,
 		"last_filter": "Package Control: ",
 		"selected_items":
 		[
 			[
 				"Package Control: ",
+				"Package Control: Enable Package"
+			],
+			[
+				"Package Control: i",
 				"Package Control: Install Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"git",
+				"Git: Commit"
+			],
+			[
+				"Package Control: in",
+				"Package Control: Install Package"
+			],
+			[
+				"sftp",
+				"SFTP: Browse Server…"
+			],
+			[
+				"Package Control: l",
+				"Package Control: List Packages"
 			]
 		],
-		"width": 464.0
+		"width": 510.0
 	},
 	"console":
 	{
@@ -61,20 +133,120 @@
 	},
 	"expanded_folders":
 	[
-		"/D/Dawid/Workplace/Mods/CoDMod New"
+		"/D/Dawid/Workplace/Mods/CoDMod"
 	],
 	"file_history":
 	[
+		"/D/Dawid/Workplace/1.8.3/vip.sma",
+		"/D/Dawid/Workplace/1.8.3/stats_system.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod New/cod_passwords.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod New/cod_password.sma",
+		"/D/Dawid/Workplace/1.8.3/spect_switch.sma",
+		"/C/Users/Dawid/Desktop/addons/amxmodx/scripting/restmenu.sma",
+		"/C/Users/Dawid/Desktop/addons/amxmodx/scripting/adminhelp.sma",
+		"/C/Users/Dawid/Desktop/addons/amxmodx/scripting/timeleft.sma",
+		"/D/Dawid/Workplace/1.8.3/kill_asysta.sma",
+		"/D/Dawid/Workplace/1.8.3/detector.sma",
+		"/D/Dawid/Workplace/1.8.3/hpk.sma",
+		"/D/Dawid/Workplace/1.8.3/ozone_security.sma",
+		"/D/Dawid/Workplace/1.8.3/afk_kicker.sma",
+		"/D/Dawid/Workplace/1.8.3/free_night_vip.sma",
+		"/D/Dawid/Workplace/1.8.3/inf_smierc.sma",
+		"/D/Dawid/Workplace/1.8.3/przelej.sma",
+		"/D/Dawid/Workplace/1.8.3/RoundSound.sma",
+		"/D/Dawid/Workplace/1.8.3/screenshots_new.sma",
+		"/D/Dawid/Workplace/1.8.3/srl_new.sma",
+		"/D/Dawid/Workplace/1.8.3/walls.sma",
+		"/D/Dawid/Workplace/1.8.3/admincmd.sma",
+		"/D/Dawid/Workplace/1.8.3/auto_admins_reload.sma",
+		"/D/Dawid/Workplace/1.8.3/adminchat.sma",
+		"/D/Dawid/Workplace/1.8.3/abd_new.sma",
+		"/D/Dawid/Workplace/A.Projects 1.8.3/detector.sma",
+		"/D/Dawid/Workplace/A.Projects 1.8.3/abd_new.sma",
+		"/D/Dawid/Workplace/A.Projects/dd2/sillyc4.sma",
+		"/D/Dawid/Workplace/A.Projects 1.8.3/admin_spec_esp.sma",
+		"/C/Users/Dawid/Desktop/ruletka/ruletka4fun.sma",
+		"/D/Dawid/Workplace/A.Projects/ruletka4fun.sma",
+		"/C/Users/Dawid/Desktop/ruletka/cstrike/addons/amxmodx/scripting/dice_items_cstrike.sma",
+		"/C/Users/Dawid/Desktop/ruletka/scripting/roulette_shellsman.sma",
+		"/D/Dawid/Workplace/A.Projects/vip_4fun.sma",
+		"/D/Dawid/Workplace/A.Projects/vip.sma",
+		"/C/Users/Dawid/Desktop/ruletka/cstrike/addons/amxmodx/scripting/dice_main.sma",
+		"/C/Users/Dawid/Desktop/ruletka/cstrike/addons/amxmodx/scripting/dice_items_global.sma",
+		"/C/Users/Dawid/Desktop/ruletka.sma",
+		"/D/Dawid/Workplace/A.Projects/knife_models.sma",
+		"/D/Downloads/GoogleChrome/ad_block.sma",
+		"/D/Dawid/Workplace/A.Projects/ozone_security.sma",
+		"/C/Users/Dawid/Desktop/Reasons/jail_powody.sma",
+		"/C/Users/Dawid/Desktop/Reasons/crx_jbreasons.sma",
+		"/D/Dawid/Workplace/A.Projects/include/jailbreak.inc",
+		"/D/Dawid/Workplace/A.Projects/switch_teams_score.sma",
+		"/D/Dawid/Workplace/A.Projects/ozone_banconfig.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.190/hackdetector.sma",
+		"/C/Users/Dawid/Desktop/inna.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.362/roulette_buried.sma",
+		"/C/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/csgo/resource/csgo_thedoctor.txt",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.600/zl_zombiesystem.sma",
+		"/D/Dawid/Workplace/Mobilet — Kraków/www/js/mobilet.js",
+		"/C/Users/Dawid/Desktop/csgo_mefju23.txt",
+		"/D/Downloads/GoogleChrome/PMN_BOT_SPEC.sma",
+		"/D/Downloads/GoogleChrome/GrenadePop.sma",
+		"/D/Downloads/GoogleChrome/AntyRushDD2.sma",
+		"/D/Dawid/Workplace/A.Projects/statsx.sma",
+		"/D/Dawid/Workplace/A.Projects/zestawy_broni.sma",
+		"/C/Users/Dawid/Desktop/csstatsx_sql.sma",
+		"/D/Dawid/Workplace/A.Projects/rank_system.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.014/statsx_n.sma",
+		"/D/Dawid/Workplace/A.Projects/przelej.sma",
+		"/D/Downloads/GoogleChrome/top_by_gametime.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.174/statsx_n.sma",
+		"/C/Users/Dawid/Desktop/csstatsx_playtime_awards.sma",
+		"/D/Dawid/Workplace/A.Projects/rank_weapons.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.464/oldshotstyle.sma",
+		"/C/Users/Dawid/Desktop/mapka.html",
+		"/C/Users/Dawid/Desktop/woj_stats.csv",
+		"/D/Downloads/GoogleChrome/crx_cmdtarget_plus.sma",
+		"/D/Mobilet/Mobilet/www/js/my-app.js",
+		"/D/Mobilet/Mobilet/www/index.html",
+		"/D/Mobilet/Mobilet/www/slider.html",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/HTML-CSS-JS Prettify/HTMLPrettify.sublime-settings",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.810/konkurs.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.111/superheromod.sma",
+		"/C/Users/Dawid/Desktop/servers/cstrike/addons/amxmodx/scripting/hackdetector.sma",
+		"/D/Downloads/GoogleChrome/QuickNoScopeD.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_mine_visible.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/speed_limit.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_casino.sma",
+		"/D/Downloads/GoogleChrome/RRHarlem.sma",
+		"/D/Downloads/GoogleChrome/OneShotMD.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/bomb_status.sma",
+		"/D/Downloads/GoogleChrome/RunBoost.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.663/csstatsx_sql.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.543/aes_statsx_cstrike.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.695/nickchange_menu.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.810/csstatsx_playtime_awards.sma",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/SFTP/SFTP.sublime-settings",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/SFTP/Default (Windows).sublime-keymap",
+		"/D/Dawid/Workplace/Mods/CoDMod/sftp-config.json",
+		"/C/users/dawid/appdata/local/temp/sublime-sftp-browse-1484357437/4FUN.json/cstrike/addons/amxmodx/configs/plugins.ini",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/Default (Windows).sublime-keymap",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/SFTP.sublime-settings",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/sftp_servers/DD2#2.json",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/sftp_servers/4fun.json",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_mod.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/codmod.sublime-project",
+		"/D/Dawid/Workplace/Mods/CoDMod New/codmod.sublime-project",
+		"/D/Dawid/Workplace/Mods/CoDMod/package.mdl",
 		"/D/Dawid/Workplace/Mods/CoDMod New/cod.txt",
 		"/D/Dawid/Workplace/Mods/CoDMod New/cod_mod.sma",
 		"/D/Dawid/Workplace/A.Projects/2048.sma",
-		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
 		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
 		"/D/Dawid/Workplace/A.Projects/abd.sma"
 	],
 	"find":
 	{
-		"height": 0.0
+		"height": 25.0
 	},
 	"find_in_files":
 	{
@@ -88,6 +260,127 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"get_small_map",
+			"green",
+			"team_col",
+			"green",
+			"team_color",
+			"red",
+			"green",
+			"showBox",
+			"green",
+			"TASK_DISPLAY",
+			"hp_display",
+			"TASK_DISPLAY",
+			"cut_throat",
+			"crab",
+			"TASK_SCORPIONS",
+			"scorpion",
+			"RollTheDice",
+			"FindPlayer",
+			"menuReasons",
+			"destroyMenu",
+			"cmdCustom",
+			"+%",
+			"$",
+			"smoke",
+			"Smoke",
+			"<font ",
+			"SFUI_Lobby_MatchReadyButton",
+			"<font ",
+			"SFUI_GO",
+			"<font ",
+			"SFUIHUD_playerid_overhead_t_lowhealth",
+			"<font ",
+			"font",
+			"vote",
+			"kick player",
+			"SFUI_Vote_KickPlayer",
+			"font",
+			"SFUI_MAINMENU",
+			"PlayButton",
+			"SFUI_MainMenu_PlayButton",
+			"global",
+			"sg550",
+			"ShowSyncHudMsg",
+			"Usp",
+			"sg550",
+			"say",
+			"cmdMAC10Top15",
+			"cmdKnifeTop15",
+			"native_get_wstats_thread",
+			"cmdKnifeTop15",
+			"sBuffer",
+			"get_user_rstats",
+			"get_wstats_thread",
+			"DB_QueryBuildGetstats",
+			"DB_QueryTop15",
+			"get_wstats_thread",
+			"get_wstats_sql_thread",
+			"DB_QueryTop15",
+			"native_get_stats_thread",
+			"get_stats_sql_thread",
+			"top15",
+			"DB_QueryBuildScore",
+			"DB_QueryTop15",
+			"get_wstats_sql_thread",
+			"SQL_GETSTATS",
+			"SQL_Handler",
+			"DB_QueryTop15",
+			"DB_QueryWeaponTop15",
+			"native_get_stats_thread",
+			"knife",
+			"DB_QueryBuildGetstats",
+			"DB_QueryTop15",
+			"get_stats_sql_thread",
+			"Info_Weapon_GetLog",
+			"ROW_WEAPON_NAME",
+			"row_weapons_names",
+			"DB_SavePlayerWstats",
+			"weapon_stats_enabled",
+			"cvar[CVAR_WEAPONSTATS]",
+			"cmdTop15",
+			"DB_QueryBuildGetstats",
+			"top15",
+			"native_get_user_wstats",
+			"cvar[CVAR_ASSISTHP]",
+			"connection_time",
+			"cvar[CVAR_RANKFORMULA]",
+			"xmod_get_maxweapons",
+			"native_get_user_wstats",
+			"native",
+			"DB_QueryBuildGetstats",
+			"DB_QueryTop15",
+			"native_get_stats_thread",
+			"get_stats_sql_thread",
+			"cmdtop15",
+			"cmdReport",
+			"cmdSwitch",
+			"DB_QueryTop15",
+			"native_get_stats_thread",
+			"cmdTop15",
+			"top15",
+			"LASTUPDATE",
+			"stats_get",
+			"get_user_sta",
+			"CurrentKills",
+			"native_stats_add_kill",
+			"xmod_get_wpnname",
+			"SD:Netflix:",
+			"Combo : ",
+			"UsedBombSite",
+			"fw_HamTakeDamagePost",
+			"amx_frozen",
+			"LASTUPDATE",
+			"FW_Initialized",
+			"FW_Assist",
+			"Stats_SaveAssist",
+			"cvar[CVAR_ASSISTHP]",
+			"get_user_wstats",
+			"native_get_user_wstats",
+			"native",
+			"_shPunish",
+			"STANDARD_SPEED"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -95,6 +388,10 @@
 		"regex": false,
 		"replace_history":
 		[
+			"MenuReasons",
+			"DestroyMenu",
+			"say_team",
+			""
 		],
 		"reverse": false,
 		"show_context": true,
@@ -105,7 +402,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 5,
 			"sheets":
 			[
 				{
@@ -121,40 +418,13 @@
 						"selection":
 						[
 							[
-								0,
-								0
+								574,
+								574
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "cod_mod.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 84240,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								168,
-								168
-							]
-						],
-						"settings":
-						{
+							"auto_complete": true,
 							"bracket_highlighter.busy": false,
 							"bracket_highlighter.locations":
 							{
@@ -173,26 +443,46 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_regex",
 								"bh_regex_center",
 								"bh_regex_open",
 								"bh_regex_close",
 								"bh_regex_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
 								"bh_c_define_close",
 								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
 								"bh_unmatched",
 								"bh_unmatched_center",
 								"bh_unmatched_open",
@@ -203,40 +493,904 @@
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
 								"bh_round_close",
 								"bh_round_content"
 							],
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
+							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
+							"incomplete_sync": null,
+							"sftp_new_server": null,
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "cod_mod.sma",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 84210,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2529,
+								2529
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".#",
+									"selector": "text.html"
+								}
+							],
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										2533,
+										2534
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/double_quote.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										2508,
+										2509
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 315.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/C/Users/Dawid/Desktop/ruletka/inna.sma",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 21918,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3884,
+								3884
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										4056,
+										4057
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/curly_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										3606,
+										3607
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content"
+							],
+							"incomplete_sync": null,
+							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 2565.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/C/Users/Dawid/Desktop/ruletka/dice_items_global.sma",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 23820,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8640,
+								8654
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".#",
+									"selector": "text.html"
+								}
+							],
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										8654,
+										8655
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/round_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										8634,
+										8635
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content"
+							],
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 4979.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/C/Users/Dawid/Desktop/ruletka/ruletka (1).sma",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 113546,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5618,
+								5622
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".#",
+									"selector": "text.html"
+								}
+							],
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+								},
+								"icon":
+								{
+								},
+								"open":
+								{
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content"
+							],
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1760.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "/C/Users/Dawid/Desktop/ruletka/ruletka.sma",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 25001,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2842,
+								2842
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".#",
+									"selector": "text.html"
+								}
+							],
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										3037,
+										3038
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/curly_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										2715,
+										2716
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
+							],
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1319.0,
+						"zoom_level": 1.0
+					},
 					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "/C/Users/Dawid/Desktop/ruletka/ruletka4fun.sma",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 22353,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								11518,
+								11528
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".#",
+									"selector": "text.html"
+								}
+							],
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										11528,
+										11529
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/double_quote.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										11517,
+										11518
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
+							],
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 6179.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "/C/Users/Dawid/Desktop/ruletka/scripting/roulette_building_amateur.sma",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5328,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2836,
+								2836
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										2835,
+										2836
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/curly_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										2688,
+										2689
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content"
+							],
+							"incomplete_sync": null,
+							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax"
+						},
+						"translation.x": -0.0,
+						"translation.y": 2340.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
 					"type": "text"
 				}
 			]
@@ -244,11 +1398,11 @@
 	],
 	"incremental_find":
 	{
-		"height": 0.0
+		"height": 25.0
 	},
 	"input":
 	{
-		"height": 0.0
+		"height": 31.0
 	},
 	"layout":
 	{
@@ -273,19 +1427,31 @@
 		]
 	},
 	"menu_visible": true,
+	"output.CSS Extended Completions":
+	{
+		"height": 0.0
+	},
 	"output.exec":
 	{
-		"height": 100.0
+		"height": 174.0
 	},
 	"output.find_results":
 	{
 		"height": 0.0
 	},
+	"output.git":
+	{
+		"height": 100.0
+	},
+	"output.sftp":
+	{
+		"height": 132.0
+	},
 	"pinned_build_system": "",
 	"project": "codmod.sublime-project",
 	"replace":
 	{
-		"height": 0.0
+		"height": 46.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -294,6 +1460,14 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"",
+				"cod.txt"
+			],
+			[
+				"package",
+				"package.mdl"
+			]
 		],
 		"width": 0.0
 	},
@@ -323,7 +1497,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 178.0,
+	"side_bar_width": 177.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
