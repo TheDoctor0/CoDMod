@@ -18,7 +18,7 @@ public plugin_init()
 public Kasyno(id)
 {
 	new tytul[25];
-	format(tytul, 24, "\rKASYNO \y,,U Kamilka''");
+	format(tytul, 24, "\rKASYNO");
 	new menu = menu_create(tytul, "Kasyno_Handler");
 	menu_additem(menu, "Obstaw 10 Monet \rWygraj 30 \rSzansa 20%");//2
 	menu_additem(menu, "Obstaw 20 Monet \rWygraj 60 \rSzansa 20%");//3
@@ -265,6 +265,3 @@ public Kasyno_Handler(id, menu, item)
 
   return PLUGIN_CONTINUE;
 }
-/* AMXX-Studio Notes - DO NOT MODIFY BELOW HERE
-*{\\ rtf1\\ ansi\\ ansicpg1250\\ deff0\\ deflang1045{\\ fonttbl{\\ f0\\ fnil Tahoma;}}\n\\ viewkind4\\ uc1\\ pard\\ f0\\ fs16 \n\\ par }
-*/
