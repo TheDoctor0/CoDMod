@@ -680,17 +680,17 @@ public assign_points(id)
 	menu_additem(menu, menuData);
 	
 	menu_addblank(menu, 0);
-	
-	format(menuData, charsmax(menuData), "Inteligencja: \r%i \y(Zwieksza sile itemow i umiejetnosci klasy)", get_intelligence(id, 1, 1));
-	menu_additem(menu, menuData);
-	
+
 	format(menuData, charsmax(menuData), "Zdrowie: \r%i \y(Zwieksza ilosc zycia)", get_health(id, 0, 1, 1));
 	menu_additem(menu, menuData);
 	
-	format(menuData, charsmax(menuData), "Wytrzymalosc: \r%i \y(Zmniejsza otrzymywane obrazenia)", get_stamina(id, 1, 1));
+	format(menuData, charsmax(menuData), "Inteligencja: \r%i \y(Zwieksza sile itemow i umiejetnosci klasy)", get_intelligence(id, 1, 1));
+	menu_additem(menu, menuData);
+
+	format(menuData, charsmax(menuData), "Sila: \r%i \y(Zwieksza zadawane obrazenia)", get_strength(id, 1, 1));
 	menu_additem(menu, menuData);
 	
-	format(menuData, charsmax(menuData), "Sila: \r%i \y(Zwieksza zadawane obrazenia)", get_strength(id, 1, 1));
+	format(menuData, charsmax(menuData), "Wytrzymalosc: \r%i \y(Zmniejsza otrzymywane obrazenia)", get_stamina(id, 1, 1));
 	menu_additem(menu, menuData);
 	
 	format(menuData, charsmax(menuData), "Kondycja: \r%i \y(Zwieksza predkosc poruszania)", get_condition(id, 1, 1));
@@ -718,8 +718,19 @@ public assign_points_handler(id, menu, item)
 	
 	switch(item) 
 	{ 
-		case 0: if(++codPlayer[id][PLAYER_POINTS_SPEED] >= charsmax(pointsDistribution)) codPlayer[id][PLAYER_POINTS_SPEED] = 0;      
+		case 0: if(++codPlayer[id][PLAYER_POINTS_SPEED] >= charsmax(pointsDistribution)) codPlayer[id][PLAYER_POINTS_SPEED] = 0;     
 		case 1: 
+		{       
+			if(codPlayer[id][PLAYER_HEAL] < levelLimit/5) 
+			{
+				if(pointsDistributionAmount > levelLimit/5 - codPlayer[id][PLAYER_HEAL]) pointsDistributionAmount = levelLimit/5 - codPlayer[id][PLAYER_HEAL];
+
+				codPlayer[id][PLAYER_HEAL] += pointsDistributionAmount;
+				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
+			}
+			else cod_print_chat(id, "Maksymalny poziom sily osiagniety!");
+		} 
+		case 2: 
 		{       
 			if(codPlayer[id][PLAYER_INT] < levelLimit/5) 
 			{
@@ -731,29 +742,7 @@ public assign_points_handler(id, menu, item)
 			} 
 			else cod_print_chat(id, "Maksymalny poziom inteligencji osiagniety!");                       
 		}
-		case 2: 
-		{       
-			if(codPlayer[id][PLAYER_HEAL] < levelLimit/5) 
-			{
-				if(pointsDistributionAmount > levelLimit/5 - codPlayer[id][PLAYER_HEAL]) pointsDistributionAmount = levelLimit/5 - codPlayer[id][PLAYER_HEAL];
-
-				codPlayer[id][PLAYER_HEAL] += pointsDistributionAmount;
-				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
-			}
-			else cod_print_chat(id, "Maksymalny poziom sily osiagniety!");
-		}
 		case 3: 
-		{       
-			if(codPlayer[id][PLAYER_STAM] < levelLimit/5) 
-			{
-				if(pointsDistributionAmount > levelLimit/5 - codPlayer[id][PLAYER_STAM]) pointsDistributionAmount = levelLimit/5 - codPlayer[id][PLAYER_STAM];
-
-				codPlayer[id][PLAYER_STAM] += pointsDistributionAmount;
-				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
-			} 
-			else cod_print_chat(id, "Maksymalny poziom wytrzymalosci osiagniety!");
-		}
-		case 4: 
 		{       
 			if(codPlayer[id][PLAYER_STR] < levelLimit/5) 
 			{
@@ -763,6 +752,17 @@ public assign_points_handler(id, menu, item)
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
 			} 
 			else cod_print_chat(id, "Maksymalny poziom sily osiagniety!");
+		}
+		case 4: 
+		{       
+			if(codPlayer[id][PLAYER_STAM] < levelLimit/5) 
+			{
+				if(pointsDistributionAmount > levelLimit/5 - codPlayer[id][PLAYER_STAM]) pointsDistributionAmount = levelLimit/5 - codPlayer[id][PLAYER_STAM];
+
+				codPlayer[id][PLAYER_STAM] += pointsDistributionAmount;
+				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
+			} 
+			else cod_print_chat(id, "Maksymalny poziom wytrzymalosci osiagniety!");
 		}
 		case 5: 
 		{       
@@ -1875,16 +1875,6 @@ public get_intelligence(id, gained_intelligence, bonus_intelligence)
 	return intelligence;
 }
 
-public get_stamina(id, gained_stamina, bonus_stamina)
-{
-	new stamina;
-	
-	if(gained_stamina) stamina += codPlayer[id][PLAYER_STAM];
-	if(bonus_stamina) stamina += codPlayer[id][PLAYER_EXTR_STAM];
-	
-	return stamina;
-}
-
 public get_strength(id, gained_strength, bonus_strength)
 {
 	new strength;
@@ -1893,6 +1883,16 @@ public get_strength(id, gained_strength, bonus_strength)
 	if(bonus_strength) strength += codPlayer[id][PLAYER_EXTR_STR];
 	
 	return strength;
+}
+
+public get_stamina(id, gained_stamina, bonus_stamina)
+{
+	new stamina;
+	
+	if(gained_stamina) stamina += codPlayer[id][PLAYER_STAM];
+	if(bonus_stamina) stamina += codPlayer[id][PLAYER_EXTR_STAM];
+	
+	return stamina;
 }
 
 public get_condition(id, gained_condition, bonus_condition)
@@ -2832,19 +2832,4 @@ stock mysql_escape_string(const dataSource[], dataDest[], dataLenght)
 	replace_all(dataDest, dataLenght, "'", "\'");
 	replace_all(dataDest, dataLenght, "`", "\`");
 	replace_all(dataDest, dataLenght, "^"", "\^"");
-}
-
-stock cmd_execute(id, const szText[], any:...) 
-{
-	#pragma unused szText
-
-	new message[256];
-
-	format_args(message, charsmax(message), 1);
-
-	message_begin(id == 0 ? MSG_ALL : MSG_ONE, SVC_DIRECTOR, _, id);
-	write_byte(strlen(message) + 2);
-	write_byte(10);
-	write_string(message);
-	message_end();
 }
