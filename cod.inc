@@ -7,7 +7,6 @@
 #define set_bit(%2,%1) (%1 |= (1<<(%2&31)))
 #define rem_bit(%2,%1) (%1 &= ~(1 <<(%2&31)))
 
-#define MAX_TRANSLATION_LENGTH 2048
 #define MAX_PLAYERS 32
 
 #define COD_CONTINUE 0
@@ -17,13 +16,11 @@
 #define DMG_HEGRENADE (1<<24)
 #define DMG_BULLET (1<<1)
 
-enum 
-{
-	DontChange = 0,
-	Grey = -1,
-	Red = -2,
-	Blue = -3
-};
+#define	RENDER_ALWAYS (1<<1)
+#define	RENDER_MOVE (1<<2)
+#define	RENDER_STAND (1<<3)
+#define	RENDER_DUCK (1<<4)
+#define	RENDER_SHIFT (1<<5)
 
 native cod_get_user_exp(id);
 /*------------------------------
@@ -338,7 +335,7 @@ forward cod_class_skill_used(id);
 Forward wysylany do pluginu z ktorego zarejestrowana jest kasa w momencie uzycia umiejetnosci klasy
 ------------------------------*/
 
-stock cmd_execute(id, const szText[], any:...) 
+stock cmd_execute(id, const text[], any:...) 
 {
 	#pragma unused szText
 
@@ -353,206 +350,12 @@ stock cmd_execute(id, const szText[], any:...)
 	message_end();
 }
 
-stock cod_print_chat(id, const fmt[] = "", any:...)
+stock cod_print_chat(id, const text[] = "", any:...)
 {
-	if(id && !is_user_connected(id)) return 0;
+	new message[192];
 
-	new sender = DontChange;
+	if(numargs() == 2) copy(message, charsmax(message), text);
+	else vformat(message, charsmax(message), text, 3);
 
-	if(sender < Blue || sender > 32) sender = DontChange;
-	else if(sender < DontChange) sender = -sender + 32;
-
-	static const szTeamName[][] = { "", "TERRORIST", "CT" };
-
-	new szMessage[191];
-
-	new iParams = numargs();
-
-	if(id)
-	{
-		if(iParams == 2) copy(szMessage, charsmax(szMessage), fmt);
-		else vformat(szMessage, charsmax(szMessage), fmt, 3);
-
-		format(szMessage, charsmax(szMessage), "^4[CoD]^1 %s", szMessage);
-
-		if(sender > (32 - Grey))
-		{
-			if(sender > (32 - Blue)) sender = id;
-			else _CC_TeamInfo(id, sender, szTeamName[sender - (32 - Grey)]);
-		}
-		
-		_CC_SayText(id, sender, szMessage);
-	}
-	else
-	{
-		new iPlayers[32], iNum;
-		
-		get_players(iPlayers, iNum, "ch");
-		
-		if(!iNum) return 0;
-
-		new iMlNumber, i, j, Array:aStoreML = ArrayCreate();
-		
-		if(iParams >= 4)
-		{
-			for(j = 2; j < iParams; j++)
-			{
-				if(getarg(j) == LANG_PLAYER)
-				{
-					i = 0;
-
-					while((szMessage[i] = getarg(j + 1, i++))) {}
-					
-					if(GetLangTransKey(szMessage) != TransKey_Bad)
-					{
-						ArrayPushCell(aStoreML, j++);
-
-						iMlNumber++;
-					}
-				}
-			}
-		}
-
-		if(!iMlNumber)
-		{
-			if(iParams == 2) copy(szMessage, charsmax(szMessage), fmt);
-			else vformat(szMessage, charsmax(szMessage), fmt, 3);
-
-			format(szMessage, charsmax(szMessage), "^4[CoD]^1 %s", szMessage);
-
-			if(0 < sender < (32 - Blue))
-			{
-				if(sender > (32 - Grey)) _CC_TeamInfo(0, sender, szTeamName[sender - (32 - Grey)]);
-
-				_CC_SayText(0, sender, szMessage);
-				
-				return 1;
-			}
-		}
-
-		if(sender > (32 - Blue)) sender = 0;
-
-		for(--iNum; iNum >= 0; iNum--)
-		{
-			id = iPlayers[iNum];
-
-			if(iMlNumber)
-			{
-				for(j = 0; j < iMlNumber; j++) setarg(ArrayGetCell(aStoreML, j), _, id);
-
-				vformat(szMessage, charsmax(szMessage), fmt, 3);
-				
-				format(szMessage, charsmax(szMessage), "^4[CoD]^1 %s", szMessage);
-			}
-
-			if(sender > (32 - Grey)) _CC_TeamInfo(id, sender, szTeamName[sender - (32 - Grey)]);
-
-			_CC_SayText(id, sender, szMessage);
-		}
-
-		ArrayDestroy(aStoreML);
-	}
-	
-	return 1;
+	client_print_color(id, id, "^x04[CoD]^x01 %s", message);
 }
-
-stock _CC_TeamInfo(iReceiver, iSender, szTeam[])
-{
-	static iTeamInfo = 0;
-	
-	if(!iTeamInfo) iTeamInfo = get_user_msgid("TeamInfo");
-
-	message_begin(iReceiver ? MSG_ONE : MSG_ALL, iTeamInfo, _, iReceiver);
-	write_byte(iSender);
-	write_string(szTeam);
-	message_end();
-}
-
-stock _CC_SayText(iReceiver, iSender, szMessage[])
-{
-	static iSayText = 0;
-	
-	if(!iSayText) iSayText = get_user_msgid("SayText");
-
-	for(new i = 0; i < 192; i++)
-	{
-		if(szMessage[i] == 0) break;
-		
-		if(szMessage[i] == '%' || szMessage[i] == '#') szMessage[i] = ' ';
-	}
-	
-	message_begin(iReceiver ? MSG_ONE : MSG_ALL, iSayText, _, iReceiver);
-	write_byte(iSender ? iSender : iReceiver);
-	
-	if(szMessage[0] > 4)
-	{
-		write_byte(1);
-		szMessage[192 - 2 - 1] = 0;
-		write_string(szMessage);
-	}
-	else
-	{
-		szMessage[192 - 1 - 1] = 0;
-		write_string(szMessage);
-	}
-	
-	message_end();
-}
-
-new _translation_szBuffer[MAX_TRANSLATION_LENGTH];
-
-stock register_dictionary_colored(const filename[])
-{
-	if(!register_dictionary(filename)) return 0;
-
-	new szFileName[256];
-	
-	get_localinfo("amxx_datadir", szFileName, charsmax(szFileName));
-	format(szFileName, charsmax(szFileName), "%s/lang/%s", szFileName, filename);
-	
-	new fp = fopen(szFileName, "rt");
-	
-	if(!fp)
-	{
-		log_amx("Failed to open %s", szFileName);
-		
-		return 0;
-	}
-
-	new szLang[3], szKey[64], TransKey:iKey;
-
-	while(!feof(fp))
-	{
-		fgets(fp, _translation_szBuffer, charsmax(_translation_szBuffer));
-		trim(_translation_szBuffer);
-
-		if(_translation_szBuffer[0] == '[') strtok(_translation_szBuffer[1], szLang, charsmax(szLang), _translation_szBuffer, 1, ']');
-		
-		else if (_translation_szBuffer[0])
-		{
-			strbreak(_translation_szBuffer, szKey, charsmax(szKey), _translation_szBuffer, charsmax(_translation_szBuffer));
-			
-			iKey = GetLangTransKey(szKey);
-			
-			if (iKey != TransKey_Bad)
-			{
-				replace_all(_translation_szBuffer, charsmax(_translation_szBuffer), "!g", "^4");
-				replace_all(_translation_szBuffer, charsmax(_translation_szBuffer), "!t", "^3");
-				replace_all(_translation_szBuffer, charsmax(_translation_szBuffer), "!n", "^1");
-				replace_all(_translation_szBuffer, charsmax(_translation_szBuffer), "^^4", "^4");
-				replace_all(_translation_szBuffer, charsmax(_translation_szBuffer), "^^3", "^3");
-				replace_all(_translation_szBuffer, charsmax(_translation_szBuffer), "^^1", "^1");
-				replace_all(_translation_szBuffer, charsmax(_translation_szBuffer), "^^n", "^n");
-				replace_all(_translation_szBuffer, charsmax(_translation_szBuffer), "^^t", "^t");
-				
-				AddTranslation(szLang, iKey, _translation_szBuffer[2]);
-			}
-		}
-	}
-
-	fclose(fp);
-	
-	return 1;
-}
-
-#define register_dictionary register_dictionary_colored

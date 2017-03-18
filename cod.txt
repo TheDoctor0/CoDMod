@@ -86,16 +86,13 @@ Aktualnie: 7209 linijek kodu
 Natywy do zrobienia
 - cod_set_user_render
 
-Forwardy do zrobienia:
-- PlayerSpawn - done
-- PlayerKilled - done
-- CmdStart - done
-- Round Start/End - done
-- Clas/Item Changed - done
-- TakeDamage (ogólny, dla klasy, dla itemu)
-- WeaponDeploy
-- Render Changed
-- Gravity Changed
+Render (values 0 to 255):
+- class render (set, get)
+- item render (set, get)
+- additional render (set, get, add) reset every spawn
+Events: change and reset
+Situations: always, crouch, walk, on weapon
+Save last state to prevent from changing render every frame
 
 Kasyno:
 - Kostka (high/low i 1-6)
