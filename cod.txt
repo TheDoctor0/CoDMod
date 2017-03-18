@@ -81,22 +81,35 @@ Nocny exp: Standardowo exp x2 w godzinach od 23 do 8 - Zrobione!
 
 Noze: kazdy noz daje inny bonus do statystyk
 
-Aktualnie: 7209 linijek kodu
-
-Natywy do zrobienia
-- cod_set_user_render
-
-Render (values 0 to 255):
-- class render (set, get)
-- item render (set, get)
-- additional render (set, get, add) reset every spawn
-Events: change and reset
-Situations: always, crouch, walk, on weapon
-Save last state to prevent from changing render every frame
-
 Kasyno:
 - Kostka (high/low i 1-6)
 - Automat
 - 2048
 - Blackjack
 - Poker
+
+Do zrobienia:
+- Noze
+- Limit predkosci
+- Aktualizacja .inc
+- Widzialnosc min dla adminow
+- Kasyno
+- Ikony bomby
+- Klany (podania i wojny)
+- Awanse klas
+- Statystyki WWW
+
+Do zrefaktoryzowania:
+- Sklep (+ zmiany)
+- Menu
+- Honor
+- Staty
+- Przelew
+- Wymiana
+- System rejestracji
+- Rynek
+- VIP
+- Questy
+- Paczki
+- Nocny Exp
+- Nagrody dla 3 najlepszych

@@ -27,7 +27,7 @@
 			"file": "cod.txt",
 			"settings":
 			{
-				"buffer_size": 4608,
+				"buffer_size": 4622,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -37,16 +37,6 @@
 			"settings":
 			{
 				"buffer_size": 96782,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "cod.inc",
-			"settings":
-			{
-				"buffer_size": 10635,
-				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		}
@@ -158,18 +148,34 @@
 	],
 	"file_history":
 	[
+		"/D/Dawid/Workplace/AMXX/scripting/cs_player_models_api.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins.ini",
+		"/D/Dawid/Workplace/AMXX/scripting/supervip.sma",
+		"/D/Dawid/Workplace/AMXX/scripting/ruletka.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/hats.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sys_error.log",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod.inc",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_mod.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_passwords.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_transfer.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_stats.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_password.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_vip.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/videopoker.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/ARP_Casino.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_rewards.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_quests.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_knife.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_shop.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/speed_limit.sma",
 		"/C/Users/Dawid/Desktop/skroty",
 		"/D/Dawid/Workplace/Mods/DiabloMod/diablo_classic.sma",
 		"/D/Dawid/Workplace/Mods/DiabloMod/include/nativesDiablo.inc",
 		"/D/Dawid/Workplace/AMXX/include/cod.inc",
-		"/D/Dawid/Workplace/New Mods/CoDMod/cod_mod.sma",
 		"/D/Dawid/Workplace/New Mods/Battlefield One/battlefield_one.sma",
-		"/D/Dawid/Workplace/New Mods/CoDMod/cod.inc",
 		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.279/diablo_nowe.sma",
 		"/D/Downloads/GoogleChrome/codclass_mnich.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.683/diablo_nowe.inc",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/hats.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sys_error.log",
 		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa1.679/nativesDiablo.inc",
 		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.877/diablo_nowe.sma",
 		"/D/Downloads/GoogleChrome/posmv.inc",
@@ -188,7 +194,6 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170316.log",
 		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.414/amx_shake.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.087/configDiablo.inc",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins.ini",
 		"/D/Downloads/GoogleChrome/cs_player_models_api (1).sma",
 		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.291/diablo_nowe.inc",
 		"/D/Downloads/GoogleChrome/AdminPrefixes.sma",
@@ -199,7 +204,6 @@
 		"/D/Dawid/Workplace/AMXX/include/cellarray.inc",
 		"/D/Dawid/Workplace/AMXX/include/sqlx.inc",
 		"/D/Dawid/Workplace/AMXX/include/amxmodx.inc",
-		"/D/Dawid/Workplace/New Mods/CoDMod/cod_knife.sma",
 		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/Emmet/Default (Windows).sublime-keymap",
 		"/D/Dawid/Workplace/New Mods/CoDMod/cod_casino.sma",
 		"/D/Dawid/Workplace/New Mods/CoDMod/ScreenMenu/natives.inl",
@@ -223,7 +227,6 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/users.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/users 3.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/users 2.ini",
-		"/D/Dawid/Workplace/AMXX/scripting/supervip.sma",
 		"/C/Users/Dawid/Desktop/classes_dex2jar.jar.src/pl/lidwin/letmespy2/PushReceiver.java",
 		"/C/Users/Dawid/Desktop/classes_dex2jar.jar.src/pl/lidwin/letmespy2/AddActivity.java",
 		"/C/Users/Dawid/Desktop/classes_dex2jar.jar.src/pl/lidwin/letmespy2/library/Sender.java",
@@ -272,20 +275,7 @@
 		"/C/Users/Dawid/Desktop/kontakt.txt",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170307 2.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170307 2.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/jail_core.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/RoundSound.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170307.log",
-		"/D/Dawid/Workplace/AMXX/scripting/mutemenu.sma",
-		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Installed Packages/amxmodx.sublime-package",
-		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/Amxx Pawn/AmxxPawn.sublime-build",
-		"/C/Users/Dawid/Desktop/Packages/Amxx Pawn/syntax_test_amxx-pawn.sma",
-		"/D/Dawid/Workplace/New Mods/CoDMod/bomb_status.sma",
-		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/amxmodx/default.sma",
-		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/amxx.sublime-settings",
-		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/AMXX-Console.sublime-settings",
-		"/C/Users/Dawid/Desktop/ruletka/ruletka4fun.sma",
-		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
-		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/Git/Git.sublime-settings"
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/jail_core.sma"
 	],
 	"find":
 	{
@@ -301,9 +291,32 @@
 	},
 	"find_state":
 	{
-		"case_sensitive": true,
+		"case_sensitive": false,
 		"find_history":
 		[
+			"cs_reset_player_model",
+			"teleport_to_enemy_spawn",
+			"Teleport",
+			"changeskin",
+			"spawn",
+			"skin",
+			"model",
+			"skin",
+			"model",
+			"DontChange, ",
+			"SpawnedEventPre",
+			"ShowVips",
+			"ShowMotd",
+			"iVip",
+			"iMaxPlayers",
+			"gArray",
+			"szCommandVip",
+			"VipStatus",
+			"HandleSayText",
+			"player_killed",
+			"DeathMsg",
+			"DontChange, ",
+			"costRepair",
 			"new const pointsDistribution[] = { 1, 3, 5, 10, 25, -1 };",
 			"#define TASK_SHOW_INFO 5357\n#define TASK_SHOW_AD 6268\n#define TASK_SET_SPEED 7532\n#define TASK_END_KILL_STREAK 8779\n#define TASK_RENDER 9611\n",
 			"_STATUS",
@@ -408,30 +421,7 @@
 			"cod_display_fade",
 			"display_hud",
 			"display_fade",
-			"cod_display_fade",
-			"writeHud",
-			"writeHudNative",
-			"damage_post",
-			"fw_SetClientKeyValue",
-			"HudSyncObj",
-			"GAME_DESCRIPTION",
-			"gForwardsMulti",
-			"getForwardMulti",
-			"MULTI_DAMAGE_TAKEN_POST",
-			"DAMAGE_POST",
-			"MULTI_DAMAGE_TAKEN_POST",
-			"MULTI_DAMAGE_TAKEN_PRE",
-			"fwDamage",
-			"take_damage",
-			"takedamage",
-			"DAMAGE_PRE",
-			"codForwards[CMD_START]",
-			"weapon_deplo",
-			"OFFSET_WPN_WIN",
-			"player_reset_max_speed",
-			"fwItemDeployPost",
-			"WEAPON_DEPLOY",
-			"FORWARD_"
+			"cod_display_fade"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -439,6 +429,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"",
 			"_STATUS",
 			"renderInfo",
 			"    ",
@@ -474,7 +465,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -483,15 +474,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4608,
+						"buffer_size": 4622,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4536,
-								4536
+								4529,
+								4529
 							]
 						],
 						"settings":
@@ -525,16 +516,11 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
 								"bh_double_quote",
 								"bh_double_quote_center",
 								"bh_double_quote_open",
@@ -545,6 +531,11 @@
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
@@ -555,31 +546,31 @@
 								"bh_unmatched_open",
 								"bh_unmatched_close",
 								"bh_unmatched_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
 								"bh_default",
 								"bh_default_center",
 								"bh_default_open",
 								"bh_default_close",
 								"bh_default_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
 								"bh_regex",
 								"bh_regex_center",
 								"bh_regex_open",
 								"bh_regex_close",
-								"bh_regex_content"
+								"bh_regex_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
 							"git_gutter_enabled": true,
@@ -588,10 +579,10 @@
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 134.0,
+						"translation.y": 1059.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
@@ -607,8 +598,8 @@
 						"selection":
 						[
 							[
-								53950,
-								53950
+								0,
+								0
 							]
 						],
 						"settings":
@@ -629,27 +620,12 @@
 							{
 								"close":
 								{
-									"1":
-									[
-										53949,
-										53950
-									]
 								},
 								"icon":
 								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/curly_bracket.png",
-										"brackethighlighter.default"
-									]
 								},
 								"open":
 								{
-									"1":
-									[
-										53879,
-										53880
-									]
 								},
 								"unmatched":
 								{
@@ -657,183 +633,64 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
-								"bh_square_content"
+								"bh_square_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content"
 							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
 							"git_gutter_enabled": true,
 							"git_savvy.file_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod\\cod_mod.sma",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 24605.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "cod.inc",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 10635,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								567,
-								495
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
-							"git_gutter_enabled": true,
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod\\cod.inc",
 							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod",
 							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
 							"translate_tabs_to_spaces": false

@@ -7,6 +7,8 @@
 #define set_bit(%2,%1) (%1 |= (1<<(%2&31)))
 #define rem_bit(%2,%1) (%1 &= ~(1 <<(%2&31)))
 
+#define is_user_player(%1) (1 <= %1 <= maxPlayers)
+
 #define MAX_PLAYERS 32
 
 #define COD_CONTINUE 0

@@ -21,21 +21,18 @@ new iSilent[MAX_PLAYERS + 1], iHP[MAX_PLAYERS + 1], iHE[MAX_PLAYERS + 1], iType[
 new cvarCostRepair[2], cvarCostItem[2], cvarCostUpgrade[2], cvarCostSmallExp[2], cvarCostBigExp[2], cvarCostSilent[2], cvarCostHP[2], cvarCostHE[2];
 new costRepair[2], costItem[2], costUpgrade[2], costSmallExp[2], costBigExp[2], costSilent[2], costHP[2], costHE[2];
 
-new cvarDurability, cvarSmallExpMin, cvarSmallExpMax, cvarBigExpMin, cvarBigExpMax, cvarSilentRounds, cvarHPAmount, cvarHPRounds, cvarHEAmount, cvarHERounds;
-new iDurability, iSmallExpMin, iSmallExpMax, iBigExpMin, iBigExpMax, iSilentRounds, iHPAmount, iHPRounds, iHEAmount, iHERounds;
+new cvarExchangeRatio, cvarDurability, cvarSmallExpMin, cvarSmallExpMax, cvarBigExpMin, cvarBigExpMax, cvarSilentRounds, cvarHPAmount, cvarHPRounds, cvarHEAmount, cvarHERounds;
+new iExchangeRatio, iDurability, iSmallExpMin, iSmallExpMax, iBigExpMin, iBigExpMax, iSilentRounds, iHPAmount, iHPRounds, iHEAmount, iHERounds;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	for(new i; i < sizeof szCommandShop; i++)
-		register_clcmd(szCommandShop[i], "Shop");
+	for(new i; i < sizeof szCommandShop; i++) register_clcmd(szCommandShop[i], "Shop");
+
+	for(new i; i < sizeof szCommandShopC; i++) register_clcmd(szCommandShopC[i], "ShopC");
 		
-	for(new i; i < sizeof szCommandShopC; i++)
-		register_clcmd(szCommandShopC[i], "ShopC");
-		
-	for(new i; i < sizeof szCommandShopH; i++)
-		register_clcmd(szCommandShopH[i], "ShopH");
+	for(new i; i < sizeof szCommandShopH; i++) register_clcmd(szCommandShopH[i], "ShopH");
 	
 	register_logevent("RoundStart", 2, "1=Round_Start");
 	register_logevent("RoundEnd", 2, "1=Round_End");
@@ -57,6 +54,7 @@ public plugin_init()
 	cvarCostHE[0] = register_cvar("cod_shop_he_costc", "5000");
 	cvarCostHE[1] = register_cvar("cod_shop_he_costh", "5");
 	
+	cvarExchangeRatio = register_cvar("cod_shop_exchange_ratio", "2500");
 	cvarDurability = register_cvar("cod_shop_durability", "30");
 	cvarSmallExpMin = register_cvar("cod_shop_smallexp_min", "25");
 	cvarSmallExpMax = register_cvar("cod_shop_smallexp_max", "75");
@@ -88,6 +86,7 @@ public plugin_cfg()
 	costHE[0] = get_pcvar_num(cvarCostHE[0]);
 	costHE[1] = get_pcvar_num(cvarCostHE[1]);
 	
+	iExchangeRatio = = get_pcvar_num(cvarExchangeRatio);
 	iDurability = get_pcvar_num(cvarDurability);
 	iSmallExpMin = get_pcvar_num(cvarSmallExpMin);
 	iSmallExpMax = get_pcvar_num(cvarSmallExpMax);
@@ -179,8 +178,11 @@ public ShowShop(id)
 	
 	new menu = menu_create("\wSklep \rCoD Mod", "ShowShop_Handler");
 	
-	new szTemp[64], szPrice[8];
-	
+	new szTemp[128], szPrice[8];
+
+	formatex(szTemp, charsmax(szTemp), "Kantor Walutowy\r[Wymiana Kasy na Honor] \yKoszt:\r %i%s/%i%s", iType[id] ? 1 : iExchangeRatio, buySymbol[iType[id]], iType[id] ? iExchangeRatio : 1, buySymbol[iType[id]]);
+	formatex(szPrice, charsmax(szPrice), -1);
+	menu_additem(menu, szTemp, szPrice);
 	formatex(szTemp, charsmax(szTemp), "Napraw Item \r[+%i Wytrzymalosci] \yKoszt:\r %i%s", iDurability, costRepair[iType[id]], buySymbol[iType[id]]);
 	formatex(szPrice, charsmax(szPrice), costRepair[iType[id]]);
 	menu_additem(menu, szTemp, szPrice);
@@ -196,15 +198,19 @@ public ShowShop(id)
 	formatex(szTemp, charsmax(szTemp), "Duzy Exp \r[Od %i do %i Expa] \yKoszt:\r %i%s", iBigExpMin, iBigExpMax, costBigExp[iType[id]], buySymbol[iType[id]]);
 	formatex(szPrice, charsmax(szPrice), costBigExp[iType[id]]);
 	menu_additem(menu, szTemp, szPrice);
-	formatex(szTemp, charsmax(szTemp), "VIP: Ciche Buty \r[%i rund] \yKoszt:\r %i%s", iSilentRounds, costSilent[iType[id]], buySymbol[iType[id]]);
-	formatex(szPrice, charsmax(szPrice), costSilent[iType[id]]);
-	menu_additem(menu, szTemp, szPrice);
-	formatex(szTemp, charsmax(szTemp), "VIP: +%i HP \r[%i rund] \yKoszt:\r %i%s", iHPAmount, iHPRounds, costHP[iType[id]], buySymbol[iType[id]]);
-	formatex(szPrice, charsmax(szPrice), costHP[iType[id]]);
-	menu_additem(menu, szTemp, szPrice);
-	formatex(szTemp, charsmax(szTemp), "VIP: Zestaw %i HE \r[%i rund] \yKoszt:\r %i%s", iHEAmount, iHERounds, costHE[iType[id]], buySymbol[iType[id]]);
-	formatex(szPrice, charsmax(szPrice), costHE[iType[id]]);
-	menu_additem(menu, szTemp, szPrice);
+
+	if(cod_get_user_vip(id))
+	{
+		formatex(szTemp, charsmax(szTemp), "VIP: Ciche Buty \r[%i rund] \yKoszt:\r %i%s", iSilentRounds, costSilent[iType[id]], buySymbol[iType[id]]);
+		formatex(szPrice, charsmax(szPrice), costSilent[iType[id]]);
+		menu_additem(menu, szTemp, szPrice);
+		formatex(szTemp, charsmax(szTemp), "VIP: +%i HP \r[%i rund] \yKoszt:\r %i%s", iHPAmount, iHPRounds, costHP[iType[id]], buySymbol[iType[id]]);
+		formatex(szPrice, charsmax(szPrice), costHP[iType[id]]);
+		menu_additem(menu, szTemp, szPrice);
+		formatex(szTemp, charsmax(szTemp), "VIP: Zestaw %i HE \r[%i rund] \yKoszt:\r %i%s", iHEAmount, iHERounds, costHE[iType[id]], buySymbol[iType[id]]);
+		formatex(szPrice, charsmax(szPrice), costHE[iType[id]]);
+		menu_additem(menu, szTemp, szPrice);
+	}
 	
 	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
 	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
@@ -215,8 +221,7 @@ public ShowShop(id)
 
 public ShowShop_Handler(id, menu, item)
 {
-	if(!is_user_connected(id))
-		return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
 		
 	client_cmd(id, "spk CoDMod/select2");
 	
@@ -226,9 +231,9 @@ public ShowShop_Handler(id, menu, item)
 		return PLUGIN_CONTINUE;
 	}
 	
-	if(item >= 5 && !cod_get_user_vip(id))
+	if(item >= 6 && !cod_get_user_vip(id))
 	{
-		cod_print_chat(id, DontChange, "Nie masz^x03 VIPa^x01!");
+		cod_print_chat(id, "Nie masz^x03 VIPa^x01!");
 		return PLUGIN_CONTINUE;
 	}
 	
@@ -236,13 +241,13 @@ public ShowShop_Handler(id, menu, item)
 	{
 		if(cod_get_user_item_value(id) <= 1)
 		{
-			cod_print_chat(id, DontChange, "Twoj item nie moze juz zostac ulepszony!");
+			cod_print_chat(id, "Twoj item nie moze juz zostac ulepszony!");
 			return PLUGIN_CONTINUE;
 		}
 		
 		if(!cod_get_user_item(id))
 		{
-			cod_print_chat(id, DontChange, "Nie masz zadnego itemu!");
+			cod_print_chat(id, "Nie masz zadnego itemu!");
 			return PLUGIN_CONTINUE;
 		}
 	}
@@ -258,7 +263,7 @@ public ShowShop_Handler(id, menu, item)
 		{
 			if(cs_get_user_money(id) < iPrice)
 			{
-				cod_print_chat(id, DontChange, "Nie masz wystarczajaco duzo kasy!");
+				cod_print_chat(id, "Nie masz wystarczajaco duzo kasy!");
 				return PLUGIN_CONTINUE;
 			}
 			
@@ -268,7 +273,7 @@ public ShowShop_Handler(id, menu, item)
 		{
 			if(cod_get_user_honor(id < iPrice))
 			{
-				cod_print_chat(id, DontChange, "Nie masz wystarczajaco duzo honoru!");
+				cod_print_chat(id, "Nie masz wystarczajaco duzo honoru!");
 				return PLUGIN_CONTINUE;
 			}
 			
@@ -280,66 +285,66 @@ public ShowShop_Handler(id, menu, item)
 	{
 		case 0:
 		{
-			cod_print_chat(id, DontChange, "Kupiles ^x03+%i^x01 wytrzymalosci itemu!", iDurability);
+			cod_print_chat(id, "Kupiles ^x03+%i^x01 wytrzymalosci itemu!", iDurability);
 			
 			if(cod_get_item_durability(id) + iDurability >= cod_max_item_durability())
 			{
 				cod_set_item_durability(id, cod_max_item_durability());
-				cod_print_chat(id, DontChange, "Twoj perk jest w pelni naprawiony!");
+				cod_print_chat(id, "Twoj perk jest w pelni naprawiony!");
 			}
 			else
 			{
 				cod_set_item_durability(id, cod_get_item_durability(id) + iDurability);
-				cod_print_chat(id, DontChange, "Wytrzymalosc twojego itemu wynosi ^x03%i^x01!", cod_get_item_durability(id));
+				cod_print_chat(id, "Wytrzymalosc twojego itemu wynosi ^x03%i^x01!", cod_get_item_durability(id));
 			}
 		}
 		case 1:
 		{
-			cod_print_chat(id, DontChange, "Kupiles^x03 losowy item^x01!");
+			cod_print_chat(id, "Kupiles^x03 losowy item^x01!");
 			
 			cod_set_user_item(id, -1, -1, 1);
 		}
 		case 2:
 		{
-			cod_print_chat(id, DontChange, "Kupiles^x03 ulepszenie itemu^x01!");
+			cod_print_chat(id, "Kupiles^x03 ulepszenie itemu^x01!");
 			
 			cod_upgrade_user_item(id);
 		}
 		case 3:
 		{
-			cod_print_chat(id, DontChange, "Kupiles^x03 Maly Exp^x01!");
+			cod_print_chat(id, "Kupiles^x03 Maly Exp^x01!");
 			
 			new iExp = random_num(iSmallExpMin, iSmallExpMax);
 
-			cod_print_chat(id, DontChange, "Dostales^x03 %i^x01 Expa!", iExp);
+			cod_print_chat(id, "Dostales^x03 %i^x01 Expa!", iExp);
 			
 			cod_set_user_exp(id, cod_get_user_exp(id) + iExp);
 		}
 		case 4:
 		{
-			cod_print_chat(id, DontChange, "Kupiles^x03 Duzy Exp^x01!");
+			cod_print_chat(id, "Kupiles^x03 Duzy Exp^x01!");
 			
 			new iExp = random_num(iBigExpMin, iBigExpMax);
 
-			cod_print_chat(id, DontChange, "Dostales^x03 %i^x01 Expa!", iExp);
+			cod_print_chat(id, "Dostales^x03 %i^x01 Expa!", iExp);
 			
 			cod_set_user_exp(id, cod_get_user_exp(id) + iExp);
 		}
 		case 5:
 		{
-			cod_print_chat(id, DontChange, "Kupiles^x03 Ciche Buty^x01 na^x03 %i^x01 rund^x01!", iSilentRounds);
+			cod_print_chat(id, "Kupiles^x03 Ciche Buty^x01 na^x03 %i^x01 rund^x01!", iSilentRounds);
 			
 			iSilent[id] += iSilentRounds;
 		}
 		case 6:
 		{
-			cod_print_chat(id, DontChange, "Kupiles^x03 +%i HP^x01 na^x03 %i^x01 rund^x01!", iHPAmount, iHPRounds);
+			cod_print_chat(id, "Kupiles^x03 +%i HP^x01 na^x03 %i^x01 rund^x01!", iHPAmount, iHPRounds);
 			
 			iHP[id] += iHPRounds;
 		}
 		case 7:
 		{
-			cod_print_chat(id, DontChange, "Kupiles^x03 Zestaw %i HE^x01 na^x03 %i^x01 rund^x01!", iHEAmount, iHERounds);
+			cod_print_chat(id, "Kupiles^x03 Zestaw %i HE^x01 na^x03 %i^x01 rund^x01!", iHEAmount, iHERounds);
 			
 			iHE[id] += iHERounds;
 		}
@@ -360,11 +365,11 @@ public RoundStart()
 		{
 			if(iSilent[id] == 1)
 			{
-				cod_print_chat(id, DontChange, "To^x03 ostatnia^x01 runda, w ktorej masz^x03 Ciche Buty^x01.");
+				cod_print_chat(id, "To^x03 ostatnia^x01 runda, w ktorej masz^x03 Ciche Buty^x01.");
 				bSilent[id] = true;
 			}
 			else
-				cod_print_chat(id, DontChange, "Jeszcze przez^x03 %i^x01 rundy masz^x03 Ciche Buty^x01.", iSilent[id]);
+				cod_print_chat(id, "Jeszcze przez^x03 %i^x01 rundy masz^x03 Ciche Buty^x01.", iSilent[id]);
 				
 			iSilent[id]--;
 			
@@ -374,9 +379,9 @@ public RoundStart()
 		if(iHP[id])
 		{
 			if(iHP[id] == 1)
-				cod_print_chat(id, DontChange, "To^x03 ostatnia^x01 runda, w ktorej masz^x03 +%i HP^x01.", iHPAmount);
+				cod_print_chat(id, "To^x03 ostatnia^x01 runda, w ktorej masz^x03 +%i HP^x01.", iHPAmount);
 			else
-				cod_print_chat(id, DontChange, "Jeszcze przez^x03 %i^x01 rundy masz^x03 +%i HP^x01.", iHP[id], iHPAmount);
+				cod_print_chat(id, "Jeszcze przez^x03 %i^x01 rundy masz^x03 +%i HP^x01.", iHP[id], iHPAmount);
 
 			iHP[id]--;
 			
@@ -386,9 +391,9 @@ public RoundStart()
 		if(iHE[id])
 		{
 			if(iHE[id] == 1)
-				cod_print_chat(id, DontChange, "To^x03 ostatnia^x01 runda, w ktorej masz^x03 %i HE^x01.", iHEAmount);
+				cod_print_chat(id, "To^x03 ostatnia^x01 runda, w ktorej masz^x03 %i HE^x01.", iHEAmount);
 			else
-				cod_print_chat(id, DontChange, "Jeszcze przez^x03 %i^x01 rundy masz^x03 %i HE^x01.", iHE[id], iHEAmount);
+				cod_print_chat(id, "Jeszcze przez^x03 %i^x01 rundy masz^x03 %i HE^x01.", iHE[id], iHEAmount);
 				
 			iHE[id]--;
 				

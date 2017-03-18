@@ -11,12 +11,12 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-#define is_user_player(%1) (1 <= %1 <= iMaxPlayers)
+#define is_user_player(%1) (1 <= %1 <= maxPlayers)
 
-new Array:gArray, iVip, iMaxPlayers;
+new Array:listVIPs, maxPlayers, vip;
 
-new const szCommandVip[][] = { "say /vip", "say_team /vip", "say /vip", "say_team /vip", "vip" };
-new const szCommandVips[][] = { "say /vips", "say_team /vips", "say /vipy", "say_team /vipy", "vipy" };
+new const commandVIP[][] = { "say /vip", "say_team /vip", "say /vip", "say_team /vip", "vip" };
+new const commandVIPs[][] = { "say /vips", "say_team /vips", "say /vipy", "say_team /vipy", "vipy" };
 
 new const szM4A1Model[][] = { "models/CoDMod/p_goldm4a1.mdl", "models/CoDMod/v_goldm4a1.mdl" };
 new const szAK47Model[][] = { "models/CoDMod/p_goldak47.mdl", "models/CoDMod/v_goldak47.mdl" };
@@ -28,16 +28,14 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	for(new i; i < sizeof szCommandVip; i++)
-		register_clcmd(szCommandVip[i], "ShowMotd");
+	for(new i; i < sizeof commandVIP; i++) register_clcmd(commandVIP[i], "show_motd");
 	
-	for(new i; i < sizeof szCommandVips; i++)
-		register_clcmd(szCommandVips[i], "ShowVips");
+	for(new i; i < sizeof commandVIPs; i++) register_clcmd(commandVIPs[i], "show_vips");
 	
-	register_event("DeathMsg", "DeathMsg", "a");
+	register_event("player_death", "DeathMsg", "a");
 
-	register_message(get_user_msgid("SayText"), "HandleSayText");
-	register_message(get_user_msgid("ScoreAttrib"), "VipStatus");
+	register_message(get_user_msgid("SayText"), "say_text");
+	register_message(get_user_msgid("ScoreAttrib"), "vip_status");
 	
 	RegisterHam(Ham_Spawn, "player", "SpawnedEventPre", 1);
 	RegisterHam(Ham_TakeDamage, "player", "TakeDamage", 0);
@@ -45,9 +43,9 @@ public plugin_init()
 	RegisterHam(Ham_Item_Deploy, "weapon_ak47", "AK47Model", 1);
 	RegisterHam(Ham_Item_Deploy, "weapon_awp", "AWPModel", 1);
 	
-	gArray = ArrayCreate(64, 32);
+	listVIPs = ArrayCreate(64, 32);
 	
-	iMaxPlayers = get_maxplayers();
+	maxPlayers = get_maxplayers();
 }
 
 public plugin_natives()
@@ -58,57 +56,54 @@ public plugin_natives()
 
 public plugin_precache()
 {
-	for(new i = 0; i < sizeof szM4A1Model; i++)
-		precache_model(szM4A1Model[i]);
+	for(new i = 0; i < sizeof szM4A1Model; i++) precache_model(szM4A1Model[i]);
 		
-	for(new i = 0; i < sizeof szM4A1Model; i++)
-		precache_model(szAK47Model[i]);
+	for(new i = 0; i < sizeof szM4A1Model; i++) precache_model(szAK47Model[i]);
 		
-	for(new i = 0; i < sizeof szAWPModel; i++)
-		precache_model(szAWPModel[i]);
+	for(new i = 0; i < sizeof szAWPModel; i++) precache_model(szAWPModel[i]);
 }
 
 public plugin_end()
-	ArrayDestroy(gArray);
+	ArrayDestroy(listVIPs);
 
 public client_authorized(id)
 {
 	if(get_user_flags(id) & ADMIN_LEVEL_H)
 	{
-		Set(id, iVip);
+		Set(id, vip);
 		
-		new szName[32], szTempName[32], iSize = ArraySize(gArray);
+		new szName[32], szTempName[32], iSize = ArraySize(listVIPs);
 		get_user_name(id, szName, charsmax(szName));
 	
 		for(new i = 0; i < iSize; i++)
 		{
-			ArrayGetString(gArray, i, szTempName, charsmax(szTempName));
+			ArrayGetString(listVIPs, i, szTempName, charsmax(szTempName));
 		
 			if(equal(szName, szTempName))
 				return 0;
 		}
 		
-		ArrayPushString(gArray, szName);
+		ArrayPushString(listVIPs, szName);
 	}
 	return PLUGIN_CONTINUE;
 }
 
 public client_disconnect(id)
 {
-	if(Get(id, iVip))
+	if(Get(id, vip))
 	{
-		Rem(id, iVip);
+		Rem(id, vip);
 		
-		new szName[32], szTempName[32], iSize = ArraySize(gArray);
+		new szName[32], szTempName[32], iSize = ArraySize(listVIPs);
 		get_user_name(id, szName,charsmax(szName));
 	
 		for(new i = 0; i < iSize; i++)
 		{
-			ArrayGetString(gArray, i, szTempName, charsmax(szTempName));
+			ArrayGetString(listVIPs, i, szTempName, charsmax(szTempName));
 		
 			if(equal(szTempName, szName))
 			{
-				ArrayDeleteItem(gArray, i);
+				ArrayDeleteItem(listVIPs, i);
 				break;
 			}
 		}
@@ -118,7 +113,7 @@ public client_disconnect(id)
 
 public client_infochanged(id)
 {
-	if(Get(id, iVip))
+	if(Get(id, vip))
 	{
 		new szName[64], szNewName[64];
 		get_user_info(id, "name", szName, charsmax(szName));
@@ -127,17 +122,17 @@ public client_infochanged(id)
 		
 		if(!equal(szName, szNewName))
 		{
-			ArrayPushString(gArray, szName);
+			ArrayPushString(listVIPs, szName);
 			
-			new szTempName[64], iSize = ArraySize(gArray);
+			new szTempName[64], iSize = ArraySize(listVIPs);
 
 			for(new i = 0; i < iSize; i++)
 			{
-				ArrayGetString(gArray, i, szTempName, charsmax(szTempName));
+				ArrayGetString(listVIPs, i, szTempName, charsmax(szTempName));
 				
 				if(equal(szTempName, szNewName))
 				{
-					ArrayDeleteItem(gArray,i);
+					ArrayDeleteItem(listVIPs,i);
 					break;
 				}
 			}
@@ -146,16 +141,16 @@ public client_infochanged(id)
 	return PLUGIN_CONTINUE;
 }
 
-public ShowMotd(id)
+public show_motd(id)
 	show_motd(id, "vip.txt", "Informacje o VIPie");
 	
-public ShowVips(id)
+public show_vips(id)
 {
-	new szName[64], szMessage[192], iSize = ArraySize(gArray);
+	new szName[64], szMessage[192], iSize = ArraySize(listVIPs);
 	
 	for(new i = 0; i < iSize; i++)
 	{
-		ArrayGetString(gArray, i, szName, charsmax(szName));
+		ArrayGetString(listVIPs, i, szName, charsmax(szName));
 		
 		add(szMessage, charsmax(szMessage), szName);
 		
@@ -165,14 +160,14 @@ public ShowVips(id)
 			add(szMessage, charsmax(szMessage), ", ");
 	}
 	
-	cod_print_chat(id, DontChange, "^x03VIPy^x01 na serwerze:^x04 %s", szMessage);
+	cod_print_chat(id, "^x03VIPy^x01 na serwerze:^x04 %s", szMessage);
 	
 	return PLUGIN_CONTINUE;
 }
 
 public SpawnedEventPre(id)
 {
-	if(Get(id, iVip) && is_user_alive(id))
+	if(Get(id, vip) && is_user_alive(id))
 		SpawnedEventPreVip(id);
 }
 
@@ -188,7 +183,7 @@ public SpawnedEventPreVip(id)
 
 public TakeDamage(iVictim, iInflictor, iAttacker, Float:fDamage, iDamagebits)
 {
-	if(!is_user_connected(iVictim) || !is_user_connected(iVictim) || get_user_team(iVictim) == get_user_team(iAttacker) || !Get(iAttacker, iVip))
+	if(!is_user_connected(iVictim) || !is_user_connected(iVictim) || get_user_team(iVictim) == get_user_team(iAttacker) || !Get(iAttacker, vip))
 		return HAM_IGNORED;
 		
 	SetHamParamFloat(4, fDamage * 1.1);
@@ -231,13 +226,13 @@ public AWPModel(weapon)
 	}
 }
 
-public DeathMsg()
+public player_death()
 {
 	new iKiller = read_data(1);
 	new iVictim = read_data(2);
 	new iHS = read_data(3);
 	
-	if(!is_user_alive(iKiller) || get_user_team(iKiller) == get_user_team(iVictim) || !Get(iKiller, iVip))
+	if(!is_user_alive(iKiller) || get_user_team(iKiller) == get_user_team(iVictim) || !Get(iKiller, vip))
 		return PLUGIN_CONTINUE;
 
 	set_user_health(iKiller, min(get_user_health(iKiller) + (iHS ? 15 : 10), cod_get_user_health(iKiller, 1, 1, 1)));
@@ -257,55 +252,47 @@ public DeathMsg()
 }
 
 public bomb_planted(id)
-{
-	if(is_user_alive(id) && Get(id, iVip))
-		cs_set_user_money(id, cs_get_user_money(id) + 500);
-}
+	if(is_user_alive(id) && Get(id, vip)) cs_set_user_money(id, cs_get_user_money(id) + 500);
 
 public bomb_defused(id)
-{
-	if(is_user_alive(id) && Get(id, iVip))
-		cs_set_user_money(id, cs_get_user_money(id) + 500);
-}
+	if(is_user_alive(id) && Get(id, vip)) cs_set_user_money(id, cs_get_user_money(id) + 500);
 
-public VipStatus()
+public vip_status()
 {
 	new id = get_msg_arg_int(1);
 	
-	if(is_user_alive(id) && Get(id, iVip))
-		set_msg_arg_int(2, ARG_BYTE, get_msg_arg_int(2) | 4);
+	if(is_user_alive(id) && Get(id, vip)) set_msg_arg_int(2, ARG_BYTE, get_msg_arg_int(2) | 4);
 }
 
-public HandleSayText(msgId, msgDest, msgEnt)
+public say_text(msgId, msgDest, msgEnt)
 {
 	new id = get_msg_arg_int(1);
 	
 	if(is_user_connected(id) && Get(id, iVip))
 	{
-		new szMessage[191], szTemp[191], szPrefix[64], szSteamID[33];
+		new szTempMessage[190], szMessage[190], szPrefix[64], szSteamID[33];
 		
-		get_msg_arg_string(2, szMessage, charsmax(szMessage));
+		get_msg_arg_string(2, szTempMessage, charsmax(szTempMessage));
 		get_user_authid(id, szSteamID, charsmax(szSteamID)); 
-	
-		if(equali(szSteamID, "STEAM_0:0:167047226"))
-			formatex(szPrefix, charsmax(szPrefix), "^x04[WLASCICIEL]");
-		else
-			formatex(szPrefix, charsmax(szPrefix), "^x04[VIP]");
+
+		if(equali(szSteamID, "STEAM_0:1:55664") || equali(szSteamID, "STEAM_0:1:6389510")) formatex(szPrefix, charsmax(szPrefix), "^x04[WLASCICIEL]");
+		else formatex(szPrefix, charsmax(szPrefix), "^x04[VIP]");
 		
-		if(!equal(szMessage, "#Cstrike_Chat_All"))
+		if(!equal(szTempMessage, "#Cstrike_Chat_All"))
 		{
-			add(szTemp, charsmax(szTemp), szPrefix);
-			add(szTemp, charsmax(szTemp), " ");
-			add(szTemp, charsmax(szTemp), szMessage);
+			add(szMessage, charsmax(szMessage), szPrefix);
+			add(szMessage, charsmax(szMessage), " ");
+			add(szMessage, charsmax(szMessage), szTempMessage);
 		}
 		else
 		{
-			add(szTemp, charsmax(szTemp), szPrefix);
-			add(szTemp, charsmax(szTemp), "^x03 %s1^x01 :  %s2");
+			add(szMessage, charsmax(szMessage), szPrefix);
+			add(szMessage, charsmax(szMessage), "^x03 %s1^x01 :  %s2");
 		}
 		
-		set_msg_arg_string(2, szTemp);
+		set_msg_arg_string(2, szMessage);
 	}
+	
 	return PLUGIN_CONTINUE;
 }
 
@@ -313,7 +300,7 @@ public amxbans_admin_connect(id)
 	client_authorized(id);
 	
 public _cod_get_user_vip(id)
-	return Get(id, iVip);
+	return Get(id, vip);
 
 public _cod_set_user_vip(id)
 	client_authorized(id);
