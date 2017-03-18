@@ -22,6 +22,10 @@
 #define	RENDER_DUCK (1<<4)
 #define	RENDER_SHIFT (1<<5)
 
+#define RENDER_CLASS 0
+#define RENDER_ITEM 1
+#define RENDER_ADDITIONAL 2
+
 native cod_get_user_exp(id);
 /*------------------------------
 Zwraca doswiadczenie gracza.
@@ -185,12 +189,12 @@ native cod_set_user_bonus_strength(id, value);
 Ustawia dodatkowe punkty statystyki sila
 ------------------------------*/
 
-native cod_get_user_strength(id, gained_condition = 1, bonus_condition = 1);
+native cod_get_user_condition(id, gained_condition = 1, bonus_condition = 1);
 /*------------------------------
 Zwraca punkty statystyki kondycja
 ------------------------------*/
 
-native cod_set_user_bonus_strength(id, value);
+native cod_set_user_bonus_condition(id, value);
 /*------------------------------
 Ustawia dodatkowe punkty statystyki kondycja
 ------------------------------*/
