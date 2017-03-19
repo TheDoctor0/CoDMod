@@ -15,70 +15,72 @@ public plugin_init()
 	cvarSecondReward = register_cvar("cod_second_reward", "200");
 	cvarThirdReward = register_cvar("cod_third_reward", "100");
 	
-	register_message(SVC_INTERMISSION, "MsgIntermission");
+	register_message(SVC_INTERMISSION, "message_intermission");
 }
 	
-public MsgIntermission() 
+public message_intermission() 
 {
-	new szName[32], szPlayers[32], iBestID[3], iBestFrags[3], id, iNum, iTempFrags, iSwapFrags, iSwapID, iExp;
-	get_players(szPlayers, iNum, "h");
+	enum _:eWiners { THIRD, SECOND, FIRST };
+
+	new playerName[32], playersList[32], winnersId[3], winnersFrags[3], tempFrags, swapFrags, swapId, id, players, exp;
+
+	get_players(playersList, players, "h");
 	
-	if(iNum < 1)
-		return PLUGIN_CONTINUE;
-		
-	for (new i = 0; i < iNum; i++)
+	if(!players) return;
+
+	for(new i = 0; i < players; i++)
 	{
-		id = szPlayers[i];
+		id = playersList[i];
 		
-		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id))
-			continue;
+		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
 		
-		iTempFrags = get_user_frags(id);
+		tempFrags = get_user_frags(id);
 		
-		if(iTempFrags > iBestFrags[0])
+		if(tempFrags > winnersFrags[THIRD])
 		{
-			iBestFrags[0] = iTempFrags;
-			iBestID[0] = id;
-			if(iTempFrags > iBestFrags[1])
+			winnersFrags[THIRD] = tempFrags;
+			winnersId[THIRD] = id;
+			
+			if(tempFrags > winnersFrags[SECOND])
 			{
-				iSwapFrags = iBestFrags[1];
-				iSwapID = iBestID[1];
-				iBestFrags[1] = iTempFrags;
-				iBestID[1] = id;
-				iBestFrags[0] = iSwapFrags;
-				iBestID[0] = iSwapID;
+				swapFrags = winnersFrags[SECOND];
+				swapId = winnersId[SECOND];
+				winnersFrags[SECOND] = tempFrags;
+				winnersId[SECOND] = id;
+				winnersFrags[THIRD] = swapFrags;
+				winnersId[THIRD] = swapId;
 				
-				if(iTempFrags > iBestFrags[2])
+				if(tempFrags > winnersFrags[FIRST])
 				{
-					iSwapFrags = iBestFrags[2];
-					iSwapID = iBestID[2];
-					iBestFrags[2] = iTempFrags;
-					iBestID[2] = id;
-					iBestFrags[1] = iSwapFrags;
-					iBestID[1] = iSwapID;
+					swapFrags = winnersFrags[FIRST];
+					swapId = winnersId[FIRST];
+					winnersFrags[FIRST] = tempFrags;
+					winnersId[FIRST] = id;
+					winnersFrags[SECOND] = swapFrags;
+					winnersId[SECOND] = swapId;
 				}
 			}
 		}
 	}
 	
-	if(!iBestID[2])
-		return PLUGIN_CONTINUE;
+	if(!winnersId[FIRST]) return;
 	
-	cod_print_chat(0, DontChange, "Gratulacje dla^x04 najlepszych graczy^x01!");
+	cod_print_chat(0, "Gratulacje dla^x03 Najlepszych Graczy^x01!");
 	
 	for(new i = 2; i >= 0; i--)
 	{
 		switch(i)
 		{
-			case 0: iExp = get_pcvar_num(cvarThirdReward);
-			case 1: iExp = get_pcvar_num(cvarSecondReward);
-			case 2: iExp = get_pcvar_num(cvarFirstReward);
+			case THIRD: exp = get_pcvar_num(cvarThirdReward);
+			case SECOND: exp = get_pcvar_num(cvarSecondReward);
+			case FIRST: exp = get_pcvar_num(cvarFirstReward);
 		}
 		
-		cod_set_user_exp(iBestID[i], cod_get_user_exp(iBestID[i]) + iExp);
+		cod_set_user_exp(winnersId[i], cod_get_user_exp(winnersId[i]) + exp);
 		
-		get_user_name(iBestID[i], szName, 31);
-		cod_print_chat(0, DontChange, "^x04 %s^x01 - +%i Doswiadczenia -^x04 %i^x01 Zabojstw.", szName, iExp, iBestFrags[i]);
+		get_user_name(winnersId[i], playerName, charsmax(playerName));
+
+		cod_print_chat(0, "^x03 %s^x01 - +%i Doswiadczenia -^x03 %i^x01 Zabojstw.", playerName, exp, winnersFrags[i]);
 	}
 	
 	return PLUGIN_CONTINUE;
