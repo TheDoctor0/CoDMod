@@ -1,5 +1,4 @@
 #include <amxmodx>
-#include <cod>
 #include <cstrike>
 #include <fakemeta>
 #include <engine>
@@ -8,6 +7,7 @@
 #include <xs>
 #include <csx>
 #include <sqlx>
+#include <cod>
 
 #define PLUGIN "CoD Mod"
 #define VERSION "1.0"

@@ -20,8 +20,8 @@ public plugin_init()
 	
 public message_intermission() 
 {
-	enum _:eWiners { THIRD, SECOND, FIRST };
-
+	enum _:winers { THIRD, SECOND, FIRST };
+	
 	new playerName[32], playersList[32], winnersId[3], winnersFrags[3], tempFrags, swapFrags, swapId, id, players, exp;
 
 	get_players(playersList, players, "h");

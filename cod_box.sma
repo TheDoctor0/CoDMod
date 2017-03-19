@@ -1,10 +1,10 @@
 #include <amxmodx>
-#include <cod>
 #include <fun>
 #include <engine>
 #include <cstrike>
 #include <fakemeta>
 #include <fakemeta_util>
+#include <cod>
 
 #define PLUGIN "CoD Box"
 #define VERSION "1.0"
@@ -176,11 +176,13 @@ public get_box(id)
 			if(get_user_health(id) < health)
 			{
 				user_kill(id);
+				
 				cod_print_chat(id, "Yyy... Zaliczyles^x04 zgon^x01!");
 			}
 			else
 			{
 				set_user_health(id, get_user_health(id) - health);
+
 				cod_print_chat(id, "Yyy... Ubylo ci^x04 %i HP^x01!", health);
 			}
 		}
@@ -189,6 +191,7 @@ public get_box(id)
 			new exp = random_num(25, 100);
 			
 			cod_set_user_exp(id, cod_get_user_exp(id) + exp);
+
 			cod_print_chat(id, "Ladnie... Dostales^x04 %i Expa^x01!", exp);
 		}
 		case 9:
@@ -196,6 +199,7 @@ public get_box(id)
 			new honor = random_num(10, 50);
 			
 			cod_set_user_honor(id, cod_get_user_honor(id) + honor);
+
 			cod_print_chat(id, "Ladnie... Dostales^x04 %i Honoru^x01!", honor);
 		}
 		case 10:
@@ -203,6 +207,7 @@ public get_box(id)
 			new honor = random_num(5, 20);
 			
 			cod_set_user_honor(id, cod_get_user_honor(id) - honor);
+
 			cod_print_chat(id, "Niestety... Straciles^x04 %i Honoru^x01!", honor);
 		}
 		case 11:
@@ -218,5 +223,6 @@ public get_box(id)
 			cod_print_chat(id, "Nice... Dostales^x04 Mine^x01!");
 		}
 	}
+
 	return PLUGIN_CONTINUE;
 }

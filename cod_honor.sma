@@ -1,7 +1,7 @@
 #include <amxmodx>
-#include <cod>
 #include <sqlx>
 #include <fakemeta>
+#include <cod>
 
 #define PLUGIN	"CoD Honor System"
 #define AUTHOR	"O'Zone"
