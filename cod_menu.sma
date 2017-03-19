@@ -5,14 +5,13 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone" 
 
-new const szCommandMenu[][] = { "say /help", "say_team /help", "say /pomoc", "say_team /pomoc", "say /menu", "say_team /menu", "menu" };
+new const commandMenu[][] = { "say /help", "say_team /help", "say /pomoc", "say_team /pomoc", "say /menu", "say_team /menu", "menu" };
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	for(new i; i < sizeof szCommandMenu; i++)
-		register_clcmd(szCommandMenu[i], "ShowMenu");
+	for(new i; i < sizeof commandMenu; i++) register_clcmd(commandMenu[i], "display_menu");
 }
 
 public client_putinserver(id)
@@ -21,11 +20,11 @@ public client_putinserver(id)
 	cmd_execute(id, "bind v menu");
 }
 
-public ShowMenu(id)
+public display_menu(id)
 {
 	client_cmd(id, "spk CodMod/select");
 	
-	new menu = menu_create("\wMenu \rCoD Mod", "ShowMenu_Handle");
+	new menu = menu_create("\wMenu \rCoD Mod", "display_menu_handle");
  
 	menu_additem(menu, "\wSklep \rSMS \y(/sklepsms)", "1");
 	menu_additem(menu, "\wWybierz \rKlase \y(/klasa)", "2");
@@ -51,27 +50,29 @@ public ShowMenu(id)
 	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
 	
 	menu_display(id, menu, 0);
+
+	return PLUGIN_HANDLED;
 }  
  
-public ShowMenu_Handle(id, menu, item)
+public display_menu_handle(id, menu, item)
 {
-	if(!is_user_connected(id))
-		return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
 
 	client_cmd(id, "spk CodMod/select");
 	
 	if(item == MENU_EXIT)
 	{
 		menu_destroy(menu);
+
 		return PLUGIN_CONTINUE;
 	}
 	
-	new szData[4], iAccess, iCallback;
-	menu_item_getinfo(menu, item, iAccess, szData, charsmax(szData), _, _, iCallback);
+	new itemData[4], itemAccess, itemCallback;
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
     
-	new iKey = str_to_num(szData);
+	new item = str_to_num(itemData);
     
-	switch(iKey)
+	switch(item)
 	{ 
 		case 1: client_cmd(id, "say /sklepsms"); 
 		case 2: client_cmd(id, "klasa"); 
@@ -93,23 +94,6 @@ public ShowMenu_Handle(id, menu, item)
 	}
 	
 	menu_destroy(menu);
+
 	return PLUGIN_CONTINUE;
-} 
-
-stock cmd_execute(id, const szText[], any:...) 
-{
-    #pragma unused szText
-
-    if(id == 0 || is_user_connected(id))
-	{
-    	new szMessage[256];
-
-    	format_args( szMessage ,charsmax(szMessage), 1);
-
-        message_begin(id == 0 ? MSG_ALL : MSG_ONE, 51, _, id);
-        write_byte(strlen(szMessage) + 2);
-        write_byte(10);
-        write_string(szMessage);
-        message_end();
-    }
 }

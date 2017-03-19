@@ -2019,7 +2019,7 @@ public reset_player(id)
 	
 	remove_tasks(id);
 
-	for(new i = PLAYER_CLASS; i <= PLAYER_HUD_POSY; i++) codPlayer[id][i] = 0;
+	for(new i = PLAYER_CLASS; i <= PLAYER_TIME_KS; i++) codPlayer[id][i] = 0;
 
 	codPlayer[id][PLAYER_MAX_HP] = _:0.0;
 	codPlayer[id][PLAYER_SPEED] = _:0.0;
@@ -2028,6 +2028,13 @@ public reset_player(id)
 	codPlayer[id][PLAYER_LAST_DYNAMITE] = _:0.0;
 	codPlayer[id][PLAYER_LAST_MEDKIT] = _:0.0;
 	codPlayer[id][PLAYER_LAST_TELEPORT] = _:0.0;
+
+	codPlayer[id][PLAYER_HUD] = TYPE_HUD;
+	codPlayer[id][PLAYER_HUD_RED] = 0;
+	codPlayer[id][PLAYER_HUD_GREEN] = 255;
+	codPlayer[id][PLAYER_HUD_BLUE] = 0;
+	codPlayer[id][PLAYER_HUD_POSX] = 66;
+	codPlayer[id][PLAYER_HUD_POSY] = 6;
 	
 	set_new_class(id);
 	set_item(id);

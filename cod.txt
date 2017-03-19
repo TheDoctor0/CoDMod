@@ -101,7 +101,7 @@ Do zrobienia:
 
 Do zrefaktoryzowania:
 - Sklep (+ zmiany)
-- Menu
+- Menu (done)
 - Honor
 - Staty
 - Przelew

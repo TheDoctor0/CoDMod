@@ -343,7 +343,7 @@ Forward wysylany do pluginu z ktorego zarejestrowana jest kasa w momencie uzycia
 
 stock cmd_execute(id, const text[], any:...) 
 {
-	#pragma unused szText
+	#pragma unused text
 
 	new message[256];
 
