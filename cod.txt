@@ -102,10 +102,10 @@ Do zrobienia:
 Do zrefaktoryzowania:
 - Sklep (+ zmiany)
 - Menu (done)
-- Honor
+- Honor (done)
 - Staty
 - Przelew
-- Wymiana
+- Wymiana (done)
 - System rejestracji
 - Rynek
 - VIP

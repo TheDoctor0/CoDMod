@@ -7,15 +7,13 @@
 
 #define Minute(%1) ((%1)*60.0)
 
-new bool:bActive;
-
 new cvarFrom, cvarTo, cvarKill, cvarKillHS, cvarDamage, cvarWin, cvarPlant, cvarDefuse, cvarHostage;
 
-new iFrom, iTo, iKill, iKillHS, iDamage, iWin, iPlant, iDefuse, iHostage;
+new bool:expActive, expFrom, expTo, expKill, expKillHS, expDamage, expWin, expPlant, expDefuse, expHostage;
 
 public plugin_init() 
 {
-	register_plugin(PLUGIN, VERSION, AUTHOR)
+	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
 	cvarFrom = register_cvar("cod_night_exp_from", "22");
 	cvarTo = register_cvar("cod_night_exp_to", "8");
@@ -27,60 +25,50 @@ public plugin_init()
 	cvarDefuse = register_cvar("cod_night_exp_defuse", "50");
 	cvarHostage = register_cvar("cod_night_exp_hostage", "50");
 	
-	set_task(1.0, "CheckTime");
+	set_task(1.0, "check_time");
 	
-	set_task(300.0, "ShowInfo", _, _, _, "b");
+	set_task(300.0, "show_info", _, _, _, "b");
 }
 
 public plugin_cfg()
 {
-	iFrom = get_pcvar_num(cvarFrom);
-	iTo = get_pcvar_num(cvarTo);
-	iKill = get_pcvar_num(cvarKill);
-	iKillHS = get_pcvar_num(cvarKillHS);
-	iDamage = get_pcvar_num(cvarDamage);
-	iWin = get_pcvar_num(cvarWin);
-	iPlant = get_pcvar_num(cvarPlant);
-	iDefuse = get_pcvar_num(cvarDefuse);
-	iHostage = get_pcvar_num(cvarHostage);
+	expFrom = get_pcvar_num(cvarFrom);
+	expTo = get_pcvar_num(cvarTo);
+	expKill = get_pcvar_num(cvarKill);
+	expKillHS = get_pcvar_num(cvarKillHS);
+	expDamage = get_pcvar_num(cvarDamage);
+	expWin = get_pcvar_num(cvarWin);
+	expPlant = get_pcvar_num(cvarPlant);
+	expDefuse = get_pcvar_num(cvarDefuse);
+	expHostage = get_pcvar_num(cvarHostage);
 }
 
-public CheckTime()	
+public check_time()	
 {
-	new szTime[3], iTime;
+	new time[3];
 
-	get_time("%H", szTime, charsmax(szTime));
+	get_time("%H", time, charsmax(time));
 	
-	iTime = str_to_num(szTime);
+	new hour = str_to_num(time);
 	
-	if(iFrom > iTo)
-	{
-		if(iTime >= iFrom || iTime < iTo)
-			bActive = true;	
-	}
-	else
-	{
-		if(iTime >= iFrom && iTime < iTo)
-			bActive = true;	
-	}
+	if((expFrom > expTo && (hour >= expFrom || hour < expTo)) || (hour >= expFrom && hour < expTo)) expActive = true;	
 	
-	if(bActive)	
+	if(expActive)	
 	{
-		server_cmd("cod_exp_kill %i;cod_exp_killhs %i;cod_exp_damage %i;cod_exp_win %i;cod_exp_plant %i;cod_exp_defuse %i;cod_exp_hostage %i", iKill, iKillHS, iDamage, iWin, iPlant, iDefuse, iHostage);
+		server_cmd("cod_exp_kill %i;cod_exp_killhs %i;cod_exp_damage %i;cod_exp_win %i;cod_exp_plant %i;cod_exp_defuse %i;cod_exp_hostage %i", expKill, expKillHS, expDamage, expWin, expPlant, expDefuse, expHostage);
+		
 		return;
 	}
 	
-	get_time("%M", szTime, 2);
+	get_time("%M", time, charsmax(time));
 	
-	iTime = str_to_num(szTime);
+	new minute = str_to_num(time);
 	
-	set_task(Minute(60 - iTime), "CheckTime");
+	set_task(Minute(60 - minute), "check_time");
 }
 
-public ShowInfo()
+public show_info()
 {
-	if(bActive)
-		cod_print_chat(0, DontChange, "Na serwerze wlaczony jest nocny^x03 EXP x 2^x01!");
-	else
-		cod_print_chat(0, DontChange, "Od godziny %i do %i na serwerze jest^x03 EXP x 2^x01!", iFrom, iTo);
+	if(expActive) cod_print_chat(0, "Na serwerze wlaczony jest nocny^x03 EXP x 2^x01!");
+	else cod_print_chat(0, "Od godziny^x03 %i^x01 do^x03 %i^x01 na serwerze jest^x03 EXP x 2^x01!", expFrom, expTo);
 }
