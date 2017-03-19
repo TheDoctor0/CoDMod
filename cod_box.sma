@@ -12,7 +12,7 @@
 
 new const boxClass[] = "cod_box";
 
-new const boxModel[] = "models/CoDMod/box_model.mdl";
+new const boxModel[] = "models/CoDMod/box.mdl";
 
 new const boxSound[] =  "CoDMod/get_box.wav";
 

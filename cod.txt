@@ -89,22 +89,24 @@ Kasyno:
 - Poker
 
 Do zrobienia:
-- Noze
+- Zmiany w sklepie
+- Podania i wojny w klanach
 - Limit predkosci
 - Aktualizacja .inc
 - Widzialnosc min dla adminow
 - Kasyno
 - Ikony bomby
-- Klany (podania i wojny)
 - Awanse klas
 - Statystyki WWW
 
 Do zrefaktoryzowania:
-- Sklep (+ zmiany)
+- Noze
+- Sklep
+- Klany
 - Menu (done)
 - Honor (done)
 - Staty
-- Przelew
+- Przelew (done)
 - Wymiana (done)
 - System rejestracji
 - Rynek
