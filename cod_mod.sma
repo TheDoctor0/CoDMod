@@ -6,6 +6,7 @@
 #include <hamsandwich>
 #include <fun>
 #include <xs>
+#include <csx>
 #include <sqlx>
 
 #define PLUGIN "CoD Mod"
@@ -130,7 +131,7 @@ public plugin_init()
 	cvarLevelLimit = register_cvar("cod_maxlevel", "500");
 	cvarLevelRatio = register_cvar("cod_levelratio", "35");
 	cvarKillStreakTime = register_cvar("cod_killstreaktime", "15");
-	cvarMinPlayers = register_cvar("cod_minplayers", "5");
+	cvarMinPlayers = register_cvar("cod_minplayers", "4");
 	cvarMinBonusPlayers = register_cvar("cod_minbonusplayers", "10");
 	cvarMaxDurability = register_cvar("cod_maxdurability", "100"); 
 	cvarMinDamageDurability = register_cvar("cod_mindamagedurability", "20");
@@ -358,9 +359,10 @@ public plugin_cfg()
 	codRender[RENDER_TYPE] = RENDER_ITEM;
 
 	for(new i = 1; i <= MAX_PLAYERS; i++) ArrayPushArray(codPlayerRender[i], codRender);
+
+	set_cvars();
 	
 	sql_init();
-	set_cvars();
 }
 
 public plugin_end()
@@ -1289,7 +1291,7 @@ public player_spawn(id)
 	
 	execute_forward_ignore_one_param(codForwards[SPAWNED], id);
 
-	set_attributes(id);
+	set_task(0.1, "set_attributes", id);
 
 	return PLUGIN_CONTINUE;
 }
@@ -1395,7 +1397,7 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 {	
 	if(!is_user_connected(killer) || !is_user_connected(victim) || !is_user_alive(killer) || get_user_team(victim) == get_user_team(killer)) return PLUGIN_CONTINUE;
 	
-	if(codPlayer[killer][PLAYER_CLASS])
+	if(codPlayer[killer][PLAYER_CLASS] && get_playersnum() < minPlayers)
 	{
 		new exp = get_exp_bonus(killer, expKill);
 		
@@ -1443,6 +1445,10 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 		cod_print_chat(victim, "Twoj przedmiot ulegl zniszczeniu.");
 	}
 	else cod_print_chat(victim, "Pozostala wytrzymalosc twojego przedmiotu to^x03 %i^x01/^x03%i^x01.", codPlayer[victim][PLAYER_ITEM_DURA], maxDurability);
+
+	new ret;
+
+	ExecuteForward(codForwards[KILLED], ret, killer, victim, weaponId, hitPlace);
 	
 	return HAM_IGNORED;
 }
@@ -1524,11 +1530,6 @@ public round_start()
 			case 1: client_cmd(id, "spk %s", codSounds[SOUND_START2]);
 			case 2: client_cmd(id, "spk %s", codSounds[SOUND_START]);
 		}
-		
-		codPlayer[id][PLAYER_TIME_KS] = 0;
-		codPlayer[id][PLAYER_KS] = 0;
-		
-		if(task_exists(id + TASK_END_KILL_STREAK)) remove_task(id + TASK_END_KILL_STREAK)
 
 		if(cs_get_user_team(id) == CS_TEAM_CT) cs_set_user_defuse(id, 1);
 	}
@@ -1555,11 +1556,11 @@ public t_win_round()
 public ct_win_round()
 	round_winner("CT");
 
-public round_winner(const szTeam[])
+public round_winner(const team[])
 {
 	new playersList[32], playersNum, id, exp;
 	
-	get_players(playersList, playersNum, "aeh", szTeam);
+	get_players(playersList, playersNum, "aeh", team);
 	
 	if(get_playersnum() < minPlayers) return;
 
@@ -1581,7 +1582,7 @@ public round_winner(const szTeam[])
 
 public bomb_planted(planter)
 {
-	if(get_playersnum() < minPlayers) return;
+	if(get_playersnum() < minPlayers || !codPlayer[PLAYER_CLASS]) return;
 
 	new exp = get_exp_bonus(planter, expPlant);
 	
@@ -1594,7 +1595,7 @@ public bomb_planted(planter)
 
 public bomb_defused(defuser)
 {
-	if(get_playersnum() < minPlayers) return;
+	if(get_playersnum() < minPlayers || !codPlayer[PLAYER_CLASS]) return;
 	
 	new exp = get_exp_bonus(defuser, expDefuse);
 	
@@ -1610,6 +1611,8 @@ public hostages_rescued()
 	if(get_playersnum() < minPlayers) return;
 
 	new rescuer = get_loguser_index(), exp = get_exp_bonus(rescuer, expRescue);
+
+	if(!codPlayer[PLAYER_CLASS]) return;
 	
 	codPlayer[rescuer][PLAYER_GAINED_EXP] += exp;
 	
@@ -1854,7 +1857,7 @@ public set_new_class(id)
 	
 	load_class(id, codPlayer[id][PLAYER_CLASS]);
 
-	set_attributes(id);
+	set_task(0.1, "set_attributes", id);
 	
 	return PLUGIN_CONTINUE;
 }
@@ -1947,6 +1950,8 @@ public check_level(id)
 
 public reset_attributes(id)
 {
+	if(task_exists(id + TASK_END_KILL_STREAK)) remove_task(id + TASK_END_KILL_STREAK);
+
 	remove_render_type(id, RENDER_ADDITIONAL);
 
 	set_user_rendering(id);
@@ -1971,6 +1976,8 @@ public reset_attributes(id)
 
 public set_attributes(id)
 {
+	if(!is_user_alive(id)) return;
+
 	codPlayer[id][PLAYER_MAX_HP] = _:(get_health(id, 1, 1, 1, 1));
 
 	codPlayer[id][PLAYER_DMG_REDUCE] = _:(0.7 * (1.0 - floatpower(1.1, -0.112311341 * get_stamina(id, 1, 1, 1))));
@@ -1998,7 +2005,7 @@ public set_attributes(id)
 	
 	get_user_weapons(id, playerWeapons, weaponTypes);
 	
-	for(new i = 0; i < weaponTypes; i++) if(is_user_alive(id) && maxAmmo[playerWeapons[i]] > 0) cs_set_user_bpammo(id, playerWeapons[i], maxAmmo[playerWeapons[i]]);
+	for(new i = 0; i < weaponTypes; i++) if(maxAmmo[playerWeapons[i]] > 0) cs_set_user_bpammo(id, playerWeapons[i], maxAmmo[playerWeapons[i]]);
 }
 
 public gravity_change(id)
@@ -2216,7 +2223,7 @@ public sql_init()
 	
 	if(errorNum)
 	{
-		log_to_file("addons/amxmodx/logs/cod_mod.log", "Error: %s", error);
+		log_to_file("cod_mod.log", "Error: %s", error);
 		
 		return;
 	}
@@ -2246,7 +2253,7 @@ public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], da
 {
 	if(failState) 
 	{
-		log_to_file("addons/amxmodx/logs/cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
 		
 		return;
 	}
@@ -2388,8 +2395,8 @@ public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSiz
 {
 	if (failState) 
 	{
-		if(failState == TQUERY_CONNECT_FAILED) log_to_file("addons/amxmodx/logs/cod_mod.log", "Could not connect to SQL database.  [%d] %s", errorNum, error);
-		else if (failState == TQUERY_QUERY_FAILED) log_to_file("addons/amxmodx/logs/cod_mod.log", "Query failed. [%d] %s", errorNum, error);
+		if(failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
+		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "Query failed. [%d] %s", errorNum, error);
 	}
 	
 	return PLUGIN_CONTINUE;
@@ -3194,18 +3201,4 @@ stock is_wall_between_points(Float:start[3], Float:end[3], ent)
 	if(fraction != 1.0) return 1;
 	
 	return 0;
-}
-
-stock mysql_escape_string(const source[], dest[], lenght)
-{
-	copy(dest, lenght, source);
-	
-	replace_all(dest, lenght, "\\", "\\\\");
-	replace_all(dest, lenght, "\0", "\\0");
-	replace_all(dest, lenght, "\n", "\\n");
-	replace_all(dest, lenght, "\r", "\\r");
-	replace_all(dest, lenght, "\x1a", "\Z");
-	replace_all(dest, lenght, "'", "\'");
-	replace_all(dest, lenght, "`", "\`");
-	replace_all(dest, lenght, "^"", "\^"");
 }

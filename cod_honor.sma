@@ -1,81 +1,55 @@
 #include <amxmodx>
 #include <cod>
-#include <nvault>
 #include <sqlx>
 #include <fakemeta>
 
 #define PLUGIN	"CoD Honor System"
 #define AUTHOR	"O'Zone"
 #define VERSION	"1.0"
-
-#define is_user_player(%1) (1 <= %1 <= iMaxPlayers)
-
-#define Set(%2,%1) (%1 |= (1<<(%2&31)))
-#define Rem(%2,%1) (%1 &= ~(1 <<(%2&31)))
-#define Get(%2,%1) (%1 & (1<<(%2&31)))
 	
-enum Events 
-{
-	KILL = 0, 
-	KILLHS, 
-	DEFUSED, 
-	PLANTED, 
-	RESCUEHOST, 
-	KILLHOST
-};
+enum _:events { KILL, KILL_HS, WIN_ROUND, BOMB_DEFUSE, BOMB_PLANT, HOST_RESCUE, HOST_KILL };
 
-new szPlayer[33][64], iPlayerHonor[33];
+new cvarMinPlayers, cvarKill, cvarKillHS, cvarWinRound, cvarBombPlated, cvarBombDefused, cvarRescueHostage, cvarKillHostage;
 
-new cvarSaveType, cvarMinPlayers, cvarKill, cvarKillHS, cvarBombPlated, cvarBombDefused, cvarRescueHostage, cvarKillHostage;
-
-new iHonor[Events], iHonorMinPlayers, iMaxPlayers, iLoaded;
-
-new gVault;
-
-new Handle:hSqlHook;
+new playerName[33][33], playerHonor[33], Handle:sql, honorEvent[events], minPlayers, maxPlayers, dataLoaded;
 
 public plugin_init()
 {	
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
-	cvarSaveType = register_cvar("cod_honor_save_type", "1"); // 0 - SQL | 1 - NVAULT
-	cvarMinPlayers = register_cvar("cod_honor_minplayers", "5");
+	cvarMinPlayers = register_cvar("cod_honor_minplayers", "4");
 	cvarKill = register_cvar("cod_honor_kill", "1");
 	cvarKillHS = register_cvar("cod_honor_killhs", "1");
-	cvarBombPlated = register_cvar("cod_honor_bombplanted", "1");
-	cvarBombDefused = register_cvar("cod_honor_bombdefused", "1");
+	cvarWinRound = register_cvar("cod_honor_winround", "1");
+	cvarBombPlated = register_cvar("cod_honor_bombplanted", "2");
+	cvarBombDefused = register_cvar("cod_honor_bombdefused", "2");
 	cvarRescueHostage = register_cvar("cod_honor_rescuehostage", "1");
 	cvarKillHostage = register_cvar("cod_honor_killhostage", "4");
 	
-	register_event("DeathMsg", "EnemyKilled", "a");
+	register_event("SendAudio", "t_win_round" , "a", "2&%!MRAD_terwin");
+	register_event("SendAudio", "ct_win_round", "a", "2&%!MRAD_ct_win_round");
+
+	register_logevent("hostage_rescued", 3, "1=triggered", "2=Rescued_A_Hostage");
+	register_logevent("hostage_killed", 3, "1=triggered", "2=Killed_A_Hostage");
 	
-	register_logevent("HostageRescued", 3, "1=triggered", "2=Rescued_A_Hostage");
-	register_logevent("HostageKilled", 3, "1=triggered", "2=Killed_A_Hostage");
+	register_message(SVC_INTERMISSION, "message_intermission");
 	
-	register_message(SVC_INTERMISSION, "MsgIntermission");
-	
-	iMaxPlayers = get_maxplayers();
+	maxPlayers = get_maxplayers();
 }
 
 public plugin_cfg()
 {
-	iHonorMinPlayers = get_pcvar_num(cvarMinPlayers);
-	iHonor[KILL] = get_pcvar_num(cvarKill);
-	iHonor[KILLHS] = get_pcvar_num(cvarKillHS);
-	iHonor[PLANTED] = get_pcvar_num(cvarBombPlated);
-	iHonor[DEFUSED] = get_pcvar_num(cvarBombDefused);
-	iHonor[RESCUEHOST] = get_pcvar_num(cvarRescueHostage);
-	iHonor[KILLHOST] = get_pcvar_num(cvarKillHostage);
-	
-	if(get_pcvar_num(cvarSaveType))
-	{
-		gVault = nvault_open("cod_honor");
-	
-		if(gVault == INVALID_HANDLE)
-			set_fail_state("Nie mozna otworzyc pliku cod_honor.vault");
-	}
-	else
-		SqlInit();
+	minPlayers = get_pcvar_num(cvarMinPlayers);
+
+	honorEvent[KILL] = get_pcvar_num(cvarKill);
+	honorEvent[KILL_HS] = get_pcvar_num(cvarKillHS);
+	honorEvent[WIN_ROUND] = get_pcvar_num(cvarWinRound);
+	honorEvent[BOMB_PLANT] = get_pcvar_num(cvarBombPlated);
+	honorEvent[BOMB_DEFUSE] = get_pcvar_num(cvarBombDefused);
+	honorEvent[HOST_RESCUE] = get_pcvar_num(cvarRescueHostage);
+	honorEvent[HOST_KILL] = get_pcvar_num(cvarKillHostage);
+
+	sql_init();
 }
 
 public plugin_natives()
@@ -85,327 +59,284 @@ public plugin_natives()
 }
 
 public plugin_end()
-	get_pcvar_num(cvarSaveType) ? nvault_close(gVault) : SQL_FreeHandle(hSqlHook);
+	SQL_FreeHandle(sql);
 
 public client_putinserver(id)
 {
-	iPlayerHonor[id] = 0;
+	playerHonor[id] = 0;
 	
-	Rem(id, iLoaded);
+	rem_bit(id, dataLoaded);
 
-	get_user_name(id, szPlayer[id], charsmax(szPlayer));
+	get_user_name(id, playerName[id], charsmax(playerName));
+
+	mysql_escape_string(playerName[id], playerName[id], charsmax(playerName));
 	
-	LoadHonor(id);
+	load_honor(id);
 }
 
-public client_disconnect(id)
-	SaveHonor(id);
+public client_disconnected(id)
+	save_honor(id);
 
-public EnemyKilled()
+public cod_killed(killer, victim, weaponId, hitPlace)
 {
-	if(get_playersnum() < iHonorMinPlayers)
-		return PLUGIN_CONTINUE;
-
-	new iKiller = read_data(1);
-	new iVictim = read_data(2);
-	new iHS = read_data(3);
-	
-	if(!is_user_alive(iKiller) || get_user_team(iKiller) == get_user_team(iVictim))
-		return PLUGIN_CONTINUE;
+	if(get_playersnum() < minPlayers) return;
 		
-	iPlayerHonor[iKiller] += cod_get_user_vip(iKiller) ? iHonor[KILL]*2 : iHonor[KILL];
+	playerHonor[killer] += cod_get_user_vip(killer) ? honorEvent[KILL] * 2 : honorEvent[KILL];
 	
-	if(iHS)	iPlayerHonor[iKiller] += cod_get_user_vip(iKiller) ? iHonor[KILLHS]*2 : iHonor[KILLHS];
+	if(hitPlace == HIT_HEAD) playerHonor[killer] += cod_get_user_vip(killer) ? honorEvent[KILL_HS] * 2 : honorEvent[KILL_HS];
 	
-	SaveHonor(iKiller);
+	save_honor(killer);
+}
+
+public t_win_round()
+	round_winner("TERRORIST");
 	
-	return PLUGIN_CONTINUE;
+public ct_win_round()
+	round_winner("CT");
+
+public round_winner(const szTeam[])
+{
+	new playersList[32], playersNum, id;
+	
+	get_players(playersList, playersNum, "aeh", szTeam);
+	
+	if(get_playersnum() < minPlayers) return;
+
+	for (new i = 0; i < playersNum; i++) 
+	{
+		id = playersList[i];
+		
+		if(!cod_get_user_class(id)) continue;
+
+		playerHonor[id] += cod_get_user_vip(id) ? honorEvent[WIN_ROUND] * 2 : honorEvent[WIN_ROUND];
+
+		save_honor(id);
+	}
 }
 
 public bomb_planted(id)
 {
-	if(get_playersnum() < iHonorMinPlayers)
-		return PLUGIN_CONTINUE;
+	if(get_playersnum() < minPlayers || !cod_get_user_class(id)) return;
 
-	iPlayerHonor[id] += cod_get_user_vip(id) ? iHonor[PLANTED]*2 : iHonor[PLANTED];
+	playerHonor[id] += cod_get_user_vip(id) ? honorEvent[BOMB_PLANT] * 2 : honorEvent[BOMB_PLANT];
 
-	SaveHonor(id);
-	
-	return PLUGIN_CONTINUE;
+	save_honor(id);
 }
 
 public bomb_defused(id)
 {
-	if(get_playersnum() < iHonorMinPlayers)
-		return PLUGIN_CONTINUE;
+	if(get_playersnum() < minPlayers || !cod_get_user_class(id)) return;
 
-	iPlayerHonor[id] += cod_get_user_vip(id) ? iHonor[DEFUSED]*2 : iHonor[DEFUSED];
+	playerHonor[id] += cod_get_user_vip(id) ? honorEvent[BOMB_DEFUSE] * 2 : honorEvent[BOMB_DEFUSE];
 
-	SaveHonor(id);
+	save_honor(id);
+}
+
+public hostage_rescued()
+{
+	if(get_playersnum() < minPlayers) return;
+
+	new id = get_loguser_index();
+
+	if(!cod_get_user_class(id)) return;
 	
+	playerHonor[id] += cod_get_user_vip(id) ? honorEvent[HOST_RESCUE] * 2 : honorEvent[HOST_RESCUE];
+
+	save_honor(id);
+}
+
+public hostage_killed() 
+{
+	if(get_playersnum() < minPlayers) return;
+
+	new id = get_loguser_index();
+
+	if(!cod_get_user_class(id)) return;
+	
+	playerHonor[id] -= cod_get_user_vip(id) ? honorEvent[HOST_KILL] / 2 : honorEvent[HOST_KILL];
+
+	save_honor(id);
+}
+
+public message_intermission() 
+{
+	new playersList[32], id, players;
+
+	get_players(playersList, players, "h");
+	
+	if(!players) return PLUGIN_CONTINUE;
+
+	for (new i = 0; i < players; i++)
+	{
+		id = playersList[i];
+		
+		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
+		
+		save_honor(id, 1);
+	}
+
 	return PLUGIN_CONTINUE;
 }
 
-public HostageRescued()
+public sql_init()
 {
-	if(get_playersnum() < iHonorMinPlayers)
-		return PLUGIN_CONTINUE;
+	new host[32], user[32], pass[32], database[32], queryData[128], error[128], errorNum;
+	
+	get_cvar_string("cod_sql_host", host, charsmax(host));
+	get_cvar_string("cod_sql_user", user, charsmax(user));
+	get_cvar_string("cod_sql_pass", pass, charsmax(pass));
+	get_cvar_string("cod_sql_database", database, charsmax(database));
+	
+	sql = SQL_MakeDbTuple(host, user, pass, database);
 
-	new szLogUser[128], szName[32];
+	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
-	read_logargv(0, szLogUser, charsmax(szLogUser));
-	parse_loguser(szLogUser, szName, charsmax(szName));
+	if(errorNum)
+	{
+		log_to_file("cod_mod.log", "Error: %s", error);
+		
+		return;
+	}
 	
-	new id = get_user_index(szName);
-	
-	iPlayerHonor[id] += cod_get_user_vip(id) ? iHonor[RESCUEHOST]*2 : iHonor[RESCUEHOST];
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_honor` (name VARCHAR(35), honor INT(11), PRIMARY KEY(name));");
 
-	SaveHonor(id);
+	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
+
+	SQL_Execute(query);
 	
-	return PLUGIN_CONTINUE;
+	SQL_FreeHandle(query);
+	SQL_FreeHandle(connectHandle);
+}
+
+public load_honor(id)
+{
+	if(!is_user_connected(id)) return;
+
+	new queryData[128], tempId[1];
+	
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_honor` WHERE name = '%s'", playerName[id]);
+	SQL_ThreadQuery(sql, "load_honor_handle", queryData, tempId, sizeof(tempId));
 } 
 
-public HostageKilled() 
+public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
-	if(get_playersnum() < iHonorMinPlayers)
-		return PLUGIN_CONTINUE;
-	
-	new szLogUser[128], szName[32];
-	
-	read_logargv(0, szLogUser, charsmax(szLogUser));
-	parse_loguser(szLogUser, szName, charsmax(szName));
-	
-	new id = get_user_index(szName);
-	
-	iPlayerHonor[id] -= cod_get_user_vip(id) ? iHonor[KILLHOST]/2 : iHonor[KILLHOST];
-
-	SaveHonor(id);
-	
-	return PLUGIN_CONTINUE;
-}
-
-public MsgIntermission() 
-{
-	new szPlayers[32], id, iNum;
-	get_players(szPlayers, iNum, "h");
-	
-	if(!iNum)
-		return PLUGIN_CONTINUE;
-		
-	for (new i = 0; i < iNum; i++)
+	if(failState) 
 	{
-		id = szPlayers[i];
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
 		
-		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id))
-			continue;
-		
-		SaveHonor(id, 1);
-	}
-
-	return PLUGIN_CONTINUE;
-}
-
-public SqlInit()
-{
-	new szData[4][64];
-	
-	get_cvar_string("cod_sql_host", szData[0], charsmax(szData)); 
-	get_cvar_string("cod_sql_user", szData[1], charsmax(szData)); 
-	get_cvar_string("cod_sql_pass", szData[2], charsmax(szData)); 
-	get_cvar_string("cod_sql_db", szData[3], charsmax(szData));  
-	
-	hSqlHook = SQL_MakeDbTuple(szData[0], szData[1], szData[2], szData[3]);
-
-	new iError, szError[128];
-	new Handle:hConnection = SQL_Connect(hSqlHook, iError, szError, charsmax(szError));
-	
-	if(iError)
-	{
-		log_to_file("addons/amxmodx/logs/password.log", "Error: %s", szError);
 		return;
 	}
 	
-	new szTemp[128], Handle:hQuery = SQL_PrepareQuery(hConnection, szTemp);
+	new id = tempId[0];
 	
-	formatex(szTemp, charsmax(szTemp), "CREATE TABLE IF NOT EXISTS `cod_honor` (name VARCHAR(35), honor INT(11), PRIMARY KEY(name));");
+	if(!is_user_connected(id)) return;
 	
-	SQL_Execute(hQuery);
-	SQL_FreeHandle(hQuery);
-	SQL_FreeHandle(hConnection);
+	if(SQL_MoreResults(query)) playerHonor[id] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
+	else
+	{
+		new queryData[128];
+		
+		formatex(queryData, charsmax(queryData), "INSERT INTO `cod_honor` VALUES ('%s', '0')", playerName[id]);
+		
+		SQL_ThreadQuery(sql, "ignore_handle", queryData);
+	}
+	
+	set_bit(id, dataLoaded);
 }
 
-public LoadHonor(id)
+stock save_honor(id, end = 0)
 {
-	if(!is_user_connected(id))
-		return;
+	if(!get_bit(id, dataLoaded)) return;
 
-	if(get_pcvar_num(cvarSaveType))
+	new queryData[128];
+		
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_honor` SET honor = '%i' WHERE name = '%s'", playerHonor[id], playerName[id]);
+		
+	switch(end)
 	{
-		new szVaultKey[64], szVaultData[64];
-	
-		formatex(szVaultKey, charsmax(szVaultKey), "%s-cod_honor", szPlayer[id]);
-	
-		if(nvault_get(gVault, szVaultKey, szVaultData, charsmax(szVaultData)))
+		case 0: SQL_ThreadQuery(sql, "ignore_handle", queryData);
+		case 1:
 		{
-			new szTempHonor[16];
-			parse(szVaultData, szTempHonor, charsmax(szTempHonor));
-	
-			iPlayerHonor[id] = str_to_num(szTempHonor);
-		}
-		
-		Set(id, iLoaded);
-	}
-	else
-	{
-		new szTemp[128], szName[33], szData[1];
-		
-		szData[0] = id;
-		
-		mysql_escape_string(szName, szPlayer[id], charsmax(szPlayer));
-	
-		formatex(szTemp, charsmax(szTemp), "SELECT * FROM `cod_honor` WHERE name = '%s'", szName);
-		SQL_ThreadQuery(hSqlHook, "LoadHonor_Handle", szTemp, szData, 1);
-	}
-} 
+			new error[128], errorNum, Handle:sqlConnection, Handle:query;
+			
+			sqlConnection = SQL_Connect(sql, errorNum, error, charsmax(error));
 
-public LoadHonor_Handle(iFailState, Handle:hQuery, szError[], iError, szData[], iSize)
-{
-	if(iFailState != TQUERY_SUCCESS)
-	{
-		log_to_file("addons/amxmodx/logs/cod_honor.log", "<Query> Error: %s", szError);
-		return;
-	}
-	
-	new id = szData[0];
-	
-	if(!is_user_connected(id))
-		return;
-	
-	if(SQL_MoreResults(hQuery))
-		iPlayerHonor[id] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "honor"));
-	else
-	{
-		new szTemp[128];
-		
-		formatex(szTemp, charsmax(szTemp), "INSERT INTO `cod_honor` VALUES ('%s', '0')", szPlayer[id]);
-		
-		SQL_ThreadQuery(hSqlHook, "Ignore_Handle", szTemp);
-	}
-	
-	Set(id, iLoaded);
-}
-
-SaveHonor(id, end = 0)
-{
-	if(!Get(id, iLoaded))
-		return;
-
-	if(get_pcvar_num(cvarSaveType))
-	{
-		new szVaultKey[64], szVaultData[64];
-	
-		formatex(szVaultKey, charsmax(szVaultKey), "%s-cod_honor", szPlayer[id]);
-		formatex(szVaultData, charsmax(szVaultData), "%d", iPlayerHonor[id]);
-	
-		nvault_set(gVault, szVaultKey, szVaultData);
-	}
-	else
-	{
-		new szTemp[128], szName[33];
-		
-		mysql_escape_string(szName, szPlayer[id], charsmax(szPlayer));
-		
-		formatex(szTemp, charsmax(szTemp), "UPDATE `cod_honor` SET honor = '%i' WHERE name = '%s'", iPlayerHonor[id], szName);
-		
-		switch(end)
-		{
-			case 0: SQL_ThreadQuery(hSqlHook, "Ignore_Handle", szTemp);
-			case 1:
+			if(!sqlConnection)
 			{
-				new szError[128], iError, Handle:hSqlConnection, Handle:hQuery;
-			
-				hSqlConnection = SQL_Connect(hSqlHook, iError, szError, charsmax(szError));
-
-				if(!hSqlConnection)
-				{
-					log_to_file("addons/amxmodx/logs/cod_honor.txt", "Save - Could not connect to SQL database.  [%d] %s", szError, szError);
+				log_to_file("cod_mod.log", "Save - Could not connect to SQL database.  [%d] %s", error, error);
 				
-					SQL_FreeHandle(hSqlConnection);
+				SQL_FreeHandle(sqlConnection);
 				
-					return;
-				}
-			
-				hQuery = SQL_PrepareQuery(hSqlConnection, szTemp);
-			
-				if(!SQL_Execute(hQuery))
-				{
-					iError = SQL_QueryError(hQuery, szError, charsmax(szError));
-				
-					log_to_file("addons/amxmodx/logs/cod_honor.txt", "Save Query Nonthreaded failed. [%d] %s", iError, szError);
-				
-					SQL_FreeHandle(hQuery);
-					SQL_FreeHandle(hSqlConnection);
-				
-					return;
-				}
-	
-				SQL_FreeHandle(hQuery);
-				SQL_FreeHandle(hSqlConnection);
+				return;
 			}
+			
+			query = SQL_PrepareQuery(sqlConnection, queryData);
+			
+			if(!SQL_Execute(query))
+			{
+				errorNum = SQL_QueryError(query, error, charsmax(error));
+				
+				log_to_file("cod_mod.log", "Save Query Nonthreaded failed. [%d] %s", errorNum, error);
+				
+				SQL_FreeHandle(query);
+				SQL_FreeHandle(sqlConnection);
+				
+				return;
+			}
+
+			SQL_FreeHandle(query);
+			SQL_FreeHandle(sqlConnection);
 		}
 	}
 	
-	if(end) Rem(id, iLoaded);
+	if(end) rem_bit(id, dataLoaded);
 }
 
-public Ignore_Handle(iFailState, Handle:hQuery, szError[], iError, szData[], iSize)
+public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
-	if(iFailState != TQUERY_SUCCESS)
+	if (failState) 
 	{
-		log_to_file("addons/amxmodx/logs/cod_honor.log", "Could not connect to SQL database.  [%d] %s", iError, szError);
-		return;
+		if(failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
+		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "Query failed. [%d] %s", errorNum, error);
 	}
-}
-
-stock mysql_escape_string(const szSource[], szDest[], iLen)
-{
-	copy(szDest, iLen, szSource);
-	replace_all(szDest, iLen, "\\", "\\\\");
-	replace_all(szDest, iLen, "\0", "\\0");
-	replace_all(szDest, iLen, "\n", "\\n");
-	replace_all(szDest, iLen, "\r", "\\r");
-	replace_all(szDest, iLen, "\x1a", "\Z");
-	replace_all(szDest, iLen, "'", "\'");
-	replace_all(szDest, iLen, "`", "\`");
-	replace_all(szDest, iLen, "^"", "\^"");
-}
-
-public _cod_get_user_honor(iPlugin, iParams)
-{
-	if(iParams != 1)
-		return PLUGIN_CONTINUE;
-		
-	new id = get_param(1);
-	
-	if(!is_user_player(id))
-		return PLUGIN_CONTINUE;
-	
-	return iPlayerHonor[id];
-}
-
-public _cod_set_user_honor(iPlugin, iParams)
-{
-	if(iParams != 1)
-		return PLUGIN_CONTINUE;
-		
-	new id = get_param(1);
-	
-	if(!is_user_player(id))
-		return PLUGIN_CONTINUE;
-	
-	iPlayerHonor[id] = get_param(2) > 0 ? get_param(2) : 0;
-	
-	SaveHonor(id);
 	
 	return PLUGIN_CONTINUE;
+}
+
+public _cod_get_user_honor(plugin, params)
+{
+	if(params != 1) return PLUGIN_CONTINUE;
+		
+	new id = get_param(1);
+	
+	if(!is_user_player(id)) return PLUGIN_CONTINUE;
+	
+	return playerHonor[id];
+}
+
+public _cod_set_user_honor(plugin, params)
+{
+	if(params != 1) return PLUGIN_CONTINUE;
+		
+	new id = get_param(1);
+	
+	if(!is_user_player(id)) return PLUGIN_CONTINUE;
+	
+	playerHonor[id] = max(0, get_param(2));
+	
+	save_honor(id);
+	
+	return PLUGIN_CONTINUE;
+}
+
+stock get_loguser_index()
+{
+	new userLog[96], userName[32];
+	
+	read_logargv(0, userLog, charsmax(userLog));
+	parse_loguser(userLog, userName, charsmax(userName));
+
+	return get_user_index(userName);
 }

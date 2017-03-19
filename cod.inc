@@ -365,3 +365,17 @@ stock cod_print_chat(id, const text[] = "", any:...)
 
 	client_print_color(id, id, "^x04[CoD]^x01 %s", message);
 }
+
+stock mysql_escape_string(const source[], dest[], lenght)
+{
+	copy(dest, lenght, source);
+	
+	replace_all(dest, lenght, "\\", "\\\\");
+	replace_all(dest, lenght, "\0", "\\0");
+	replace_all(dest, lenght, "\n", "\\n");
+	replace_all(dest, lenght, "\r", "\\r");
+	replace_all(dest, lenght, "\x1a", "\Z");
+	replace_all(dest, lenght, "'", "\'");
+	replace_all(dest, lenght, "`", "\`");
+	replace_all(dest, lenght, "^"", "\^"");
+}
