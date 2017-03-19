@@ -22,7 +22,9 @@ public client_putinserver(id)
 
 public display_menu(id)
 {
-	client_cmd(id, "spk CodMod/select");
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+		
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new menu = menu_create("\wMenu \rCoD Mod", "display_menu_handle");
  
@@ -56,15 +58,17 @@ public display_menu(id)
  
 public display_menu_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
-
-	client_cmd(id, "spk CodMod/select");
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+		
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
 	new itemData[4], itemAccess, itemCallback;
