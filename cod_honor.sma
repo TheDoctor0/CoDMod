@@ -11,7 +11,7 @@ enum _:events { KILL, KILL_HS, WIN_ROUND, BOMB_DEFUSE, BOMB_PLANT, HOST_RESCUE, 
 
 new cvarMinPlayers, cvarKill, cvarKillHS, cvarWinRound, cvarBombPlated, cvarBombDefused, cvarRescueHostage, cvarKillHostage;
 
-new playerName[33][33], playerHonor[33], Handle:sql, honorEvent[events], minPlayers, maxPlayers, dataLoaded;
+new playerName[33][64], playerHonor[33], Handle:sql, honorEvent[events], minPlayers, maxPlayers, dataLoaded;
 
 public plugin_init()
 {	
@@ -67,9 +67,9 @@ public client_putinserver(id)
 	
 	rem_bit(id, dataLoaded);
 
-	get_user_name(id, playerName[id], charsmax(playerName));
+	get_user_name(id, playerName[id], charsmax(playerName[]));
 
-	mysql_escape_string(playerName[id], playerName[id], charsmax(playerName));
+	mysql_escape_string(playerName[id], playerName[id], charsmax(playerName[]));
 	
 	load_honor(id);
 }
