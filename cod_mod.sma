@@ -431,7 +431,7 @@ public select_fraction(id)
 	{
 		cod_print_chat(id, "Trwa wczytywanie twoich klas...");
 		
-		return;
+		return PLUGIN_HANDLED;
 	}
 	
 	if(ArraySize(codFractions))
@@ -737,7 +737,7 @@ public reset_points(id)
 	codPlayer[id][PLAYER_STR] = 0;
 	codPlayer[id][PLAYER_STAM] = 0;
 	
-	if(codPlayer[id][PLAYER_POINTS]) assign_points(id);
+	if(codPlayer[id][PLAYER_POINTS]) assign_points(id, 0);
 }
 
 public assign_points(id, sound)
@@ -1341,7 +1341,7 @@ public player_spawn(id)
 	
 	if(get_bit(id, resetStats)) reset_points(id);
 	
-	if(codPlayer[id][PLAYER_POINTS] > 0) assign_points(id);
+	if(codPlayer[id][PLAYER_POINTS] > 0) assign_points(id, 0);
 	
 	if(codPlayer[id][PLAYER_CLASS]) execute_forward_ignore_one_param(get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_SPAWNED), id);
 	
