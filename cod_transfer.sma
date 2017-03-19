@@ -1,266 +1,294 @@
-#include <amxmod> 
-#include <cod> 
-#include <fakemeta> 
+#include <amxmodx>
+#include <cstrike>
+#include <cod>
 
 #define PLUGIN "CoD Transfer"
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new const szCommandHonor[][] = { "say /przelewh", "say_team /przelewh", "say /przelejh", "say_team /przelejh", "przelejh" };
-new const szCommandCash[][] = { "say /przelew", "say_team /przelew", "say /przelej", "say_team /przelej", "przelej" };
+new const commandHonor[][] = { "say /przelewh", "say_team /przelewh", "say /przelejh", "say_team /przelejh", "przelejh" };
+new const commandCash[][] = { "say /przelew", "say_team /przelew", "say /przelej", "say_team /przelej", "przelej" };
 
-new iPlayer[MAX_PLAYERS + 1];
+new transferPlayer[MAX_PLAYERS + 1], maxPlayers;
 
 public plugin_init() 
 {  
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	for(new i; i < sizeof szCommandHonor; i++)
-		register_clcmd(szCommandHonor[i], "TransferHonorMenu");
+	for(new i; i < sizeof commandHonor; i++) register_clcmd(commandHonor[i], "transfer_honor_menu");
 		
-	for(new i; i < sizeof szCommandCash; i++)
-		register_clcmd(szCommandCash[i], "TransferCashMenu");
+	for(new i; i < sizeof commandCash; i++) register_clcmd(commandCash[i], "transfer_cash_menu");
 
-	register_clcmd("Ilosc_Honoru", "TransferHonor_Handler");
-	register_clcmd("Ilosc_Kasy", "TransferCash_Handler");
+	register_clcmd("ILOSC_HONORU", "transfer_honor_handle");
+	register_clcmd("ILOSC_KASY", "transfer_cash_handle");
+
+	maxPlayers = get_maxplayers();
 } 
 
-public TransferHonorMenu(id) 
+public transfer_honor_menu(id) 
 { 
 	if(!cod_check_password(id))
 	{
 		cod_force_password(id);
+
 		return PLUGIN_HANDLED;
 	}
 
-	new szMenu[256], szName[32], szPlayer[2], iPlayers;
+	new menuData[256], playerName[64], playerId[3], players, menu = menu_create("\wWybierz \rGracza\w, ktoremu chcesz przelac \yHonor:", "transfer_honor_menu_handle");
 	
-	formatex(szMenu, charsmax(szMenu), "\wWybierz \rGracza\w, ktoremu chcesz przelac \yHonor:");
-	
-	new menu = menu_create(szMenu, "TransferHonorMenu_Handler")
-	
-	for(new player = 1; player <= 32; player++)
+	for(new player = 1; player <= maxPlayers; player++)
 	{
-		if(!is_user_connected(player) || is_user_hltv(id) || is_user_bot(id) || player == id)
-			continue;
+		if(!is_user_connected(player) || !cod_get_user_class(player) || player == id) continue;
 		
-		get_user_name(player, szName, charsmax(szName));
+		get_user_name(player, playerName, charsmax(playerName));
 		
-		formatex(szMenu, charsmax(szMenu), "%s \y[%d Honoru]", szName, cod_get_user_honor(player));
-		formatex(szPlayer, charsmax(szPlayer), "%i", get_user_index(szName));
+		formatex(menuData, charsmax(menuData), "%s \y[%d Honoru]", playerName, cod_get_user_honor(player));
+
+		num_to_str(player, playerId, charsmax(playerId));
 		
-		menu_additem(menu, szMenu, szPlayer);
+		menu_additem(menu, menuData, playerId);
 		
-		iPlayers++;
+		players++;
 	}
 	
 	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
 	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
-	if(!iPlayers)
+	if(!players)
 	{
 		menu_destroy(menu);
-		cod_print_chat(id, DontChange, "Na serwerze nie ma gracza, ktoremu moglbys przelac^x03 Honor^x01!");
+
+		cod_print_chat(id, "Na serwerze nie ma gracza, ktoremu moglbys przelac^x03 honor^x01!");
 	}
-	return PLUGIN_CONTINUE;
+	else menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
 }
 
-public TransferHonorMenu_Handler(id, menu, item)
+public transfer_honor_menu_handle(id, menu, item)
 {
-	if(item == MENU_EXIT || !is_user_connected(id))
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+		
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
-		return PLUGIN_CONTINUE;
+
+		return PLUGIN_HANDLED;
 	}
 	
-	new szData[6], iAccess, iCallback;
-	menu_item_getinfo(menu, item, iAccess, szData, charsmax(szData), _, _, iCallback);
-	
-	new player = str_to_num(szData);
+	new playerId[3], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, playerId, charsmax(playerId), _, _, itemCallback);
+
+	new player = str_to_num(playerId);
+
+	menu_destroy(menu);
 	
 	if(!is_user_connected(player))
 	{
-		cod_print_chat(id, DontChange, "Tego gracza nie ma juz na serwerze!");
-		return PLUGIN_CONTINUE;
+		cod_print_chat(id, "Tego gracza nie ma juz na serwerze!");
+
+		return PLUGIN_HANDLED;
 	}
 	
-	iPlayer[id] = player;
+	transferPlayer[id] = player;
 	
-	client_cmd(id, "messagemode Ilosc_Honoru");
+	client_cmd(id, "messagemode ILOSC_HONORU");
 	
-	cod_print_chat(id, DontChange, "Wpisz ilosc^x03 Honoru^x01, ktora chcesz przelac!");
-	client_print(id, print_center, "Wpisz ilosc Honoru, ktora chcesz przelac!");
+	cod_print_chat(id, "Wpisz ilosc^x03 honoru^x01, ktora chcesz przelac!");
+
+	client_print(id, print_center, "Wpisz ilosc honoru, ktora chcesz przelac!");
 	
-	menu_destroy(menu);
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
-public TransferHonor_Handler(id)
+public transfer_honor_handle(id)
 {
-	if(!is_user_connected(id))
-		return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
 	if(!cod_check_password(id))
 	{
 		cod_force_password(id);
-		return PLUGIN_CONTINUE;
+
+		return PLUGIN_HANDLED;
 	}
 		
-	if(!is_user_connected(iPlayer[id]))
+	if(!is_user_connected(transferPlayer[id]))
 	{
-		cod_print_chat(id, DontChange, "Gracza, ktoremu chcesz przelac^x03 Honor^x01 nie ma juz na serwerze!");
-		return PLUGIN_CONTINUE;
-	}
-	
-	new szTemp[16], iHonorAmount;
-	
-	read_args(szTemp, charsmax(szTemp));
-	remove_quotes(szTemp);
+		cod_print_chat(id, "Gracza, ktoremu chcesz przelac^x03 honor^x01 nie ma juz na serwerze!");
 
-	iHonorAmount = str_to_num(szTemp);
-	
-	if(!iHonorAmount)
-	{ 
-		cod_print_chat(id, DontChange, "Nie mozesz przelac mniej niz^x03 1 Honoru^x01!");
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
-	if(cod_get_user_honor(id) < iHonorAmount) 
+	new honorData[16], honorAmount;
+	
+	read_args(honorData, charsmax(honorData));
+	remove_quotes(honorData);
+
+	honorAmount = str_to_num(honorData);
+	
+	if(honorAmount <= 0)
 	{ 
-		cod_print_chat(id, DontChange, "Nie masz tyle^x03 Honoru^x01!");
-		return PLUGIN_CONTINUE;
+		cod_print_chat(id, "Nie mozesz przelac mniej niz^x03 1 honoru^x01!");
+
+		return PLUGIN_HANDLED;
+	}
+	
+	if(cod_get_user_honor(id) < honorAmount) 
+	{ 
+		cod_print_chat(id, "Nie masz tyle^x03 honoru^x01!");
+
+		return PLUGIN_HANDLED;
 	} 
 	
-	new szName[33], szPlayerName[33];
+	new playerName[33], playerIdName[33];
 	
-	get_user_name(id, szName, charsmax(szName));
-	get_user_name(iPlayer[id], szPlayerName, charsmax(szPlayerName));
+	get_user_name(id, playerName, charsmax(playerName));
+	get_user_name(transferPlayer[id], playerIdName, charsmax(playerIdName));
 	
-	cod_set_user_honor(iPlayer[id], cod_get_user_honor(iPlayer[id]) + iHonorAmount);
-	cod_set_user_honor(id, cod_get_user_honor(id) - iHonorAmount);
+	cod_set_user_honor(transferPlayer[id], cod_get_user_honor(transferPlayer[id]) + honorAmount);
+	cod_set_user_honor(id, cod_get_user_honor(id) - honorAmount);
 	
-	cod_print_chat(0, DontChange, "^x03%s^x01 przelal^x04 %i Honoru^x01 na konto^x03 %s^x01.", szName, iHonorAmount, szPlayerName);
+	cod_print_chat(0, "^x03%s^x01 przelal^x04 %i honoru^x01 na konto^x03 %s^x01.", playerName, honorAmount, playerIdName);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
-public TransferCashMenu(id) 
+public transfer_cash_menu(id) 
 { 
 	if(!cod_check_password(id))
 	{
 		cod_force_password(id);
+
 		return PLUGIN_HANDLED;
 	}
+
+	new menuData[256], playerName[64], playerId[3], players, menu = menu_create("\wWybierz \rGracza\w, ktoremu chcesz przelac \yKase:", "transfer_cash_menu_handle");
 	
-	new szMenu[256], szName[32], szPlayer[2], iPlayers;
-	
-	formatex(szMenu, charsmax(szMenu), "\wWybierz \rGracza\w, ktoremu chcesz przelac \ykase:");
-	
-	new menu = menu_create(szMenu, "TransferCashMenu_Handler")
-	
-	for(new player = 1; player <= 32; player++)
+	for(new player = 1; player <= maxPlayers; player++)
 	{
-		if(!is_user_connected(player) || is_user_hltv(id) || is_user_bot(id) || player == id)
-			continue;
+		if(!is_user_connected(player) || !cod_get_user_class(player) || player == id) continue;
 		
-		get_user_name(player, szName, charsmax(szName));
+		get_user_name(player, playerName, charsmax(playerName));
 		
-		formatex(szMenu, charsmax(szMenu), "%s \y[%d $]", szName, cs_get_user_money(player));
-		formatex(szPlayer, charsmax(szPlayer), "%i", get_user_index(szName));
+		formatex(menuData, charsmax(menuData), "%s \y[%d$]", playerName, cod_get_user_honor(player));
+
+		num_to_str(player, playerId, charsmax(playerId));
 		
-		menu_additem(menu, szMenu, szPlayer);
+		menu_additem(menu, menuData, playerId);
 		
-		iPlayers++;
+		players++;
 	}
 	
 	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
 	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
-	if(!iPlayers)
+	if(!players)
 	{
 		menu_destroy(menu);
-		cod_print_chat(id, DontChange, "Na serwerze nie ma gracza, ktoremu moglbys przelac^x03 kase^x01!");
+
+		cod_print_chat(id, "Na serwerze nie ma gracza, ktoremu moglbys przelac^x03 kase^x01!");
 	}
-	return PLUGIN_CONTINUE;
+	else menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
 }
 
-public TransferCashMenu_Handler(id, menu, item)
+public transfer_cash_menu_handle(id, menu, item)
 {
-	if(item == MENU_EXIT || !is_user_connected(id))
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+		
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
-		return PLUGIN_CONTINUE;
+
+		return PLUGIN_HANDLED;
 	}
 	
-	new szData[6], iAccess, iCallback;
-	menu_item_getinfo(menu, item, iAccess, szData, charsmax(szData), _, _, iCallback);
-	
-	new player = str_to_num(szData);
+	new playerId[3], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, playerId, charsmax(playerId), _, _, itemCallback);
+
+	new player = str_to_num(playerId);
+
+	menu_destroy(menu);
 	
 	if(!is_user_connected(player))
 	{
-		cod_print_chat(id, DontChange, "Tego gracza nie ma juz na serwerze!");
-		return PLUGIN_CONTINUE;
+		cod_print_chat(id, "Tego gracza nie ma juz na serwerze!");
+
+		return PLUGIN_HANDLED;
 	}
 	
-	iPlayer[id] = player;
+	transferPlayer[id] = player;
 	
-	client_cmd(id, "messagemode Ilosc_Kasy");
+	client_cmd(id, "messagemode ILOSC_KASY");
 	
-	cod_print_chat(id, DontChange, "Wpisz ilosc^x03 kasy^x01, ktora chcesz przelac!");
+	cod_print_chat(id, "Wpisz ilosc^x03 kasy^x01, ktora chcesz przelac!");
+
 	client_print(id, print_center, "Wpisz ilosc kasy, ktora chcesz przelac!");
 	
-	menu_destroy(menu);
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
-public TransferCash_Handler(id)
+public transfer_cash_handle(id)
 {
-	if(!is_user_connected(id))
-		return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
 	if(!cod_check_password(id))
 	{
 		cod_force_password(id);
-		return PLUGIN_CONTINUE;
+
+		return PLUGIN_HANDLED;
 	}
 		
-	if(!is_user_connected(iPlayer[id]))
+	if(!is_user_connected(transferPlayer[id]))
 	{
-		cod_print_chat(id, DontChange, "Gracza, ktoremu chcesz przelac^x03 kase^x01 nie ma juz na serwerze!");
-		return PLUGIN_CONTINUE;
-	}
-	
-	new szTemp[16], iCashAmount;
-	
-	read_args(szTemp, charsmax(szTemp));
-	remove_quotes(szTemp);
+		cod_print_chat(id, "Gracza, ktoremu chcesz przelac^x03 honor^x01 nie ma juz na serwerze!");
 
-	iCashAmount = str_to_num(szTemp);
-	
-	if(!iCashAmount)
-	{ 
-		cod_print_chat(id, DontChange, "Nie mozesz przelac mniej niz^x03 1 $^x01!");
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
-	if(cs_get_user_money(id) < iCashAmount) 
+	new cashData[16], cashAmount;
+	
+	read_args(cashData, charsmax(cashData));
+	remove_quotes(cashData);
+
+	cashAmount = str_to_num(cashData);
+	
+	if(cashAmount <= 0)
 	{ 
-		cod_print_chat(id, DontChange, "Nie masz tyle^x03 kasy^x01!");
-		return PLUGIN_CONTINUE;
+		cod_print_chat(id, "Nie mozesz przelac mniej niz^x03 1$^x01!");
+
+		return PLUGIN_HANDLED;
+	}
+	
+	if(cs_get_user_money(id) < cashAmount) 
+	{ 
+		cod_print_chat(id, "Nie masz tyle^x03 honoru^x01!");
+
+		return PLUGIN_HANDLED;
 	} 
 	
-	new szName[33], szPlayerName[33];
+	new playerName[33], playerIdName[33];
 	
-	get_user_name(id, szName, charsmax(szName));
-	get_user_name(iPlayer[id], szPlayerName, charsmax(szPlayerName));
+	get_user_name(id, playerName, charsmax(playerName));
+	get_user_name(transferPlayer[id], playerIdName, charsmax(playerIdName));
 	
-	cs_set_user_money(iPlayer[id], cs_get_user_money(iPlayer[id]) + iCashAmount);
-	cs_set_user_money(id, cs_get_user_money(id) - iCashAmount);
+	cs_set_user_money(transferPlayer[id], cs_get_user_money(transferPlayer[id]) + cashAmount);
+	cs_set_user_money(id, cs_get_user_money(id) - cashAmount);
 	
-	cod_print_chat(0, DontChange, "^x03%s^x01 przelal^x04 %i $^x01 na konto^x03 %s^x01.", szName, iCashAmount, szPlayerName);
+	cod_print_chat(0, "^x03%s^x01 przelal^x04 %i honoru^x01 na konto^x03 %s^x01.", playerName, cashAmount, playerIdName);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }

@@ -41,6 +41,16 @@ new const codSounds[sounds][] =
 	"CoDMod/levelup3.wav"
 };
 
+native cod_check_password(id);
+/*------------------------------
+Sprawdza, czy gracz zalogowal sie na konto.
+------------------------------*/
+
+native cod_force_password(id);
+/*------------------------------
+Wyświetla menu logowania na konto.
+------------------------------*/
+
 native cod_get_user_exp(id);
 /*------------------------------
 Zwraca doswiadczenie gracza.
