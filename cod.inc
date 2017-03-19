@@ -28,6 +28,19 @@
 #define RENDER_ITEM 1
 #define RENDER_ADDITIONAL 2
 
+enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3 };
+
+new const codSounds[sounds][] =
+{
+	"CoDMod/select.wav",
+	"CoDMod/exit.wav",
+	"CoDMod/start.wav",
+	"CoDMod/start2.wav",
+	"CoDMod/levelup.wav",
+	"CoDMod/levelup2.wav",
+	"CoDMod/levelup3.wav"
+};
+
 native cod_get_user_exp(id);
 /*------------------------------
 Zwraca doswiadczenie gracza.

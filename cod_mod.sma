@@ -39,19 +39,6 @@ new const commandPoints[][] = { "staty", "say /staty", "say_team /staty", "say /
 new const commandHud[][] = { "hud", "say /hud", "say_team /hud", "say /zmienhud", "say_team /zmienhud", "say /change_hud", "say_team /change_hud" };
 new const commandBlock[][] = { "fullupdate", "cl_autobuy", "cl_rebuy", "cl_setautobuy", "rebuy", "autobuy", "hegren", "sgren", "flash", "-rocket", "-mine", "-dynamite", "-medkit", "-teleport" };
 
-enum _:sounds { SOUND_SELECT, SOUND_SELECT2, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3 };
-
-new const codSounds[sounds][] =
-{
-	"CoDMod/select.wav",
-	"CoDMod/select2.wav",
-	"CoDMod/start.wav",
-	"CoDMod/start2.wav",
-	"CoDMod/levelup.wav",
-	"CoDMod/levelup2.wav",
-	"CoDMod/levelup3.wav"
-};
-
 enum _:models { MODEL_ROCKET, MODEL_MINE, MODEL_DYNAMITE, MODEL_MEDKIT };
 
 new const codModels[models][] =
@@ -438,6 +425,8 @@ public client_disconnected(id)
 
 public select_fraction(id)
 {
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
 	if(!get_bit(id, dataLoaded))
 	{
 		cod_print_chat(id, "Trwa wczytywanie twoich klas...");
@@ -447,6 +436,8 @@ public select_fraction(id)
 	
 	if(ArraySize(codFractions))
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
 		new fractionName[MAX_NAME], menu = menu_create("\wWybierz \rFrakcje:", "select_fraction_handel");
 	
 		for(new i = 0; i < ArraySize(codFractions); i++)
@@ -463,28 +454,32 @@ public select_fraction(id)
 		menu_display(id, menu);
 	}
 	else select_class(id);
+
+	return PLUGIN_HANDLED;
 }
  
 public select_fraction_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
-
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+		
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
-		
-		return PLUGIN_CONTINUE;
+
+		return PLUGIN_HANDLED;
 	}
 
-	new menuData[128], tempId[3], itemData[MAX_NAME], codClass[classInfo], classId, itemAccess, menuCallback;
+	new menuData[128], itemData[MAX_NAME], codClass[classInfo], classId, itemAccess, menuCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, menuCallback);
 	
 	menu_destroy(menu);
 	
-	new menu = menu_create("\wWybierz \rKlase:", "select_class_handle");
+	new playerId[3], menu = menu_create("\wWybierz \rKlase:", "select_class_handle");
 	
 	classId = codPlayer[id][PLAYER_CLASS];
 
@@ -498,8 +493,9 @@ public select_fraction_handle(id, menu, item)
 			
 			formatex(menuData, charsmax(menuData), "%s \yPoziom: %i \d(%s)", codClass[CLASS_NAME], codPlayer[id][PLAYER_LEVEL], get_weapons(codClass[CLASS_WEAPONS]));
 			
-			num_to_str(i, tempId, charsmax(tempId));
-			menu_additem(menu, menuData, tempId);
+			num_to_str(i, playerId, charsmax(playerId));
+
+			menu_additem(menu, menuData, playerId);
 		}
 	}
 	
@@ -511,12 +507,16 @@ public select_fraction_handle(id, menu, item)
 	
 	menu_display(id, menu);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public select_class(id)
 {
-	new menuData[128], tempId[3], codClass[classInfo], classId, menu = menu_create("\wWybierz \rKlase:", "select_class_handle");
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+		
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	new menuData[128], playerId[3], codClass[classInfo], classId, menu = menu_create("\wWybierz \rKlase:", "select_class_handle");
 	
 	classId = codPlayer[id][PLAYER_CLASS];
 
@@ -528,8 +528,9 @@ public select_class(id)
 
 		formatex(menuData, charsmax(menuData), "%s \yPoziom: %i \d(%s)", codClass[CLASS_NAME], codPlayer[id][PLAYER_LEVEL], get_weapons(codClass[CLASS_WEAPONS]));
 
-		num_to_str(i, tempId, charsmax(tempId));
-		menu_additem(menu, menuData, tempId);
+		num_to_str(i, playerId, charsmax(playerId));
+
+		menu_additem(menu, menuData, playerId);
 	}
 	
 	if(classId) load_class(id, classId);
@@ -545,35 +546,45 @@ public select_class(id)
 
 public select_class_handle(id, menu, item)
 {
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+		
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
-		
-		return PLUGIN_CONTINUE;
-	}       
+
+		return PLUGIN_HANDLED;
+	}   
 	
 	new itemData[64], itemAccess, menuCallback;
 	
 	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, menuCallback);
 	
-	item = str_to_num(itemData);
+	new class = str_to_num(itemData);
 
 	load_class(id, codPlayer[id][PLAYER_CLASS]);
 	
-	if(item == codPlayer[id][PLAYER_CLASS] && !codPlayer[id][PLAYER_NEW_CLASS]) return PLUGIN_CONTINUE;
+	if(class == codPlayer[id][PLAYER_CLASS] && !codPlayer[id][PLAYER_NEW_CLASS]) return PLUGIN_CONTINUE;
 	
-	codPlayer[id][PLAYER_NEW_CLASS] = item;
+	codPlayer[id][PLAYER_NEW_CLASS] = class;
 	
 	if(codPlayer[id][PLAYER_CLASS]) cod_print_chat(id, "Klasa zostanie zmieniona w nastepnej rundzie.");
 	else set_new_class(id);
+
+	menu_destroy(menu);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public display_classes_description(id)
 {
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+		
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
 	new className[MAX_NAME], menu = menu_create("\wWybierz \rKlase:", "display_class_description_handle");
 
 	for(new i = 1; i < ArraySize(codClasses); i++)
@@ -588,34 +599,47 @@ public display_classes_description(id)
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepna strona");
 	
 	menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
 }
 
 public display_classes_description_handle(id, menu, item)
 {
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT2]);
-	
-	if(item++ == MENU_EXIT)
-	{
-		menu_destroy(menu);
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
-		return PLUGIN_CONTINUE;
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	if(item == MENU_EXIT)
+	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
 	}
+
+	menu_destroy(menu);
 	
 	new menuData[256], codClass[classInfo];
 	
 	ArrayGetArray(codClasses, item, codClass);
 	
 	format(menuData, charsmax(menuData), "\yKlasa: \w%s^n\yFrakcja: \w%i^n\yZycie: \w%i^n\yBronie:\w%s^n\yOpis: \w%s^n%s", codClass[CLASS_NAME], 100 + codClass[CLASS_HEAL], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_DESC], codClass[CLASS_DESC][79]);
+	
 	show_menu(id, 0, menuData);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public display_item_description(id)
 	show_item_description(id, codPlayer[id][PLAYER_ITEM]);
 	
-stock display_items_description(id, page = 0)
+public display_items_description(id, page, sound)
 {
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	
+	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
 	new itemName[MAX_NAME], menu = menu_create("\wWybierz \rPrzedmiot:", "display_items_description_handle");
 	
 	for(new i = 1; i < ArraySize(codItems); i++)
@@ -630,23 +654,32 @@ stock display_items_description(id, page = 0)
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepna strona");
 	
 	menu_display(id, menu, page);
+
+	return PLUGIN_HANDLED;
 }
 
 public display_items_description_handle(id, menu, item)
 {
-	if(item++ == MENU_EXIT)
-	{
-		menu_destroy(menu);
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
-		return PLUGIN_CONTINUE;
-	}
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT2]);
+	if(item == MENU_EXIT)
+	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	menu_destroy(menu);
 	
 	show_item_description(id, item);
-	display_items_description(id, (item - 1) / 7);
+
+	display_items_description(id, (item - 1) / 7, 1);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 	
 public show_item_description(id, item)
@@ -685,6 +718,7 @@ public reset_stats(id)
 	}
 	
 	set_bit(id, resetStats);
+
 	cod_print_chat(id, "Twoje umiejetnosci zostana zresetowane w kolejnej rudzie.");
 	
 	return PLUGIN_CONTINUE;
@@ -693,8 +727,6 @@ public reset_stats(id)
 public reset_points(id)
 {
 	if(!is_user_connected(id)) return;
-
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	rem_bit(id, resetStats);
 	
@@ -708,8 +740,12 @@ public reset_points(id)
 	if(codPlayer[id][PLAYER_POINTS]) assign_points(id);
 }
 
-public assign_points(id)
+public assign_points(id, sound)
 {
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	
+	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
 	new menuData[128];
 	
 	format(menuData, charsmax(menuData), "\wPrzydziel \rPunkty \y(%i):", codPlayer[id][PLAYER_POINTS]);
@@ -741,17 +777,23 @@ public assign_points(id)
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjdz", 0);
 	
 	menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
 }
 
 public assign_points_handler(id, menu, item) 
 {
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-
-	if(item == MENU_EXIT) 
-	{
-		menu_destroy(menu);
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
-		return PLUGIN_CONTINUE;
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	if(item == MENU_EXIT)
+	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
 	}
 	
 	if(codPlayer[id][PLAYER_POINTS] < 1) return PLUGIN_CONTINUE;
@@ -819,13 +861,19 @@ public assign_points_handler(id, menu, item)
 		}
 	}
 
-	if(codPlayer[id][PLAYER_POINTS] > 0) assign_points(id);
+	menu_destroy(menu);
 
-	return PLUGIN_CONTINUE;
+	if(codPlayer[id][PLAYER_POINTS] > 0) assign_points(id, 1);
+
+	return PLUGIN_HANDLED;
 }
 
-public change_hud(id)
+public change_hud(id, sound)
 {
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+		
+	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
 	new menuData[128], menu = menu_create("\yCoD Mod: \rKonfiguracja HUD", "change_hud_handle");
 	
 	format(menuData, charsmax(menuData), "\wSposob \yWyswietlania: \r%s", codPlayer[id][PLAYER_HUD] > TYPE_HUD ? "DHUD" : "HUD");
@@ -852,15 +900,23 @@ public change_hud(id)
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjdz", 0);
 	
 	menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
 }
 
 public change_hud_handle(id, menu, item) 
 {
-	if(item == MENU_EXIT) 
-	{
-		menu_destroy(menu);
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
-		return PLUGIN_CONTINUE;
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	if(item == MENU_EXIT)
+	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
 	}
 	
 	switch(item)
@@ -881,8 +937,10 @@ public change_hud_handle(id, menu, item)
 			codPlayer[id][PLAYER_HUD_POSY] = 6;
 		}
 	}
+
+	menu_destroy(id);
 	
-	change_hud(id);
+	change_hud(id, 1);
 	
 	return PLUGIN_CONTINUE;
 }
@@ -1580,45 +1638,45 @@ public round_winner(const team[])
 	}
 }
 
-public bomb_planted(planter)
+public bomb_planted(id)
 {
-	if(get_playersnum() < minPlayers || !codPlayer[PLAYER_CLASS]) return;
+	if(get_playersnum() < minPlayers || !codPlayer[id][PLAYER_CLASS]) return;
 
-	new exp = get_exp_bonus(planter, expPlant);
+	new exp = get_exp_bonus(id, expPlant);
 	
-	codPlayer[planter][PLAYER_GAINED_EXP] += exp;
+	codPlayer[id][PLAYER_GAINED_EXP] += exp;
 	
-	cod_print_chat(planter, "Dostales^x03 %i^x01 doswiadczenia za podlozenie bomby.", exp);
+	cod_print_chat(id, "Dostales^x03 %i^x01 doswiadczenia za podlozenie bomby.", exp);
 	
-	check_level(planter);
+	check_level(id);
 }
 
-public bomb_defused(defuser)
+public bomb_defused(id)
 {
-	if(get_playersnum() < minPlayers || !codPlayer[PLAYER_CLASS]) return;
+	if(get_playersnum() < minPlayers || !codPlayer[id][PLAYER_CLASS]) return;
 	
-	new exp = get_exp_bonus(defuser, expDefuse);
+	new exp = get_exp_bonus(id, expDefuse);
 	
-	codPlayer[defuser][PLAYER_GAINED_EXP] += exp;
+	codPlayer[id][PLAYER_GAINED_EXP] += exp;
 	
-	cod_print_chat(defuser, "Dostales^x03 %i^x01 doswiadczenia za rozbrojenie bomby.", exp);
+	cod_print_chat(id, "Dostales^x03 %i^x01 doswiadczenia za rozbrojenie bomby.", exp);
 	
-	check_level(defuser);
+	check_level(id);
 }
 
 public hostages_rescued()
 {
 	if(get_playersnum() < minPlayers) return;
 
-	new rescuer = get_loguser_index(), exp = get_exp_bonus(rescuer, expRescue);
+	new id = get_loguser_index(), exp = get_exp_bonus(id, expRescue);
 
-	if(!codPlayer[PLAYER_CLASS]) return;
+	if(!codPlayer[id][PLAYER_CLASS]) return;
 	
-	codPlayer[rescuer][PLAYER_GAINED_EXP] += exp;
+	codPlayer[id][PLAYER_GAINED_EXP] += exp;
 	
-	cod_print_chat(rescuer, "Dostales^x03 %i^x01 doswiadczenia za uratowanie zakladnikow.", exp);
+	cod_print_chat(id, "Dostales^x03 %i^x01 doswiadczenia za uratowanie zakladnikow.", exp);
 	
-	check_level(rescuer);
+	check_level(id);
 }
 
 stock render_change(id, playerStatus = -1)
@@ -2241,15 +2299,15 @@ public sql_init()
 
 public load_data(id)
 {
-	new tempId[1], queryData[128];
+	new playerId[1], queryData[128];
 	
-	tempId[0] = id;
+	playerId[0] = id;
 	
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_mod` WHERE name = '%s'", codPlayer[id][PLAYER_NAME]);
-	SQL_ThreadQuery(sql, "load_data_handle", queryData, tempId, sizeof(tempId));
+	SQL_ThreadQuery(sql, "load_data_handle", queryData, playerId, sizeof(playerId));
 }
 
-public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+public load_data_handle(failState, Handle:query, error[], errorNum, playerId[], dataSize)
 {
 	if(failState) 
 	{
@@ -2258,7 +2316,7 @@ public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], da
 		return;
 	}
 	
-	new id = tempId[0], className[MAX_NAME], codClass[playerClassInfo], classId;
+	new id = playerId[0], className[MAX_NAME], codClass[playerClassInfo], classId;
 	
 	while(SQL_MoreResults(query))
 	{
@@ -2291,15 +2349,15 @@ public save_data(id, end)
 {
 	if(!codPlayer[id][PLAYER_CLASS] || !get_bit(id, dataLoaded)) return;
 
-	new tempId[256], className[MAX_NAME];
+	new queryData[256], className[MAX_NAME];
 	get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 	
-	formatex(tempId, charsmax(tempId), "UPDATE `cod_mod` SET exp = (`exp` + %d), lvl = (`lvl` + %d), intelligence = '%d', health = '%d', stamina = '%d', strength = '%d', condition = '%d' WHERE name = '%s' AND class = '%s'", 
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_mod` SET exp = (`exp` + %d), lvl = (`lvl` + %d), intelligence = '%d', health = '%d', stamina = '%d', strength = '%d', condition = '%d' WHERE name = '%s' AND class = '%s'", 
 	codPlayer[id][PLAYER_GAINED_EXP], codPlayer[id][PLAYER_GAINED_LEVEL], codPlayer[id][PLAYER_INT], codPlayer[id][PLAYER_HEAL], codPlayer[id][PLAYER_STAM], codPlayer[id][PLAYER_STR], codPlayer[id][PLAYER_COND], codPlayer[id][PLAYER_NAME], className);
 	
 	switch(end)
 	{
-		case NORMAL, DISCONNECT: SQL_ThreadQuery(sql, "ignore_handle", tempId);
+		case NORMAL, DISCONNECT: SQL_ThreadQuery(sql, "ignore_handle", queryData);
 		case MAP_END:
 		{
 			new error[128], errorNum, Handle:connect, Handle:query;
@@ -2315,7 +2373,7 @@ public save_data(id, end)
 				return;
 			}
 			
-			query = SQL_PrepareQuery(connect, tempId);
+			query = SQL_PrepareQuery(connect, queryData);
 			
 			if(!SQL_Execute(query))
 			{

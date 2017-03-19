@@ -110,6 +110,6 @@ Do zrefaktoryzowania:
 - Rynek
 - VIP
 - Questy
-- Paczki
-- Nocny Exp
-- Nagrody dla 3 najlepszych
+- Paczki (done)
+- Nocny Exp (done)
+- Nagrody dla 3 najlepszych (done)

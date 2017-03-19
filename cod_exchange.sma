@@ -8,7 +8,7 @@
 new const commandExchange[][] = { "say /exchange", "say_team /exchange", "say /zamien", "say_team /zamien", "say /wymien", "say_team /wymien", "wymien" };
 new const commandGive[][] = { "say /give", "say_team /give", "say /oddaj", "say_team /oddaj", "say /daj", "say_team /daj", "daj" };
 
-new blockExchange, cooldown, exchangeId[MAX_PLAYERS + 1], giveId[MAX_PLAYERS + 1];
+new maxPlayers, blockExchange, cooldown;
 
 public plugin_init() 
 {
@@ -17,6 +17,8 @@ public plugin_init()
 	for(new i; i < sizeof commandExchange; i++) register_clcmd(commandExchange[i], "exchange_menu");
 		
 	for(new i; i < sizeof commandGive; i++) register_clcmd(commandGive[i], "give_item");
+
+	maxPlayers = get_maxplayers();
 }
 
 public cod_new_round()
@@ -24,43 +26,43 @@ public cod_new_round()
 	
 public exchange_menu(id)
 {
-	client_cmd(id, "spk CodMod/select");
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new menuData[64], menu = menu_create("\wMenu \rWymiany", "exchange_menu_handle");
 	
 	menu_additem(menu, "Wymien \yPrzedmiot^n");
 	
 	formatex(menuData, charsmax(menuData), "Propozycje \yWymiany \d[\r%s\d]", get_bit(id, blockExchange) ? "Zablokowane" : "Odblokowane");
+	
 	menu_additem(menu, menuData);
 	
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjdz");
 	
 	menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
 }
 
 public exchange_menu_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	client_cmd(id, "spk QTM_CodMod/select");
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
 		menu_destroy(menu);
 
-		return PLUGIN_CONTINUE;
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		return PLUGIN_HANDLED;
 	}
 	
 	switch(item)
 	{
-		case 0:
-		{
-			exchange_item(id);
-
-			menu_destroy(menu);
-
-			return PLUGIN_HANDLED;
-		}
+		case 0: exchange_item(id);
 		case 1:
 		{
 			if(get_bit(id, blockExchange))
@@ -78,84 +80,107 @@ public exchange_menu_handle(id, menu, item)
 		}		
 	}
 
-	return PLUGIN_CONTINUE;
+	menu_destroy(menu);
+
+	return PLUGIN_HANDLED;
 }
 
 public exchange_item(id)
 {
-	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	client_cmd(id, "spk QTM_CodMod/select");
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new menuData[128], playerName[64], itemName[64], menu = menu_create("\wWymien \rPrzedmiot", "exchange_item_handle");
-	
-	for(new i = 0, j = 0; i <= 32; i++)
+	new menuData[128], playerName[64], itemName[64], playerId[3], players, menu = menu_create("\wWymien \rPrzedmiot", "exchange_item_handle");
+
+	for(new player = 1; player <= maxPlayers; player++)
 	{
-		if(!is_user_connected(i) || id == i || !cod_get_user_class(i) || !cod_get_user_item(i) || get_bit(id, blockExchange)) continue;
-
-		exchangeId[j++] = i;
-
+		if(!is_user_connected(player) || id == player || !cod_get_user_class(player) || !cod_get_user_item(player)) continue;
+		
 		cod_get_item_name(cod_get_user_item(id), itemName, charsmax(itemName));
-		get_user_name(id, playerName, charsmax(playerName));
 
+		get_user_name(id, playerName, charsmax(playerName));
+		
 		formatex(menuData, charsmax(menuData), "%s \y(%s)", playerName, itemName);
 
-		menu_additem(menu, menuData);
+		num_to_str(player, playerId, charsmax(playerId));
+		
+		menu_additem(menu, menuData, playerId);
+		
+		players++;
 	}
 	
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjdz");
-	
-	menu_display(id, menu);
+	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
+	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 
-	return PLUGIN_CONTINUE;
+	if(!players)
+	{
+		menu_destroy(menu);
+
+		cod_print_chat(id, "Na serwerze nie ma gracza, z ktorym moglbys sie wymienic przedmiotem!");
+	}
+	else menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
 }
 
 public exchange_item_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	client_cmd(id, "spk QTM_CodMod/select");
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
 		menu_destroy(menu);
 
-		return PLUGIN_CONTINUE;
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		return PLUGIN_HANDLED;
 	}
+
+	new playerId[3], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, playerId, charsmax(playerId), _, _, itemCallback);
+
+	new player = str_to_num(playerId);
+
+	menu_destroy(menu);
 	
-	if(!is_user_connected(exchangeId[item]))
+	if(!is_user_connected(player))
 	{
 		cod_print_chat(id, "Wybranego gracza nie ma juz na serwerze.");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
-	if(get_bit(exchangeId[item], cooldown))
+	if(get_bit(player, cooldown))
 	{
 		cod_print_chat(id, "Wybrany gracz musi poczekac^x03 1 runde^x01, aby wymienic sie przedmiotem.");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
 	if(get_bit(id, cooldown))
 	{
 		cod_print_chat(id, "Musisz poczekac^x03 1 runde^x01, aby wymienic sie tym przedmiotem.");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
-	if(!cod_get_user_item(exchangeId[item]))
+	if(!cod_get_user_item(player))
 	{
 		cod_print_chat(id, "Wybrany gracz nie ma zadnego przedmiotu.");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
 	if(!cod_get_user_item(id))
 	{
 		cod_print_chat(id, "Nie masz zadnego przedmiotu.");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 
 	new menuData[128], playerName[64], itemName[64];
@@ -167,70 +192,78 @@ public exchange_item_handle(id, menu, item)
 	
 	new menu = menu_create(menuData, "exchange_item_question");
 
-	menu_additem(menu, "Tak", playerName);
-	menu_additem(menu, "Nie", playerName);
+	num_to_str(player, playerId, charsmax(playerId));
+
+	menu_additem(menu, "Tak", playerId);
+	menu_additem(menu, "Nie", playerId);
 	
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjdz");
-	menu_display(exchangeId[item], menu);
+
+	menu_display(player, menu);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public exchange_item_question(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
-	client_cmd(id, "spk QTM_CodMod/select");
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
-	new playerName[64], itemAccess, itemCallback;
-	
-	menu_item_getinfo(menu, item, itemAccess, playerName, charsmax(playerName), _, _, itemCallback);
-	
-	new player = get_user_index(playerName);
+	new playerId[3], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, playerId, charsmax(playerId), _, _, itemCallback);
+
+	new player = str_to_num(playerId);
+
+	menu_destroy(menu);
 	
 	if(!is_user_connected(player))
 	{
 		cod_print_chat(id, "Gracza proponujacego wymiane nie ma juz na serwerze.");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
 	if(get_bit(player, cooldown))
 	{
 		cod_print_chat(id, "Gracz proponujacy wymiane musi poczekac^x03 1 runde^x01, aby wymienic sie przedmiotem.");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
 	if(!cod_get_user_item(player))
 	{
 		cod_print_chat(id, "Gracz proponujacy wymiane nie ma juz przedmiotu.");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
 	if(!cod_get_user_item(id))
 	{
 		cod_print_chat(id, "Nie masz zadnego przedmiotu.");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
 	switch(item)
 	{
 		case 0: 
 		{ 
-			new name[64], itemName[64], playerItemName[64],
+			new name[64], playerName[64], itemName[64], playerItemName[64],
 				playerItemValue, playerItemId = cod_get_user_item(player, playerItemValue), itemValue, itemId = cod_get_user_item(id, itemValue), 
 				playerItemDurability = cod_get_item_durability(player), itemDurability = cod_get_item_durability(id);
 
+			get_user_name(player, playerName, charsmax(playerName));
 			get_user_name(id, name, charsmax(name));
 
 			cod_get_item_name(cod_get_user_item(player), playerItemName, charsmax(playerItemName));
@@ -250,89 +283,114 @@ public exchange_item_question(id, menu, item)
 		}
 		case 1: cod_print_chat(player, "Wybrany gracz nie zgodzil sie na wymiane przedmiotami.");
 	}
-	return PLUGIN_CONTINUE;
+
+	return PLUGIN_HANDLED;
 }
 
 public give_item(id)
 {
-	client_cmd(id, "spk CodMod/select");
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	new playerName[64], menu = menu_create("\wOddaj \rPrzedmiot", "give_item_handle");
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	for(new i = 0, n = 0; i <= 32; i++)
-	{
-		if(!is_user_connected(i) || i == id || !cod_get_user_class(i) || cod_get_user_item(i)) continue;
+	new playerName[64], playerId[3], players, menu = menu_create("\wOddaj \rPrzedmiot", "give_item_handle");
 
-		giveId[n++] = i;
+	for(new player = 1; player <= maxPlayers; player++)
+	{
+		if(!is_user_connected(player) || player == id || !cod_get_user_class(player) || cod_get_user_item(player)) continue;
 		
-		get_user_name(i, playerName, charsmax(playerName));
+		get_user_name(id, playerName, charsmax(playerName));
+
+		num_to_str(player, playerId, charsmax(playerId));
 		
-		menu_additem(menu, playerName);
+		menu_additem(menu, playerName, playerId);
+		
+		players++;
 	}
 	
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjdz");
-	
-	menu_display(id, menu);
+	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
+	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+
+	if(!players)
+	{
+		menu_destroy(menu);
+
+		cod_print_chat(id, "Na serwerze nie ma gracza, z ktoremu moglbys oddac przedmiot!");
+	}
+	else menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
 }
 
 public give_item_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
-	client_cmd(id, "spk QTM_CodMod/select");
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
-	if(!is_user_connected(giveId[item]))
+	new playerId[3], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, playerId, charsmax(playerId), _, _, itemCallback);
+
+	new player = str_to_num(playerId);
+
+	menu_destroy(menu);
+	
+	if(!is_user_connected(player))
 	{
 		cod_print_chat(id, "Wybranego gracza nie ma juz na serwerze.");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
 	if(get_bit(id, cooldown))
 	{
 		cod_print_chat(id, "Musisz poczekac^x03 1 runde^x01, aby oddac ten przedmiot.");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
-	if(cod_get_user_item(giveId[id]))
+	if(cod_get_user_item(player))
 	{
 		cod_print_chat(id, "Wybrany gracz ma juz przedmiot.");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
-	
-	new itemValue, itemId = cod_get_user_item(id, itemValue), itemDurability = cod_get_item_durability(id);
-	
-	if(!itemId)
+
+	if(!cod_get_user_item(id))
 	{
 		cod_print_chat(id, "Nie masz zadnego przedmiotu.");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
-	new name[64], playerName[64], itemName[64];
+	new name[64], playerName[64], itemName[64],
+		itemValue, itemId = cod_get_user_item(id, itemValue), itemDurability = cod_get_item_durability(id);
 	
 	get_user_name(id, name, charsmax(name));
-	get_user_name(giveId[item], playerName, charsmax(playerName));
+	get_user_name(player, playerName, charsmax(playerName));
 
 	cod_get_item_name(cod_get_user_item(id), itemName, charsmax(itemName));
 	
-	set_bit(giveId[item], cooldown);
+	set_bit(player, cooldown);
+	rem_bit(id, cooldown);
 	
-	cod_set_user_item(giveId[item], itemId, itemValue);
-	cod_set_item_durability(giveId[item], itemDurability);
+	cod_set_user_item(player, itemId, itemValue);
+	cod_set_item_durability(player, itemDurability);
 	cod_set_user_item(id);
 	
 	cod_print_chat(id, "Oddales przedmiot^x03 %s^x01 graczowi^x03 %s^x01.", name, itemName);
-	cod_print_chat(giveId[item], "Dostales przedmiot^x03 %s^x01 od gracza^x03 %s^x01.", playerName, itemName);
+	cod_print_chat(player, "Dostales przedmiot^x03 %s^x01 od gracza^x03 %s^x01.", playerName, itemName);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
