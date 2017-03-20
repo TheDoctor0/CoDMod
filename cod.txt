@@ -100,7 +100,7 @@ Do zrobienia:
 - Statystyki WWW
 
 Do zrefaktoryzowania:
-- Noze
+- Noze (done)
 - Sklep
 - Klany
 - Menu (done)

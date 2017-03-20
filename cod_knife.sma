@@ -59,7 +59,7 @@ public change_knife(id)
         return PLUGIN_HANDLED;
     }
 
-    new knifeData[64], knifeId[3], menu = menu_create("\wWybierz\r Model Noza\w:", "change_knife_handle");
+    new knifeData[64], knifeId[3], menu = menu_create("\wWybierz \yModel Noza\w:", "change_knife_handle");
     
     for(new i = 0; i < sizeof(knifeModels); i++)
     {
@@ -102,7 +102,7 @@ public ChangeKnife_Handler(id, menu, item)
     
     save_knife(id);
     
-    cod_print_chat(id, "Twoj nowy noz to:^x04 %s %s^x01!", knifeModels[id][NAME], knifeModels[id][BONUS]);
+    cod_print_chat(id, "Twoj nowy noz to:^x03 %s %s^x01!", knifeModels[id][NAME], knifeModels[id][BONUS]);
 
     menu_destroy(menu);
 
