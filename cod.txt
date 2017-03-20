@@ -15,8 +15,6 @@ Do zrefaktoryzowania:
 - Sklep
 - Klany (pamietac o unikalnym id)
 - Staty
-- System rejestracji (pamietac o zabezpieczeniu przed wielokrotnym wyswietlaniem menu)
-- VIP
 - Questy
 
 Kasyno:
