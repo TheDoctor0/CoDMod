@@ -461,8 +461,6 @@ public select_fraction(id)
 public select_fraction_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
@@ -472,6 +470,8 @@ public select_fraction_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
 	new menuData[128], itemData[MAX_NAME], codClass[classInfo], classId, itemAccess, menuCallback;
 
@@ -547,8 +547,6 @@ public select_class(id)
 public select_class_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
@@ -557,7 +555,9 @@ public select_class_handle(id, menu, item)
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
-	}   
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new itemData[64], itemAccess, menuCallback;
 	
@@ -606,8 +606,6 @@ public display_classes_description(id)
 public display_classes_description_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
@@ -617,6 +615,8 @@ public display_classes_description_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
 	menu_destroy(menu);
 	
@@ -661,8 +661,6 @@ public display_items_description(id, page, sound)
 public display_items_description_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
@@ -672,6 +670,8 @@ public display_items_description_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
 	menu_destroy(menu);
 	
@@ -784,8 +784,6 @@ public assign_points(id, sound)
 public assign_points_handler(id, menu, item) 
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
@@ -795,6 +793,8 @@ public assign_points_handler(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(codPlayer[id][PLAYER_POINTS] < 1) return PLUGIN_CONTINUE;
 
@@ -907,8 +907,6 @@ public change_hud(id, sound)
 public change_hud_handle(id, menu, item) 
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
@@ -918,6 +916,8 @@ public change_hud_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	switch(item)
 	{

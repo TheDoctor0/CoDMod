@@ -32,7 +32,7 @@ public exchange_menu(id)
 	
 	new menuData[64], menu = menu_create("\wMenu \rWymiany", "exchange_menu_handle");
 	
-	menu_additem(menu, "Wymien \yPrzedmiot^n");
+	menu_additem(menu, "Wymien \yPrzedmiot \r(/wymien)^n");
 	
 	formatex(menuData, charsmax(menuData), "Propozycje \yWymiany \d[\r%s\d]", get_bit(id, blockExchange) ? "Zablokowane" : "Odblokowane");
 	
@@ -49,8 +49,6 @@ public exchange_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-	
 	if(item == MENU_EXIT)
 	{
 		menu_destroy(menu);
@@ -59,10 +57,12 @@ public exchange_menu_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	switch(item)
 	{
-		case 0: exchange_item(id);
+		case 0: exchange_item(id, 1);
 		case 1:
 		{
 			if(get_bit(id, blockExchange))
@@ -85,11 +85,11 @@ public exchange_menu_handle(id, menu, item)
 	return PLUGIN_HANDLED;
 }
 
-public exchange_item(id)
+public exchange_item(id, sound)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new menuData[128], playerName[64], itemName[64], playerId[3], players, menu = menu_create("\wWymien \rPrzedmiot", "exchange_item_handle");
 
@@ -129,8 +129,6 @@ public exchange_item_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-	
 	if(item == MENU_EXIT)
 	{
 		menu_destroy(menu);
@@ -139,6 +137,8 @@ public exchange_item_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
 	new playerId[3], itemAccess, itemCallback;
 
@@ -207,8 +207,6 @@ public exchange_item_handle(id, menu, item)
 public exchange_item_question(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
@@ -218,6 +216,8 @@ public exchange_item_question(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new playerId[3], itemAccess, itemCallback;
 
@@ -326,8 +326,6 @@ public give_item(id)
 public give_item_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
@@ -337,6 +335,8 @@ public give_item_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new playerId[3], itemAccess, itemCallback;
 

@@ -59,8 +59,6 @@ public display_menu(id)
 public display_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
@@ -70,6 +68,8 @@ public display_menu_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new itemData[4], itemAccess, itemCallback;
 	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);

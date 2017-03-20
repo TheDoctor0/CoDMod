@@ -59,6 +59,8 @@ public change_knife(id)
         return PLUGIN_HANDLED;
     }
 
+    client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
     new knifeData[64], knifeId[3], menu = menu_create("\wWybierz \yModel Noza\w:", "change_knife_handle");
     
     for(new i = 0; i < sizeof(knifeModels); i++)
@@ -82,8 +84,6 @@ public change_knife(id)
 public ChangeKnife_Handler(id, menu, item)
 {
     if(!is_user_connected(id)) return PLUGIN_HANDLED;
-        
-    client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
     
     if(item == MENU_EXIT)
     {
@@ -93,6 +93,8 @@ public ChangeKnife_Handler(id, menu, item)
 
         return PLUGIN_HANDLED;
     }
+
+    client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
     
     new knifeId[3], itemAccess, itemCallback;
 

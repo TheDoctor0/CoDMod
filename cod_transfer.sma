@@ -34,6 +34,8 @@ public transfer_honor_menu(id)
 		return PLUGIN_HANDLED;
 	}
 
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
 	new menuData[256], playerName[64], playerId[3], players, menu = menu_create("\wWybierz \rGracza\w, ktoremu chcesz przelac \yHonor:", "transfer_honor_menu_handle");
 	
 	for(new player = 1; player <= maxPlayers; player++)
@@ -69,8 +71,6 @@ public transfer_honor_menu(id)
 public transfer_honor_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
@@ -80,6 +80,8 @@ public transfer_honor_menu_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new playerId[3], itemAccess, itemCallback;
 
@@ -117,6 +119,8 @@ public transfer_honor_handle(id)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 		
 	if(!is_user_connected(transferPlayer[id]))
 	{
@@ -168,6 +172,8 @@ public transfer_cash_menu(id)
 		return PLUGIN_HANDLED;
 	}
 
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
 	new menuData[256], playerName[64], playerId[3], players, menu = menu_create("\wWybierz \rGracza\w, ktoremu chcesz przelac \yKase:", "transfer_cash_menu_handle");
 	
 	for(new player = 1; player <= maxPlayers; player++)
@@ -203,8 +209,6 @@ public transfer_cash_menu(id)
 public transfer_cash_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(item == MENU_EXIT)
 	{
@@ -214,6 +218,8 @@ public transfer_cash_menu_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new playerId[3], itemAccess, itemCallback;
 
@@ -251,6 +257,8 @@ public transfer_cash_handle(id)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 		
 	if(!is_user_connected(transferPlayer[id]))
 	{
