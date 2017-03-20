@@ -102,7 +102,7 @@ Do zrobienia:
 Do zrefaktoryzowania:
 - Noze (done)
 - Sklep
-- Klany
+- Klany (pamiętać o unikalnym id)
 - Menu (done)
 - Honor (done)
 - Staty

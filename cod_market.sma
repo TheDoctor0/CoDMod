@@ -1,492 +1,583 @@
 #include <amxmodx>
-#include <cod>
 #include <cstrike>
+#include <cod>
 
 #define PLUGIN "CoD Market"
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-#define Set(%2,%1)	(%1 |= (1<<(%2&31)))
-#define Rem(%2,%1)	(%1 &= ~(1 <<(%2&31)))
-#define Get(%2,%1)	(%1 & (1<<(%2&31)))
-
-#define MAX_PLAYERS 32
 #define MAX_ITEMS 5
 
-enum _:Item { ID = 0, ITEM, VALUE, DURABILITY, OWNER, TYPE, PRICE, NAME[32] };
+enum _:items { ID, ITEM, VALUE, DURABILITY, OWNER, TYPE, PRICE, NAME[64] };
 
-new const szCommandMarket[][] = { "say /market", "say_team /market", "say /rynek", "say_team /rynek", "rynek" };
-new const szCommandSell[][] = { "say /sell", "say_team /sell", "say /wystaw", "say_team /wystaw", "say /sprzedaj", "say_team /sprzedaj", "sprzedaj" };
-new const szCommandBuy[][] = { "say /buy", "say_team /buy", "say /kup", "say_team /kup", "kup" };
-new const szCommandWithdraw[][] = { "say /withdraw", "say_team /withdraw", "say /wycofaj", "say_team /wycofaj", "wycofaj" };
+new const commandMarket[][] = { "say /market", "say_team /market", "say /rynek", "say_team /rynek", "rynek" };
+new const commandSell[][] = { "say /sell", "say_team /sell", "say /wystaw", "say_team /wystaw", "say /sprzedaj", "say_team /sprzedaj", "sprzedaj" };
+new const commandBuy[][] = { "say /buy", "say_team /buy", "say /kup", "say_team /kup", "kup" };
+new const commandWithdraw[][] = { "say /withdraw", "say_team /withdraw", "say /wycofaj", "say_team /wycofaj", "wycofaj" };
 
-new Array:gItems;
-
-new iUniqueID;
-
-new szPlayer[MAX_PLAYERS + 1][64], iPriceType[MAX_PLAYERS + 1];
+new playerName[MAX_PLAYERS + 1][64], priceType[MAX_PLAYERS + 1], Array:marketItems, itemId;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	for(new i; i < sizeof szCommandMarket; i++)
-		register_clcmd(szCommandMarket[i], "MarketMenu");
+	for(new i; i < sizeof commandMarket; i++) register_clcmd(commandMarket[i], "market_menu");
 
-	for(new i; i < sizeof szCommandSell; i++)
-		register_clcmd(szCommandSell[i], "SellItem");
+	for(new i; i < sizeof commandSell; i++) register_clcmd(commandSell[i], "sell_item");
 	
-	for(new i; i < sizeof szCommandBuy; i++)
-		register_clcmd(szCommandBuy[i], "BuyItem");
+	for(new i; i < sizeof commandBuy; i++) register_clcmd(commandBuy[i], "buy_item");
 	
-	for(new i; i < sizeof szCommandWithdraw; i++)
-		register_clcmd(szCommandWithdraw[i], "WithdrawItem");
+	for(new i; i < sizeof commandWithdraw; i++) register_clcmd(commandWithdraw[i], "withdraw_item");
 
-	register_concmd("Wpisz_Cene_Itemu", "SetItemPrice");
+	register_concmd("CENA_PRZEDMIOTU", "set_item_price");
 	
-	gItems = ArrayCreate(Item);
+	marketItems = ArrayCreate(items);
 }
 
-public client_disconnect(id)
-	RemoveSeller(id);
+public client_disconnected(id)
+	remove_seller(id);
 
 public client_connect(id)
-	get_user_name(id, szPlayer[id], charsmax(szPlayer));
+	get_user_name(id, playerName[id], charsmax(playerName[]));
 
-public MarketMenu(id)
+public market_menu(id)
 {
 	if(!cod_check_password(id))
 	{
 		cod_force_password(id);
+
 		return PLUGIN_HANDLED;
 	}
 	
-	client_cmd(id, "spk CodMod/select");
+	new menu = menu_create("\wMenu \rRynku", "market_menu_handle"), callback = menu_makecallback("market_menu_callback");
 	
-	new menu = menu_create("\wMenu \rRynku", "MarketMenu_Handle");
-	new callback = menu_makecallback("MarketMenu_Callback");
-	
-	menu_additem(menu, "Wystaw \yItem", _, _, callback);
-	menu_additem(menu, "Kup \yItem", _, _, callback);
-	menu_additem(menu, "Wycofaj \yItem", _, _, callback);
+	menu_additem(menu, "Wystaw \yPrzedmiot \r(/wystaw)", _, _, callback);
+	menu_additem(menu, "Kup \yPrzedmiot \r(/kup)", _, _, callback);
+	menu_additem(menu, "Wycofaj \yPrzedmiot \r(/wycofaj)", _, _, callback);
 	
 	menu_display(id, menu);
 	
 	return PLUGIN_CONTINUE;
 }
 
-public MarketMenu_Handle(id, menu, item)
+public market_menu_handle(id, menu, item)
 {
-	if(!is_user_connected(id))
-		return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
-	client_cmd(id, "spk CodMod/select");
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	if(item == MENU_EXIT)	
+	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
-		return PLUGIN_CONTINUE;
+
+		return PLUGIN_HANDLED;
 	}
 	
 	switch(item)	
 	{
-		case 0: SellItem(id);	
-		case 1: BuyItem(id);
-		case 2: WithdrawItem(id);
+		case 0: sell_item(id, 1);	
+		case 1: buy_item(id, 1);
+		case 2: withdraw_item(id, 1);
 	}
-	return PLUGIN_CONTINUE;
+
+	return PLUGIN_HANDLED;
 }
 
-public MarketMenu_Callback(id, menu, item)
+public market_menu_callback(id, menu, item)
 {
 	switch(item)	
 	{
-		case 0: if(!cod_get_user_class(id) || !cod_get_user_item(id) || getItemsAmount(id) >= MAX_ITEMS) return ITEM_DISABLED;
-		case 1: if(!ArraySize(gItems)) return ITEM_DISABLED;
-		case 2: if(!getItemsAmount(id)) return ITEM_DISABLED;
+		case 0: if(!cod_get_user_class(id) || !cod_get_user_item(id) || get_items_amount(id) >= MAX_ITEMS) return ITEM_DISABLED;
+		case 1: if(!ArraySize(marketItems)) return ITEM_DISABLED;
+		case 2: if(!get_items_amount(id)) return ITEM_DISABLED;
 	}
+
 	return ITEM_ENABLED;
 }
 
-public SellItem(id)
+public sell_item(id, sound)
 {
-	if(!is_user_connected(id))
-		return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
 	if(!cod_check_password(id))
 	{
 		cod_force_password(id);
+
 		return PLUGIN_HANDLED;
 	}
 		
-	client_cmd(id, "spk CodMod/select");
+	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new menu = menu_create("\wRodzaj \rOferty", "SellItem_Handle");
+	new menu = menu_create("\wRodzaj \rOferty", "sell_item_handle");
 	
-	menu_additem(menu, "Za \yDolary");
-	menu_additem(menu, "Za \yHonor");
+	menu_additem(menu, "Sprzedaz \rza \yDolary");
+	menu_additem(menu, "Sprzedaz \rza \yHonor");
 	
-	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
-	menu_setprop(menu, MPROP_EXIT, 0);
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
 	menu_display(id, menu);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
-public SellItem_Handle(id, menu, item)
+public sell_item_handle(id, menu, item)
 {
-	if(!is_user_connected(id))
-		return PLUGIN_CONTINUE;
-		
-	client_cmd(id, "spk CodMod/select");
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
 	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
+
 		return PLUGIN_HANDLED;
 	}
-	
-	iPriceType[id] = item;
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	if(!cod_get_user_item(id))	
 	{
-		MarketMenu(id);
-		cod_print_chat(id, DontChange, "Nie masz zadnego itemu!");
-		return PLUGIN_CONTINUE;
+		cod_print_chat(id, "Nie masz zadnego itemu!");
+
+		return PLUGIN_HANDLED;
 	}
 	
-	if(getItemsAmount(id) >= MAX_ITEMS)	
+	if(get_items_amount(id) >= MAX_ITEMS)	
 	{
-		MarketMenu(id);
-		cod_print_chat(id, DontChange, "Wystawiles juz %i itemow!", MAX_ITEMS);
-		return PLUGIN_CONTINUE;
+		cod_print_chat(id, "Wystawiles juz maksymalne^x03 %i^x01 przedmiotow!", MAX_ITEMS);
+
+		return PLUGIN_HANDLED;
 	}
+
+	priceType[id] = item;
 	
-	client_cmd(id, "messagemode Wpisz_Cene_Itemu");
+	client_cmd(id, "messagemode CENA_PRZEDMIOTU");
 	
-	cod_print_chat(id, DontChange, "Wpisz cene, za ktora chcesz sprzedac item.");
+	cod_print_chat(id, "Wpisz^x03 cene^x01, za ktora chcesz sprzedac item.");
+
+	client_print(id, print_center, "Wpisz cene, za ktora chcesz sprzedac item.");
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
-public SetItemPrice(id)
+public set_item_price(id)
 {
 	if(!cod_check_password(id))
 	{
 		cod_force_password(id);
+
 		return PLUGIN_HANDLED;
 	}
-	
-	new szMessage[16], szTemp[16], iPrice;
-	
-	read_argv(1, szMessage, charsmax(szMessage));
-	format(szTemp, charsmax(szTemp), "%s", szMessage);
-	
-	iPrice = str_to_num(szTemp);
-	
-	if(iPrice > 0 && iPrice < 100000)	
+
+	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+	if(!cod_get_user_item(id))
 	{
-		SellItem(id);
-		cod_print_chat(id, DontChange, "Cena musi nalezec do przedzialu 1 - 99999!");
-		return PLUGIN_CONTINUE;
+		cod_print_chat(id, "Nie masz zadnego itemu!");
+
+		return PLUGIN_HANDLED;
 	}
+
+	if(get_items_amount(id) >= MAX_ITEMS)	
+	{
+		cod_print_chat(id, "Wystawiles juz maksymalne^x03 %i^x01 przedmiotow!", MAX_ITEMS);
+
+		return PLUGIN_HANDLED;
+	}
+
+	new priceData[16], price;
 	
-	new aItem[Item];
+	read_args(priceData, charsmax(priceData));
+	remove_quotes(priceData);
+
+	price = str_to_num(priceData);
 	
-	aItem[ID] = iUniqueID++;
-	aItem[ITEM] = cod_get_user_item(id, aItem[VALUE]);
-	aItem[DURABILITY] = cod_get_item_durability(id);
-	aItem[OWNER] = id;
-	aItem[TYPE] = iPriceType[id];
-	aItem[PRICE] = iPrice;
-	cod_get_item_name(cod_get_user_item(id), aItem[NAME], charsmax(aItem[NAME]));
+	if(price  <= 0 || price >= 100000)
+	{ 
+		cod_print_chat(id, "Cena musi nalezec do przedzialu^x03 1 - 99999^x01!");
+
+		return PLUGIN_HANDLED;
+	}
+
+	new marketItem[items];
 	
-	ArrayPushArray(gItems, aItem);
+	marketItem[ID] = itemId++;
+	marketItem[ITEM] = cod_get_user_item(id, marketItem[VALUE]);
+	marketItem[DURABILITY] = cod_get_item_durability(id);
+	marketItem[OWNER] = id;
+	marketItem[TYPE] = priceType[id];
+	marketItem[PRICE] = price;
+
+	cod_get_item_name(cod_get_user_item(id), marketItem[NAME], charsmax(marketItem[NAME]));
 	
-	cod_set_user_item(id, 0);
+	ArrayPushArray(marketItems, marketItem);
 	
-	cod_print_chat(0, DontChange, "^x03%s^x01 wystawil na rynek^x03 %s^x01 za^x03 %i %s^x01.", szPlayer[id], aItem[NAME], aItem[PRICE], aItem[TYPE] ? "Honoru" : "$");
+	cod_set_user_item(id);
 	
-	return PLUGIN_CONTINUE;
+	cod_print_chat(0, "^x03%s^x01 wystawil^x03 %s^x01 na rynek za^x03 %i%s^x01.", playerName[id], marketItem[NAME], marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
+	
+	return PLUGIN_HANDLED;
 }
 
-public BuyItem(id)
+public buy_item(id, sound)
 {
-	if(!is_user_connected(id))
-		return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
 	if(!cod_check_password(id))
 	{
 		cod_force_password(id);
+
 		return PLUGIN_HANDLED;
 	}
+
+	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	client_cmd(id, "spk CodMod/select");
+	new marketItem[items], itemData[128], itemId[2], itemsCounts = 0, menu = menu_create("\wKup \rPrzedmiot", "buy_item_handle");
 	
-	new menu = menu_create("\wKup \rItem", "BuyItem_Handle");
-	
-	new szTemp[128], szData[2];
-	
-	for(new i = 0; i < ArraySize(gItems); i++)
-	{		
-		new aItem[Item];
+	for(new i = 0; i < ArraySize(marketItems); i++)
+	{
+		ArrayGetArray(marketItems, i, marketItem);
 		
-		ArrayGetArray(gItems, i, aItem);
+		if(marketItem[OWNER] == id) continue;
+
+		num_to_str(marketItem[ID], itemId, charsmax(itemId));
 		
-		if(aItem[OWNER] == id)
-			continue;
+		formatex(itemData, charsmax(itemData), "\w%s \y(%i/%i Wytrzymalosci) \r(%i%s)", marketItem[NAME], marketItem[DURABILITY], cod_max_item_durability(), marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
 		
-		szData[0] = i;
-		szData[1] = aItem[ID];
-		
-		formatex(szTemp, charsmax(szTemp), "\w%s \y(%i/%i Wytrzymalosci) \r(%i %s)", aItem[NAME], aItem[DURABILITY], cod_max_item_durability(), aItem[PRICE], aItem[TYPE] ? "H" : "$");
-		
-		menu_additem(menu, szTemp, szData);
+		menu_additem(menu, itemData, itemId);
+
+		itemsCounts++;
 	}
-	menu_display(id, menu);
+
+	if(!itemsCounts)
+	{
+		menu_destroy(menu);
+
+		cod_print_chat(id, "Na rynku nie ma zadnych przedmiotow, ktore moglbys kupic!");
+	}
+	else menu_display(id, menu);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
-public BuyItem_Handle(id, menu, item)
+public buy_item_handle(id, menu, item)
 {
-	if(!is_user_connected(id))
-		return PLUGIN_CONTINUE;
-		
-	client_cmd(id, "spk CodMod/select");
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
 	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
-		return PLUGIN_CONTINUE;
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	new itemId[2], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemId, charsmax(itemId), _, _, itemCallback);
+
+	new item = check_item_id(str_to_num(itemId));
+
+	if(item < 0)
+	{
+		buy_item(id, 1);
+
+		cod_print_chat(id, "Przedmiot zostal juz kupiony lub wycofany z rynku!");
+
+		return PLUGIN_HANDLED;
 	}
 	
-	new szText[512], szDesc[64], iLen = 0, iMax = sizeof(szText) - 1, aItem[Item];
-	
-	new szData[2], iAccesss, iCallback;
-	menu_item_getinfo(menu, item, iAccesss, szData, charsmax(szData), _, _, iCallback);
-	
-	ArrayGetArray(gItems, item, aItem);
-	
-	cod_get_item_desc(aItem[ITEM], szDesc, charsmax(szDesc));
+	new marketItem[items], menuData[512], itemDescription[64], length = 0, maxLength = sizeof(menuData) - 1;
 
-	iLen += formatex(szText[iLen], iMax - iLen, "Potwierdzenie kupna itemu od: \r%s^n", szPlayer[aItem[OWNER]]);
-	iLen += formatex(szText[iLen], iMax - iLen, "\yItem: \r%s^n", aItem[NAME]);
-	iLen += formatex(szText[iLen], iMax - iLen, "\yOpis: \r%s^n", szDesc);
-	iLen += formatex(szText[iLen], iMax - iLen, "\yKoszt: \r%d %s^n", aItem[PRICE], aItem[TYPE] ? "H" : "$");
-	iLen += formatex(szText[iLen], iMax - iLen, "\yWytrzymalosc: \r%d/%i^n^n", aItem[DURABILITY], cod_max_item_durability());
-	iLen += formatex(szText[iLen], iMax - iLen, "\wCzy chcesz kupic ten item?");
+	ArrayGetArray(marketItems, item, marketItem);
 	
-	new menu = menu_create(szText, "BuyQuestion_Handle");
+	cod_get_item_desc(marketItem[ITEM], itemDescription, charsmax(itemDescription));
+
+	length += formatex(menuData[length], maxLength - length, "Potwierdzenie kupna od: \y%s^n", playerName[marketItem[OWNER]]);
+	length += formatex(menuData[length], maxLength - length, "\wPrzedmiot: \y%s^n", marketItem[NAME]);
+	length += formatex(menuData[length], maxLength - length, "\wOpis: \y%s^n", itemDescription);
+	length += formatex(menuData[length], maxLength - length, "\wKoszt: \y%d%s^n", marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
+	length += formatex(menuData[length], maxLength - length, "\wWytrzymalosc: \y%d/%i^n", marketItem[DURABILITY], cod_max_item_durability());
+	length += formatex(menuData[length], maxLength - length, "\wCzy chcesz \rkupic\w ten przedmiot?^n^n");
 	
-	menu_additem(menu, "Tak", szData);
+	new menu = menu_create(menuData, "buy_question_handle");
+	
+	menu_additem(menu, "Tak", itemId);
 	menu_additem(menu, "Nie");
 
 	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
+
 	menu_display(id, menu);
 	
 	return PLUGIN_CONTINUE;
 }
 
-public BuyQuestion_Handle(id, menu, item)
+public buy_question_handle(id, menu, item)
 {
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	
 	if(item == MENU_EXIT || item)
 	{
-		BuyItem(id);
-		return PLUGIN_CONTINUE;
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new szData[2], iAccesss, iCallback;
-	menu_item_getinfo(menu, item, iAccesss, szData, charsmax(szData), _, _, iCallback);
-	
-	new aItem[Item], aItemID = szData[0];
-	
-	ArrayGetArray(gItems, aItemID, aItem);
-	
-	if(szData[1] != aItem[ID])
+	new itemId[2], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemId, charsmax(itemId), _, _, itemCallback);
+
+	new item = check_item_id(str_to_num(itemId));
+
+	if(item < 0)
 	{
-		BuyItem(id);
-		cod_print_chat(id, DontChange, "Item zostal juz kupiony lub wycofany z rynku!");
-		return PLUGIN_CONTINUE;
-	}	
+		buy_item(id, 1);
+
+		cod_print_chat(id, "Przedmiot zostal juz kupiony lub wycofany z rynku!");
+
+		return PLUGIN_HANDLED;
+	}
+
+	new marketItem[items];
+
+	ArrayGetArray(marketItems, item, marketItem);
 	
-	switch(aItem[TYPE])
+	switch(marketItem[TYPE])
 	{
 		case 0:
 		{
-			if(cs_get_user_money(id) < aItem[PRICE])
+			if(cs_get_user_money(id) < marketItem[PRICE])
 			{
-				cod_print_chat(id, DontChange, "Nie masz wystarczajacej ilosci kasy!");
-				return PLUGIN_CONTINUE;
+				cod_print_chat(id, "Nie masz wystarczajacej ilosci kasy!");
+
+				return PLUGIN_HANDLED;
 			}
 			else
 			{
-				cs_set_user_money(aItem[OWNER], cs_get_user_money(aItem[OWNER]) + aItem[PRICE]);
-				cs_set_user_money(id, cs_get_user_money(id) - aItem[PRICE]);
+				cs_set_user_money(marketItem[OWNER], cs_get_user_money(marketItem[OWNER]) + marketItem[PRICE]);
+				cs_set_user_money(id, cs_get_user_money(id) - marketItem[PRICE]);
 			}
 		}
 		case 1:
 		{
-			if(cod_get_user_honor(id) < aItem[PRICE])
+			if(cod_get_user_honor(id) < marketItem[PRICE])
 			{
-				cod_print_chat(id, DontChange, "Nie masz wystarczajacej ilosci honoru!");
-				return PLUGIN_CONTINUE;
+				cod_print_chat(id, "Nie masz wystarczajacej ilosci honoru!");
+
+				return PLUGIN_HANDLED;
 			}
 			else
 			{
-				cod_set_user_honor(aItem[OWNER], cod_get_user_honor(aItem[OWNER]) + aItem[PRICE]);
-				cod_set_user_honor(id, cod_get_user_honor(id) - aItem[PRICE]);
+				cod_set_user_honor(marketItem[OWNER], cod_get_user_honor(marketItem[OWNER]) + marketItem[PRICE]);
+				cod_set_user_honor(id, cod_get_user_honor(id) - marketItem[PRICE]);
 			}
 		}
 	}
+
+	new itemDescription[64];
 	
-	ArrayDeleteItem(gItems, aItemID);
+	ArrayDeleteItem(marketItems, item);
 	
-	cod_set_user_item(id, aItem[ITEM], aItem[VALUE]);
+	cod_set_user_item(id, marketItem[ITEM], marketItem[VALUE]);
+
+	cod_get_item_desc(marketItem[ITEM], itemDescription, charsmax(itemDescription));
 	
-	cod_print_chat(id, DontChange, "Item^x03 %s^x01 zostal pomyslnie zakupiony.", aItem);
-	cod_print_chat(aItem[OWNER], DontChange, "Twoj item^x03 %s zostal zakupiony przez^x03 %s^x01. Otrzymujesz^x03 %i %s^x01.", aItem[NAME], szPlayer[id], aItem[PRICE], aItem[TYPE] ? "Honoru" : "$");
+	cod_print_chat(id, "Przedmiot^x03 %s^x01 zostal pomyslnie zakupiony.", itemDescription);
+	cod_print_chat(marketItem[OWNER], "Twoj item^x03 %s zostal zakupiony przez^x03 %s^x01. Otrzymujesz^x03 %i%s^x01.", marketItem[NAME], playerName[id], marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
 	
 	return PLUGIN_CONTINUE;
 }
 
-public WithdrawItem(id)
-{		
-	if(!is_user_connected(id))
-		return PLUGIN_CONTINUE;
-		
+public withdraw_item(id, sound)
+{
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	
 	if(!cod_check_password(id))
 	{
 		cod_force_password(id);
+
+		return PLUGIN_HANDLED;
+	}
+
+	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	new marketItem[items], itemData[128], itemId[2], itemsCounts = 0, menu = menu_create("\wWycofaj \rPrzedmiot", "withdraw_item_handle");
+	
+	for(new i = 0; i < ArraySize(marketItems); i++)
+	{
+		ArrayGetArray(marketItems, i, marketItem);
+		
+		if(marketItem[OWNER] != id) continue;
+
+		num_to_str(marketItem[ID], itemId, charsmax(itemId));
+		
+		formatex(itemData, charsmax(itemData), "\w%s \y(%i/%i Wytrzymalosci) \r(%i%s)", marketItem[NAME], marketItem[DURABILITY], cod_max_item_durability(), marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
+		
+		menu_additem(menu, itemData, itemId);
+
+		itemsCounts++;
+	}
+
+	if(!itemsCounts)
+	{
+		menu_destroy(menu);
+
+		cod_print_chat(id, "Na rynku nie ma zadnych twoich przedmiotow!");
+	}
+	else menu_display(id, menu);
+	
+	return PLUGIN_CONTINUE;
+}
+
+public withdraw_item_handle(id, menu, item)
+{
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	
+	if(item == MENU_EXIT || item)
+	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	new itemId[2], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemId, charsmax(itemId), _, _, itemCallback);
+
+	new item = check_item_id(str_to_num(itemId));
+
+	if(item < 0)
+	{
+		buy_item(id, 1);
+
+		cod_print_chat(id, "Przedmiot zostal juz kupiony!");
+
 		return PLUGIN_HANDLED;
 	}
 	
-	client_cmd(id, "spk CodMod/select");
-	
-	new menu = menu_create("\wTwoje \rOferty", "WithdrawItem_Handle");
-	
-	new szTemp[128], szData[2];
-	
-	for(new i = 0; i < ArraySize(gItems); i++)
-	{		
-		new aItem[Item];
-		
-		ArrayGetArray(gItems, i, aItem);
-		
-		if(aItem[OWNER] != id)
-			continue;
-		
-		szData[0] = i;
-		szData[1] = aItem[ID];
-		
-		formatex(szTemp, charsmax(szTemp), "\w%s \y(%i/%i Wytrzymalosci) \r(%i %s)", aItem[NAME], aItem[DURABILITY], cod_max_item_durability(), aItem[PRICE], aItem[TYPE] ? "H" : "$");
-		
-		menu_additem(menu, szTemp, szData);
-	}
-	menu_display(id, menu);
-	
-	return PLUGIN_CONTINUE;
-}
+	new marketItem[items], menuData[512], itemDescription[64], length = 0, maxLength = sizeof(menuData) - 1;
 
-public WithdrawItem_Handle(id, menu, item)
-{
-	if(!is_user_connected(id))
-		return PLUGIN_CONTINUE;
-		
-	client_cmd(id, "spk CodMod/select");
+	ArrayGetArray(marketItems, item, marketItem);
 	
-	if(item == MENU_EXIT)
-	{
-		menu_destroy(menu);
-		return PLUGIN_CONTINUE;
-	}
-	
-	new szText[512], szDesc[64], iLen = 0, iMax = sizeof(szText) - 1, aItem[Item];
-	
-	new szData[2], iAccesss, iCallback;
-	menu_item_getinfo(menu, item, iAccesss, szData, charsmax(szData), _, _, iCallback);
-	
-	ArrayGetArray(gItems, item, aItem);
-	
-	cod_get_item_desc(aItem[ITEM], szDesc, charsmax(szDesc));
+	cod_get_item_desc(marketItem[ITEM], itemDescription, charsmax(itemDescription));
 
-	iLen += formatex(szText[iLen], iMax - iLen, "Potwierdzenie wycofania itemu^n");
-	iLen += formatex(szText[iLen], iMax - iLen, "\yItem: \r%s^n", aItem[NAME]);
-	iLen += formatex(szText[iLen], iMax - iLen, "\yOpis: \r%s^n", szDesc);
-	iLen += formatex(szText[iLen], iMax - iLen, "\yKoszt: \r%d %s^n", aItem[PRICE], aItem[TYPE] ? "H" : "$");
-	iLen += formatex(szText[iLen], iMax - iLen, "\yWytrzymalosc: \r%d/%i^n^n", aItem[DURABILITY], cod_max_item_durability());
-	iLen += formatex(szText[iLen], iMax - iLen, "\wCzy chcesz \rwycofac ten item?");
+	length += formatex(menuData[length], maxLength - length, "Potwierdzenie wycofania przedmiotu^n");
+	length += formatex(menuData[length], maxLength - length, "\wItem: \y%s^n", marketItem[NAME]);
+	length += formatex(menuData[length], maxLength - length, "\wOpis: \y%s^n", itemDescription);
+	length += formatex(menuData[length], maxLength - length, "\wKoszt: \y%d%s^n", marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
+	length += formatex(menuData[length], maxLength - length, "\wWytrzymalosc: \y%d/%i^n^n", marketItem[DURABILITY], cod_max_item_durability());
+	length += formatex(menuData[length], maxLength - length, "\wCzy chcesz \rwycofac\w ten item?");
 	
-	new menu = menu_create(szText, "WithdrawQuestion_Handle");
+	new menu = menu_create(menuData, "withdraw_question_handle");
 	
-	menu_additem(menu, "Tak", szData);
+	menu_additem(menu, "Tak", itemId);
 	menu_additem(menu, "Nie");
 
 	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
+
 	menu_display(id, menu);
 	
 	return PLUGIN_CONTINUE;
 }
 
-public WithdrawQuestion_Handle(id, menu, item)
+public withdraw_question_handle(id, menu, item)
 {
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	
 	if(item == MENU_EXIT || item)
 	{
-		WithdrawItem(id);
-		return PLUGIN_CONTINUE;
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new szData[2], iAccesss, iCallback;
-	menu_item_getinfo(menu, item, iAccesss, szData, charsmax(szData), _, _, iCallback);
-	
-	new aItem[Item], aItemID = szData[0];
-	
-	ArrayGetArray(gItems, aItemID, aItem);
-	
-	if(szData[1] != aItem[ID])
+	new itemId[2], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemId, charsmax(itemId), _, _, itemCallback);
+
+	new item = check_item_id(str_to_num(itemId));
+
+	if(item < 0)
 	{
-		WithdrawItem(id);
-		cod_print_chat(id, DontChange, "Item zostal juz kupiony!");
-		return PLUGIN_CONTINUE;
-	}	
+		withdraw_item(id, 1);
+
+		cod_print_chat(id, "Przedmiot zostal juz kupiony!");
+
+		return PLUGIN_HANDLED;
+	}
+
+	new marketItem[items];
+
+	ArrayGetArray(marketItems, item, marketItem);
 	
-	ArrayDeleteItem(gItems, aItemID);
+	cod_set_user_item(id, marketItem[ITEM], marketItem[VALUE]);
+
+	ArrayDeleteItem(marketItems, item);
 	
-	cod_set_user_item(id, aItem[ITEM], aItem[VALUE]);
+	cod_print_chat(id, "Przedmiot^x03 %s^x01 zostal pomyslnie wycofany z rynku.", marketItem[NAME]);
 	
-	cod_print_chat(id, DontChange, "Item zostal pomyslnie wycofany z rynku.");
-	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
-stock getItemsAmount(id) 
+stock get_items_amount(id) 
 {
-	if(!is_user_connected(id))
-		return 0;
+	if(!is_user_connected(id)) return 0;
 		
-	new iAmount = 0, aItem[Item];
+	new amount = 0, marketItem[items];
 	
-	for(new i = 0; i < ArraySize(gItems); ++i) 
+	for(new i = 0; i < ArraySize(marketItems); i++) 
 	{
-		ArrayGetArray(gItems, i, aItem);
-		if(id == aItem[OWNER])
-			iAmount++;
+		ArrayGetArray(marketItems, i, marketItem);
+
+		if(marketItem[OWNER] == id) amount++;
 	}
 	
-	return iAmount;
+	return amount;
 }
 
-stock RemoveSeller(id)
+stock check_item_id(item)
 {
-	new aItem[Item];
+	new marketItem[items];
 	
-	for(new i = 0; i < ArraySize(gItems); ++i) 
+	for(new i = 0; i < ArraySize(marketItems); i++) 
 	{
-		ArrayGetArray(gItems, i, aItem);
-		if(id == aItem[OWNER]) 
+		ArrayGetArray(marketItems, i, marketItem);
+
+		if(marketItem[ID] == item) return i;
+	}
+	
+	return -1;
+}
+
+stock remove_seller(id)
+{
+	new marketItem[items];
+	
+	for(new i = 0; i < ArraySize(marketItems); i++) 
+	{
+		ArrayGetArray(marketItems, i, marketItem);
+
+		if(marketItem[OWNER] == id) 
 		{
-			ArrayDeleteItem(gItems, i);
+			ArrayDeleteItem(marketItems, i);
+
 			i -= 1;
 		}
 	}
