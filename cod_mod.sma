@@ -1037,13 +1037,21 @@ public use_mine(id)
 		
 		return PLUGIN_HANDLED;
 	}
+
+	if(!(pev(id, pev_flags) & FL_ONGROUND))
+	{
+		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
+		show_dhudmessage(id, "Musisz stac na podlozu, aby podlozyc mine!");
+
+		return PLUGIN_HANDLED;
+	}
 	
 	if(!is_enough_space(id))
 	{
 		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
-		show_dhudmessage(id, "Miny nie mozesz postawic w przejsciu!");
+		show_dhudmessage(id, "Nie mozesz postawic miny w przejsciu!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
 	codPlayer[id][PLAYER_LAST_MINE] = floatround(get_gametime());
@@ -1134,13 +1142,21 @@ public use_dynamite(id)
 		
 		return PLUGIN_HANDLED;
 	}
+
+	if(!(pev(id, pev_flags) & FL_ONGROUND))
+	{
+		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
+		show_dhudmessage(id, "Musisz stac na podlozu, aby postawic dynamit!");
+
+		return PLUGIN_HANDLED;
+	}
 	
 	if(!is_enough_space(id))
 	{
 		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
-		show_dhudmessage(id, "Dynamitu nie mozesz postawic w przejsciu!");
+		show_dhudmessage(id, "Nie mozesz postawic dynamitu w przejsciu!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 	
 	codPlayer[id][PLAYER_LAST_DYNAMITE] = floatround(get_gametime());
