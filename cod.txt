@@ -1,95 +1,7 @@
-Silnik: Zoptymalizowany silnik CoD'a z porządnym zapisem SQL
-(zabezpieczonym w 100% przed resetowaniem expa w wyniku błędu),
-wieloma nowymi natywami i wbudowanymi funkcjami obsługującymi
-najczęściej powtarzające się umiejętności klas/moce itemów, aby kod pluginów skrócić do minimum.
-Wstępna wersja takiego silnika leży już na moim dysku bodajże od grudnia,
-ale nie jest dokończona i ma także kilka błędów,
-więc najprawdopodobniej w oparciu o nią napiszę silnik od zera.
-
-Ilość poziomów: 501 (slow/medium exp, reset raz na 3-4 miesiące)
-
-Punkty statystyk za każdy poziom: 1
-
-Statystyki:
-- Zdrowie (każdy punkt to + 1hp)
-- Kondycja (każdy punkt to + 0.5-1.0% prędkość i biegu)
-- Wytrzymałość (każdy punkt to 0.25-0.35% otrzymywanych obrażeń)
-- Siła (każdy punkt to + 0.1-0.2 obrażeń)
-- Inteligencja (każdy punkt to wzmocnienie o 0.1% siły itemów)
-
-Limit każdej statystyki: 100 punktów
- 
-Klasy: ~15 (w tym 2 premium)
-Stosunkowo mała liczba klas, ale z różnorodnymi umiejętnościami i brońmi,
-tak aby każde mógł wybrać to, co lubi najbardziej.
-Dzięki funkcjom wbudowanym w silnik kod większości klas nie powinien
-przekroczyć 60-70 linijek, a wykorzystanie pól bitowych zamiast tablic
-zapewni dodatkową oszczędność w zużyciu zasobów serwera
- 
-Awanse: Awans co 100 poziomów, wbudowane w klasę.
-Co mam na myśli przez wbudowane w klasę?
-Aktualnie dostępny publicznie system awansów jest zaprojektowany tak,
-że każdy awans, to osobna klasa = marnotrawienie zasobów serwera.
-Moim pomysłem jest zawarcie wszystkiego w kodzie jednej klasy,
-tak aby umiejętności polepszały się/odblokowywały się z postępem poziomu.
- 
-Ilość itemów: ~75, podobnie jak w przypadku klas napisane z wykorzystaniem pól bitowych
-i ze zredukowanym kodem, dzięki funkcjom wbudowanym w silnik
- 
-Wytrzymałość itemów: Z tym, że naprawianie itemów będzie znacznie droższe niż zazwyczaj,
-aby wykazać się sprytem/umiejętnościami, żeby utrzymać się z jednym itemem przez całą mapę - Zrobione!
- 
-Ulepszanie itemów: ~60% na ulepszenie, ~30% na uszkodzenie, ~10% na zniszczenie itemu
- 
-Wymiana i przekazywane itemów: Tak, z możliwością zablokowania ofert wymiany od danego gracza,
-w razie gdyby ktoś uporczywie spamował ofertami, a to się zdarza dość często - Zrobione!
- 
-Rynek itemów: Możliwość wystawienia zdobytych itemów na sprzedaż za kasę lub honor,
-każdy gracz miałby możliwość wystawienia maksymalnie 5 itemów - Zrobione!
- 
-System dodatkowej waluty: Honor, który pozwala na zakupy w sklepie, ale jego główną funkcją
-jest możliwość rozwijania Klanu przy jego pomocy. - Zrobione!
- 
-System Klanów: Poza optymalizacją całego kodu wraz z zapisem sql, takie dodatki jak
-możliwość składania podań do klanów, wojny między klanami na liczbę zdobytych fragów
-na graczach z przeciwnego klanu, w których nagrodą będzie ustalona ilość honoru,
-która zostanie przed wojną pobrana z konta obu klanów - Zrobione (jak narazie bez podań i wojen)!
- 
-System bonusowego expa: Każdy gracz, który wejdzie na serwer, gdy do pełnego serwera
-brakuje 10 graczy, daje 10% bonus expa dla wszystkich, co przy pełnym serwerze daje exp x2 - Zrobione!
- 
-System Kill Streaku: Przez 15s po zdobyciu fraga mnożnik expa wzrasta do 1,2-1.5,
-frag zdobyty w tym czasie to reset zegara do 15s i jeszcze większy mnożnik expa,
-kill streak zeruje się na końcu rundy - Zrobione!
- 
-Paczki wypadające z graczy: Odświeżona wersja z ciekawym animowanym modelem, który można zobaczyć na testowym ZM - Zrobione!
- 
-Questy: Podejrzewam, że bardzo podobne/identyczne do tych, które są już na naszym DiabloModzie. - Zrobione!
- 
-Sklep: Tutaj nie przewiduję zmian w porównaniu z tym, co było na starym CoDzie. - Zrobione!
- 
-VIP: złote modele głównych broni, nieco szybszy exp, 5-10% więcej obrażeń,
-hp i kasa za zabicie, status w tabeli i prefix w chatcie, pakiet granatów na spawnie - Zrobione!
- 
-Dodatkowy exp na końcu mapy dla 3 najlepszych graczy: Oczywiście, bez zmian - Zrobione!
- 
-System czasu: Zliczanie czasu gry wraz z informacją o ostatniej wizycie na serwerze przy wejściu, tak jak na BF2 - Zrobione!
- 
-Automatyczne przenoszenie expa: Z wykorzystaniem sklepu sms, koszt 1,23zł
- 
-Nocny exp: Standardowo exp x2 w godzinach od 23 do 8 - Zrobione!
-
-Noze: kazdy noz daje inny bonus do statystyk
-
-Kasyno:
-- Kostka (high/low i 1-6)
-- Automat
-- 2048
-- Blackjack
-- Poker
-
 Do zrobienia:
+- Refaktoryzacja pluginów
 - Zmiany w sklepie
+- Przenoszenie expa
 - Podania i wojny w klanach
 - Limit predkosci
 - Aktualizacja .inc
@@ -100,18 +12,16 @@ Do zrobienia:
 - Statystyki WWW
 
 Do zrefaktoryzowania:
-- Noze (done)
 - Sklep
-- Klany (pamiętać o unikalnym id)
-- Menu (done)
-- Honor (done)
+- Klany (pamietac o unikalnym id)
 - Staty
-- Przelew (done)
-- Wymiana (done)
-- System rejestracji
-- Rynek
+- System rejestracji (pamietac o zabezpieczeniu przed wielokrotnym wyswietlaniem menu)
 - VIP
 - Questy
-- Paczki (done)
-- Nocny Exp (done)
-- Nagrody dla 3 najlepszych (done)
+
+Kasyno:
+- Kostka (high/low i 1-6)
+- Automat
+- 2048
+- Blackjack
+- Poker
