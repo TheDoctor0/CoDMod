@@ -311,7 +311,7 @@ public _cod_get_user_honor(plugin, params)
 		
 	new id = get_param(1);
 	
-	if(!is_user_player(id)) return PLUGIN_CONTINUE;
+	if(!is_user_valid(id)) return PLUGIN_CONTINUE;
 	
 	return playerHonor[id];
 }
@@ -322,7 +322,7 @@ public _cod_set_user_honor(plugin, params)
 		
 	new id = get_param(1);
 	
-	if(!is_user_player(id)) return PLUGIN_CONTINUE;
+	if(!is_user_valid(id)) return PLUGIN_CONTINUE;
 	
 	playerHonor[id] = max(0, get_param(2));
 	

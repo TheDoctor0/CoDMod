@@ -42,12 +42,9 @@ public client_connect(id)
 
 public market_menu(id)
 {
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 
-		return PLUGIN_HANDLED;
-	}
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new menu = menu_create("\wMenu \rRynku", "market_menu_handle"), callback = menu_makecallback("market_menu_callback");
 	
@@ -101,12 +98,7 @@ public sell_item(id, sound)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
-
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 		
 	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
@@ -164,12 +156,7 @@ public sell_item_handle(id, menu, item)
 
 public set_item_price(id)
 {
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
-
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
@@ -225,12 +212,7 @@ public buy_item(id, sound)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
-
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
@@ -401,12 +383,7 @@ public withdraw_item(id, sound)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
-
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	

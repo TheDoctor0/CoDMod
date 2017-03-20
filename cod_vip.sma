@@ -182,7 +182,7 @@ public cod_damage_post(attacker, victim, Float:damage, damageBits)
 
 public cod_weapon_deploy(id, weapon, ent)
 {
-	if(!is_user_player(id)) return PLUGIN_CONTINUE;
+	if(!is_user_valid(id)) return PLUGIN_CONTINUE;
 
 	switch(weapon)
 	{

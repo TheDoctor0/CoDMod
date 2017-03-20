@@ -27,12 +27,7 @@ public plugin_init()
 
 public transfer_honor_menu(id) 
 { 
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
-
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
@@ -113,12 +108,7 @@ public transfer_honor_handle(id)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
-
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 		
@@ -165,12 +155,7 @@ public transfer_honor_handle(id)
 
 public transfer_cash_menu(id) 
 { 
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
-
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
@@ -251,12 +236,7 @@ public transfer_cash_handle(id)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
-
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 		

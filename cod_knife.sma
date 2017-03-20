@@ -52,12 +52,7 @@ public client_putinserver(id)
 
 public change_knife(id)
 {
-    if(!cod_check_password(id))
-    {
-        cod_force_password(id);
-
-        return PLUGIN_HANDLED;
-    }
+    if(!cod_check_account(id)) return PLUGIN_HANDLED;
 
     client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 

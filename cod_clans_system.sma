@@ -123,7 +123,7 @@ public client_putinserver(id)
 	LoadMember(id);
 }
 
-public client_disconnect(id)
+public client_disconnected(id)
 {
 	Rem(id, iPassword);
 	iClan[id] = 0;
@@ -145,7 +145,7 @@ public PlayerSpawn(id)
 	
 	if(equal(aClan[PASSWORD], "") && get_user_status(id, iClan[id]) == LEADER)
 	{
-		cod_print_chat(id, DontChange, "Nie wpisano hasla zarzadzania klanem. Wpisz je teraz!");
+		cod_print_chat(id,  "Nie wpisano hasla zarzadzania klanem. Wpisz je teraz!");
 		client_cmd(id, "messagemode Ustaw_Haslo");
 	}
 	
@@ -215,11 +215,7 @@ public ClanMenu(id)
 	if(!is_user_connected(id))
 		return PLUGIN_HANDLED;
 		
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 	
 	client_cmd(id, "spk CodMod/select2");
 	
@@ -311,13 +307,13 @@ public ClanMenu_Handler(id, menu, item)
 			
 			if(iClan[id])
 			{
-				cod_print_chat(id, DontChange, "Nie mozesz utworzyc klanu, jesli w jakims jestes!");
+				cod_print_chat(id,  "Nie mozesz utworzyc klanu, jesli w jakims jestes!");
 				return PLUGIN_HANDLED;
 			}
 			
 			if(cod_get_user_level(id) < iCreateLevel)
 			{
-				cod_print_chat(id, DontChange, "Nie masz wystarczajacego poziomu by stworzyc klan (Wymagany^x03 %i^x01)!", iCreateLevel);
+				cod_print_chat(id,  "Nie masz wystarczajacego poziomu by stworzyc klan (Wymagany^x03 %i^x01)!", iCreateLevel);
 				return PLUGIN_HANDLED;
 			}
 			
@@ -328,7 +324,7 @@ public ClanMenu_Handler(id, menu, item)
 		case 3: 
 		{
 			client_cmd(id, "messagemode Ilosc_Honoru");
-			cod_print_chat(id, DontChange, "Wpisz ilosc Honoru, ktora chcesz wplacic.");
+			cod_print_chat(id,  "Wpisz ilosc Honoru, ktora chcesz wplacic.");
 		}
 		case 4: Clans_Top15(id);
 	}
@@ -341,13 +337,13 @@ public CmdCreateClan(id)
 {
 	if(iClan[id])
 	{
-		cod_print_chat(id, DontChange, "Nie mozesz utworzyc klanu, jesli w jakims jestes!");
+		cod_print_chat(id,  "Nie mozesz utworzyc klanu, jesli w jakims jestes!");
 		return PLUGIN_HANDLED;
 	}
 	
 	if(cod_get_user_level(id) < iCreateLevel)
 	{
-		cod_print_chat(id, DontChange, "Nie masz wystarczajaco duzego poziomu (Wymagany: %i)!", iCreateLevel);
+		cod_print_chat(id,  "Nie masz wystarczajaco duzego poziomu (Wymagany: %i)!", iCreateLevel);
 		return PLUGIN_HANDLED;
 	}
 	
@@ -358,7 +354,7 @@ public CmdCreateClan(id)
 	
 	if(equal(szName, ""))
 	{
-		cod_print_chat(id, DontChange, "Nie wpisano nazwy klanu.");
+		cod_print_chat(id,  "Nie wpisano nazwy klanu.");
 		ClanMenu(id);
 		return PLUGIN_HANDLED;
 	}
@@ -367,7 +363,7 @@ public CmdCreateClan(id)
 	
 	if(CheckClanName(szTempName))
 	{
-		cod_print_chat(id, DontChange, "Klan z taka nazwa juz istnieje.");
+		cod_print_chat(id,  "Klan z taka nazwa juz istnieje.");
 		ClanMenu(id);
 		return PLUGIN_HANDLED;
 	}
@@ -394,8 +390,8 @@ public CmdCreateClan(id)
 	set_user_clan(id, ArraySize(gClans) - 1, 1);
 	set_user_status(id, ArraySize(gClans) - 1, LEADER);
 	
-	cod_print_chat(id, DontChange, "Pomyslnie zalozyles klan^x03 %s^01.", szName);
-	cod_print_chat(id, DontChange, "Teraz wpisz haslo, ktore pozwoli na zarzadzanie klanem.");
+	cod_print_chat(id,  "Pomyslnie zalozyles klan^x03 %s^01.", szName);
+	cod_print_chat(id,  "Teraz wpisz haslo, ktore pozwoli na zarzadzanie klanem.");
 	client_print(id, print_center, "Wpisz haslo pozwalajace zarzadzac klanem!");
 	
 	client_cmd(id, "messagemode Ustaw_Haslo");
@@ -407,7 +403,7 @@ public CmdSetPassword(id)
 {
 	if(!iClan[id])
 	{
-		cod_print_chat(id, DontChange, "Nie mozesz ustawic hasla, bo nie masz klanu!");
+		cod_print_chat(id,  "Nie mozesz ustawic hasla, bo nie masz klanu!");
 		return PLUGIN_HANDLED;
 	}
 	
@@ -418,7 +414,7 @@ public CmdSetPassword(id)
 	
 	if(equal(szPassword, ""))
 	{
-		cod_print_chat(id, DontChange, "Nie wpisano hasla zarzadzania klanem. Wpisz je teraz!");
+		cod_print_chat(id,  "Nie wpisano hasla zarzadzania klanem. Wpisz je teraz!");
 		client_cmd(id, "messagemode Ustaw_Haslo");
 		return PLUGIN_HANDLED;
 	}
@@ -432,8 +428,8 @@ public CmdSetPassword(id)
 	SaveClan(iClan[id]);
 	
 	client_print(id, print_center, "Haslo zostalo ustawione!");
-	cod_print_chat(id, DontChange, "Haslo zarzadzania klanem zostalo ustawione.");
-	cod_print_chat(id, DontChange, "Wpisz w konsoli^x03 setinfo ^"_klan^" ^"%s^"^x01.", szPassword);
+	cod_print_chat(id,  "Haslo zarzadzania klanem zostalo ustawione.");
+	cod_print_chat(id,  "Wpisz w konsoli^x03 setinfo ^"_klan^" ^"%s^"^x01.", szPassword);
 	
 	Set(id, iPassword);
 	
@@ -486,14 +482,14 @@ public LeaveConfirmMenu_Handler(id, menu, item)
 		{
 			if(get_user_status(id, iClan[id]) == LEADER)
 			{
-				cod_print_chat(id, DontChange, "Oddaj przywodctwo klanu jednemu z czlonkow zanim go upuscisz.");
+				cod_print_chat(id,  "Oddaj przywodctwo klanu jednemu z czlonkow zanim go upuscisz.");
 				ClanMenu(id);
 				return PLUGIN_HANDLED;
 			}
 			
 			log_to_file("addons/amxmodx/logs/cod_clans.log", "Opuszczenie Klanu: %s", szMemberName[id]);
 			
-			cod_print_chat(id, DontChange, "Opusciles swoj klan.");
+			cod_print_chat(id,  "Opusciles swoj klan.");
 			
 			set_user_clan(id);
 			
@@ -542,7 +538,7 @@ public ShowMembersOnlineMenu(id)
 	if(!iNumPlayers)
 	{
 		menu_destroy(menu);
-		cod_print_chat(id, DontChange, "Na serwerze nie ma zadnego czlonka twojego klanu!");
+		cod_print_chat(id,  "Na serwerze nie ma zadnego czlonka twojego klanu!");
 	}
 	return PLUGIN_CONTINUE;
 }
@@ -580,7 +576,7 @@ public CmdCheckPassword(id)
 	
 	if(equal(szPassword, ""))
 	{
-		cod_print_chat(id, DontChange, "Nie wpisales hasla zarzadzania klanem!");
+		cod_print_chat(id,  "Nie wpisales hasla zarzadzania klanem!");
 		ClanMenu(id);
 		return PLUGIN_HANDLED;
 	}
@@ -590,14 +586,14 @@ public CmdCheckPassword(id)
 	
 	if(!equal(aClan[PASSWORD], szPassword))
 	{
-		cod_print_chat(id, DontChange, "Podane haslo zarzadzania klanem jest nieprawidlowe!");
+		cod_print_chat(id,  "Podane haslo zarzadzania klanem jest nieprawidlowe!");
 		ClanMenu(id);
 		return PLUGIN_HANDLED;
 	}
 	
 	Set(id, iPassword);
 	
-	cod_print_chat(id, DontChange, "Wpisane haslo jest prawidlowe.");
+	cod_print_chat(id,  "Wpisane haslo jest prawidlowe.");
 	
 	ShowLeaderMenu(id);
 	
@@ -631,7 +627,7 @@ public ShowLeaderMenu(id)
 	else
 	{
 		client_cmd(id, "messagemode Podaj_Haslo");
-		cod_print_chat(id, DontChange, "Wpisz jednorazowo haslo zarzadzania klanem.");
+		cod_print_chat(id,  "Wpisz jednorazowo haslo zarzadzania klanem.");
 		client_print(id, print_center, "Wpisz haslo zarzadzania klanem");
 	}
 	return PLUGIN_CONTINUE;
@@ -732,13 +728,13 @@ public DisbandConfirmMenu_Handler(id, menu, item)
 
 				set_user_clan(iPlayer);
 				
-				cod_print_chat(iPlayer, DontChange, "Twoj klan zostal rozwiazany.");
+				cod_print_chat(iPlayer,  "Twoj klan zostal rozwiazany.");
 			}
 			
 			iPlayerClan = iClan[id];
 			set_user_clan(id);
 			
-			cod_print_chat(id, DontChange, "Rozwiazales swoj klan.");
+			cod_print_chat(id,  "Rozwiazales swoj klan.");
 			
 			mysql_escape_string(aClan[NAME], szTempName, charsmax(szTempName));
 			
@@ -817,7 +813,7 @@ public SkillsMenu_Handler(id, menu, item)
 		{
 			if(aClan[LEVEL] == iLevelMax)
 			{
-				cod_print_chat(id, DontChange, "Twoj klan ma juz maksymalny Poziom.");
+				cod_print_chat(id,  "Twoj klan ma juz maksymalny Poziom.");
 				ShowSkillsMenu(id);
 				return PLUGIN_HANDLED;
 			}
@@ -826,7 +822,7 @@ public SkillsMenu_Handler(id, menu, item)
 			
 			if(iRemaining < 0)
 			{
-				cod_print_chat(id, DontChange, "Twoj klan nie ma wystarczajacej ilosci Honoru.");
+				cod_print_chat(id,  "Twoj klan nie ma wystarczajacej ilosci Honoru.");
 				ShowSkillsMenu(id);
 				return PLUGIN_HANDLED;
 			}
@@ -836,13 +832,13 @@ public SkillsMenu_Handler(id, menu, item)
 			aClan[LEVEL]++;
 			aClan[HONOR] = iRemaining;
 			
-			cod_print_chat(id, DontChange, "Ulepszyles klan na^x03 %i Poziom^x01!", aClan[LEVEL]);
+			cod_print_chat(id,  "Ulepszyles klan na^x03 %i Poziom^x01!", aClan[LEVEL]);
 		}
 		case 1:
 		{
 			if(aClan[SPEED] == iSpeedMax)
 			{
-				cod_print_chat(id, DontChange, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
+				cod_print_chat(id,  "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
 				ShowSkillsMenu(id);
 				return PLUGIN_HANDLED;
 			}
@@ -851,7 +847,7 @@ public SkillsMenu_Handler(id, menu, item)
 			
 			if(iRemaining < 0)
 			{
-				cod_print_chat(id, DontChange, "Twoj klan nie ma wystarczajacej ilosci Honoru.");
+				cod_print_chat(id,  "Twoj klan nie ma wystarczajacej ilosci Honoru.");
 				ShowSkillsMenu(id);
 				return PLUGIN_HANDLED;
 			}
@@ -861,13 +857,13 @@ public SkillsMenu_Handler(id, menu, item)
 			aClan[SPEED]++;
 			aClan[HONOR] = iRemaining;
 			
-			cod_print_chat(id, DontChange, "Ulepszyles umiejetnosc^x03 Predkosc^x01 na^x03 %i^x01 poziom!", aClan[SPEED]);
+			cod_print_chat(id,  "Ulepszyles umiejetnosc^x03 Predkosc^x01 na^x03 %i^x01 poziom!", aClan[SPEED]);
 		}
 		case 2:
 		{
 			if(aClan[GRAVITY] == iGravityMax)
 			{
-				cod_print_chat(id, DontChange, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
+				cod_print_chat(id,  "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
 				ShowSkillsMenu(id);
 				return PLUGIN_HANDLED;
 			}
@@ -876,7 +872,7 @@ public SkillsMenu_Handler(id, menu, item)
 			
 			if(iRemaining < 0)
 			{
-				cod_print_chat(id, DontChange, "Twoj klan nie ma wystarczajacej ilosci Honoru.");
+				cod_print_chat(id,  "Twoj klan nie ma wystarczajacej ilosci Honoru.");
 				ShowSkillsMenu(id);
 				return PLUGIN_HANDLED;
 			}
@@ -886,13 +882,13 @@ public SkillsMenu_Handler(id, menu, item)
 			aClan[GRAVITY]++;
 			aClan[HONOR] = iRemaining;
 			
-			cod_print_chat(id, DontChange, "Ulepszyles umiejetnosc^x03 Grawitacja^x01 na^x03 %i^x01 poziom!", aClan[GRAVITY]);
+			cod_print_chat(id,  "Ulepszyles umiejetnosc^x03 Grawitacja^x01 na^x03 %i^x01 poziom!", aClan[GRAVITY]);
 		}
 		case 3:
 		{
 			if(aClan[DAMAGE] == iDamageMax)
 			{
-				cod_print_chat(id, DontChange, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
+				cod_print_chat(id,  "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
 				ShowSkillsMenu(id);
 				return PLUGIN_HANDLED;
 			}
@@ -901,7 +897,7 @@ public SkillsMenu_Handler(id, menu, item)
 			
 			if(iRemaining < 0)
 			{
-				cod_print_chat(id, DontChange, "Twoj klan nie ma wystarczajacej ilosci Honoru.");
+				cod_print_chat(id,  "Twoj klan nie ma wystarczajacej ilosci Honoru.");
 				ShowSkillsMenu(id);
 				return PLUGIN_HANDLED;
 			}
@@ -911,13 +907,13 @@ public SkillsMenu_Handler(id, menu, item)
 			aClan[DAMAGE]++;
 			aClan[HONOR] = iRemaining;
 			
-			cod_print_chat(id, DontChange, "Ulepszyles umiejetnosc^x03 Obrazenia^x01 na^x03 %i^x01 poziom!", aClan[DAMAGE]);
+			cod_print_chat(id,  "Ulepszyles umiejetnosc^x03 Obrazenia^x01 na^x03 %i^x01 poziom!", aClan[DAMAGE]);
 		}
 		case 4:
 		{
 			if(aClan[DROP] == iWeaponDropMax)
 			{
-				cod_print_chat(id, DontChange, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
+				cod_print_chat(id,  "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
 				ShowSkillsMenu(id);
 				return PLUGIN_HANDLED;
 			}
@@ -926,7 +922,7 @@ public SkillsMenu_Handler(id, menu, item)
 			
 			if(iRemaining < 0)
 			{
-				cod_print_chat(id, DontChange, "Twoj klan nie ma wystarczajacej ilosci Honoru.");
+				cod_print_chat(id,  "Twoj klan nie ma wystarczajacej ilosci Honoru.");
 				ShowSkillsMenu(id);
 				return PLUGIN_HANDLED;
 			}
@@ -936,7 +932,7 @@ public SkillsMenu_Handler(id, menu, item)
 			aClan[DROP]++;
 			aClan[HONOR] = iRemaining;
 			
-			cod_print_chat(id, DontChange, "Ulepszyles umiejetnosc^x03 Obezwladnienie^x01 na^x03 %i^x01 poziom!", aClan[DROP]);
+			cod_print_chat(id,  "Ulepszyles umiejetnosc^x03 Obezwladnienie^x01 na^x03 %i^x01 poziom!", aClan[DROP]);
 		}
 	}
 	
@@ -956,11 +952,11 @@ public SkillsMenu_Handler(id, menu, item)
 		
 		switch(iUpgraded)
 		{
-			case 1: cod_print_chat(iPlayer, DontChange, "^x03 %s^x01 ulepszyl klan na^x03 %i Poziom^x01!", szName, aClan[LEVEL]);
-			case 2: cod_print_chat(iPlayer, DontChange, "^x03 %s^x01 ulepszyl umiejetnosc^x03 Predkosc^x01 na^x03 %i^x01 poziom!", szName, aClan[SPEED]);
-			case 3: cod_print_chat(iPlayer, DontChange, "^x03 %s^x01 ulepszyl umiejetnosc^x03 Grawitacja^x01 na^x03 %i^x01 poziom!", szName, aClan[GRAVITY]);
-			case 4: cod_print_chat(iPlayer, DontChange, "^x03 %s^x01 ulepszyl umiejetnosc^x03 Obrazenia^x01 na^x03 %i^x01 poziom!", szName, aClan[DAMAGE]);
-			case 5: cod_print_chat(iPlayer, DontChange, "^x03 %s^x01 ulepszyl umiejetnosc^x03 Obezwladnienie^x01 na^x03 %i^x01 poziom!", szName, aClan[DROP]);
+			case 1: cod_print_chat(iPlayer,  "^x03 %s^x01 ulepszyl klan na^x03 %i Poziom^x01!", szName, aClan[LEVEL]);
+			case 2: cod_print_chat(iPlayer,  "^x03 %s^x01 ulepszyl umiejetnosc^x03 Predkosc^x01 na^x03 %i^x01 poziom!", szName, aClan[SPEED]);
+			case 3: cod_print_chat(iPlayer,  "^x03 %s^x01 ulepszyl umiejetnosc^x03 Grawitacja^x01 na^x03 %i^x01 poziom!", szName, aClan[GRAVITY]);
+			case 4: cod_print_chat(iPlayer,  "^x03 %s^x01 ulepszyl umiejetnosc^x03 Obrazenia^x01 na^x03 %i^x01 poziom!", szName, aClan[DAMAGE]);
+			case 5: cod_print_chat(iPlayer,  "^x03 %s^x01 ulepszyl umiejetnosc^x03 Obezwladnienie^x01 na^x03 %i^x01 poziom!", szName, aClan[DROP]);
 		}
 	}
 	
@@ -1002,7 +998,7 @@ public ShowInviteMenu(id)
 	if(!iNumPlayers)
 	{
 		menu_destroy(menu);
-		cod_print_chat(id, DontChange, "Na serwerze nie ma gracza, ktorego moglbys zaprosic!");
+		cod_print_chat(id,  "Na serwerze nie ma gracza, ktorego moglbys zaprosic!");
 	}
 	return PLUGIN_CONTINUE;
 }
@@ -1028,15 +1024,11 @@ public InviteMenu_Handler(id, menu, item)
 	if(!is_user_connected(iPlayer))
 		return PLUGIN_HANDLED;
 		
-	if(!cod_check_password(id))
-	{
-		cod_force_password(iPlayer);
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 	
 	ShowInviteConfirmMenu(id, iPlayer);
 
-	cod_print_chat(id, DontChange, "Zaprosiles %s do do twojego klanu.", szName);
+	cod_print_chat(id,  "Zaprosiles %s do do twojego klanu.", szName);
 	
 	ClanMenu(id);
 	
@@ -1088,7 +1080,7 @@ public InviteConfirmMenu_Handler(id, menu, item)
 	
 	if(get_user_status(id, iClan[id]) == LEADER)
 	{
-		cod_print_chat(id, DontChange, "Nie mozesz dolaczyc do klanu, jesli jestes zalozycielem innego.");
+		cod_print_chat(id,  "Nie mozesz dolaczyc do klanu, jesli jestes zalozycielem innego.");
 		return PLUGIN_HANDLED;
 	}
 	
@@ -1098,13 +1090,13 @@ public InviteConfirmMenu_Handler(id, menu, item)
 	
 	if(((aClan[LEVEL]*iMembersPerLevel) + iMaxMembers) <= aClan[MEMBERS])
 	{
-		cod_print_chat(id, DontChange, "Niestety, w tym klanie nie ma juz wolnego miejsca.");
+		cod_print_chat(id,  "Niestety, w tym klanie nie ma juz wolnego miejsca.");
 		return PLUGIN_HANDLED;
 	}
 	
 	set_user_clan(id, iPlayerClan);
 	
-	cod_print_chat(id, DontChange, "Dolaczyles do klanu^x03 %s^01.", aClan[NAME]);
+	cod_print_chat(id,  "Dolaczyles do klanu^x03 %s^01.", aClan[NAME]);
 	
 	return PLUGIN_HANDLED;
 }
@@ -1121,7 +1113,7 @@ public ChangeName_Handle(id)
 	
 	if(equal(szName, ""))
 	{
-		cod_print_chat(id, DontChange, "Nie wpisano nowej nazwy klanu.");
+		cod_print_chat(id,  "Nie wpisano nowej nazwy klanu.");
 		ClanMenu(id);
 		return PLUGIN_HANDLED;
 	}
@@ -1130,7 +1122,7 @@ public ChangeName_Handle(id)
 	
 	if(CheckClanName(szTempName))
 	{
-		cod_print_chat(id, DontChange, "Klan z taka nazwa juz istnieje.");
+		cod_print_chat(id,  "Klan z taka nazwa juz istnieje.");
 		ClanMenu(id);
 		return PLUGIN_HANDLED;
 	}
@@ -1151,7 +1143,7 @@ public ChangeName_Handle(id)
 	SQL_ThreadQuery(hSqlTuple, "Table_Handle", szCache);
 	log_to_file("addons/amxmodx/logs/cod_clans.log", "Zmiana Nazwy Klanu (2): %s", szCache);
 	
-	cod_print_chat(id, DontChange, "Zmieniles nazwe klanu na^x03 %s^x01.", aClan[NAME]);
+	cod_print_chat(id,  "Zmieniles nazwe klanu na^x03 %s^x01.", aClan[NAME]);
 	
 	return PLUGIN_CONTINUE;
 }
@@ -1242,7 +1234,7 @@ public MemberMenu_Handler(id, menu, item)
 
 	if(iID == id)
 	{
-		cod_print_chat(id, DontChange, "Nie mozesz zarzadzac soba!");
+		cod_print_chat(id,  "Nie mozesz zarzadzac soba!");
 		ShowMembersMenu(id);
 		return PLUGIN_HANDLED;
 	}
@@ -1252,7 +1244,7 @@ public MemberMenu_Handler(id, menu, item)
 
 	if(iFlag == LEADER)
 	{
-		cod_print_chat(id, DontChange, "Nie mozna zarzadzac przywodca klanu!");
+		cod_print_chat(id,  "Nie mozna zarzadzac przywodca klanu!");
 		ShowMembersMenu(id);
 		return PLUGIN_HANDLED;
 	}
@@ -1331,23 +1323,23 @@ public UpdateMember(id, status)
 				{
 					set_user_status(id, iClan[id], DEPUTY);
 					set_user_status(iPlayer, iClan[id], LEADER);
-					cod_print_chat(iPlayer, DontChange, "Zostales mianowany przywodca klanu!");
+					cod_print_chat(iPlayer,  "Zostales mianowany przywodca klanu!");
 				}
 				case DEPUTY:
 				{
 					set_user_status(iPlayer, iClan[id], DEPUTY);
-					cod_print_chat(iPlayer, DontChange, "^x01 Zostales zastepca przywodcy klanu!");		
+					cod_print_chat(iPlayer,  "^x01 Zostales zastepca przywodcy klanu!");		
 				}
 				case MEMBER:
 				{
 					set_user_status(iPlayer, iClan[id], MEMBER);
-					cod_print_chat(iPlayer, DontChange, "^x01 Zostales zdegradowany do rangi czlonka klanu.");
+					cod_print_chat(iPlayer,  "^x01 Zostales zdegradowany do rangi czlonka klanu.");
 				}
 				case NONE:
 				{
 					log_to_file("addons/amxmodx/logs/cod_clans.log", "Wyrzucenie z Klanu: %s", szChosenName[id]);
 					set_user_clan(iPlayer);
-					cod_print_chat(iPlayer, DontChange, "Zostales wyrzucony z klanu.");
+					cod_print_chat(iPlayer,  "Zostales wyrzucony z klanu.");
 				}
 			}
 
@@ -1357,10 +1349,10 @@ public UpdateMember(id, status)
 		
 		switch(status)
 		{
-			case LEADER: cod_print_chat(iPlayer, DontChange, "^x03 %s^01 zostal nowym przywodca klanu.", szChosenName[id]);
-			case DEPUTY: cod_print_chat(iPlayer, DontChange, "^x03 %s^x01 zostal zastepca przywodcy klanu.", szChosenName[id]);
-			case MEMBER: cod_print_chat(iPlayer, DontChange, "^x03 %s^x01 zostal zdegradowany do rangi czlonka klanu.", szChosenName[id]);
-			case NONE: cod_print_chat(iPlayer, DontChange, "^x03 %s^01 zostal wyrzucony z klanu.", szChosenName[id]);
+			case LEADER: cod_print_chat(iPlayer,  "^x03 %s^01 zostal nowym przywodca klanu.", szChosenName[id]);
+			case DEPUTY: cod_print_chat(iPlayer,  "^x03 %s^x01 zostal zastepca przywodcy klanu.", szChosenName[id]);
+			case MEMBER: cod_print_chat(iPlayer,  "^x03 %s^x01 zostal zdegradowany do rangi czlonka klanu.", szChosenName[id]);
+			case NONE: cod_print_chat(iPlayer,  "^x03 %s^01 zostal wyrzucony z klanu.", szChosenName[id]);
 		}
 	}
 	
@@ -1395,11 +1387,7 @@ public DepositHonor_Handle(id)
 	if(!iClan[id])
 		return PLUGIN_HANDLED;
 		
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 		
 	new szArgs[10], aClan[ClanInfo], iHonor;
 	
@@ -1411,13 +1399,13 @@ public DepositHonor_Handle(id)
 	
 	if(!iHonor)
 	{
-		cod_print_chat(id, DontChange, "Probujesz wplacic ujemna lub zerowa ilosc Honoru!");
+		cod_print_chat(id,  "Probujesz wplacic ujemna lub zerowa ilosc Honoru!");
 		return PLUGIN_HANDLED;
 	}
 	
 	if(iHonor > cod_get_user_honor(id))
 	{
-		cod_print_chat(id, DontChange, "Nie masz tyle Honoru!");
+		cod_print_chat(id,  "Nie masz tyle Honoru!");
 		return PLUGIN_HANDLED;
 	}
 	
@@ -1428,8 +1416,8 @@ public DepositHonor_Handle(id)
 	
 	SaveClan(iClan[id]);
 	
-	cod_print_chat(id, DontChange, "Wplaciles^x03 %i^x01 Honoru na rzecz klanu.", iHonor);
-	cod_print_chat(id, DontChange, "Aktualnie twoj klan ma^x03 %i^x01 Honoru.", aClan[HONOR]);
+	cod_print_chat(id,  "Wplaciles^x03 %i^x01 Honoru na rzecz klanu.", iHonor);
+	cod_print_chat(id,  "Aktualnie twoj klan ma^x03 %i^x01 Honoru.", aClan[HONOR]);
 	
 	return PLUGIN_HANDLED;
 }
@@ -1849,19 +1837,6 @@ public ConfigLoad()
 	if(iFile) fclose(iFile);
 }
 
-stock mysql_escape_string(const szSource[], szDest[], iLen)
-{
-	copy(szDest, iLen, szSource);
-	replace_all(szDest, iLen, "\\", "\\\\");
-	replace_all(szDest, iLen, "\0", "\\0");
-	replace_all(szDest, iLen, "\n", "\\n");
-	replace_all(szDest, iLen, "\r", "\\r");
-	replace_all(szDest, iLen, "\x1a", "\Z");
-	replace_all(szDest, iLen, "'", "\'");
-	replace_all(szDest, iLen, "`", "\`");
-	replace_all(szDest, iLen, "^"", "\^"");
-}
-
 stock GetClanID(const szClan[])
 {
 	new aClan[ClanInfo];
@@ -1875,24 +1850,6 @@ stock GetClanID(const szClan[])
 	}
 	
 	return 0;
-}
-
-stock cmd_execute(id, const szText[], any:...) 
-{
-    #pragma unused szText
-
-    if (id == 0 || is_user_connected(id))
-	{
-    	new szMessage[256];
-
-    	format_args(szMessage, charsmax(szMessage), 1);
-
-        message_begin(id == 0 ? MSG_ALL : MSG_ONE, 51, _, id);
-        write_byte(strlen(szMessage) + 2);
-        write_byte(10);
-        write_string(szMessage);
-        message_end();
-    }
 }
 
 Ham:get_player_resetmaxspeed_func()

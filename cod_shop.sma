@@ -86,7 +86,7 @@ public plugin_cfg()
 	costHE[0] = get_pcvar_num(cvarCostHE[0]);
 	costHE[1] = get_pcvar_num(cvarCostHE[1]);
 	
-	iExchangeRatio = = get_pcvar_num(cvarExchangeRatio);
+	iExchangeRatio = get_pcvar_num(cvarExchangeRatio);
 	iDurability = get_pcvar_num(cvarDurability);
 	iSmallExpMin = get_pcvar_num(cvarSmallExpMin);
 	iSmallExpMax = get_pcvar_num(cvarSmallExpMax);
@@ -101,11 +101,7 @@ public plugin_cfg()
 	
 public Shop(id)
 {
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 	
 	client_cmd(id, "spk CodMod/select2");
 	
@@ -144,11 +140,7 @@ public Shop_Handler(id, menu, item)
 
 public ShopC(id)
 {
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 	
 	iType[id] = CASH;
 	
@@ -159,11 +151,7 @@ public ShopC(id)
 
 public ShopH(id)
 {
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 	
 	iType[id] = HONOR;
 	
@@ -181,7 +169,7 @@ public ShowShop(id)
 	new szTemp[128], szPrice[8];
 
 	formatex(szTemp, charsmax(szTemp), "Kantor Walutowy\r[Wymiana Kasy na Honor] \yKoszt:\r %i%s/%i%s", iType[id] ? 1 : iExchangeRatio, buySymbol[iType[id]], iType[id] ? iExchangeRatio : 1, buySymbol[iType[id]]);
-	formatex(szPrice, charsmax(szPrice), -1);
+	formatex(szPrice, charsmax(szPrice), "%i", -1);
 	menu_additem(menu, szTemp, szPrice);
 	formatex(szTemp, charsmax(szTemp), "Napraw Item \r[+%i Wytrzymalosci] \yKoszt:\r %i%s", iDurability, costRepair[iType[id]], buySymbol[iType[id]]);
 	formatex(szPrice, charsmax(szPrice), costRepair[iType[id]]);
@@ -239,15 +227,17 @@ public ShowShop_Handler(id, menu, item)
 	
 	if(item == 2)
 	{
-		if(cod_get_user_item_value(id) <= 1)
-		{
-			cod_print_chat(id, "Twoj item nie moze juz zostac ulepszony!");
-			return PLUGIN_CONTINUE;
-		}
-		
-		if(!cod_get_user_item(id))
+		new itemValue, playerItem = cod_get_user_item(id, itemValue);
+
+		if(!playerItem)
 		{
 			cod_print_chat(id, "Nie masz zadnego itemu!");
+			return PLUGIN_CONTINUE;
+		}
+
+		if(itemValue <= 1)
+		{
+			cod_print_chat(id, "Twoj item nie moze juz zostac ulepszony!");
 			return PLUGIN_CONTINUE;
 		}
 	}
@@ -302,7 +292,7 @@ public ShowShop_Handler(id, menu, item)
 		{
 			cod_print_chat(id, "Kupiles^x03 losowy item^x01!");
 			
-			cod_set_user_item(id, -1, -1, 1);
+			cod_set_user_item(id, -1, -1);
 		}
 		case 2:
 		{

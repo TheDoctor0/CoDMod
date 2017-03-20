@@ -14,8 +14,6 @@
 #define Rem(%2,%1) (%1 &= ~(1 <<(%2&31)))
 #define Get(%2,%1) (%1 & (1<<(%2&31)))
 
-#define is_user_player(%1) (1 <= %1 <= iMaxPlayers)
-
 #define TASK_TIME 9054
 
 enum Stats
@@ -43,7 +41,7 @@ new const szCommandTopTime[][] = { "say /ttop15", "say_team /ttop15", "say /topt
 new const szCommandStats[][] = { "say /beststats", "say_team /beststats", "say /bstats", "say_team /bstats", "say /najlepszestaty", "say_team /najlepszestaty", "say /nstaty", "say_team /nstaty", "najlepszestaty" };
 new const szCommandTopStats[][] = { "say /stop15", "say_team /stop15", "say /topstats", "say_team /topstats", "say /topstaty", "say_team /topstaty", "topstaty" };
 
-new szBuffer[2048], gPlayer[MAX_PLAYERS + 1][Stats], iLoaded, iVisit, iMaxPlayers, Handle:hSqlHook;
+new szBuffer[2048], gPlayer[MAX_PLAYERS + 1][Stats], iLoaded, iVisit, maxPlayers, Handle:hSqlHook;
 
 public plugin_init() 
 {
@@ -80,7 +78,7 @@ public plugin_init()
 	register_message(SVC_INTERMISSION, "MsgIntermission");
 	register_message(get_user_msgid("SayText"), "HandleSayText");
 	
-	iMaxPlayers = get_maxplayers();
+	maxPlayers = get_maxplayers();
 }
 
 public plugin_cfg()
@@ -124,7 +122,7 @@ public client_putinserver(id)
 public client_authorized(id)
 	gPlayer[id][Admin] = get_user_flags(id) & ADMIN_BAN ? 1 : 0;
 	
-public client_disconnect(id)
+public client_disconnected(id)
 	SaveStats(id);
 	
 public StatsMenu(id)
@@ -212,8 +210,8 @@ public ShowTime(iFailState, Handle:hQuery, szError[], iError, szData[], iDataSiz
 		iHours++;
 	}
 	
-	cod_print_chat(id, DontChange, "Spedziles na serwerze lacznie^x04 %i h %i min %i s^x01.", iHours, iMinutes, iSeconds);
-	cod_print_chat(id, DontChange, "Zajmujesz^x04 %i/%i^x01 miejsce w rankingu czasu gry.", iRank, iPlayers);
+	cod_print_chat(id, "Spedziles na serwerze lacznie^x04 %i h %i min %i s^x01.", iHours, iMinutes, iSeconds);
+	cod_print_chat(id, "Zajmujesz^x04 %i/%i^x01 miejsce w rankingu czasu gry.", iRank, iPlayers);
 	
 	return PLUGIN_CONTINUE;
 }
@@ -310,11 +308,11 @@ public ShowStats(iFailState, Handle:hQuery, szError[], iError, szData[], iDataSi
 	new iPlayers = SQL_ReadResult(hQuery, 1);
 	
 	if(gPlayer[id][CurrentStats] > gPlayer[id][BestStats])
-		cod_print_chat(id, DontChange, "Twoje najlepsze staty to^x04 %i^x01 zabic (w tym^x04 %i^x01 z HS) i^x04 %i^x01 zgonow^x01.", gPlayer[id][CurrentKills], gPlayer[id][CurrentHS], gPlayer[id][CurrentDeaths]);
+		cod_print_chat(id, "Twoje najlepsze staty to^x04 %i^x01 zabic (w tym^x04 %i^x01 z HS) i^x04 %i^x01 zgonow^x01.", gPlayer[id][CurrentKills], gPlayer[id][CurrentHS], gPlayer[id][CurrentDeaths]);
 	else
-		cod_print_chat(id, DontChange, "Twoje najlepsze staty to^x04 %i^x01 zabic (w tym^x04 %i^x01 z HS) i^x04 %i^x01 zgonow^x01.", gPlayer[id][BestKills], gPlayer[id][BestHS], gPlayer[id][BestDeaths]);
+		cod_print_chat(id, "Twoje najlepsze staty to^x04 %i^x01 zabic (w tym^x04 %i^x01 z HS) i^x04 %i^x01 zgonow^x01.", gPlayer[id][BestKills], gPlayer[id][BestHS], gPlayer[id][BestDeaths]);
 		
-	cod_print_chat(id, DontChange, "Zajmujesz^x04 %i/%i^x01 miejsce w rankingu najlepszych statystyk.", iRank, iPlayers);
+	cod_print_chat(id, "Zajmujesz^x04 %i/%i^x01 miejsce w rankingu najlepszych statystyk.", iRank, iPlayers);
 	
 	return PLUGIN_CONTINUE;
 }
@@ -454,20 +452,20 @@ public CheckTime(id)
 	
 	UnixToTime(iTime, iYear, iMonth, iDay, iHour, iMinute, iSecond, UT_TIMEZONE_SERVER);
 	
-	cod_print_chat(id, DontChange, "Aktualnie jest godzina^x03 %02d:%02d:%02d (Data: %02d.%02d.%02d)^x01.", iHour, iMinute, iSecond, iDay, iMonth, iYear);
+	cod_print_chat(id, "Aktualnie jest godzina^x03 %02d:%02d:%02d (Data: %02d.%02d.%02d)^x01.", iHour, iMinute, iSecond, iDay, iMonth, iYear);
 	
 	if(gPlayer[id][FirstVisit] == gPlayer[id][LastVisit])
-		cod_print_chat(id, DontChange, "To twoja^x03 pierwsza wizyta^x01 na serwerze. Zyczymy milej gry!" );
+		cod_print_chat(id, "To twoja^x03 pierwsza wizyta^x01 na serwerze. Zyczymy milej gry!" );
 	else 
 	{
 		UnixToTime(gPlayer[id][LastVisit], Year, Month, Day, iHour, iMinute, iSecond, UT_TIMEZONE_SERVER);
 		
 		if(iYear == Year && iMonth == Month && iDay == Day)
-			cod_print_chat(id, DontChange, "Twoja ostatnia wizyta miala miejsce^x04 dzisiaj^x01 o^x03 %02d:%02d:%02d^x01. Zyczymy milej gry!", iHour, iMinute, iSecond);
+			cod_print_chat(id, "Twoja ostatnia wizyta miala miejsce^x04 dzisiaj^x01 o^x03 %02d:%02d:%02d^x01. Zyczymy milej gry!", iHour, iMinute, iSecond);
 		else if(iYear == Year && iMonth == Month && (iDay - 1) == Day)
-			cod_print_chat(id, DontChange, "Twoja ostatnia wizyta miala miejsce^x04 wczoraj^x01 o^x03 %02d:%02d:%02d^x01. Zyczymy milej gry!", iHour, iMinute, iSecond);
+			cod_print_chat(id, "Twoja ostatnia wizyta miala miejsce^x04 wczoraj^x01 o^x03 %02d:%02d:%02d^x01. Zyczymy milej gry!", iHour, iMinute, iSecond);
 		else
-			cod_print_chat(id, DontChange, "Twoja ostatnia wizyta:^x03 %02d:%02d:%02d (Data: %02d.%02d.%02d)^x01. Zyczymy milej gry!", iHour, iMinute, iSecond, Day, Month, Year);
+			cod_print_chat(id, "Twoja ostatnia wizyta:^x03 %02d:%02d:%02d (Data: %02d.%02d.%02d)^x01. Zyczymy milej gry!", iHour, iMinute, iSecond, Day, Month, Year);
 	}
 }
 
@@ -717,7 +715,7 @@ public _stats_add_kill(iPlugin, iParams)
 		
 	new id = get_param(1);
 	
-	if(!is_user_player(id))
+	if(!is_user_valid(id))
 		return PLUGIN_CONTINUE;
 	
 	gPlayer[id][CurrentKills]++;
@@ -730,7 +728,7 @@ public _cod_get_user_time(id, szReturn[], iLen)
 {
 	new id = get_param(1);
 	
-	if(!is_user_player(id))
+	if(!is_user_valid(id))
 		return;
 
 	new szTemp[64], iSeconds = (gPlayer[id][Time] + get_user_time(id)), iMinutes, iHours;
@@ -759,17 +757,4 @@ stock get_loguser_index()
 	parse_loguser(szLogUser, szName, 31);
 
 	return get_user_index(szName);
-}
-
-stock mysql_escape_string(const szSource[], szDest[], iLen)
-{
-	copy(szDest, iLen, szSource);
-	replace_all(szDest, iLen, "\\", "\\\\");
-	replace_all(szDest, iLen, "\0", "\\0");
-	replace_all(szDest, iLen, "\n", "\\n");
-	replace_all(szDest, iLen, "\r", "\\r");
-	replace_all(szDest, iLen, "\x1a", "\Z");
-	replace_all(szDest, iLen, "'", "\'");
-	replace_all(szDest, iLen, "`", "\`");
-	replace_all(szDest, iLen, "^"", "\^"");
 }

@@ -425,6 +425,8 @@ public select_fraction(id)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
+
 	if(!get_bit(id, dataLoaded))
 	{
 		cod_print_chat(id, "Trwa wczytywanie twoich klas...");
@@ -707,7 +709,9 @@ public drop_item(id)
 }
 
 public reset_stats(id)
-{	
+{
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
+
 	if(!is_user_alive(id))
 	{
 		reset_points(id);
@@ -741,6 +745,8 @@ public reset_points(id)
 public assign_points(id, sound)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 	
 	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
@@ -869,6 +875,8 @@ public assign_points_handler(id, menu, item)
 public change_hud(id, sound)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 		
 	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
@@ -1341,7 +1349,9 @@ public use_skill(id)
 }
 
 public player_spawn(id)
-{	
+{
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
+	
 	if(codPlayer[id][PLAYER_NEW_CLASS]) set_new_class(id);
 	
 	if(!codPlayer[id][PLAYER_CLASS])

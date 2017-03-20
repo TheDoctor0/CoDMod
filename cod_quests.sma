@@ -110,12 +110,7 @@ public client_connect(id)
 
 public QuestMenu(id)
 {
-	if(!cod_check_password(id))
-	{
-		cod_force_password(id);
-		
-		return PLUGIN_HANDLED;
-	}
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 	
 	client_cmd(id, "spk CodMod/select");
 	
@@ -131,6 +126,8 @@ public QuestMenu(id)
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
 	menu_display(id, menu, 0);
+
+	return PLUGIN_HANDLED;
 }
 
 public QuestMenu_Handle(id, menu, item)
@@ -173,7 +170,7 @@ public SelectChapter(id)
 
 	client_cmd(id, "spk CoDMod/select");
 	
-	if(iPlayer[TYPE][id]) cod_print_chat(id, DontChange, "Najpierw wykonaj poprzedni quest.");
+	if(iPlayer[TYPE][id]) cod_print_chat(id, "Najpierw wykonaj poprzedni quest.");
 
 	new menu = menu_create("\wWybierz \rRozdzial:", "SelectChapter_Handler");
 	new callback = menu_makecallback("SelectChapter_Callback");
@@ -293,7 +290,7 @@ public SelectQuest_Handler(id, menu, item)
 	{
 		case CLASS: SelectClass(id);
 		case ITEM: SelectItem(id);
-		default: cod_print_chat(id, DontChange, "Rozpoczales wykonywac quest. Powodzenia!");
+		default: cod_print_chat(id, "Rozpoczales wykonywac quest. Powodzenia!");
 	}
 	
 	menu_destroy(menu);
@@ -378,7 +375,7 @@ public Choose_Handler(id, menu, item)
 	
 	iPlayer[ADDITIONAL][id] = str_to_num(szData);
 	
-	cod_print_chat(id, DontChange, "Rozpoczales wykonywac quest. Powodzenia!");
+	cod_print_chat(id, "Rozpoczales wykonywac quest. Powodzenia!");
 	
 	menu_destroy(menu);
 	
@@ -472,7 +469,7 @@ public GiveReward(id)
 	SaveQuest(id, iPlayer[ID][id]);
 	ResetQuest(id);
 	
-	cod_print_chat(id, DontChange, "Gratulacje! Ukonczyles Quest - otrzymujesz^x03 %i Expa^x01.", iReward);
+	cod_print_chat(id, "Gratulacje! Ukonczyles Quest - otrzymujesz^x03 %i Expa^x01.", iReward);
 	
 	return PLUGIN_CONTINUE;
 }
@@ -486,13 +483,13 @@ public ResetQuest(id)
 
 public CheckQuest(id)
 {
-	if(!iPlayer[TYPE][id]) cod_print_chat(id, DontChange, "Nie wykonujesz zadnej misji");
+	if(!iPlayer[TYPE][id]) cod_print_chat(id, "Nie wykonujesz zadnej misji");
 	else
 	{
 		new szInfo[128];
 		
 		formatex(szInfo, charsmax(szInfo), QuestsInfo[iPlayer[TYPE][id]], (GetProgressNeed(id)- GetProgress(id)));
-		cod_print_chat(id, DontChange, "Zakres:^x03 %s^x01. Postep:^x03 %i/%i^x01. Info:^x03 %s", QuestsChapter[iPlayer[CHAPTER][id]], GetProgress(id), GetProgressNeed(id), szInfo);
+		cod_print_chat(id, "Zakres:^x03 %s^x01. Postep:^x03 %i/%i^x01. Info:^x03 %s", QuestsChapter[iPlayer[CHAPTER][id]], GetProgress(id), GetProgressNeed(id), szInfo);
 	}
 	
 	return PLUGIN_CONTINUE;

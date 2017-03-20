@@ -7,7 +7,7 @@
 #define set_bit(%2,%1) (%1 |= (1<<(%2&31)))
 #define rem_bit(%2,%1) (%1 &= ~(1 <<(%2&31)))
 
-#define is_user_player(%1) (1 <= %1 <= maxPlayers)
+#define is_user_valid(%1) (1 <= %1 <= maxPlayers)
 
 #define MAX_PLAYERS 32
 
@@ -43,14 +43,10 @@ new const codSounds[sounds][] =
 	"CoDMod/levelup3.wav"
 };
 
-native cod_check_password(id);
+native cod_check_account(id);
 /*------------------------------
 Sprawdza, czy gracz zalogowal sie na konto.
-------------------------------*/
-
-native cod_force_password(id);
-/*------------------------------
-Wyświetla menu logowania na konto.
+Wyświetla menu logowania na konto, jeśli nie jest zalogowany.
 ------------------------------*/
 
 native cod_get_user_exp(id);
