@@ -333,7 +333,7 @@ public plugin_cfg()
 	ArrayPushArray(codItems, codItem);
 	
 	formatex(codClass[CLASS_NAME], charsmax(codClass[CLASS_NAME]), "Brak");
-	
+
 	ArrayPushArray(codClasses, codClass);
 
 	codRender[RENDER_VALUE] = 256;
@@ -438,7 +438,7 @@ public select_fraction(id)
 	{
 		client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-		new fractionName[MAX_NAME], menu = menu_create("\wWybierz \rFrakcje:", "select_fraction_handel");
+		new fractionName[MAX_NAME], menu = menu_create("\wWybierz \rFrakcje:", "select_fraction_handle");
 	
 		for(new i = 0; i < ArraySize(codFractions); i++)
 		{
@@ -513,6 +513,8 @@ public select_fraction_handle(id, menu, item)
 public select_class(id)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 		
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
@@ -1351,7 +1353,7 @@ public use_skill(id)
 public player_spawn(id)
 {
 	if(!cod_check_account(id)) return PLUGIN_HANDLED;
-	
+
 	if(codPlayer[id][PLAYER_NEW_CLASS]) set_new_class(id);
 	
 	if(!codPlayer[id][PLAYER_CLASS])
