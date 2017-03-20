@@ -3241,7 +3241,7 @@ stock cs_get_weaponbox_type(weaponTypeBox)
 
 stock is_enough_space(id)
 {
-	new Float:origin[3], Float:start[3], Float:end[3];
+	new Float:origin[3], Float:start[3], Float:end[3], Float:limit = 135.0;
 	
 	pev(id, pev_origin, origin);
  
@@ -3249,15 +3249,15 @@ stock is_enough_space(id)
 	start[1] = end[1] = origin[1];
 	start[2] = end[2] = origin[2];
 
-	start[0] += 135.0;
-	end[0] -= 135.0;
+	start[0] += limit;
+	end[0] -= limit;
  
 	if(is_wall_between_points(start, end, id)) return 0;
  
-	start[0] -= 135.0;
-	end[0] += 135.0;
-	start[1] += 135.0;
-	end[1] -= 135.0;
+	start[0] -= limit;
+	end[0] += limit;
+	start[1] += limit;
+	end[1] -= limit;
  
 	if(is_wall_between_points(start, end, id)) return 0;
  
