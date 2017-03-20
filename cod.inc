@@ -168,7 +168,7 @@ native cod_get_user_vip(id);
 Sprawdza, czy gracz ma vipa
 ------------------------------*/
 
-native cod_get_user_health(id, class_health = 1, gained_health = 1, bonus_health = 1);
+native cod_get_user_health(id, class_health = 1, stats_health = 1, bonus_health = 1);
 /*------------------------------
 Zwraca punkty statystyki zdrowie
 ------------------------------*/
@@ -183,7 +183,12 @@ native cod_set_user_bonus_health(id, value);
 Ustawia dodatkowe punkty statystyki zdrowie
 ------------------------------*/
 
-native cod_get_user_intelligence(id, gained_intelligence = 1, bonus_intelligence = 1);
+native cod_get_user_bonus_health(id);
+/*------------------------------
+Zwraca dodatkowe punkty statystyki zdrowie
+------------------------------*/
+
+native cod_get_user_intelligence(id, class_intelligence = 1, stats_intelligence = 1, bonus_intelligence = 1);
 /*------------------------------
 Zwraca punkty statystyki inteligencja
 ------------------------------*/
@@ -193,18 +198,27 @@ native cod_set_user_bonus_intelligence(id, value);
 Ustawia dodatkowe punkty statystyki inteligencja
 ------------------------------*/
 
-native cod_get_user_stamina(id, gained_stamina = 1, bonus_stamina = 1);
+native cod_get_user_bonus_intelligence(id);
+/*------------------------------
+Zwraca dodatkowe punkty statystyki inteligencja
+------------------------------*/
+
+native cod_get_user_stamina(id, class_stamina = 1, stats_stamina = 1, bonus_stamina = 1);
 /*------------------------------
 Zwraca punkty statystyki wytrzymalosc
 ------------------------------*/
 
-
-native cod_set_user_bonus_stamina(id, wartosc);
+native cod_set_user_bonus_stamina(id, value);
 /*------------------------------
 Ustawia dodatkowe punkty statystyki wytrzymalosc
 ------------------------------*/
 
-native cod_get_user_strength(id, gained_strength = 1, bonus_strength = 1);
+native cod_get_user_bonus_stamina(id);
+/*------------------------------
+Zwraca dodatkowe punkty statystyki wytrzymalosc
+------------------------------*/
+
+native cod_get_user_strength(id, class_strength = 1, stats_strength = 1, bonus_strength = 1);
 /*------------------------------
 Zwraca punkty statystyki sila
 ------------------------------*/
@@ -214,7 +228,12 @@ native cod_set_user_bonus_strength(id, value);
 Ustawia dodatkowe punkty statystyki sila
 ------------------------------*/
 
-native cod_get_user_condition(id, gained_condition = 1, bonus_condition = 1);
+native cod_get_user_bonus_strength(id);
+/*------------------------------
+Zwraca dodatkowe punkty statystyki sila
+------------------------------*/
+
+native cod_get_user_condition(id, class_condition = 1, stats_condition = 1, bonus_condition = 1);
 /*------------------------------
 Zwraca punkty statystyki kondycja
 ------------------------------*/
@@ -224,6 +243,10 @@ native cod_set_user_bonus_condition(id, value);
 Ustawia dodatkowe punkty statystyki kondycja
 ------------------------------*/
 
+native cod_get_user_bonus_condition(id);
+/*------------------------------
+Ustawia dodatkowe punkty statystyki kondycja
+------------------------------*/
 
 native cod_inflict_damage(attacker, victim, Float:damage, Float:factor = 0.5, flags = 0);
 /*------------------------------
