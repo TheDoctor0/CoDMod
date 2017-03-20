@@ -392,7 +392,7 @@ public buy_question_handle(id, menu, item)
 	cod_get_item_desc(marketItem[ITEM], itemDescription, charsmax(itemDescription));
 	
 	cod_print_chat(id, "Przedmiot^x03 %s^x01 zostal pomyslnie zakupiony.", itemDescription);
-	cod_print_chat(marketItem[OWNER], "Twoj item^x03 %s zostal zakupiony przez^x03 %s^x01. Otrzymujesz^x03 %i%s^x01.", marketItem[NAME], playerName[id], marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
+	cod_print_chat(marketItem[OWNER], "Twoj przedmiot^x03 %s zostal zakupiony przez^x03 %s^x01. Otrzymujesz^x03 %i%s^x01.", marketItem[NAME], playerName[id], marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
 	
 	return PLUGIN_CONTINUE;
 }
@@ -479,7 +479,7 @@ public withdraw_item_handle(id, menu, item)
 	length += formatex(menuData[length], maxLength - length, "\wOpis: \y%s^n", itemDescription);
 	length += formatex(menuData[length], maxLength - length, "\wKoszt: \y%d%s^n", marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
 	length += formatex(menuData[length], maxLength - length, "\wWytrzymalosc: \y%d/%i^n^n", marketItem[DURABILITY], cod_max_item_durability());
-	length += formatex(menuData[length], maxLength - length, "\wCzy chcesz \rwycofac\w ten item?");
+	length += formatex(menuData[length], maxLength - length, "\wCzy chcesz \rwycofac\w ten przedmiot?");
 	
 	new menu = menu_create(menuData, "withdraw_question_handle");
 	
@@ -539,7 +539,7 @@ public withdraw_question_handle(id, menu, item)
 stock get_items_amount(id) 
 {
 	if(!is_user_connected(id)) return 0;
-		
+
 	new amount = 0, marketItem[items];
 	
 	for(new i = 0; i < ArraySize(marketItems); i++) 
