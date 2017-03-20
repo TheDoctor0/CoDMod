@@ -14,7 +14,7 @@ enum _:knife { NAME, BONUS, MODEL, DEFAULT, HEALTH, INTELLIGENCE, STAMINA, STREN
 
 new const knifeModels[][][] =
 {
-    { "Standardowy", "(Brak bonusu)", "models/v_knife.mdl" },
+    { "Standardowy", "(+2 Kazdej Statystyki)", "models/v_knife.mdl" },
     { "Mysliwski", "(+10 Zdrowia)", "models/CoDMod/hunting.mdl" },
     { "Kieszonkowy", "(+10 Inteligencji)", "models/CoDMod/pocket.mdl" },
     { "Tasak", "(+10 Wytrzymalosci)", "models/CoDMod/chopper.mdl" },
@@ -128,6 +128,14 @@ public set_bonus(id, oldKnife, newKnife)
 {
     switch(oldKnife)
     {
+        case STANDARD:
+        {
+            cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) - 2);
+            cod_set_user_bonus_intelligence(id, cod_get_user_bonus_intelligence(id) - 2);
+            cod_set_user_bonus_stamina(id, cod_get_user_bonus_stamina(id) - 2);
+            cod_set_user_bonus_strength(id, cod_get_user_bonus_strength(id) - 2);
+            cod_set_user_bonus_condition(id, cod_get_user_bonus_condition(id) - 2);
+        }
         case HEALTH: cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) - 10);
         case INTELLIGENCE: cod_set_user_bonus_intelligence(id, cod_get_user_bonus_intelligence(id) - 10);
         case STAMINA: cod_set_user_bonus_stamina(id, cod_get_user_bonus_stamina(id) - 10);
@@ -137,6 +145,14 @@ public set_bonus(id, oldKnife, newKnife)
 
     switch(newKnife)
     {
+         case STANDARD:
+        {
+            cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + 2);
+            cod_set_user_bonus_intelligence(id, cod_get_user_bonus_intelligence(id) + 2);
+            cod_set_user_bonus_stamina(id, cod_get_user_bonus_stamina(id) + 2);
+            cod_set_user_bonus_strength(id, cod_get_user_bonus_strength(id) + 2);
+            cod_set_user_bonus_condition(id, cod_get_user_bonus_condition(id) + 2);
+        }
         case HEALTH: cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + 10);
         case INTELLIGENCE: cod_set_user_bonus_intelligence(id, cod_get_user_bonus_intelligence(id) + 10);
         case STAMINA: cod_set_user_bonus_stamina(id, cod_get_user_bonus_stamina(id) + 10);
@@ -175,6 +191,7 @@ public load_knife(id)
 
         set_bonus(id, DEFAULT, playerKnife[id]);
     }
+    else set_bonus(id, BONUS, DEFAULT);
 
     return PLUGIN_CONTINUE;
 } 
