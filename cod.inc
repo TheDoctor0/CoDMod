@@ -28,6 +28,8 @@
 #define RENDER_ITEM 1
 #define RENDER_ADDITIONAL 2
 
+enum _:hud { TYPE_HUD, TYPE_DHUD };
+
 enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3 };
 
 new const codSounds[sounds][] =
@@ -314,6 +316,11 @@ Pobiera wytrzymalosc itemu gracza
 native cod_max_item_durability()
 /*------------------------------
 Zwraca maksymalna wytrzymalosc itemu
+------------------------------*/
+
+native cod_show_hud(id, const text[], type=0, red=255, green=255, blue=255, Float:x=-1.0, Float:y=0.35, effects=0, Float:fxtime=6.0, Float:holdtime=12.0, Float:fadeintime=0.1, Float:fadeouttime=0.2)
+/*------------------------------
+Wyświetla hud o podanych parametrach
 ------------------------------*/
 
 native cod_display_fade(id, duration, holdtime, fadetype, red, green, blue, alpha);

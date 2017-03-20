@@ -2,7 +2,6 @@
 #include <fun>
 #include <engine>
 #include <cstrike>
-#include <fakemeta>
 #include <fakemeta_util>
 #include <cod>
 
@@ -10,19 +9,13 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new const boxClass[] = "cod_box";
-
-new const boxModel[] = "models/CoDMod/box.mdl";
-
-new const boxSound[] =  "CoDMod/get_box.wav";
+new const boxClass[] = "cod_box", boxModel[] = "models/CoDMod/box.mdl", boxSound[] =  "CoDMod/get_box.wav";
 
 new spriteGreen, spriteAcid, cvarBoxChance;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
-	register_event("DeathMsg", "player_death", "a");
 	
 	register_touch(boxClass, "player", "touch_box");
 	
@@ -38,8 +31,8 @@ public plugin_precache()
 	spriteAcid = precache_model("sprites/CoDMod/acid_pou.spr");
 }
 
-public player_death()
-	if(random_num(1, get_pcvar_num(cvarBoxChance)) == 1) create_box(read_data(2));
+public cod_killed(killer, victim, weaponId, hitPlace)
+	if(random_num(1, get_pcvar_num(cvarBoxChance)) == 1) create_box(victim);
 
 public create_box(id)
 {

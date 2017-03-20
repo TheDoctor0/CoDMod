@@ -130,7 +130,7 @@ public set_bonus(id, oldKnife, newKnife)
 {
     switch(oldKnife)
     {
-        case STANDARD:
+        case DEFAULT:
         {
             cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) - 2);
             cod_set_user_bonus_intelligence(id, cod_get_user_bonus_intelligence(id) - 2);
@@ -147,7 +147,7 @@ public set_bonus(id, oldKnife, newKnife)
 
     switch(newKnife)
     {
-         case STANDARD:
+         case DEFAULT:
         {
             cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + 2);
             cod_set_user_bonus_intelligence(id, cod_get_user_bonus_intelligence(id) + 2);

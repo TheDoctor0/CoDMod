@@ -5,6 +5,8 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
+enum _:winers { THIRD, SECOND, FIRST };
+
 new cvarFirstReward, cvarSecondReward, cvarThirdReward;
 
 public plugin_init() 
@@ -20,13 +22,11 @@ public plugin_init()
 	
 public message_intermission() 
 {
-	enum _:winers { THIRD, SECOND, FIRST };
-	
 	new playerName[32], playersList[32], winnersId[3], winnersFrags[3], tempFrags, swapFrags, swapId, id, players, exp;
 
 	get_players(playersList, players, "h");
 	
-	if(!players) return;
+	if(!players) return PLUGIN_CONTINUE;
 
 	for(new i = 0; i < players; i++)
 	{
@@ -63,7 +63,7 @@ public message_intermission()
 		}
 	}
 	
-	if(!winnersId[FIRST]) return;
+	if(!winnersId[FIRST]) return PLUGIN_CONTINUE;
 	
 	cod_print_chat(0, "Gratulacje dla^x03 Najlepszych Graczy^x01!");
 	

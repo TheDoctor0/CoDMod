@@ -87,8 +87,6 @@ new codPlayer[MAX_PLAYERS + 1][playerInfo];
 	
 enum save { NORMAL, DISCONNECT, MAP_END };
 
-enum _:hud { TYPE_HUD, TYPE_DHUD };
-
 new expKill, expKillHS, expDamage, expWinRound, expPlant, expDefuse, expRescue, levelLimit, levelRatio, 
 	killStreakTime, minPlayers, minBonusPlayers, maxDurability, minDamageDurability, maxDamageDurability;
 
@@ -2883,7 +2881,7 @@ public _cod_make_bartimer(id, duration)
 	make_bar_timer(id, duration);
 
 public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
-	if(!get_bit(victim, itemResistance)) ExecuteHam(Ham_TakeDamage, victim, attacker, attacker, damage + get_intelligence(attacker, 1, 1, 1) * factor, (1<<31) | flags);
+	if(!get_bit(victim, itemResistance) && !(flags & DMG_BULLET)) ExecuteHam(Ham_TakeDamage, victim, attacker, attacker, damage + get_intelligence(attacker, 1, 1, 1) * factor, DMG_CODSKILL | flags);
 	
 public _cod_kill_player(killer, victim, flags)
 {
@@ -3165,19 +3163,19 @@ stock make_bar_timer(id, duration)
 	message_end();
 }
 
-stock show_hud(id, const text[], type, red, green, blue, Float:x=-1.0, Float:y=0.35, effects=0, Float:fxtime=6.0, Float:holdtime=12.0, Float:fadeintime=0.1, Float:fadeouttime=0.2)
+stock show_hud(id, const text[], type=0, red=255, green=255, blue=255, Float:x=-1.0, Float:y=0.35, effects=0, Float:fxtime=6.0, Float:holdtime=12.0, Float:fadeintime=0.1, Float:fadeouttime=0.2)
 {
 	if(!is_user_connected(id)) return;
 	
 	if(type)
 	{
-		set_hudmessage(red, green, blue, x, y, effects, fxtime, holdtime, fadeintime, fadeouttime);
-		ShowSyncHudMsg(id, hudSync, text);
+		set_dhudmessage(red, green, blue, x, y, effects, fxtime, holdtime, fadeintime, fadeouttime);
+		show_dhudmessage(id, text);
 	}
 	else
 	{
-		set_dhudmessage(red, green, blue, x, y, effects, fxtime, holdtime, fadeintime, fadeouttime);
-		show_dhudmessage(id, text);
+		set_hudmessage(red, green, blue, x, y, effects, fxtime, holdtime, fadeintime, fadeouttime);
+		ShowSyncHudMsg(id, hudSync, text);
 	}
 }
 
