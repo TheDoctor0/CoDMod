@@ -27,7 +27,7 @@ new playerName[MAX_PLAYERS + 1][64], playerKnife[MAX_PLAYERS + 1], knives;
 public plugin_init() 
 {
     register_plugin(PLUGIN, VERSION, AUTHOR);
-
+ 
     for(new i; i < sizeof commandKnives; i++) register_clcmd(commandKnives[i], "change_knife");
     
     knives = nvault_open("cod_knives");

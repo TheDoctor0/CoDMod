@@ -1,11 +1,10 @@
 Do zrobienia:
 - Refaktoryzacja pluginów
-- Zmiany w sklepie
+- Zmiany w sklepie (w trakcie refaktoryzacji)
 - Przenoszenie expa
 - Podania i wojny w klanach
 - Limit predkosci
 - Aktualizacja .inc
-- Widzialnosc min dla adminow
 - Kasyno
 - Ikony bomby
 - Awanse klas
@@ -15,7 +14,6 @@ Do zrefaktoryzowania:
 - Sklep
 - Klany (pamietac o unikalnym id)
 - Staty
-- Questy
 
 Kasyno:
 - Kostka (high/low i 1-6)
