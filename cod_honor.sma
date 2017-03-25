@@ -11,7 +11,7 @@ enum _:events { KILL, KILL_HS, WIN_ROUND, BOMB_DEFUSE, BOMB_PLANT, HOST_RESCUE, 
 
 new cvarMinPlayers, cvarKill, cvarKillHS, cvarWinRound, cvarBombPlated, cvarBombDefused, cvarRescueHostage, cvarKillHostage;
 
-new playerName[33][64], playerHonor[33], Handle:sql, honorEvent[events], minPlayers, maxPlayers, dataLoaded;
+new playerName[MAX_PLAYERS + 1][64], playerHonor[MAX_PLAYERS + 1], Handle:sql, honorEvent[events], minPlayers, maxPlayers, dataLoaded;
 
 public plugin_init()
 {	
