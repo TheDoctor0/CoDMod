@@ -106,9 +106,7 @@ public transfer_honor_menu_handle(id, menu, item)
 
 public transfer_honor_handle(id)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-		
-	if(!cod_check_account(id)) return PLUGIN_HANDLED;
+	if(!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 		
@@ -234,9 +232,7 @@ public transfer_cash_menu_handle(id, menu, item)
 
 public transfer_cash_handle(id)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-		
-	if(!cod_check_account(id)) return PLUGIN_HANDLED;
+	if(!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 		
