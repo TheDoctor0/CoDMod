@@ -3,7 +3,6 @@ Do zrobienia:
 - Zmiany w sklepie (w trakcie refaktoryzacji)
 - Przenoszenie expa
 - Podania i wojny w klanach
-- Limit predkosci
 - Aktualizacja .inc
 - Kasyno
 - Ikony bomby

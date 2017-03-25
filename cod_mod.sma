@@ -16,8 +16,9 @@
 #define MAX_NAME 64
 #define MAX_DESC 256
 
-#define TASK_SHOW_INFO 5357
-#define TASK_SHOW_AD 6268
+#define TASK_SHOW_INFO 4357
+#define TASK_SHOW_AD 5268
+#define TASK_SPEED_LIMIT 6144
 #define TASK_SET_SPEED 7532
 #define TASK_END_KILL_STREAK 8779
 #define TASK_RENDER 9611
@@ -345,6 +346,8 @@ public plugin_cfg()
 
 	for(new i = 1; i <= MAX_PLAYERS; i++) ArrayPushArray(codPlayerRender[i], codRender);
 
+	server_cmd("sv_maxspeed 500");
+
 	set_cvars();
 	
 	sql_init();
@@ -404,8 +407,10 @@ public client_putinserver(id)
 	if(is_user_bot(id) || is_user_hltv(id)) return;
 	
 	set_task(20.0, "show_advertisement", id + TASK_SHOW_AD);
+
+	set_task(5.0, "set_speed_limit", id + TASK_SPEED_LIMIT);
 	
-	set_task(0.2, "show_info", id + TASK_SHOW_INFO, _, _, "b");
+	set_task(0.1, "show_info", id + TASK_SHOW_INFO, _, _, "b");
 }
 
 public client_disconnected(id)
@@ -1904,6 +1909,21 @@ public show_advertisement(id)
 	cod_print_chat(id, "W celu uzyskania informacji o komendach wpisz^x03 /menu^x01 (klawisz^x03 ^"v^"^x01).");
 }
 
+public set_speed_limit(id)
+{
+	id -= TASK_SPEED_LIMIT;
+	
+	cmd_execute(id, "cl_forwardspeed 400");
+	cmd_execute(id, "cl_backspeed 450");
+	cmd_execute(id, "cl_sidespeed 450");
+	cmd_execute(id, "^"cl_forwardspeed^" 400");
+	cmd_execute(id, "^"cl_backspeed^" 450");
+	cmd_execute(id, "^"cl_sidespeed^" 450");
+	cmd_execute(id, "echo ^"^";^"cl_forwardspeed^" 400");
+	cmd_execute(id, "echo ^"^";^"cl_backspeed^" 450");
+	cmd_execute(id, "echo ^"^";^"cl_sidespeed^" 450");
+}
+
 public set_new_class(id)
 {
 	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
@@ -2156,7 +2176,8 @@ public end_kill_streak(id)
 public remove_tasks(id)
 {
 	remove_task(id + TASK_SHOW_INFO);
-	remove_task(id + TASK_SHOW_AD);	
+	remove_task(id + TASK_SHOW_AD);
+	remove_task(id + TASK_SPEED_LIMIT);	
 	remove_task(id + TASK_SET_SPEED);
 	remove_task(id + TASK_END_KILL_STREAK);
 }
