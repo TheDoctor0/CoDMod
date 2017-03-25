@@ -3,136 +3,100 @@
 #include <csx>
 #include <sqlx>
 #include <fakemeta>
-#include <hamsandwich>
 #include <unixtime>
 
 #define PLUGIN "CoD Stats"
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-#define Set(%2,%1) (%1 |= (1<<(%2&31)))
-#define Rem(%2,%1) (%1 &= ~(1 <<(%2&31)))
-#define Get(%2,%1) (%1 & (1<<(%2&31)))
-
 #define TASK_TIME 9054
 
-enum Stats
-{
-	Name[64],
-	Admin,
-	Time,
-	FirstVisit,
-	LastVisit,
-	Kills,
-	BestStats,
-	BestKills,
-	BestDeaths,
-	BestHS,
-	CurrentStats,
-	CurrentKills,
-	CurrentDeaths,
-	CurrentHS,
-};
+enum _:statsInfo { ADMIN, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BEST_STATS, BEST_KILLS, 
+	BEST_HS_KILLS, BEST_DEATHS, CURRENT_STATS, CURRENT_KILLS, CURRENT_HS_KILLS, CURRENT_DEATHS };
 
-new const szCommandMenu[][] = { "say /statsmenu", "say_team /statsmenu", "say /menustaty", "say_team /menustaty", "menustaty" };
-new const szCommandTime[][] = { "say /time", "say_team /time", "say /czas", "say_team /czas", "czas" };
-new const szCommandAdminTime[][] = { "say /timeadmin", "say_team /timeadmin", "say /tadmin", "say_team /tadmin", "say /czasadmin", "say_team /czasadmin", "say /cadmin", "say_team /cadmin", "czasadmin" };
-new const szCommandTopTime[][] = { "say /ttop15", "say_team /ttop15", "say /toptime", "say_team /toptime", "say /ctop15", "say_team /ctop15", "say /topczas", "say_team /topczas", "topczas" };
-new const szCommandStats[][] = { "say /beststats", "say_team /beststats", "say /bstats", "say_team /bstats", "say /najlepszestaty", "say_team /najlepszestaty", "say /nstaty", "say_team /nstaty", "najlepszestaty" };
-new const szCommandTopStats[][] = { "say /stop15", "say_team /stop15", "say /topstats", "say_team /topstats", "say /topstaty", "say_team /topstaty", "topstaty" };
+new const commandMenu[][] = { "say /statsmenu", "say_team /statsmenu", "say /menustaty", "say_team /menustaty", "menustaty" };
+new const commandTime[][] = { "say /time", "say_team /time", "say /czas", "say_team /czas", "czas" };
+new const commandAdminTime[][] = { "say /timeadmin", "say_team /timeadmin", "say /tadmin", "say_team /tadmin", "say /czasadmin", "say_team /czasadmin", "say /cadmin", "say_team /cadmin", "say /adminczas", "say_team /adminczas", "czasadmin" };
+new const commandTopTime[][] = { "say /ttop15", "say_team /ttop15", "say /toptime", "say_team /toptime", "say /ctop15", "say_team /ctop15", "say /topczas", "say_team /topczas", "topczas" };
+new const commandBestStats[][] = { "say /staty", "say_team /staty", "say /beststats", "say_team /beststats", "say /bstats", "say_team /bstats", "say /najlepszestaty", "say_team /najlepszestaty", "say /nstaty", "say_team /nstaty", "najlepszestaty" };
+new const commandTopStats[][] = { "say /stop15", "say_team /stop15", "say /topstats", "say_team /topstats", "say /topstaty", "say_team /topstaty", "topstaty" };
 
-new szBuffer[2048], gPlayer[MAX_PLAYERS + 1][Stats], iLoaded, iVisit, maxPlayers, Handle:hSqlHook;
+new playerName[MAX_PLAYERS + 1][64], playerStats[MAX_PLAYERS + 1][statsInfo], Handle:sql, dataLoaded, visitInfo, maxPlayers;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
-	register_cvar("cod_sql_host", "sql.pukawka.pl", FCVAR_SPONLY | FCVAR_PROTECTED);
-	register_cvar("cod_sql_user", "262947", FCVAR_SPONLY | FCVAR_PROTECTED);
-	register_cvar("cod_sql_pass", "A$*C*!2]XhfysF!", FCVAR_SPONLY | FCVAR_PROTECTED);
-	register_cvar("cod_sql_database", "262947_cod", FCVAR_SPONLY | FCVAR_PROTECTED);
-	
-	for(new i; i < sizeof szCommandMenu; i++)
-		register_clcmd(szCommandMenu[i], "StatsMenu");
-		
-	for(new i; i < sizeof szCommandTime; i++)
-		register_clcmd(szCommandTime[i], "CmdTime");
 
-	for(new i; i < sizeof szCommandTopTime; i++)
-		register_clcmd(szCommandTopTime[i], "CmdTimeTop");
-	
-	for(new i; i < sizeof szCommandStats; i++)
-		register_clcmd(szCommandStats[i], "CmdStats");
+	for(new i; i < sizeof commandMenu; i++) register_clcmd(commandMenu[i], "stats_menu");
 		
-	for(new i; i < sizeof szCommandTopStats; i++)
-		register_clcmd(szCommandTopStats[i], "CmdTopStats");
-		
-	for(new i; i < sizeof szCommandAdminTime; i++)
-		register_clcmd(szCommandAdminTime[i], "CmdTimeAdmin");
+	for(new i; i < sizeof commandTime; i++) register_clcmd(commandTime[i], "command_time");
 
-	RegisterHam(Ham_Spawn , "player", "Spawn", 1);
+	for(new i; i < sizeof commandAdminTime; i++) register_clcmd(commandAdminTime[i], "command_time_admin");
+
+	for(new i; i < sizeof commandTopTime; i++) register_clcmd(commandTopTime[i], "command_time_top");
 	
-	register_event("DeathMsg", "DeathMsg", "a");
-	register_event("TextMsg", "HostagesRescued", "a", "2&#All_Hostages_R");
-	
-	register_message(SVC_INTERMISSION, "MsgIntermission");
-	register_message(get_user_msgid("SayText"), "HandleSayText");
+	for(new i; i < sizeof commandBestStats; i++) register_clcmd(commandBestStats[i], "command_best_stats");
+		
+	for(new i; i < sizeof commandTopStats; i++) register_clcmd(commandTopStats[i], "command_top_stats");
+
+	register_event("TextMsg", "hostages_rescued", "a", "2&#All_Hostages_R");
+
+	register_message(get_user_msgid("SayText"), "say_text");
+
+	register_message(SVC_INTERMISSION, "message_intermission");
 	
 	maxPlayers = get_maxplayers();
 }
 
 public plugin_cfg()
-	SqlInit();
+	sql_init();
 	
 public plugin_end()
-	SQL_FreeHandle(hSqlHook);
+	SQL_FreeHandle(sql);
 	
 public plugin_natives()
 {
-	register_native("cod_stats_add_kill", "_cod_stats_add_kill");
+	register_native("cod_stats_add_kill", "_cod_stats_add_kill", 1);
+
+	register_native("cod_get_user_time", "_cod_get_user_time", 1);
 	
-	register_native("cod_get_user_time", "_cod_get_user_time");
+	register_native("cod_get_user_time_text", "_cod_get_user_time_text", 1);
 }
 
 public client_putinserver(id)
 {
-	if(is_user_bot(id) || is_user_hltv(id))
-		return;
+	if(is_user_bot(id) || is_user_hltv(id)) return;
 
-	get_user_name(id, gPlayer[id][Name], charsmax(gPlayer));
+	get_user_name(id, playerName[id], charsmax(playerName[]));
+
+	mysql_escape_string(playerName[id], playerName[id], charsmax(playerName[]));
 	
-	Rem(id, iLoaded);
-	Rem(id, iVisit);
+	rem_bit(id, dataLoaded);
+	rem_bit(id, visitInfo);
+
+	for(new i = 0; i <= CURRENT_DEATHS; i++) playerStats[id][i] = 0;
 	
-	gPlayer[id][Kills] = 0;
-	gPlayer[id][Time] = 0;
-	gPlayer[id][FirstVisit] = 0;
-	gPlayer[id][LastVisit] = 0;
-	gPlayer[id][CurrentKills] = 0;
-	gPlayer[id][CurrentDeaths] = 0;
-	gPlayer[id][CurrentHS] = 0;
-	gPlayer[id][CurrentKills] = 0;
-	gPlayer[id][CurrentDeaths] = 0;
-	gPlayer[id][CurrentHS] = 0;
-	gPlayer[id][BestStats] = 0;
-	
-	LoadStats(id);
+	load_stats(id);
 }
 
 public client_authorized(id)
-	gPlayer[id][Admin] = get_user_flags(id) & ADMIN_BAN ? 1 : 0;
+	playerStats[id][ADMIN] = get_user_flags(id) & ADMIN_BAN ? 1 : 0;
 	
 public client_disconnected(id)
-	SaveStats(id);
+	save_stats(id);
 	
-public StatsMenu(id)
+public stats_menu(id)
 {
-	new menu = menu_create("\wMenu \rStatow", "StatsMenu_Handler");
+	if(!cod_check_account(id)) return PLUGIN_HANDLED;
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	new menu = menu_create("\wMenu \yStatow\r", "stats_menu_handle");
  
 	menu_additem(menu, "\wMoj \rCzas \y(/czas)", "1");
-	menu_additem(menu, "\wCzas \rAdminow \y(/adminczas)", "2");
+	if(get_user_flags(id) & ADMIN_BAN) menu_additem(menu, "\wCzas \rAdminow \y(/adminczas)", "2");
 	menu_additem(menu, "\wTop \rCzasu \y(/ctop15)", "3");
-	menu_additem(menu, "\wNajlepsze \rStaty \y(/nstaty)", "4");
+	menu_additem(menu, "\wNajlepsze \rStaty \y(/staty)", "4");
 	menu_additem(menu, "\wTop \rStatow \y(/stop15)", "5");
     
 	menu_setprop(menu, MPROP_EXIT, MEXIT_ALL);
@@ -140,621 +104,575 @@ public StatsMenu(id)
 	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
 	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
 	
-	menu_display(id, menu, 0);
+	menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
 }  
  
-public StatsMenu_Handler(id, menu, item)
+public stats_menu_handle(id, menu, item)
 {
-	if(!is_user_connected(id))
-		return PLUGIN_CONTINUE;
-
-	client_cmd(id, "spk CodMod/select");
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
 	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
-		return PLUGIN_CONTINUE;
+
+		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new szData[4], iAccess, iCallback;
-	menu_item_getinfo(menu, item, iAccess, szData, charsmax(szData), _, _, iCallback);
+	new itemData[3], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
     
-	new iKey = str_to_num(szData);
+	new item = str_to_num(itemData);
     
-	switch(iKey)
+	switch(item)
     { 
-		case 1: client_cmd(id, "czas"); 
-		case 2: client_cmd(id, "czasadmin"); 
-		case 3: client_cmd(id, "topczas"); 
-		case 4: client_cmd(id, "najlepszestaty"); 
-		case 5: client_cmd(id, "topstaty"); 
+		case 1: command_time(id);
+		case 2: command_time_admin(id)
+		case 3: command_time_top(id);
+		case 4: command_best_stats(id);
+		case 5: command_top_stats(id);
 	}
 	
 	menu_destroy(menu);
-	return PLUGIN_CONTINUE;
+
+	return PLUGIN_HANDLED;
 } 
 
-public CmdTime(id)
+public command_time(id)
 {
-	new szTemp[256], szName[33], szData[1];
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	new queryData[128], tempId[1];
 	
-	szData[0] = id;
-	
-	mysql_escape_string(szName, gPlayer[id][Name], charsmax(gPlayer));
-	
-	formatex(szTemp, charsmax(szTemp), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `stats_system`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `stats_system` WHERE `time` > '%i' ORDER BY `time` DESC) b", gPlayer[id][Time]);
-	SQL_ThreadQuery(hSqlHook, "ShowTime", szTemp, szData, charsmax(szData));
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `stats_system`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `stats_system` WHERE `time` > '%i' ORDER BY `time` DESC) b", playerStats[id][TIME]);
+	SQL_ThreadQuery(sql, "show_time", queryData, tempId, sizeof(tempId));
+
+	return PLUGIN_HANDLED;
 }
 
-public ShowTime(iFailState, Handle:hQuery, szError[], iError, szData[], iDataSize)
+public show_time(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
-	if(iFailState) 
+	if(failState) 
 	{
-		log_to_file("addons/amxmodx/logs/cod_stats.log", "SQL Error: %s (%d)", szError, iError);
-		return PLUGIN_CONTINUE;
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		
+		return PLUGIN_HANDLED;
 	}
 	
-	new id = szData[0];
-	new iRank = SQL_ReadResult(hQuery, 0) + 1;
-	new iPlayers = SQL_ReadResult(hQuery, 1);
-	new iSeconds = (gPlayer[id][Time] + get_user_time(id)), iMinutes, iHours;
+	new id = tempId[0];
 	
-	while(iSeconds >= 60)
-	{
-		iSeconds -= 60;
-		iMinutes++;
-	}
-	while(iMinutes >= 60)
-	{
-		iMinutes -= 60;
-		iHours++;
-	}
-	
-	cod_print_chat(id, "Spedziles na serwerze lacznie^x04 %i h %i min %i s^x01.", iHours, iMinutes, iSeconds);
-	cod_print_chat(id, "Zajmujesz^x04 %i/%i^x01 miejsce w rankingu czasu gry.", iRank, iPlayers);
-	
-	return PLUGIN_CONTINUE;
-}
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 
-public CmdTimeTop(id)
-{
-	new szTemp[256], szData[1];
+	new rank = SQL_ReadResult(query, 0) + 1, players = SQL_ReadResult(query, 1), seconds = (playerStats[id][TIME] + get_user_time(id)), minutes, hours;
 	
-	szData[0] = id;
-	
-	format(szTemp, charsmax(szTemp), "SELECT name, time FROM `stats_system` ORDER BY time DESC LIMIT 15");
-	SQL_ThreadQuery(hSqlHook, "ShowTimeTop", szTemp, szData, charsmax(szData));
-}
-
-public ShowTimeTop(iFailState, Handle:hQuery, szError[], iError, szData[], iDataSize)
-{
-	if(iFailState) 
+	while(seconds >= 60)
 	{
-		log_to_file("addons/amxmodx/logs/cod_stats.log", "SQL Error: %s (%d)", szError, iError);
-		return PLUGIN_CONTINUE;
+		seconds -= 60;
+		minutes++;
+	}
+	while(minutes >= 60)
+	{
+		minutes -= 60;
+		hours++;
 	}
 	
-	new id = szData[0];
-	
-	static iLen, iPlace = 0;
-	
-	iLen = format(szBuffer, charsmax(szBuffer), "<body bgcolor=#000000><font color=#FFB000><pre>");
-	iLen += format(szBuffer[iLen], charsmax(szBuffer) - iLen, "%1s %-22.22s %13s^n", "#", "Nick", "Czas Gry");
-	
-	while(SQL_MoreResults(hQuery))
-	{
-		iPlace++;
-		
-		static szName[33], iSeconds = 0, iMinutes = 0, iHours = 0;
-		
-		SQL_ReadResult(hQuery, 0, szName, charsmax(szName));
-		iSeconds = SQL_ReadResult(hQuery, 1);
-		
-		replace_all(szName, charsmax(szName), "<", "");
-		replace_all(szName, charsmax(szName), ">", "");
-		
-		while(iSeconds >= 60)
-		{
-			iSeconds -= 60;
-			iMinutes++;
-		}
-		while(iMinutes >= 60)
-		{
-			iMinutes -= 60;
-			iHours++;
-		}
-		
-		if(iPlace >= 10)
-			iLen += format(szBuffer[iLen], charsmax(szBuffer) - iLen, "%1i %-22.22s %1ih %1imin %1is^n", iPlace, szName, iHours, iMinutes, iSeconds);
-		else
-			iLen += format(szBuffer[iLen], charsmax(szBuffer) - iLen, "%1i %-22.22s %2ih %1imin %1is^n", iPlace, szName, iHours, iMinutes, iSeconds);
-		
-		SQL_NextRow(hQuery);
-	}
-	
-	show_motd(id, szBuffer, "Top15 Czasu Gry");
+	cod_print_chat(id, "Spedziles na serwerze lacznie^x04 %i h %i min %i s^x01.", hours, minutes, seconds);
+	cod_print_chat(id, "Zajmujesz^x04 %i/%i^x01 miejsce w rankingu czasu gry.", rank, players);
 	
 	return PLUGIN_HANDLED;
 }
 
-public CmdStats(id)
+public command_time_admin(id)
 {
-	new szTemp[256], szName[33], szData[1];
+	if(!(get_user_flags(id) & ADMIN_BAN) || !is_user_connected(id)) return PLUGIN_HANDLED;
+
+
+	new queryData[128], tempData[2];
 	
-	szData[0] = id;
-	
-	mysql_escape_string(szName, gPlayer[id][Name], charsmax(gPlayer));
-	
-	gPlayer[id][CurrentStats] = gPlayer[id][CurrentKills]*2 + gPlayer[id][CurrentHS] - gPlayer[id][CurrentDeaths]*2;
-	
-	if(gPlayer[id][CurrentStats] > gPlayer[id][BestStats])
-		formatex(szTemp, charsmax(szTemp), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `stats_system`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `stats_system` WHERE `beststats` > '%i' ORDER BY `beststats` DESC) b", gPlayer[id][BestStats]);
-	else
-		formatex(szTemp, charsmax(szTemp), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `stats_system`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `stats_system` WHERE `beststats` > '%i' ORDER BY `beststats` DESC) b", gPlayer[id][CurrentStats]);
-	
-	SQL_ThreadQuery(hSqlHook, "ShowStats", szTemp, szData, charsmax(szData));
+	tempData[0] = id;
+	tempData[1] = 1;
+
+	formatex(queryData, charsmax(queryData), "SELECT name, time FROM `cod_stats` WHERE admin = '1' ORDER BY time DESC");
+	SQL_ThreadQuery(sql, "show_top_time", queryData, tempData, sizeof(tempData));
+
+	return PLUGIN_HANDLED;
 }
 
-public ShowStats(iFailState, Handle:hQuery, szError[], iError, szData[], iDataSize)
+public command_time_top(id)
 {
-	if(iFailState) 
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	new queryData[128], tempId[2];
+	
+	tempId[0] = id;
+	tempId[0] = 0;
+
+	formatex(queryData, charsmax(queryData), "SELECT name, time FROM `stats_system` ORDER BY time DESC LIMIT 15");
+	SQL_ThreadQuery(sql, "show_top_time", queryData, tempId, sizeof(tempId));
+
+	return PLUGIN_HANDLED;
+}
+
+public show_top_time(failState, Handle:query, error[], errorNum, tempData[], dataSize)
+{
+	if(failState) 
 	{
-		log_to_file("addons/amxmodx/logs/cod_stats.log", "SQL Error: %s (%d)", szError, iError);
-		return PLUGIN_CONTINUE;
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		
+		return PLUGIN_HANDLED;
 	}
 	
-	new id = szData[0];
-	new iRank = SQL_ReadResult(hQuery, 0);
-	new iPlayers = SQL_ReadResult(hQuery, 1);
+	new id = tempData[0];
 	
-	if(gPlayer[id][CurrentStats] > gPlayer[id][BestStats])
-		cod_print_chat(id, "Twoje najlepsze staty to^x04 %i^x01 zabic (w tym^x04 %i^x01 z HS) i^x04 %i^x01 zgonow^x01.", gPlayer[id][CurrentKills], gPlayer[id][CurrentHS], gPlayer[id][CurrentDeaths]);
-	else
-		cod_print_chat(id, "Twoje najlepsze staty to^x04 %i^x01 zabic (w tym^x04 %i^x01 z HS) i^x04 %i^x01 zgonow^x01.", gPlayer[id][BestKills], gPlayer[id][BestHS], gPlayer[id][BestDeaths]);
-		
-	cod_print_chat(id, "Zajmujesz^x04 %i/%i^x01 miejsce w rankingu najlepszych statystyk.", iRank, iPlayers);
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	return PLUGIN_CONTINUE;
-}
-
-public CmdTopStats(id)
-{
-	new szTemp[512], szData[1];
+	static motdData[2048], userName[64], motdLength, rank = 0, seconds = 0, minutes = 0, hours = 0;
 	
-	szData[0] = id;
+	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
+	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %13s^n", "#", "Nick", "Czas Gry");
 	
-	format(szTemp, charsmax(szTemp), "SELECT name, bestkills, besths, bestdeaths FROM `stats_system` ORDER BY beststats DESC LIMIT 15");
-	SQL_ThreadQuery(hSqlHook, "ShowStatsTop", szTemp, szData, charsmax(szData));
-}
-
-public ShowStatsTop(iFailState, Handle:hQuery, szError[], iError, szData[], iDataSize)
-{
-	if(iFailState) 
+	while(SQL_MoreResults(query))
 	{
-		log_to_file("addons/amxmodx/logs/cod_stats.log", "SQL Error: %s (%d)", szError, iError);
-		return PLUGIN_CONTINUE;
-	}
-	
-	new id = szData[0];
-	
-	static iLen, iPlace = 0;
-	
-	iLen = format(szBuffer, charsmax(szBuffer), "<body bgcolor=#000000><font color=#FFB000><pre>");
-	iLen += format(szBuffer[iLen], charsmax(szBuffer) - iLen, "%1s %-22.22s %19s %4s^n", "#", "Nick", "Zabojstwa", "Zgony");
-	
-	while(SQL_MoreResults(hQuery))
-	{
-		iPlace++;
+		rank++;
 		
-		static szName[33], iKills, iHS, iDeaths;
+		SQL_ReadResult(query, 0, userName, charsmax(userName));
+		seconds = SQL_ReadResult(query, 1);
 		
-		SQL_ReadResult(hQuery, 0, szName, charsmax(szName));
-		iKills = SQL_ReadResult(hQuery, 1);
-		iHS = SQL_ReadResult(hQuery, 2);
-		iDeaths = SQL_ReadResult(hQuery, 3);
+		replace_all(userName, charsmax(userName), "<", "");
+		replace_all(userName, charsmax(userName), ">", "");
 		
-		replace_all(szName, charsmax(szName), "<", "");
-		replace_all(szName, charsmax(szName), ">", "");
-		
-		if(iPlace >= 10)
-			iLen += format(szBuffer[iLen], charsmax(szBuffer) - iLen, "%1i %-22.22s %1d (%i HS) %12d^n", iPlace, szName, iKills, iHS, iDeaths);
-		else
-			iLen += format(szBuffer[iLen], charsmax(szBuffer) - iLen, "%1i %-22.22s %2d (%i HS) %12d^n", iPlace, szName, iKills, iHS, iDeaths);
-		
-		SQL_NextRow(hQuery);
-	}
-	
-	show_motd(id, szBuffer, "Top15 Statystyk");
-	
-	return PLUGIN_CONTINUE;
-}
-
-public CmdTimeAdmin(id)
-{
-	if(!(get_user_flags(id) & ADMIN_BAN))
-		return;
-		
-	new szTemp[256], szData[1];
-	
-	szData[0] = id;
-	
-	format(szTemp, charsmax(szTemp), "SELECT name, time FROM `cod_stats` WHERE admin = '1' ORDER BY time DESC");
-	SQL_ThreadQuery(hSqlHook, "ShowTimeAdmin", szTemp, szData, charsmax(szData));
-}
-
-public ShowTimeAdmin(iFailState, Handle:hQuery, szError[], iError, szData[], iDataSize)
-{
-	if(iFailState) 
-	{
-		log_to_file("addons/amxmodx/logs/cod_stats.log", "SQL Error: %s (%d)", szError, iError);
-		return PLUGIN_CONTINUE;
-	}
-	
-	new id = szData[0];
-	
-	static iLen, iPlace = 0;
-	
-	iLen = format(szBuffer, charsmax(szBuffer), "<body bgcolor=#000000><font color=#FFB000><pre>");
-	iLen += format(szBuffer[iLen], charsmax(szBuffer) - iLen, "%1s %-22.22s %13s^n", "#", "Nick", "Czas Gry");
-	
-	while(SQL_MoreResults(hQuery))
-	{
-		iPlace++;
-		
-		static szName[33], iSeconds = 0, iMinutes = 0, iHours = 0;
-		
-		SQL_ReadResult(hQuery, 0, szName, charsmax(szName));
-		iSeconds = SQL_ReadResult(hQuery, 1);
-		
-		replace_all(szName, charsmax(szName), "<", "");
-		replace_all(szName, charsmax(szName), ">", "");
-		
-		while(iSeconds >= 60)
+		while(seconds >= 60)
 		{
-			iSeconds -= 60;
-			iMinutes++;
+			seconds -= 60;
+			minutes++;
 		}
-		while(iMinutes >= 60)
+		while(minutes >= 60)
 		{
-			iMinutes -= 60;
-			iHours++;
+			minutes -= 60;
+			hours++;
 		}
 		
-		if(iPlace >= 10)
-			iLen += format(szBuffer[iLen], charsmax(szBuffer) - iLen, "%1i %-22.22s %1ih %1imin %1is^n", iPlace, szName, iHours, iMinutes, iSeconds);
-		else
-			iLen += format(szBuffer[iLen], charsmax(szBuffer) - iLen, "%1i %-22.22s %2ih %1imin %1is^n", iPlace, szName, iHours, iMinutes, iSeconds);
+		if(rank >= 10) motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %-22.22s %1ih %1imin %1is^n", rank, userName, hours, minutes, seconds);
+		else motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %-22.22s %2ih %1imin %1is^n", rank, userName, hours, minutes, seconds);
 		
-		SQL_NextRow(hQuery);
+		SQL_NextRow(query);
 	}
 	
-	show_motd(id, szBuffer, "Czas Gry Adminow");
+	tempData[1] ? show_motd(id, motdData, "Czas Gry Adminow") : show_motd(id, motdData, "Top15 Czasu Gry");
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
-public CheckTime(id)
+public command_best_stats(id)
+{
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	new queryData[128], tempId[1];
+	
+	tempId[0] = id;
+
+	playerStats[id][CURRENT_STATS] = playerStats[id][CURRENT_KILLS]*2 + playerStats[id][CURRENT_HS_KILLS] - playerStats[id][CURRENT_DEATHS]*2;
+
+	if(playerStats[id][CURRENT_STATS] > playerStats[id][BEST_STATS]) formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `stats_system`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `stats_system` WHERE `beststats` > '%i' ORDER BY `beststats` DESC) b", playerStats[id][BEST_STATS]);
+	else formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `stats_system`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `stats_system` WHERE `beststats` > '%i' ORDER BY `beststats` DESC) b", playerStats[id][CURRENT_STATS]);
+
+	SQL_ThreadQuery(sql, "show_best_stats", queryData, tempId, sizeof(tempId));
+
+	return PLUGIN_HANDLED;
+}
+
+public show_best_stats(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if(failState) 
+	{
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		
+		return PLUGIN_HANDLED;
+	}
+	
+	new id = tempId[0];
+	
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	
+	new rank = SQL_ReadResult(query, 0), players = SQL_ReadResult(query, 1);
+	
+	if(playerStats[id][CURRENT_STATS] > playerStats[id][BEST_STATS]) cod_print_chat(id, "Twoje najlepsze staty to^x04 %i^x01 zabic (w tym^x04 %i^x01 z HS) i^x04 %i^x01 zgonow^x01.", playerStats[id][CURRENT_KILLS], playerStats[id][CURRENT_HS_KILLS], playerStats[id][CURRENT_DEATHS]);
+	else cod_print_chat(id, "Twoje najlepsze staty to^x04 %i^x01 zabic (w tym^x04 %i^x01 z HS) i^x04 %i^x01 zgonow^x01.", playerStats[id][BEST_KILLS], playerStats[id][BEST_HS_KILLS], playerStats[id][BEST_DEATHS]);
+		
+	cod_print_chat(id, "Zajmujesz^x04 %i/%i^x01 miejsce w rankingu najlepszych statystyk.", rank, players);
+	
+	return PLUGIN_HANDLED;
+}
+
+public command_top_stats(id)
+{
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	new queryData[128], tempId[1];
+	
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT name, bestkills, besths, bestdeaths FROM `stats_system` ORDER BY beststats DESC LIMIT 15");
+	SQL_ThreadQuery(sql, "show_top_stats", queryData, tempId, sizeof(tempId));
+
+	return PLUGIN_HANDLED;
+}
+
+public show_top_stats(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if(failState) 
+	{
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		
+		return PLUGIN_HANDLED;
+	}
+	
+	new id = tempId[0];
+	
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	static motdData[2048], userName[64], motdLength, rank = 0, kills = 0, hs = 0, deaths = 0;
+	
+	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
+	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %19s %4s^n", "#", "Nick", "Zabojstwa", "Zgony");
+	
+	while(SQL_MoreResults(query))
+	{
+		rank++;
+		
+		SQL_ReadResult(query, 0, userName, charsmax(userName));
+
+		kills = SQL_ReadResult(query, 1);
+		hs = SQL_ReadResult(query, 2);
+		deaths = SQL_ReadResult(query, 3);
+		
+		replace_all(userName, charsmax(userName), "<", "");
+		replace_all(userName, charsmax(userName), ">", "");
+		
+		if(rank >= 10) motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %-22.22s %1d (%i HS) %12d^n", rank, userName, kills, hs, deaths);
+		else motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %-22.22s %2d (%i HS) %12d^n", rank, userName, kills, hs, deaths);
+		
+		SQL_NextRow(query);
+	}
+	
+	show_motd(id, motdData, "Top15 Statystyk");
+	
+	return PLUGIN_HANDLED;
+}
+
+public check_time(id)
 {
 	id -= TASK_TIME;
 	
-	if(Get(id, iVisit))
-		return;
+	if(get_bit(id, visitInfo)) return;
 	
-	if(Get(id, iLoaded))
+	if(get_bit(id, dataLoaded))
 	{ 
-		set_task(3.0, "CheckTime", id + TASK_TIME);
+		set_task(3.0, "check_time", id + TASK_TIME);
+
 		return;
 	}
 	
-	Set(id, iVisit);
+	set_bit(id, visitInfo);
 	
-	new iYear, Year, iMonth, Month, iDay, Day, iHour, iMinute, iSecond, iTime = get_systime();
+	new currentYear, lastYear, currentMonth, lastMonth, currentDay, lastDay, hour, minute, second, time = get_systime();
 	
-	UnixToTime(iTime, iYear, iMonth, iDay, iHour, iMinute, iSecond, UT_TIMEZONE_SERVER);
+	UnixToTime(time, currentYear, currentMonth, currentDay, hour, minute, second, UT_TIMEZONE_SERVER);
 	
-	cod_print_chat(id, "Aktualnie jest godzina^x03 %02d:%02d:%02d (Data: %02d.%02d.%02d)^x01.", iHour, iMinute, iSecond, iDay, iMonth, iYear);
+	cod_print_chat(id, "Aktualnie jest godzina^x03 %02d:%02d:%02d (Data: %02d.%02d.%02d)^x01.", hour, minute, second, currentDay, currentMonth, currentYear);
 	
-	if(gPlayer[id][FirstVisit] == gPlayer[id][LastVisit])
-		cod_print_chat(id, "To twoja^x03 pierwsza wizyta^x01 na serwerze. Zyczymy milej gry!" );
+	if(playerStats[id][FIRST_VISIT] == playerStats[id][LAST_VISIT]) cod_print_chat(id, "To twoja^x03 pierwsza wizyta^x01 na serwerze. Zyczymy milej gry!" );
 	else 
 	{
-		UnixToTime(gPlayer[id][LastVisit], Year, Month, Day, iHour, iMinute, iSecond, UT_TIMEZONE_SERVER);
+		UnixToTime(playerStats[id][LAST_VISIT], lastYear, lastMonth, lastDay, hour, minute, second, UT_TIMEZONE_SERVER);
 		
-		if(iYear == Year && iMonth == Month && iDay == Day)
-			cod_print_chat(id, "Twoja ostatnia wizyta miala miejsce^x04 dzisiaj^x01 o^x03 %02d:%02d:%02d^x01. Zyczymy milej gry!", iHour, iMinute, iSecond);
-		else if(iYear == Year && iMonth == Month && (iDay - 1) == Day)
-			cod_print_chat(id, "Twoja ostatnia wizyta miala miejsce^x04 wczoraj^x01 o^x03 %02d:%02d:%02d^x01. Zyczymy milej gry!", iHour, iMinute, iSecond);
-		else
-			cod_print_chat(id, "Twoja ostatnia wizyta:^x03 %02d:%02d:%02d (Data: %02d.%02d.%02d)^x01. Zyczymy milej gry!", iHour, iMinute, iSecond, Day, Month, Year);
+		if(currentYear == lastYear && currentMonth == lastMonth && currentDay == lastDay) cod_print_chat(id, "Twoja ostatnia wizyta miala miejsce^x04 dzisiaj^x01 o^x03 %02d:%02d:%02d^x01. Zyczymy milej gry!", hour, minute, second);
+		else if(currentYear == lastYear && currentMonth == lastMonth && (currentDay - 1) == lastDay) cod_print_chat(id, "Twoja ostatnia wizyta miala miejsce^x04 wczoraj^x01 o^x03 %02d:%02d:%02d^x01. Zyczymy milej gry!", hour, minute, second);
+		else cod_print_chat(id, "Twoja ostatnia wizyta:^x03 %02d:%02d:%02d (Data: %02d.%02d.%02d)^x01. Zyczymy milej gry!", hour, minute, second, lastDay, lastMonth, lastYear);
 	}
 }
 
-public Spawn(id)
+public cod_spawned(id)
+	if(get_bit(id, visitInfo)) set_task(5.0, "check_time", id + TASK_TIME);
+
+public cod_killed(killer, victim, weaponId, hitPlace)
 {
-	if(is_user_alive(id) && Get(id, iVisit))
-		set_task(5.0, "CheckTime", id + TASK_TIME);
+	playerStats[victim][CURRENT_DEATHS]++;
+
+	playerStats[killer][CURRENT_KILLS]++;
+	playerStats[killer][KILLS]++;
+		
+	if(hitPlace == HIT_HEAD) playerStats[killer][CURRENT_HS_KILLS]++;
 }
 
-public DeathMsg()
+public message_intermission() 
 {
-	new iKiller = read_data(1);
-	new iVictim = read_data(2);
-	new iHeadShot = read_data(3);
+	new playersList[32], id, players;
+
+	get_players(playersList, players, "h");
 	
-	if(is_user_connected(iVictim))
-		gPlayer[iVictim][CurrentDeaths]++;
+	if(!players) return PLUGIN_CONTINUE;
 
-	if(is_user_connected(iKiller) && iKiller != iVictim)
+	for (new i = 0; i < players; i++)
 	{
-		gPlayer[iKiller][CurrentKills]++;
-		gPlayer[iKiller][Kills]++;
+		id = playersList[i];
 		
-		if(iHeadShot)
-			gPlayer[iKiller][CurrentHS]++;
+		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
+		
+		save_stats(id, 1);
 	}
-}
 
-public MsgIntermission() 
-{
-	new szPlayers[32], id, iNum;
-	get_players(szPlayers, iNum, "h");
-	
-	if(!iNum)
-		return PLUGIN_CONTINUE;
-		
-	for (new i = 0; i < iNum; i++)
-	{
-		id = szPlayers[i];
-		
-		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id))
-			continue;
-		
-		SaveStats(id, 1);
-	}
 	return PLUGIN_CONTINUE;
 }
 
-public HandleSayText(msgId, msgDest, msgEnt)
+public say_text(msgId, msgDest, msgEnt)
 {
 	new id = get_msg_arg_int(1);
 	
 	if(is_user_connected(id))
 	{
-		new szTmp[150], szTmp2[170], szPrefix[16], iStats[8], iBody[8], iRank;
+		new tempMessage[192], message[192], chatPrefix[16], stats[8], body[8], rank;
 		
-		get_msg_arg_string(2, szTmp, charsmax(szTmp));
-		iRank = get_user_stats(id, iStats, iBody);
-		
-		if(iRank > 3)
-			return PLUGIN_CONTINUE;
+		get_msg_arg_string(2, tempMessage, charsmax(tempMessage));
+		rank = get_user_stats(id, stats, body);
+
+		if(rank > 3) return PLUGIN_CONTINUE;
 			
-		switch(iRank)
+		switch(rank)
 		{
-			case 1: formatex(szPrefix, charsmax(szPrefix), "^x04[TOP1]");
-			case 2: formatex(szPrefix, charsmax(szPrefix), "^x04[TOP2]");
-			case 3: formatex(szPrefix, charsmax(szPrefix), "^x04[TOP3]");
+			case 1: formatex(chatPrefix, charsmax(chatPrefix), "^x04[TOP1]");
+			case 2: formatex(chatPrefix, charsmax(chatPrefix), "^x04[TOP2]");
+			case 3: formatex(chatPrefix, charsmax(chatPrefix), "^x04[TOP3]");
 		}
 		
-		if(!equal(szTmp,"#Cstrike_Chat_All"))
+		if(!equal(tempMessage, "#Cstrike_Chat_All"))
 		{
-			add(szTmp2,charsmax(szTmp2), szPrefix);
-			add(szTmp2,charsmax(szTmp2), "");
-			add(szTmp2,charsmax(szTmp2), szTmp);
+			add(message, charsmax(message), chatPrefix);
+			add(message, charsmax(message), " ");
+			add(message, charsmax(message), tempMessage);
 		}
 		else
 		{
-			add(szTmp2,charsmax(szTmp2), szPrefix);
-			add(szTmp2,charsmax(szTmp2), "^x03 %s1^x01 :  %s2");
+			add(message, charsmax(message), chatPrefix);
+			add(message, charsmax(message), "^x03 %s1^x01 :  %s2");
 		}
-		set_msg_arg_string(2, szTmp2);
+		
+		set_msg_arg_string(2, message);
 	}
+
 	return PLUGIN_CONTINUE;
 }
 
 public bomb_explode(planter, defuser) 
-	gPlayer[planter][Kills] += 3;
+	playerStats[planter][KILLS] += 3;
 
 public bomb_defused(defuser)
-	gPlayer[defuser][Kills] += 3;
+	playerStats[defuser][KILLS] += 3;
 
-public HostagesRescued()
-	gPlayer[get_loguser_index()][Kills] += 3;
+public hostages_rescued()
+	playerStats[get_loguser_index()][KILLS] += 3;
 	
-public SqlInit()
+public sql_init()
 {
-	new szHost[32], szUser[32], szPass[32], szDatabase[32], szTemp[512], szError[128], iError;
+	new host[32], user[32], pass[32], database[32], queryData[256], error[128], errorNum;
 	
-	get_cvar_string("cod_sql_host", szHost, charsmax(szHost));
-	get_cvar_string("cod_sql_user", szUser, charsmax(szUser));
-	get_cvar_string("cod_sql_pass", szPass, charsmax(szPass));
-	get_cvar_string("cod_sql_database", szDatabase, charsmax(szDatabase));
+	get_cvar_string("cod_sql_host", host, charsmax(host));
+	get_cvar_string("cod_sql_user", user, charsmax(user));
+	get_cvar_string("cod_sql_pass", pass, charsmax(pass));
+	get_cvar_string("cod_sql_database", database, charsmax(database));
 	
-	hSqlHook = SQL_MakeDbTuple(szHost, szUser, szPass, szDatabase);
+	sql = SQL_MakeDbTuple(host, user, pass, database);
 
-	new Handle:hConnect = SQL_Connect(hSqlHook, iError, szError, charsmax(szError));
+	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
-	if(iError)
+	if(errorNum)
 	{
-		log_to_file("addons/amxmodx/logs/cod_stats.log", "Error: %s", szError);
+		log_to_file("cod_mod.log", "Error: %s", error);
+		
 		return;
 	}
 	
-	formatex(szTemp, charsmax(szTemp), "CREATE TABLE IF NOT EXISTS `cod_stats` (`name` varchar(32) NOT NULL, `admin` int(10) NOT NULL, `kills` int(10) NOT NULL, `time` int(10) NOT NULL, `firstvisit` int(10) NOT NULL, ");
-	add(szTemp, charsmax(szTemp), "`lastvisit` int(10) NOT NULL, `bestkills` int(10) NOT NULL, `bestdeaths` int(10) NOT NULL, `besths` int(10) NOT NULL, `beststats` int(10) NOT NULL, PRIMARY KEY (`name`));");
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_stats` (`name` varchar(32) NOT NULL, `admin` int(10) NOT NULL, `kills` int(10) NOT NULL, `time` int(10) NOT NULL, `firstvisit` int(10) NOT NULL, ");
+	add(queryData, charsmax(queryData), "`lastvisit` int(10) NOT NULL, `bestkills` int(10) NOT NULL, `bestdeaths` int(10) NOT NULL, `besths` int(10) NOT NULL, `beststats` int(10) NOT NULL, PRIMARY KEY (`name`));");
 
-	new Handle:hQuery = SQL_PrepareQuery(hConnect, szTemp);
+	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
 
-	SQL_Execute(hQuery);
+	SQL_Execute(query);
 	
-	SQL_FreeHandle(hQuery);
-	SQL_FreeHandle(hConnect);
+	SQL_FreeHandle(query);
+	SQL_FreeHandle(connectHandle);
 }
 
-public LoadStats(id)
+public load_stats(id)
 {
-	if(!is_user_connected(id))
-		return;
+	if(!is_user_connected(id)) return;
 
-	new szTemp[128], szName[33], szData[1];
-
-	szData[0] = id;
-
-	mysql_escape_string(szName, gPlayer[id][Name], charsmax(gPlayer));
+	new queryData[128], tempId[1];
 	
-	formatex(szTemp, charsmax(szTemp), "SELECT * FROM `cod_stats` WHERE name = '%s'", szName);
-	SQL_ThreadQuery(hSqlHook, "LoadStats_Handle", szTemp, szData, 1);
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_stats` WHERE name = '%s'", playerName[id]);
+	SQL_ThreadQuery(sql, "load_stats_handle", queryData, tempId, sizeof(tempId));
 }
 
-public LoadStats_Handle(iFailState, Handle:hQuery, szError[], iError, szData[], iSize)
+public load_stats_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
-	if(iFailState != TQUERY_SUCCESS)
+	if(failState) 
 	{
-		log_to_file("addons/amxmodx/logs/cod_stats.log", "<Query> Error: %s", szError);
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		
 		return;
 	}
-
-	new id = szData[0];
 	
-	if(SQL_NumRows(hQuery))
+	new id = tempId[0];
+	
+	if(!is_user_connected(id)) return;
+	
+	if(SQL_NumRows(query))
 	{
-		gPlayer[id][Kills] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "kills"));
-		gPlayer[id][Time] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "time"));
-		gPlayer[id][FirstVisit] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "firstvisit"));
-		gPlayer[id][LastVisit] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "lastvisit"));
-		gPlayer[id][BestStats] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "beststats"));
-		gPlayer[id][BestKills] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "bestkills"));
-		gPlayer[id][BestHS] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "besths"));
-		gPlayer[id][BestDeaths] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "bestdeaths"));
+		playerStats[id][KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "kills"));
+		playerStats[id][TIME] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "time"));
+		playerStats[id][FIRST_VISIT] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "firstvisit"));
+		playerStats[id][LAST_VISIT] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "lastvisit"));
+		playerStats[id][BEST_STATS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "beststats"));
+		playerStats[id][BEST_KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "bestkills"));
+		playerStats[id][BEST_HS_KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "besths"));
+		playerStats[id][BEST_DEATHS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "bestdeaths"));
 	}
 	else
 	{
-		new szTemp[256], iVisit = get_systime();
+		new queryData[128];
 		
-		formatex(szTemp, charsmax(szTemp), "INSERT IGNORE INTO `cod_stats` (`name`, `firstvisit`) VALUES ('%s', '%i');", gPlayer[id][Name], iVisit);
+		formatex(queryData, charsmax(queryData), "INSERT INTO `cod_honor` VALUES ('%s', '0')", playerName[id]);
 		
-		SQL_ThreadQuery(hSqlHook, "Ignore_Handle", szTemp);
+		SQL_ThreadQuery(sql, "ignore_handle", queryData);
 	}
 	
-	Set(id, iLoaded);
+	set_bit(id, dataLoaded);
 }
 
-SaveStats(id, end = 0)
+save_stats(id, end = 0)
 {
-	if(Get(id, iLoaded))
-		return;
+	if(!get_bit(id, dataLoaded)) return;
+
+	new queryData[256], queryTemp[128];
 		
-	new szTemp[256], szBest[128], szName[33];
-
-	gPlayer[id][CurrentStats] = gPlayer[id][CurrentKills]*2 + gPlayer[id][CurrentHS] - gPlayer[id][CurrentDeaths]*2;
+	playerStats[id][CURRENT_STATS] = playerStats[id][CURRENT_KILLS]*2 + playerStats[id][CURRENT_HS_KILLS] - playerStats[id][CURRENT_DEATHS]*2;
 	
-	if(gPlayer[id][CurrentStats] > gPlayer[id][BestStats])
+	if(playerStats[id][CURRENT_STATS] > playerStats[id][BEST_STATS])
 	{			
-		formatex(szBest, charsmax(szBest), ", `bestkills` = %d, `besths` = %d, `bestdeaths` = %d, `beststats` = %d", 
-		gPlayer[id][CurrentKills], gPlayer[id][CurrentHS], gPlayer[id][CurrentDeaths], gPlayer[id][CurrentStats]);
+		formatex(queryTemp, charsmax(queryTemp), ", `bestkills` = %d, `besths` = %d, `bestdeaths` = %d, `beststats` = %d", 
+		playerStats[id][CURRENT_KILLS], playerStats[id][CURRENT_HS_KILLS], playerStats[id][CURRENT_DEATHS], playerStats[id][CURRENT_STATS]);
 	}
-	
-	gPlayer[id][Time] += get_user_time(id);
-	
-	mysql_escape_string(szName, gPlayer[id][Name], charsmax(gPlayer));
 
-	formatex(szTemp, charsmax(szTemp), "UPDATE `cod_stats` SET `admin` = %i, `kills` = %i, `time` = %i, `lastvisit` = %i%s WHERE name = '%s' AND `time` <= %i", 
-	gPlayer[id][Admin], gPlayer[id][Kills], gPlayer[id][Time], get_systime(), szBest, szName, gPlayer[id][Time]);
+	playerStats[id][TIME] += get_user_time(id);
 
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_stats` SET `admin` = %i, `kills` = %i, `time` = %i, `lastvisit` = %i%s WHERE name = '%s' AND `time` <= %i", 
+	playerStats[id][ADMIN], playerStats[id][KILLS], playerStats[id][TIME], get_systime(), queryTemp, playerName[id], playerStats[id][TIME]);
+		
 	switch(end)
 	{
-		case 0: SQL_ThreadQuery(hSqlHook, "Ignore_Handle", szTemp);
+		case 0: SQL_ThreadQuery(sql, "ignore_handle", queryData);
 		case 1:
 		{
-			new szError[128], iError, Handle:hSqlConnection, Handle:hQuery;
+			new error[128], errorNum, Handle:sqlConnection, Handle:query;
 			
-			hSqlConnection = SQL_Connect(hSqlHook, iError, szError, charsmax(szError));
+			sqlConnection = SQL_Connect(sql, errorNum, error, charsmax(error));
 
-			if(!hSqlConnection)
+			if(!sqlConnection)
 			{
-				log_to_file("addons/amxmodx/logs/cod_stats.txt", "Save - Could not connect to SQL database.  [%d] %s", szError, szError);
+				log_to_file("cod_mod.log", "Save - Could not connect to SQL database.  [%d] %s", error, error);
 				
-				SQL_FreeHandle(hSqlConnection);
+				SQL_FreeHandle(sqlConnection);
 				
 				return;
 			}
 			
-			hQuery = SQL_PrepareQuery(hSqlConnection, szTemp);
+			query = SQL_PrepareQuery(sqlConnection, queryData);
 			
-			if(!SQL_Execute(hQuery))
+			if(!SQL_Execute(query))
 			{
-				iError = SQL_QueryError(hQuery, szError, charsmax(szError));
+				errorNum = SQL_QueryError(query, error, charsmax(error));
 				
-				log_to_file("addons/amxmodx/logs/cod_stats.txt", "Save Query Nonthreaded failed. [%d] %s", iError, szError);
+				log_to_file("cod_mod.log", "Save Query Nonthreaded failed. [%d] %s", errorNum, error);
 				
-				SQL_FreeHandle(hQuery);
-				SQL_FreeHandle(hSqlConnection);
+				SQL_FreeHandle(query);
+				SQL_FreeHandle(sqlConnection);
 				
 				return;
 			}
-	
-			SQL_FreeHandle(hQuery);
-			SQL_FreeHandle(hSqlConnection);
+
+			SQL_FreeHandle(query);
+			SQL_FreeHandle(sqlConnection);
 		}
 	}
-
-	Rem(id, iLoaded);
+	
+	if(end) rem_bit(id, dataLoaded);
 }
 
-public Ignore_Handle(iFailState, Handle:hQuery, szError[], iError, szData[], iSize)
+public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
-	if(iFailState == TQUERY_CONNECT_FAILED)
-		log_to_file("addons/amxmodx/logs/cod_stats.txt", "Could not connect to SQL database. [%d] %s", iError, szError);
-	else if(iFailState == TQUERY_QUERY_FAILED)
-		log_to_file("addons/amxmodx/logs/cod_stats.txt", "Query failed. [%d] %s", iError, szError);
-}
-
-public _stats_add_kill(iPlugin, iParams)
-{
-	if(iParams != 1)
-		return PLUGIN_CONTINUE;
-		
-	new id = get_param(1);
-	
-	if(!is_user_valid(id))
-		return PLUGIN_CONTINUE;
-	
-	gPlayer[id][CurrentKills]++;
-	gPlayer[id][Kills]++;
+	if (failState) 
+	{
+		if(failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
+		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "Query failed. [%d] %s", errorNum, error);
+	}
 	
 	return PLUGIN_CONTINUE;
 }
 
-public _cod_get_user_time(id, szReturn[], iLen)
+public _cod_stats_add_kill(id)
 {
-	new id = get_param(1);
+	if(!is_user_valid(id)) return;
 	
-	if(!is_user_valid(id))
-		return;
+	playerStats[id][CURRENT_KILLS]++;
+	playerStats[id][KILLS]++;
+}
 
-	new szTemp[64], iSeconds = (gPlayer[id][Time] + get_user_time(id)), iMinutes, iHours;
+public _cod_get_user_time(id)
+{
+	if(!is_user_valid(id)) return 0;
+
+	return playerStats[id][TIME] + get_user_time(id);
+}
+
+public _cod_get_user_time_text(id, dataReturn[], dataLength)
+{
+	if(!is_user_valid(id)) return;
+
+	new tempData[64], seconds = (playerStats[id][TIME] + get_user_time(id)), minutes, hours;
 	
-	while(iSeconds >= 60)
+	while(seconds >= 60)
 	{
-		iSeconds -= 60;
-		iMinutes++;
+		seconds -= 60;
+		minutes++;
 	}
-	while(iMinutes >= 60)
+	while(minutes >= 60)
 	{
-		iMinutes -= 60;
-		iHours++;
+		minutes -= 60;
+		hours++;
 	}
 	
 	param_convert(2);
 	
-	formatex(szTemp, charsmax(szTemp), "%i h %i min %i s", iHours, iMinutes, iSeconds);
-	copy(szReturn, iLen, szTemp);
+	formatex(tempData, charsmax(tempData), "%i h %i min %i s", hours, minutes, seconds);
+
+	copy(dataReturn, dataLength, tempData);
 }
 
 stock get_loguser_index()
 {
-	new szLogUser[80], szName[32];
-	read_logargv(0, szLogUser, 79);
-	parse_loguser(szLogUser, szName, 31);
+	new userLog[80], userName[32];
+	read_logargv(0, userLog, charsmax(userLog));
+	parse_loguser(userLog, userName, charsmax(userName));
 
-	return get_user_index(szName);
+	return get_user_index(userName);
 }
