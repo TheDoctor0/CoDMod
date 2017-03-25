@@ -2554,18 +2554,18 @@ public _cod_get_classid(className[])
 	return get_class_id(className);
 }
 
-public _cod_get_class_name(class, dataReturn[], dataLenght)
+public _cod_get_class_name(class, dataReturn[], dataLength)
 {
 	param_convert(2);
 	
-	get_class_info(class, CLASS_NAME, dataReturn, charsmax(dataLenght));
+	get_class_info(class, CLASS_NAME, dataReturn, charsmax(dataLength));
 }
 
-public _cod_get_class_desc(class, dataReturn[], dataLenght)
+public _cod_get_class_desc(class, dataReturn[], dataLength)
 {
 	param_convert(2);
 	
-	get_class_info(class, CLASS_DESC, dataReturn, charsmax(dataLenght));
+	get_class_info(class, CLASS_DESC, dataReturn, charsmax(dataLength));
 }
 
 public _cod_get_class_health(class)
@@ -2659,18 +2659,18 @@ public _cod_get_itemid(itemName[])
 	return 0;
 }
 
-public _cod_get_item_name(item, dataReturn[], dataLenght)
+public _cod_get_item_name(item, dataReturn[], dataLength)
 {
 	param_convert(2);
 	
-	get_item_info(item, ITEM_NAME, dataReturn, charsmax(dataLenght));
+	get_item_info(item, ITEM_NAME, dataReturn, charsmax(dataLength));
 }
 
-public _cod_get_item_desc(item, dataReturn[], dataLenght)
+public _cod_get_item_desc(item, dataReturn[], dataLength)
 {
 	param_convert(2);
 	
-	get_item_info(item, ITEM_DESC, dataReturn, charsmax(dataLenght));
+	get_item_info(item, ITEM_DESC, dataReturn, charsmax(dataLength));
 }
 
 public _cod_get_items_num()
@@ -3071,7 +3071,7 @@ stock execute_forward_ignore_two_params(forwardHandle, paramOne, paramTwo)
 	return ExecuteForward(forwardHandle, ret, paramOne, paramTwo);
 }
 
-stock get_class_info(class, info, dataReturn[] = "", dataLenght = 0)
+stock get_class_info(class, info, dataReturn[] = "", dataLength = 0)
 {
 	new codClass[classInfo];
 	
@@ -3079,7 +3079,7 @@ stock get_class_info(class, info, dataReturn[] = "", dataLenght = 0)
 	
 	if(info == CLASS_NAME || info == CLASS_DESC || info == CLASS_FRACTION)
 	{
-		copy(dataReturn, dataLenght, codClass[info]);
+		copy(dataReturn, dataLength, codClass[info]);
 		
 		return 0;
 	}
@@ -3101,7 +3101,7 @@ stock get_class_id(className[])
 	return 0;
 }
 
-stock get_item_info(item, info, dataReturn[] = "", dataLenght = 0)
+stock get_item_info(item, info, dataReturn[] = "", dataLength = 0)
 {
 	new codItem[itemInfo];
 	
@@ -3109,7 +3109,7 @@ stock get_item_info(item, info, dataReturn[] = "", dataLenght = 0)
 	
 	if(info == ITEM_NAME || info == ITEM_DESC)
 	{
-		copy(dataReturn, dataLenght, codItem[info]);
+		copy(dataReturn, dataLength, codItem[info]);
 		
 		return 0;
 	}

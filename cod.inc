@@ -84,12 +84,12 @@ native cod_get_classid(szClass[]);
 Zwraca klase o podanej nazwie.
 ------------------------------*/
 
-native cod_get_class_name(class, dataReturn[], dataLenght);
+native cod_get_class_name(class, dataReturn[], dataLength);
 /*------------------------------
 Zwraca nazwe klasy.
 ------------------------------*/
 
-native cod_get_class_desc(class, dataReturn[], dataLenght);
+native cod_get_class_desc(class, dataReturn[], dataLength);
 /*------------------------------
 Zwraca opis klasy.
 ------------------------------*/
@@ -126,12 +126,12 @@ native cod_get_itemid(szItem[]);
 Zwraca item o podanej nazwie.
 ------------------------------*/
 
-native cod_get_item_name(item, dataReturn[], dataLenght);
+native cod_get_item_name(item, dataReturn[], dataLength);
 /*------------------------------
 Zwraca nazwe itemu.
 ------------------------------*/
 
-native cod_get_item_desc(item, dataReturn[], dataLenght);
+native cod_get_item_desc(item, dataReturn[], dataLength);
 /*------------------------------
 Zwraca opis itemu.
 ------------------------------*/
@@ -415,16 +415,16 @@ stock cod_print_chat(id, const text[] = "", any:...)
 	client_print_color(id, id, "^x04[CoD]^x01 %s", message);
 }
 
-stock mysql_escape_string(const source[], dest[], lenght)
+stock mysql_escape_string(const source[], dest[], length)
 {
-	copy(dest, lenght, source);
+	copy(dest, length, source);
 	
-	replace_all(dest, lenght, "\\", "\\\\");
-	replace_all(dest, lenght, "\0", "\\0");
-	replace_all(dest, lenght, "\n", "\\n");
-	replace_all(dest, lenght, "\r", "\\r");
-	replace_all(dest, lenght, "\x1a", "\Z");
-	replace_all(dest, lenght, "'", "\'");
-	replace_all(dest, lenght, "`", "\`");
-	replace_all(dest, lenght, "^"", "\^"");
+	replace_all(dest, length, "\\", "\\\\");
+	replace_all(dest, length, "\0", "\\0");
+	replace_all(dest, length, "\n", "\\n");
+	replace_all(dest, length, "\r", "\\r");
+	replace_all(dest, length, "\x1a", "\Z");
+	replace_all(dest, length, "'", "\'");
+	replace_all(dest, length, "`", "\`");
+	replace_all(dest, length, "^"", "\^"");
 }
