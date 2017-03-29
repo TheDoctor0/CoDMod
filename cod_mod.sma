@@ -2333,8 +2333,8 @@ public sql_init()
 		return;
 	}
 	
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_mod` (name VARCHAR(35) NOT NULL, class VARCHAR(64) NOT NULL, exp INT UNSIGNED NOT NULL DEFAULT 0, lvl INT UNSIGNED NOT NULL DEFAULT 1, PRIMARY KEY(name, class), ");
-	add(queryData,  charsmax(queryData), "intelligence INT UNSIGNED NOT NULL DEFAULT 0, health INT UNSIGNED NOT NULL DEFAULT 0, stamina INT UNSIGNED NOT NULL DEFAULT 0, condition INT UNSIGNED NOT NULL DEFAULT 0, strength INT UNSIGNED NOT NULL DEFAULT 0)");	
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_mod` (name VARCHAR(35) NOT NULL, class VARCHAR(64) NOT NULL, exp INT UNSIGNED NOT NULL DEFAULT 0, lvl INT UNSIGNED NOT NULL DEFAULT 1, intelligence INT UNSIGNED NOT NULL DEFAULT 0, ");
+	add(queryData,  charsmax(queryData), "health INT UNSIGNED NOT NULL DEFAULT 0, stamina INT UNSIGNED NOT NULL DEFAULT 0, condition INT UNSIGNED NOT NULL DEFAULT 0, strength INT UNSIGNED NOT NULL DEFAULT 0, PRIMARY KEY(name, class));");	
 
 	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
 
@@ -2914,7 +2914,7 @@ public _cod_make_bartimer(id, duration)
 	make_bar_timer(id, duration);
 
 public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
-	if(!get_bit(victim, itemResistance) || ((get_bit(victim, itemResistance) && !(flags & DMG_CODSKILL))) ExecuteHam(Ham_TakeDamage, victim, attacker, attacker, damage + get_intelligence(attacker, 1, 1, 1) * factor, DMG_CODSKILL | flags);
+	if(!get_bit(victim, itemResistance) || ((get_bit(victim, itemResistance) && !(flags & DMG_CODSKILL)))) ExecuteHam(Ham_TakeDamage, victim, attacker, attacker, damage + get_intelligence(attacker, 1, 1, 1) * factor, DMG_CODSKILL | flags);
 	
 public _cod_kill_player(killer, victim, flags)
 {
@@ -3089,7 +3089,7 @@ stock get_class_info(class, info, dataReturn[] = "", dataLength = 0)
 
 stock get_class_id(className[])
 {
-	new codClass[classInfo];
+	static codClass[classInfo];
 	
 	for(new i = 1; i < ArraySize(codClasses); i++)
 	{
@@ -3103,7 +3103,7 @@ stock get_class_id(className[])
 
 stock get_item_info(item, info, dataReturn[] = "", dataLength = 0)
 {
-	new codItem[itemInfo];
+	static codItem[itemInfo];
 	
 	ArrayGetArray(codItems, item, codItem);
 	
@@ -3119,7 +3119,7 @@ stock get_item_info(item, info, dataReturn[] = "", dataLength = 0)
 
 stock remove_render_type(id, type)
 {
-	new codRender[renderInfo];
+	static codRender[renderInfo];
 
 	for(new i = 0; i < ArraySize(codPlayerRender[id]); i++)
 	{
