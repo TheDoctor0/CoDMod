@@ -2914,7 +2914,7 @@ public _cod_make_bartimer(id, duration)
 	make_bar_timer(id, duration);
 
 public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
-	if(!get_bit(victim, itemResistance) && !(flags & DMG_BULLET)) ExecuteHam(Ham_TakeDamage, victim, attacker, attacker, damage + get_intelligence(attacker, 1, 1, 1) * factor, DMG_CODSKILL | flags);
+	if(!get_bit(victim, itemResistance) || ((get_bit(victim, itemResistance) && !(flags & DMG_CODSKILL))) ExecuteHam(Ham_TakeDamage, victim, attacker, attacker, damage + get_intelligence(attacker, 1, 1, 1) * factor, DMG_CODSKILL | flags);
 	
 public _cod_kill_player(killer, victim, flags)
 {
