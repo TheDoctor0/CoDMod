@@ -1,1300 +1,1117 @@
 #include <amxmodx>
-#include <cod>
-#include <hamsandwich>
-#include <fun>
 #include <sqlx>
+#include <cod>
 
-#define PLUGIN "CoD Clans System"
+#define PLUGIN "CoD codClans System"
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-#define Set(%2,%1)	(%1 |= (1<<(%2&31)))
-#define Rem(%2,%1)	(%1 &= ~(1 <<(%2&31)))
-#define Get(%2,%1)	(%1 & (1<<(%2&31)))
+enum _:clanInfo { CLAN_ID, CLAN_LEVEL, CLAN_HONOR, CLAN_HEALTH, CLAN_GRAVITY, CLAN_DAMAGE, CLAN_DROP, CLAN_KILLS, CLAN_MEMBERS, Trie:CLAN_STATUS, CLAN_NAME[64] };
 
-enum _:ClanInfo
-{
-	NAME[64],
-	PASSWORD[32],
-	LEVEL,
-	HONOR,
-	SPEED,
-	GRAVITY,
-	DAMAGE,
-	DROP,
-	KILLS,
-	MEMBERS,
-	Trie:STATUS,
-};
+enum _:statusInfo { STATUS_NONE, STATUS_MEMBER, STATUS_DEPUTY, STATUS_LEADER };
 
-enum
-{
-	NONE = 0,
-	MEMBER,
-	DEPUTY,
-	LEADER
-};
+new const commandClan[][] = { "say /clan", "say_team /clan", "say /codClans", "say_team /codClans", "say /klany", "say_team /klany", "say /klan", "say_team /klan", "klan" };
 
-new const szCommandClan[][] = { "say /clan", "say_team /clan", "say /clans", "say_team /clans", "say /klany", "say_team /klany", "say /klan", "say_team /klan", "klan" };
+new cvarLevelCost, cvarNextLevelCost, cvarSkillCost, cvarNextSkillCost, cvarCreateLevel, cvarMembersStart, cvarLevelMax, 
+	cvarSkillMax, cvarMembersPerLevel, cvarHealthPerLevel, cvarGravityPerLevel, cvarDamagePerLevel, cvarWeaponDropPerLevel;
 
-new const szFile[] = "cod_clans.ini";
+new levelCost, nextLevelCost, skillCost, nextSkillCost, createLevel, membersStart, levelMax, 
+	skillMax, membersPerLevel, healthPerLevel, gravityPerLevel, damagePerLevel, weaponDropPerLevel;
 
-new iLevelCost, iNextLevelCost, iSpeedCost, iNextSpeedCost, iGravityCost, iNextGravityCost, iDamageCost, iNextDamageCost, iWeaponDropCost, iNextWeaponDropCost;
-new iLevelMax, iSpeedMax, iGravityMax, iDamageMax, iWeaponDropMax;
-new iMembersPerLevel, iSpeedPerLevel, iGravityPerLevel, iDamagePerLevel, iWeaponDropPerLevel;
-new iCreateLevel, iMaxMembers;
-
-new szMemberName[MAX_PLAYERS + 1][64], szChosenName[MAX_PLAYERS + 1][64];
-
-new iClan[MAX_PLAYERS + 1], iChosenID[MAX_PLAYERS + 1];
-
-new iPassword;
-
-new bool:bFreezeTime;
-
-new szCache[512], szMessage[2048];
-
-new Handle:hSqlTuple;
-
-new Array:gClans;
+new playerName[MAX_PLAYERS + 1][64], chosenName[MAX_PLAYERS + 1][64], clan[MAX_PLAYERS + 1], chosenId[MAX_PLAYERS + 1], Handle:sql, Array:codClans;
 
 public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	register_cvar("cod_clans_sql_host", "sql.pukawka.pl", FCVAR_SPONLY|FCVAR_PROTECTED); 
-	register_cvar("cod_clans_sql_user", "310529", FCVAR_SPONLY|FCVAR_PROTECTED); 
-	register_cvar("cod_clans_sql_pass", "IzQsAjTnjuPnJu41", FCVAR_SPONLY|FCVAR_PROTECTED); 
-	register_cvar("cod_clans_sql_db", "310529_cod", FCVAR_SPONLY|FCVAR_PROTECTED); 
+	for(new i; i < sizeof commandClan; i++) register_clcmd(commandClan[i], "show_clan_menu");
 	
-	for(new i; i < sizeof szCommandClan; i++)
-		register_clcmd(szCommandClan[i], "ClanMenu");
+	register_clcmd("PODAJ_NAZWE_KLANU", "create_clan_handle");
+	register_clcmd("PODAJ_NOWA_NAZWE_KLANU", "change_name_handle");
+	register_clcmd("WPISZ_ILOSC_HONORU", "deposit_honor_handle");
+
+	cvarLevelCost = register_cvar("cod_clans_level_cost", "1000");
+	cvarNextLevelCost = register_cvar("cod_clans_next_level_cost", "1000");
+	cvarSkillCost = register_cvar("cod_clans_skill_cost", "500");
+	cvarNextSkillCost = register_cvar("cod_clans_next_skill_cost", "500");
+	cvarCreateLevel = register_cvar("cod_clans_create_level", "25");
+	cvarMembersStart = register_cvar("cod_clans_members_start", "3");
+	cvarLevelMax = register_cvar("cod_clans_level_max", "10");
+	cvarSkillMax = register_cvar("cod_clans_skill_max", "10");
+	cvarMembersPerLevel = register_cvar("cod_clans_members_per_level", "1");
+	cvarHealthPerLevel = register_cvar("cod_clans_health_per_level", "1");
+	cvarGravityPerLevel = register_cvar("cod_clans_gravity_per_level", "20");
+	cvarDamagePerLevel = register_cvar("cod_clans_damage_per_level", "1");
+	cvarWeaponDropPerLevel = register_cvar("cod_clans_weapondrop_per_level", "1");
 	
-	register_clcmd("Nazwa", "CmdCreateClan");
-	register_clcmd("Ustaw_Haslo", "CmdSetPassword");
-	register_clcmd("Podaj_Haslo", "CmdCheckPassword");
-	register_clcmd("Nowa_Nazwa", "ChangeName_Handle");
-	register_clcmd("Ilosc_Honoru", "DepositHonor_Handle");
+	register_message(get_user_msgid("SayText"), "say_text");
 	
-	register_event("DeathMsg", "DeathMsg", "a");
-	register_event("HLTV", "NewRound", "a", "1=0", "2=0");
-	
-	register_logevent("RoundStart", 2, "1=Round_Start");
-	
-	register_message(get_user_msgid("SayText"), "HandleSayText");
-	
-	RegisterHam(Ham_Spawn, "player", "PlayerSpawn", 1);
-	RegisterHam(Ham_TakeDamage, "player", "TakeDamage", 0);
-	RegisterHam(get_player_resetmaxspeed_func(), "player", "PlayerResetMaxSpeed", 1);
-	
-	gClans = ArrayCreate(ClanInfo);
-	
-	new aClan[ClanInfo];
-	
-	aClan[NAME] = "Brak";
-	aClan[LEVEL] = 0;
-	aClan[HONOR] = 0;
-	aClan[SPEED] = 0;
-	aClan[GRAVITY] = 0;
-	aClan[DROP] = 0;
-	aClan[DAMAGE] = 0;
-	aClan[PASSWORD] = 0;
-	aClan[MEMBERS] = 0;
-	aClan[STATUS] = _:TrieCreate();
-	
-	ArrayPushArray(gClans, aClan);
+	codClans = ArrayCreate(clanInfo);
 }
 
 public plugin_cfg()
 {
-	ConfigLoad();
-	SqlInit();
+	levelCost = get_pcvar_num(cvarLevelCost);
+	nextLevelCost = get_pcvar_num(cvarNextLevelCost);
+	skillCost = get_pcvar_num(cvarSkillCost);
+	nextSkillCost = get_pcvar_num(cvarNextSkillCost);
+	createLevel = get_pcvar_num(cvarCreateLevel);
+	membersStart = get_pcvar_num(cvarMembersStart);
+	levelMax = get_pcvar_num(cvarLevelMax);
+	skillMax = get_pcvar_num(cvarSkillMax);
+	membersPerLevel = get_pcvar_num(cvarMembersPerLevel);
+	healthPerLevel = get_pcvar_num(cvarHealthPerLevel);
+	gravityPerLevel = get_pcvar_num(cvarGravityPerLevel);
+	damagePerLevel = get_pcvar_num(cvarDamagePerLevel);
+	weaponDropPerLevel = get_pcvar_num(cvarWeaponDropPerLevel);
+
+	new codClan[clanInfo];
+	
+	codClan[CLAN_NAME] = "Brak";
+	
+	ArrayPushArray(codClans, codClan);
+
+	sql_init();
 }
 
 public plugin_end()
 {
-	SQL_FreeHandle(hSqlTuple);
-	ArrayDestroy(gClans);
+	SQL_FreeHandle(sql);
+
+	ArrayDestroy(codClans);
 }
 
 public client_putinserver(id)
 {
-	iClan[id] = 0;
-	LoadMember(id);
+	if(is_user_bot(id) || is_user_hltv(id)) return;
+
+	clan[id] = 0;
+
+	get_user_name(id, playerName[id], charsmax(playerName));
+
+	mysql_escape_string(playerName[id], playerName[id], charsmax(playerName));
+
+	load_data(id);
 }
 
 public client_disconnected(id)
 {
-	Rem(id, iPassword);
-	iClan[id] = 0;
+	playerName[id] = "";
+
+	clan[id] = 0;
 }
 
-public NewRound()
-	bFreezeTime = true;
-
-public RoundStart()
-	bFreezeTime = false;
-
-public PlayerSpawn(id)
+public cod_spawned(id)
 {
-	if(!is_user_alive(id) || !iClan[id])
-		return HAM_IGNORED;
-	
-	new aClan[ClanInfo];
-	ArrayGetArray(gClans, iClan[id], aClan);
-	
-	if(equal(aClan[PASSWORD], "") && get_user_status(id, iClan[id]) == LEADER)
-	{
-		cod_print_chat(id,  "Nie wpisano hasla zarzadzania klanem. Wpisz je teraz!");
-		client_cmd(id, "messagemode Ustaw_Haslo");
-	}
-	
-	new iGravity = 800 - (iGravityPerLevel*aClan[GRAVITY]);
-	set_user_gravity(id, float(iGravity)/800.0);
-	
-	return HAM_IGNORED;
-}
+	if(!clan[id]) return PLUGIN_CONTINUE;
 
-public PlayerResetMaxSpeed(id)
-{
-	if(!iClan[id] || bFreezeTime || !is_user_alive(id))
-		return HAM_IGNORED;
-	
-	new aClan[ClanInfo];
-	ArrayGetArray(gClans, iClan[id], aClan);
-	
-	if(aClan[SPEED])
-		set_user_maxspeed(id, get_user_maxspeed(id) + (iSpeedPerLevel * aClan[SPEED]));
-
-	return HAM_IGNORED;
-}
-
-public TakeDamage(iVictim, iInflictor, iAttacker, Float:Damage, iBits)
-{
-	if(!is_user_alive(iAttacker) || !is_user_connected(iVictim))
-		return HAM_IGNORED;
-	
-	if(get_user_team(iVictim) == get_user_team(iAttacker) || !iClan[iAttacker])
-		return HAM_IGNORED;
-	
-	new aClan[ClanInfo];
-	ArrayGetArray(gClans, iClan[iAttacker], aClan);
-	
-	if(aClan[DAMAGE])
-		SetHamParamFloat(4, Damage + (iDamagePerLevel*(aClan[DAMAGE])));
-	
-	if(aClan[DROP])
-	{
-		if(random_num(1, (iWeaponDropMax*1.6 - (aClan[DROP] * iWeaponDropPerLevel)) == 1))
-			client_cmd(iVictim, "drop");
-	}
-	
-	return HAM_IGNORED;
-}
-
-public DeathMsg()
-{
-	new iKiller = read_data(1);
-	
-	if(!is_user_alive(iKiller) || !iClan[iKiller])
-		return PLUGIN_CONTINUE;
-	
-	new aClan[ClanInfo];
-	ArrayGetArray(gClans, iClan[iKiller], aClan);
-	
-	aClan[KILLS]++;
-	ArraySetArray(gClans, iClan[iKiller], aClan);
-	
-	SaveClan(iClan[iKiller]);
+	cod_add_user_gravity(id, -gravityPerLevel * get_clan_info(clan[id], CLAN_GRAVITY));
 	
 	return PLUGIN_CONTINUE;
 }
 
-public ClanMenu(id)
+public cod_damage_post(attacker, victim, Float:damage, damageBits)
+{
+	if(!clan[attacker]) return PLUGIN_CONTINUE;
+	
+	cod_inflict_damage(attacker, victim, damage * damagePerLevel * get_clan_info(clan[attacker], CLAN_DAMAGE) / 100.0, 0.0, damageBits);
+	
+	if(get_clan_info(clan[attacker], CLAN_DROP) && random_num(1, (skillMax * 1.6 - (get_clan_info(clan[attacker], CLAN_DROP) * weaponDropPerLevel)) == 1)) engclient_cmd(victim, "drop");
+	
+	return PLUGIN_CONTINUE;
+}
+
+public cod_killed(killer, victim, weaponId, hitPlace)
+{
+	if(!clan[killer]) return PLUGIN_CONTINUE;
+	
+	set_clan_info(clan[killer], CLAN_KILLS, get_clan_info(clan[killer], CLAN_KILLS) + 1);
+	
+	return PLUGIN_CONTINUE;
+}
+
+public show_clan_menu(id, sound)
 {	
-	if(!is_user_connected(id))
-		return PLUGIN_HANDLED;
-		
-	if(!cod_check_account(id)) return PLUGIN_HANDLED;
+	if(!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
 	
-	client_cmd(id, "spk CodMod/select2");
+	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new aClan[ClanInfo], szMenu[128], menu;
+	new codClan[clanInfo], menuData[128], menu;
 	
-	if(iClan[id])
+	if(clan[id])
 	{
-		ArrayGetArray(gClans, iClan[id], aClan);
+		ArrayGetArray(codClans, clan[id], codClan);
 		
-		formatex(szMenu, charsmax(szMenu), "\wMenu \rKlanu^n\wAktualny Klan:\y %s^n\w(\y%i/%i %s | %i Honoru\w)", aClan[NAME], aClan[MEMBERS], aClan[LEVEL]*iMembersPerLevel+iMaxMembers, aClan[MEMBERS] > 1 ? "Czlonkow" : "Czlonek", aClan[HONOR]);
+		formatex(menuData, charsmax(menuData), "\wMenu \rKlanu^n\wAktualny Klan:\y %s^n\w(\y%i/%i %s | %i Honoru\w)", codClan[CLAN_NAME], codClan[CLAN_MEMBERS], codClan[CLAN_LEVEL] * membersPerLevel + membersStart, codClan[CLAN_MEMBERS] > 1 ? "Czlonkow" : "Czlonek", codClan[CLAN_HONOR]);
 		
-		menu = menu_create(szMenu, "ClanMenu_Handler");
+		menu = menu_create(menuData, "show_clan_menu_handle");
 		
-		if(get_user_status(id, iClan[id]) > MEMBER)
-			menu_additem(menu, "\wZarzadzaj \yKlanem");
+		if(get_user_status(id) > STATUS_MEMBER) menu_additem(menu, "\wZarzadzaj \yKlanem");
 		else 
 		{
-			formatex(szMenu, charsmax(szMenu), "\wStworz \yKlan \r(Wymagany %i Poziom)", iCreateLevel);
-			menu_additem(menu, szMenu);
+			formatex(menuData, charsmax(menuData), "\wStworz \yKlan \r(Wymagany %i Poziom)", createLevel);
+
+			menu_additem(menu, menuData);
 		}
 	}
 	else
 	{
-		menu = menu_create("\wMenu \rKlanu^n\wAktualny Klan:\y Brak", "ClanMenu_Handler");
-		formatex(szMenu, charsmax(szMenu), "\wStworz \yKlan \r(Wymagany %i Poziom)", iCreateLevel);
-		menu_additem(menu, szMenu);
+		menu = menu_create("\wMenu \rKlanu^n\wAktualny Klan:\y Brak", "show_clan_menu_handle");
+
+		formatex(menuData, charsmax(menuData), "\wStworz \yKlan \r(Wymagany %i Poziom)", createLevel);
+		menu_additem(menu, menuData);
 	}
 	
-	new callback = menu_makecallback("ClanMenu_Callback");
+	new callback = menu_makecallback("show_clan_menu_callback");
 
 	menu_additem(menu, "\wOpusc \yKlan", _, _, callback);
 	menu_additem(menu, "\wCzlonkowie \yOnline", _, _, callback);
 	menu_additem(menu, "\wWplac \yHonor", _, _, callback);
 	menu_additem(menu, "\wTop15 \yKlanow", _, _, callback);
 	
-	menu_setprop(menu, MPROP_NOCOLORS, 1);
-	menu_setprop(menu, MPROP_NUMBER_COLOR, "\r");
-	
 	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
 	
 	menu_display(id, menu);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
-public ClanMenu_Callback(id, menu, item)
+public show_clan_menu_callback(id, menu, item)
 {
 	switch(item)
 	{
-		case 1, 3, 4: return iClan[id] ? ITEM_ENABLED : ITEM_DISABLED;
-		case 2: 
-		{
-			if(iClan[id] && get_user_status(id, iClan[id]) > MEMBER)
-			{
-				new aClan[ClanInfo];
-				ArrayGetArray(gClans, iClan[id], aClan);
-				
-				if(((aClan[LEVEL]*iMembersPerLevel) + iMaxMembers) > aClan[MEMBERS])
-					return ITEM_ENABLED;
-			}
-			return ITEM_DISABLED;
-		}
+		case 1, 3, 4: return clan[id] ? ITEM_ENABLED : ITEM_DISABLED;
+		case 2: if(get_user_status(id) < STATUS_DEPUTY || ((get_clan_info(clan[id], CLAN_LEVEL) * membersPerLevel) + membersStart) <= get_clan_info(clan[id], CLAN_MEMBERS)) return ITEM_DISABLED;
 	}
+
 	return ITEM_ENABLED;
 }
 
-public ClanMenu_Handler(id, menu, item)
+public show_clan_menu_handle(id, menu, item)
 {
-	if(!is_user_connected(id))
-		return PLUGIN_CONTINUE;
-		
-	client_cmd(id, "spk CodMod/select2");
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
 	
 	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
-		return PLUGIN_CONTINUE;
+
+		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	switch(item)
 	{
 		case 0: 
 		{
-			if(get_user_status(id, iClan[id]) > MEMBER)
+			if(get_user_status(id) > STATUS_MEMBER)
 			{
-				ShowLeaderMenu(id);
+				leader_menu(id);
+
 				return PLUGIN_HANDLED;
 			}
 			
-			if(iClan[id])
+			if(clan[id])
 			{
-				cod_print_chat(id,  "Nie mozesz utworzyc klanu, jesli w jakims jestes!");
+				cod_print_chat(id, "Nie mozesz utworzyc klanu, jesli w jakims jestes!");
+
 				return PLUGIN_HANDLED;
 			}
 			
-			if(cod_get_user_level(id) < iCreateLevel)
+			if(cod_get_user_level(id) < createLevel)
 			{
-				cod_print_chat(id,  "Nie masz wystarczajacego poziomu by stworzyc klan (Wymagany^x03 %i^x01)!", iCreateLevel);
+				cod_print_chat(id, "Nie masz wystarczajacego poziomu by stworzyc klan (Wymagany^x03 %i^x01)!", createLevel);
+
 				return PLUGIN_HANDLED;
 			}
 			
-			client_cmd(id, "messagemode Nazwa");
+			client_cmd(id, "messagemode PODAJ_NAZWE_KLANU");
 		}
-		case 1: ShowLeaveConfirmMenu(id);
-		case 2: ShowMembersOnlineMenu(id);
-		case 3: 
+		case 1: leave_confim_menu(id);
+		case 2: members_online_menu(id);
+		case 3:
 		{
-			client_cmd(id, "messagemode Ilosc_Honoru");
-			cod_print_chat(id,  "Wpisz ilosc Honoru, ktora chcesz wplacic.");
+			client_cmd(id, "messagemode WPISZ_ILOSC_HONORU");
+
+			client_print(id, print_center, "Wpisz ilosc Honoru, ktora chcesz wplacic");
+
+			cod_print_chat(id, "Wpisz ilosc Honoru, ktora chcesz wplacic.");
 		}
-		case 4: Clans_Top15(id);
+		case 4: clans_top15(id);
 	}
 	
 	menu_destroy(menu);
+
 	return PLUGIN_CONTINUE;
 }
 
-public CmdCreateClan(id)
+public create_clan_handle(id)
 {
-	if(iClan[id])
-	{
-		cod_print_chat(id,  "Nie mozesz utworzyc klanu, jesli w jakims jestes!");
-		return PLUGIN_HANDLED;
-	}
-	
-	if(cod_get_user_level(id) < iCreateLevel)
-	{
-		cod_print_chat(id,  "Nie masz wystarczajaco duzego poziomu (Wymagany: %i)!", iCreateLevel);
-		return PLUGIN_HANDLED;
-	}
-	
-	new szName[64], szTempName[64];
-	
-	read_args(szName, charsmax(szName));
-	remove_quotes(szName);
-	
-	if(equal(szName, ""))
-	{
-		cod_print_chat(id,  "Nie wpisano nazwy klanu.");
-		ClanMenu(id);
-		return PLUGIN_HANDLED;
-	}
-	
-	mysql_escape_string(szName, szTempName, charsmax(szTempName));
-	
-	if(CheckClanName(szTempName))
-	{
-		cod_print_chat(id,  "Klan z taka nazwa juz istnieje.");
-		ClanMenu(id);
-		return PLUGIN_HANDLED;
-	}
-	
-	new aClan[ClanInfo];
-	
-	copy(aClan[NAME], charsmax(aClan[NAME]), szName);
-	aClan[LEVEL] = 0;
-	aClan[HONOR] = 0;
-	aClan[SPEED] = 0;
-	aClan[GRAVITY] = 0;
-	aClan[DROP] = 0;
-	aClan[DAMAGE] = 0;
-	aClan[PASSWORD] = 0;
-	aClan[MEMBERS] = 0;
-	aClan[STATUS] = _:TrieCreate();
-	
-	ArrayPushArray(gClans, aClan);
-	
-	formatex(szCache, charsmax(szCache), "INSERT INTO `clans` (`clan_name`) VALUES ('%s');", szTempName);
-	log_to_file("addons/amxmodx/logs/cod_clans.log", "Utworzenie Klanu: %s", szCache);
-	SQL_ThreadQuery(hSqlTuple, "Table_Handle", szCache);
-	
-	set_user_clan(id, ArraySize(gClans) - 1, 1);
-	set_user_status(id, ArraySize(gClans) - 1, LEADER);
-	
-	cod_print_chat(id,  "Pomyslnie zalozyles klan^x03 %s^01.", szName);
-	cod_print_chat(id,  "Teraz wpisz haslo, ktore pozwoli na zarzadzanie klanem.");
-	client_print(id, print_center, "Wpisz haslo pozwalajace zarzadzac klanem!");
-	
-	client_cmd(id, "messagemode Ustaw_Haslo");
-	
-	return PLUGIN_HANDLED;
-}
-
-public CmdSetPassword(id)
-{
-	if(!iClan[id])
-	{
-		cod_print_chat(id,  "Nie mozesz ustawic hasla, bo nie masz klanu!");
-		return PLUGIN_HANDLED;
-	}
-	
-	new szPassword[32];
-	
-	read_args(szPassword, charsmax(szPassword));
-	remove_quotes(szPassword);
-	
-	if(equal(szPassword, ""))
-	{
-		cod_print_chat(id,  "Nie wpisano hasla zarzadzania klanem. Wpisz je teraz!");
-		client_cmd(id, "messagemode Ustaw_Haslo");
-		return PLUGIN_HANDLED;
-	}
-	
-	new aClan[ClanInfo];
-	ArrayGetArray(gClans, iClan[id], aClan);
-	
-	copy(aClan[PASSWORD], charsmax(aClan[PASSWORD]), szPassword);
-	ArraySetArray(gClans, iClan[id], aClan);
-	
-	SaveClan(iClan[id]);
-	
-	client_print(id, print_center, "Haslo zostalo ustawione!");
-	cod_print_chat(id,  "Haslo zarzadzania klanem zostalo ustawione.");
-	cod_print_chat(id,  "Wpisz w konsoli^x03 setinfo ^"_klan^" ^"%s^"^x01.", szPassword);
-	
-	Set(id, iPassword);
-	
-	cmd_execute(id, "setinfo _klan %s", szPassword);
-	cmd_execute(id, "writecfg klan");
-	
-	return PLUGIN_HANDLED;
-}
-
-public ShowLeaveConfirmMenu(id)
-{
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_CONTINUE;
+	if(!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
 		
-	client_cmd(id, "spk CodMod/select2");
+	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+	if(clan[id])
+	{
+		cod_print_chat(id, "Nie mozesz utworzyc klanu, jesli w jakims jestes!");
+
+		return PLUGIN_HANDLED;
+	}
 	
-	new menu = menu_create("\wJestes \ypewien\w, ze chcesz \ropuscic \wklan?", "LeaveConfirmMenu_Handler");
+	if(cod_get_user_level(id) < createLevel)
+	{
+		cod_print_chat(id, "Nie masz wystarczajaco wysokiego poziomu (Wymagany: %i)!", createLevel);
+
+		return PLUGIN_HANDLED;
+	}
+	
+	new clanName[64];
+	
+	read_args(clanName, charsmax(clanName));
+	remove_quotes(clanName);
+	trim(clanName);
+	
+	if(equal(clanName, ""))
+	{
+		cod_print_chat(id, "Nie wpisales nazwy klanu.");
+
+		show_clan_menu(id, 1);
+
+		return PLUGIN_HANDLED;
+	}
+
+	if(strlen(clanName) < 3)
+	{
+		cod_print_chat(id, "Nazwa klanu musi miec co najmniej 3 znaki.");
+
+		show_clan_menu(id, 1);
+
+		return PLUGIN_HANDLED;
+	}
+	
+	if(check_clan_name(clanName))
+	{
+		cod_print_chat(id, "Klan z taka nazwa juz istnieje.");
+
+		show_clan_menu(id, 1);
+
+		return PLUGIN_HANDLED;
+	}
+
+	create_clan(id, clanName);
+	
+	cod_print_chat(id, "Pomyslnie zalozyles klan^x03 %s^01.", clanName);
+	
+	return PLUGIN_HANDLED;
+}
+
+public leave_confim_menu(id)
+{
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
+	
+	new menu = menu_create("\wJestes \ypewien\w, ze chcesz \ropuscic \wklan?", "leave_confim_menu_handle");
+	
+	menu_additem(menu, "Tak");
+	menu_additem(menu, "Nie^n");
+	
+	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
+	
+	menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public leave_confim_menu_handle(id, menu, item)
+{
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
+	
+	if(item == MENU_EXIT)
+	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	switch(item)
+	{
+		case 0: 
+		{
+			if(get_user_status(id) == STATUS_LEADER)
+			{
+				cod_print_chat(id, "Oddaj przywodctwo klanu jednemu z czlonkow zanim go upuscisz.");
+
+				show_clan_menu(id, 1);
+
+				return PLUGIN_HANDLED;
+			}
+
+			set_user_clan(id);
+			
+			cod_print_chat(id, "Opusciles swoj klan.");
+			
+			show_clan_menu(id, 1);
+		}
+		case 1: show_clan_menu(id, 1);
+	}
+
+	return PLUGIN_HANDLED;
+}
+
+public members_online_menu(id)
+{
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
+	
+	new clanName[64], players[32], playersNum, playersAvailable = 0;
+
+	get_players(players, playersNum);
+	
+	new menu = menu_create("\wCzlonkowie \rOnline:", "members_online_menu_handle");
+	
+	for(new i = 0, player; i < playersNum; i++)
+	{
+		player = players[i];
+		
+		if(clan[id] != clan[player]) continue;
+			
+		playersAvailable++;
+		
+		get_user_name(player, clanName, charsmax(clanName));
+		
+		switch(get_user_status(player))
+		{
+			case STATUS_MEMBER: add(clanName, charsmax(clanName), " \y[Czlonek]");
+			case STATUS_DEPUTY: add(clanName, charsmax(clanName), " \y[Zastepca]");
+			case STATUS_LEADER: add(clanName, charsmax(clanName), " \y[Przywodca]");
+		}
+		menu_additem(menu, clanName);
+	}
+	
+	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
+	
+	if(!playersAvailable) cod_print_chat(id, "Na serwerze nie ma zadnego czlonka twojego klanu!");
+	else menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public members_online_menu_handle(id, menu, item)
+{
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
+	
+	if(item == MENU_EXIT)
+	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		show_clan_menu(id, 1);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	menu_destroy(menu);
+	
+	members_online_menu(id);
+	
+	return PLUGIN_HANDLED;
+}
+
+public leader_menu(id)
+{
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
+	
+	new menu = menu_create("\wZarzadzaj \rKlanem", "leader_menu_handle"), callback = menu_makecallback("leader_menu_callback");
+
+	menu_additem(menu, "\wRozwiaz \yKlan", _, _, callback);
+	menu_additem(menu, "\wUlepsz \yUmiejetnosci", _, _, callback);
+	menu_additem(menu, "\wZapros \yGracza", _, _, callback);
+	menu_additem(menu, "\wZarzadzaj \yCzlonkami", _, _, callback);
+	menu_additem(menu, "\wZmien \yNazwe Klanu^n", _, _, callback);
+	menu_additem(menu, "\wWroc", _, _, callback);
+		
+	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
+	
+	menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public leader_menu_callback(id, menu, item)
+{
+	switch(item)
+	{
+		case 1: get_user_status(id) == STATUS_LEADER ? ITEM_ENABLED : ITEM_DISABLED;
+		case 2: if(((get_clan_info(clan[id], CLAN_LEVEL) * membersPerLevel) + membersStart) <= get_clan_info(clan[id], CLAN_MEMBERS)) return ITEM_DISABLED;
+	}
+
+	return ITEM_ENABLED;
+}
+
+public leader_menu_handle(id, menu, item)
+{
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
+	
+	if(item == MENU_EXIT)
+	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		show_clan_menu(id, 1);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	switch(item)
+	{
+		case 0: disband_menu(id);
+		case 1: skills_menu(id);
+		case 2: invite_menu(id);
+		case 3: members_menu(id);
+		case 4: client_cmd(id, "messagemode PODAJ_NOWA_NAZWE_KLANU");
+		case 5: show_clan_menu(id, 1);
+	}
+	return PLUGIN_HANDLED;
+}
+
+public disband_menu(id)
+{
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
+	
+	new menu = menu_create("\wJestes \ypewien\w, ze chcesz \rrozwiazac\w klan?", "disband_menu_handle");
 	
 	menu_additem(menu, "Tak", "0");
 	menu_additem(menu, "Nie^n", "1");
 	
 	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
 	
-	menu_display(id, menu, 0);
-	return PLUGIN_CONTINUE;
-}
+	menu_display(id, menu);
 
-public LeaveConfirmMenu_Handler(id, menu, item)
-{
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk CodMod/select2");
-	
-	if(item == MENU_EXIT)
-	{
-		menu_destroy(menu);
-		return PLUGIN_HANDLED;
-	}
-	
-	new szData[6], iAccess, iCallback;
-	menu_item_getinfo(menu, item, iAccess, szData, charsmax(szData), _, _, iCallback);
-	
-	new aClan[ClanInfo];
-	ArrayGetArray(gClans, iClan[id], aClan);
-	
-	switch(str_to_num(szData))
-	{
-		case 0: 
-		{
-			if(get_user_status(id, iClan[id]) == LEADER)
-			{
-				cod_print_chat(id,  "Oddaj przywodctwo klanu jednemu z czlonkow zanim go upuscisz.");
-				ClanMenu(id);
-				return PLUGIN_HANDLED;
-			}
-			
-			log_to_file("addons/amxmodx/logs/cod_clans.log", "Opuszczenie Klanu: %s", szMemberName[id]);
-			
-			cod_print_chat(id,  "Opusciles swoj klan.");
-			
-			set_user_clan(id);
-			
-			ClanMenu(id);
-		}
-		case 1: ClanMenu(id);
-	}
 	return PLUGIN_HANDLED;
 }
 
-public ShowMembersOnlineMenu(id)
+public disband_menu_handle(id, menu, item)
 {
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_CONTINUE;
-		
-	client_cmd(id, "spk CodMod/select2");
-	
-	new szName[64], iPlayers[32], iNum, iNumPlayers = 0;
-	get_players(iPlayers, iNum);
-	
-	new menu = menu_create("\wCzlonkowie \rOnline:", "MembersOnlineMenu_Handler");
-	
-	for(new i = 0, iPlayer; i < iNum; i++)
-	{
-		iPlayer = iPlayers[i];
-		
-		if(iClan[id] != iClan[iPlayer])
-			continue;
-			
-		iNumPlayers++;
-		
-		get_user_name(iPlayer, szName, charsmax(szName));
-		
-		switch(get_user_status(iPlayer, iClan[id]))
-		{
-			case MEMBER: add(szName, charsmax(szName), " \y[Czlonek]");
-			case DEPUTY: add(szName, charsmax(szName), " \y[Zastepca]");
-			case LEADER: add(szName, charsmax(szName), " \y[Przywodca]");
-		}
-		menu_additem(menu, szName);
-	}
-	
-	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
-	menu_display(id, menu, 0);
-	
-	if(!iNumPlayers)
-	{
-		menu_destroy(menu);
-		cod_print_chat(id,  "Na serwerze nie ma zadnego czlonka twojego klanu!");
-	}
-	return PLUGIN_CONTINUE;
-}
-
-public MembersOnlineMenu_Handler(id, menu, item)
-{
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_CONTINUE;
-		
-	client_cmd(id, "spk CodMod/select2");
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
 	
 	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
-		ClanMenu(id);
+
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
+	switch(item)
+	{
+		case 0: 
+		{
+			cod_print_chat(id, "Rozwiazales swoj klan.");
+			
+			remove_clan(id);
+			
+			show_clan_menu(id, 1);
+		}
+		case 1: show_clan_menu(id, 1);
+	}
+
 	menu_destroy(menu);
-	
-	ShowMembersOnlineMenu(id);
-	
+
 	return PLUGIN_HANDLED;
 }
 
-public CmdCheckPassword(id)
+public skills_menu(id)
 {
-	if(!iClan[id] || get_user_status(id, iClan[id]) < DEPUTY)
-		return PLUGIN_HANDLED;
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
 	
-	new szPassword[32];
-	read_args(szPassword, charsmax(szPassword));
-	
-	remove_quotes(szPassword);
-	
-	if(equal(szPassword, ""))
-	{
-		cod_print_chat(id,  "Nie wpisales hasla zarzadzania klanem!");
-		ClanMenu(id);
-		return PLUGIN_HANDLED;
-	}
-	
-	new aClan[ClanInfo];
-	ArrayGetArray(gClans, iClan[id], aClan);
-	
-	if(!equal(aClan[PASSWORD], szPassword))
-	{
-		cod_print_chat(id,  "Podane haslo zarzadzania klanem jest nieprawidlowe!");
-		ClanMenu(id);
-		return PLUGIN_HANDLED;
-	}
-	
-	Set(id, iPassword);
-	
-	cod_print_chat(id,  "Wpisane haslo jest prawidlowe.");
-	
-	ShowLeaderMenu(id);
-	
-	return PLUGIN_HANDLED;
-}
+	new codClan[clanInfo], menuData[128];
 
-public ShowLeaderMenu(id)
-{
-	if(Get(id, iPassword))
-	{
-		if(!is_user_connected(id) || !iClan[id])
-			return PLUGIN_CONTINUE;
-		
-		client_cmd(id, "spk CodMod/select2");
+	ArrayGetArray(codClans, clan[id], codClan);
 	
-		new menu = menu_create("\wZarzadzaj \rKlanem", "LeaderMenu_Handler");
-		
-		new callback = menu_makecallback("LeaderMenu_Callback");
+	formatex(menuData, charsmax(menuData), "\wMenu \rUmiejetnosci^n\rHonor Klanu: %i", codClan[CLAN_HONOR]);
 
-		menu_additem(menu, "\wRozwiaz \yKlan", _, _, callback);
-		menu_additem(menu, "\wUlepsz \yUmiejetnosci", _, _, callback);
-		menu_additem(menu, "\wZapros \yGracza", "3", _, callback);
-		menu_additem(menu, "\wZarzadzaj \yCzlonkami", "4", _, callback);
-		menu_additem(menu, "\wZmien \yNazwe Klanu^n", "5", _, callback);
-		menu_additem(menu, "\wWroc", "6", _, callback);
-		
-		menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
+	new menu = menu_create(menuData, "skills_menu_handle");
 	
-		menu_display(id, menu, 0);
-	}
-	else
-	{
-		client_cmd(id, "messagemode Podaj_Haslo");
-		cod_print_chat(id,  "Wpisz jednorazowo haslo zarzadzania klanem.");
-		client_print(id, print_center, "Wpisz haslo zarzadzania klanem");
-	}
-	return PLUGIN_CONTINUE;
-}
+	formatex(menuData, charsmax(menuData), "Poziom Klanu \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_LEVEL], levelMax, levelCost + nextLevelCost * codClan[CLAN_LEVEL]);
+	menu_additem(menu, menuData);
 
-public LeaderMenu_Callback(id, menu, item)
-{
-	switch(item)
-	{
-		case 1: get_user_status(id, iClan[id]) == LEADER ? ITEM_ENABLED : ITEM_DISABLED;
-		case 2: 
-		{
-			new aClan[ClanInfo];
-			ArrayGetArray(gClans, iClan[id], aClan);
-				
-			if(((aClan[LEVEL]*iMembersPerLevel) + iMaxMembers) <= aClan[MEMBERS])
-				return ITEM_DISABLED;
-		}
-	}
-	return ITEM_ENABLED;
-}
+	formatex(menuData, charsmax(menuData), "Zycie \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_HEALTH], skillMax, skillCost + nextSkillCost * codClan[CLAN_HEALTH]);
+	menu_additem(menu, menuData);
 
-public LeaderMenu_Handler(id, menu, item)
-{
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk CodMod/select2");
-	
-	if(item == MENU_EXIT)
-	{
-		ClanMenu(id);
-		return PLUGIN_HANDLED;
-	}
-	
-	switch(item)
-	{
-		case 0: ShowDisbandConfirmMenu(id);
-		case 1: ShowSkillsMenu(id);
-		case 2: ShowInviteMenu(id);
-		case 3: ShowMembersMenu(id);
-		case 4: client_cmd(id, "messagemode Nowa_Nazwa");
-		case 5: ClanMenu(id);
-	}
-	return PLUGIN_HANDLED;
-}
+	formatex(menuData, charsmax(menuData), "Grawitacja \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_GRAVITY], skillMax, skillCost + nextSkillCost * codClan[CLAN_GRAVITY]);
+	menu_additem(menu, menuData);
 
-public ShowDisbandConfirmMenu(id)
-{
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_CONTINUE;
-		
-	client_cmd(id, "spk CodMod/select2");
-	
-	new menu = menu_create("\wJestes \ypewien\w, ze chcesz \rrozwiazac\w klan?", "DisbandConfirmMenu_Handler");
-	
-	menu_additem(menu, "Tak", "0");
-	menu_additem(menu, "Nie^n", "1");
-	
-	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
-	
-	menu_display(id, menu, 0);
-	return PLUGIN_CONTINUE;
-}
+	formatex(menuData, charsmax(menuData), "Obrazenia \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_DAMAGE], skillMax, skillCost + nextSkillCost * codClan[CLAN_DAMAGE]);
+	menu_additem(menu, menuData);
 
-public DisbandConfirmMenu_Handler(id, menu, item)
-{
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk CodMod/select2");
+	formatex(menuData, charsmax(menuData), "Obezwladnienie \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_DROP], skillMax, skillCost + nextSkillCost * codClan[CLAN_DROP]);
+	menu_additem(menu, menuData);
 	
-	if(item == MENU_EXIT)
-		return PLUGIN_HANDLED;
-	
-	new szData[6], iAccess, iCallback;
-	menu_item_getinfo(menu, item, iAccess, szData, charsmax(szData), _, _, iCallback);
-	
-	switch(str_to_num(szData))
-	{
-		case 0: 
-		{
-			new szTempName[64], iPlayers[32], aClan[ClanInfo], iNum, iPlayer, iPlayerClan;
-			
-			ArrayGetArray(gClans, iClan[id], aClan);
-			
-			get_players(iPlayers, iNum);
-			
-			for(new i = 0; i < iNum; i++)
-			{
-				iPlayer = iPlayers[i];
-				
-				if(iPlayer == id)
-					continue;
-				
-				if(iClan[id] != iClan[iPlayer] || is_user_hltv(iPlayer) || !is_user_connected(iPlayer))
-					continue;
-
-				set_user_clan(iPlayer);
-				
-				cod_print_chat(iPlayer,  "Twoj klan zostal rozwiazany.");
-			}
-			
-			iPlayerClan = iClan[id];
-			set_user_clan(id);
-			
-			cod_print_chat(id,  "Rozwiazales swoj klan.");
-			
-			mysql_escape_string(aClan[NAME], szTempName, charsmax(szTempName));
-			
-			formatex(szCache, charsmax(szCache), "DELETE FROM `clans` WHERE clan_name = '%s'", szTempName);
-			SQL_ThreadQuery(hSqlTuple, "Table_Handle", szCache);
-			log_to_file("addons/amxmodx/logs/cod_clans.log", "Rozwiazanie Klanu (1): %s", szCache);
-			
-			formatex(szCache, charsmax(szCache), "UPDATE `clans_members` SET flag = '0', clan = '' WHERE clan = '%s'", szTempName);
-			SQL_ThreadQuery(hSqlTuple, "Table_Handle", szCache);
-			log_to_file("addons/amxmodx/logs/cod_clans.log", "Rozwiazanie Klanu (2): %s", szCache);
-			
-			ArrayDeleteItem(gClans, iPlayerClan);
-			
-			ClanMenu(id);
-		}
-		case 1: ClanMenu(id);
-	}
-	return PLUGIN_HANDLED;
-}
-
-public ShowSkillsMenu(id)
-{	
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_CONTINUE;
-		
-	client_cmd(id, "spk CodMod/select2");
-		
-	new aClan[ClanInfo];
-	ArrayGetArray(gClans, iClan[id], aClan);
-	
-	new szMenu[128];
-	
-	formatex(szMenu, charsmax(szMenu), "\wMenu \rUmiejetnosci^n\rHonor Klanu: %i", aClan[HONOR]);
-	new menu = menu_create(szMenu, "SkillsMenu_Handler");
-	
-	formatex(szMenu, charsmax(szMenu), "Poziom Klanu \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", aClan[LEVEL], iLevelMax, iLevelCost+iNextLevelCost*aClan[LEVEL]);
-	menu_additem(menu, szMenu, "0");
-	formatex(szMenu, charsmax(szMenu), "Predkosc \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", aClan[SPEED], iSpeedMax, iSpeedCost+iNextSpeedCost*aClan[SPEED]);
-	menu_additem(menu, szMenu, "1");
-	formatex(szMenu, charsmax(szMenu), "Grawitacja \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", aClan[GRAVITY], iGravityMax, iGravityCost+iNextGravityCost*aClan[GRAVITY]);
-	menu_additem(menu, szMenu, "2");
-	formatex(szMenu, charsmax(szMenu), "Obrazenia \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", aClan[DAMAGE], iDamageMax, iDamageCost+iNextDamageCost*aClan[DAMAGE]);
-	menu_additem(menu, szMenu, "3");
-	formatex(szMenu, charsmax(szMenu), "Obezwladnienie \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", aClan[DROP], iWeaponDropMax, iWeaponDropCost+iNextWeaponDropCost*aClan[DROP]);
-	menu_additem(menu, szMenu, "4");
-	
-	menu_setprop(menu, MPROP_NOCOLORS, 1);
-	menu_setprop(menu, MPROP_NUMBER_COLOR, "\r");
 	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
 	
 	menu_display(id, menu);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
-public SkillsMenu_Handler(id, menu, item)
+public skills_menu_handle(id, menu, item)
 {
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_CONTINUE;
-		
-	client_cmd(id, "spk CodMod/select2");
-		
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
+	
 	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
-		ClanMenu(id);
-		return PLUGIN_CONTINUE;
+
+		show_clan_menu(id, 1);
+
+		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new aClan[ClanInfo], iUpgraded;
-	ArrayGetArray(gClans, iClan[id], aClan);
+	new codClan[clanInfo], upgradedSkill;
+
+	ArrayGetArray(codClans, clan[id], codClan);
+
+	menu_destroy(menu);
 	
 	switch(item)
 	{
 		case 0:
 		{
-			if(aClan[LEVEL] == iLevelMax)
+			if(codClan[CLAN_LEVEL] == levelMax)
 			{
-				cod_print_chat(id,  "Twoj klan ma juz maksymalny Poziom.");
-				ShowSkillsMenu(id);
+				cod_print_chat(id, "Twoj klan ma juz maksymalny Poziom.");
+
+				skills_menu(id);
+
 				return PLUGIN_HANDLED;
 			}
 			
-			new iRemaining = aClan[HONOR] - (iLevelCost + iNextLevelCost*aClan[LEVEL]);
+			new remainingHonor = codClan[CLAN_HONOR] - (levelCost + nextLevelCost * codClan[CLAN_LEVEL]);
 			
-			if(iRemaining < 0)
+			if(remainingHonor < 0)
 			{
-				cod_print_chat(id,  "Twoj klan nie ma wystarczajacej ilosci Honoru.");
-				ShowSkillsMenu(id);
+				cod_print_chat(id, "Twoj klan nie ma wystarczajacej ilosci Honoru.");
+
+				skills_menu(id);
+
 				return PLUGIN_HANDLED;
 			}
 			
-			iUpgraded = 1;
+			upgradedSkill = CLAN_LEVEL;
 			
-			aClan[LEVEL]++;
-			aClan[HONOR] = iRemaining;
+			codClan[CLAN_LEVEL]++;
+			codClan[CLAN_HONOR] = remainingHonor;
 			
-			cod_print_chat(id,  "Ulepszyles klan na^x03 %i Poziom^x01!", aClan[LEVEL]);
+			cod_print_chat(id, "Ulepszyles klan na^x03 %i Poziom^x01!", codClan[CLAN_LEVEL]);
 		}
 		case 1:
 		{
-			if(aClan[SPEED] == iSpeedMax)
+			if(codClan[CLAN_HEALTH] == skillMax)
 			{
-				cod_print_chat(id,  "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
-				ShowSkillsMenu(id);
+				cod_print_chat(id, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
+
+				skills_menu(id);
+
 				return PLUGIN_HANDLED;
 			}
 			
-			new iRemaining = aClan[HONOR] - (iSpeedCost + iNextSpeedCost*aClan[SPEED]);
+			new remainingHonor = codClan[CLAN_HONOR] - (skillCost + nextSkillCost * codClan[CLAN_HEALTH]);
 			
-			if(iRemaining < 0)
+			if(remainingHonor < 0)
 			{
-				cod_print_chat(id,  "Twoj klan nie ma wystarczajacej ilosci Honoru.");
-				ShowSkillsMenu(id);
+				cod_print_chat(id, "Twoj klan nie ma wystarczajacej ilosci Honoru.");
+
+				skills_menu(id);
+
 				return PLUGIN_HANDLED;
 			}
 			
-			iUpgraded = 2;
+			upgradedSkill = CLAN_HEALTH;
 			
-			aClan[SPEED]++;
-			aClan[HONOR] = iRemaining;
+			codClan[CLAN_HEALTH]++;
+			codClan[CLAN_HONOR] = remainingHonor;
+
+			cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + get_clan_info(clan[id], CLAN_HEALTH) * healthPerLevel);
 			
-			cod_print_chat(id,  "Ulepszyles umiejetnosc^x03 Predkosc^x01 na^x03 %i^x01 poziom!", aClan[SPEED]);
+			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Predkosc^x01 na^x03 %i^x01 poziom!", codClan[CLAN_HEALTH]);
 		}
 		case 2:
 		{
-			if(aClan[GRAVITY] == iGravityMax)
+			if(codClan[CLAN_GRAVITY] == skillMax)
 			{
-				cod_print_chat(id,  "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
-				ShowSkillsMenu(id);
+				cod_print_chat(id, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
+
+				skills_menu(id);
+
 				return PLUGIN_HANDLED;
 			}
 			
-			new iRemaining = aClan[HONOR] - (iGravityCost + iNextGravityCost*aClan[GRAVITY]);
+			new remainingHonor = codClan[CLAN_HONOR] - (skillCost + nextSkillCost * codClan[CLAN_GRAVITY]);
 			
-			if(iRemaining < 0)
+			if(remainingHonor < 0)
 			{
-				cod_print_chat(id,  "Twoj klan nie ma wystarczajacej ilosci Honoru.");
-				ShowSkillsMenu(id);
+				cod_print_chat(id, "Twoj klan nie ma wystarczajacej ilosci Honoru.");
+
+				skills_menu(id);
+
 				return PLUGIN_HANDLED;
 			}
 			
-			iUpgraded = 3;
+			upgradedSkill = CLAN_GRAVITY;
 			
-			aClan[GRAVITY]++;
-			aClan[HONOR] = iRemaining;
+			codClan[CLAN_GRAVITY]++;
+			codClan[CLAN_HONOR] = remainingHonor;
 			
-			cod_print_chat(id,  "Ulepszyles umiejetnosc^x03 Grawitacja^x01 na^x03 %i^x01 poziom!", aClan[GRAVITY]);
+			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Grawitacja^x01 na^x03 %i^x01 poziom!", codClan[CLAN_GRAVITY]);
 		}
 		case 3:
 		{
-			if(aClan[DAMAGE] == iDamageMax)
+			if(codClan[CLAN_DAMAGE] == skillMax)
 			{
-				cod_print_chat(id,  "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
-				ShowSkillsMenu(id);
+				cod_print_chat(id, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
+
+				skills_menu(id);
+
 				return PLUGIN_HANDLED;
 			}
 			
-			new iRemaining = aClan[HONOR] - (iDamageCost + iNextDamageCost*aClan[DAMAGE]);
+			new remainingHonor = codClan[CLAN_HONOR] - (skillCost + nextSkillCost * codClan[CLAN_DAMAGE]);
 			
-			if(iRemaining < 0)
+			if(remainingHonor < 0)
 			{
-				cod_print_chat(id,  "Twoj klan nie ma wystarczajacej ilosci Honoru.");
-				ShowSkillsMenu(id);
+				cod_print_chat(id, "Twoj klan nie ma wystarczajacej ilosci Honoru.");
+
+				skills_menu(id);
+
 				return PLUGIN_HANDLED;
 			}
 			
-			iUpgraded = 4;
+			upgradedSkill = CLAN_DAMAGE;
 			
-			aClan[DAMAGE]++;
-			aClan[HONOR] = iRemaining;
+			codClan[CLAN_DAMAGE]++;
+			codClan[CLAN_HONOR] = remainingHonor;
 			
-			cod_print_chat(id,  "Ulepszyles umiejetnosc^x03 Obrazenia^x01 na^x03 %i^x01 poziom!", aClan[DAMAGE]);
+			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Obrazenia^x01 na^x03 %i^x01 poziom!", codClan[CLAN_DAMAGE]);
 		}
 		case 4:
 		{
-			if(aClan[DROP] == iWeaponDropMax)
+			if(codClan[CLAN_DROP] == skillMax)
 			{
-				cod_print_chat(id,  "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
-				ShowSkillsMenu(id);
+				cod_print_chat(id, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
+
+				skills_menu(id);
+
 				return PLUGIN_HANDLED;
 			}
 			
-			new iRemaining = aClan[HONOR] - (iWeaponDropCost + iNextWeaponDropCost*aClan[DROP]);
+			new remainingHonor = codClan[CLAN_HONOR] - (skillCost + nextSkillCost * codClan[CLAN_DROP]);
 			
-			if(iRemaining < 0)
+			if(remainingHonor < 0)
 			{
-				cod_print_chat(id,  "Twoj klan nie ma wystarczajacej ilosci Honoru.");
-				ShowSkillsMenu(id);
+				cod_print_chat(id, "Twoj klan nie ma wystarczajacej ilosci Honoru.");
+
+				skills_menu(id);
+
 				return PLUGIN_HANDLED;
 			}
 			
-			iUpgraded = 5;
+			upgradedSkill = CLAN_DROP;
 			
-			aClan[DROP]++;
-			aClan[HONOR] = iRemaining;
+			codClan[CLAN_DROP]++;
+			codClan[CLAN_HONOR] = remainingHonor;
 			
-			cod_print_chat(id,  "Ulepszyles umiejetnosc^x03 Obezwladnienie^x01 na^x03 %i^x01 poziom!", aClan[DROP]);
+			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Obezwladnienie^x01 na^x03 %i^x01 poziom!", codClan[CLAN_DROP]);
 		}
 	}
 	
-	ArraySetArray(gClans, iClan[id], aClan);
+	ArraySetArray(codClans, clan[id], codClan);
+
+	save_clan(clan[id]);
 	
-	new iPlayers[32], iNum, iPlayer, szName[32];
+	new players[32], playersNum, player, name[32];
 	
-	get_players(iPlayers, iNum);
-	get_user_name(id, szName, charsmax(szName));
+	get_players(players, playersNum);
+	get_user_name(id, name, charsmax(name));
 	
-	for(new i = 0 ; i < iNum; i++)
+	for(new i = 0 ; i < playersNum; i++)
 	{
-		iPlayer = iPlayers[i];
+		player = players[i];
 		
-		if(iPlayer == id || iClan[iPlayer] != iClan[id])
-			continue;
-		
-		switch(iUpgraded)
-		{
-			case 1: cod_print_chat(iPlayer,  "^x03 %s^x01 ulepszyl klan na^x03 %i Poziom^x01!", szName, aClan[LEVEL]);
-			case 2: cod_print_chat(iPlayer,  "^x03 %s^x01 ulepszyl umiejetnosc^x03 Predkosc^x01 na^x03 %i^x01 poziom!", szName, aClan[SPEED]);
-			case 3: cod_print_chat(iPlayer,  "^x03 %s^x01 ulepszyl umiejetnosc^x03 Grawitacja^x01 na^x03 %i^x01 poziom!", szName, aClan[GRAVITY]);
-			case 4: cod_print_chat(iPlayer,  "^x03 %s^x01 ulepszyl umiejetnosc^x03 Obrazenia^x01 na^x03 %i^x01 poziom!", szName, aClan[DAMAGE]);
-			case 5: cod_print_chat(iPlayer,  "^x03 %s^x01 ulepszyl umiejetnosc^x03 Obezwladnienie^x01 na^x03 %i^x01 poziom!", szName, aClan[DROP]);
-		}
+		if(player == id || clan[player] != clan[id]) continue;
+
+		cod_set_user_bonus_health(player, cod_get_user_bonus_health(player) + get_clan_info(clan[player], CLAN_HEALTH) * healthPerLevel);
+
+		cod_print_chat(player, "^x03 %s^x01 ulepszyl klan na^x03 %i Poziom^x01!", name, codClan[upgradedSkill]);
 	}
 	
-	SaveClan(iClan[id]);
-	
-	ShowSkillsMenu(id);
+	skills_menu(id);
 	
 	return PLUGIN_HANDLED;
 }
 
-public ShowInviteMenu(id)
+public invite_menu(id)
 {	
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_CONTINUE;
-		
-	client_cmd(id, "spk CodMod/select2");
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
 	
-	new szName[32], iPlayers[32], szInfo[6], iNum, iNumPlayers = 0;
-	get_players(iPlayers, iNum);
-	
-	new menu = menu_create("\wWybierz \rGracza \wdo zaproszenia:", "InviteMenu_Handler");
-	
-	for(new i = 0, iPlayer; i < iNum; i++)
-	{
-		iPlayer = iPlayers[i];
-		
-		if(iPlayer == id || iClan[iPlayer] == iClan[id] || is_user_hltv(iPlayer) || !is_user_connected(iPlayer))
-			continue;
+	new userName[64], players[32], userId[6], playersNum, playersAvailable = 0;
 
-		iNumPlayers++;
+	get_players(players, playersNum);
+	
+	new menu = menu_create("\wWybierz \rGracza \wdo zaproszenia:", "invite_menu_handle");
+	
+	for(new i = 0, player; i < playersNum; i++)
+	{
+		player = players[i];
 		
-		get_user_name(iPlayer, szName, charsmax(szName));
-		num_to_str(iPlayer, szInfo, charsmax(szInfo));
-		menu_additem(menu, szName, szInfo);
+		if(player == id || clan[player] || is_user_hltv(player) || !is_user_connected(player)) continue;
+
+		playersAvailable++;
+		
+		get_user_name(player, userName, charsmax(userName));
+
+		num_to_str(player, userId, charsmax(userId));
+
+		menu_additem(menu, userName, userId);
 	}	
 	
-	menu_display(id, menu, 0);
+	if(!playersAvailable) cod_print_chat(id, "Na serwerze nie ma gracza, ktorego moglbys zaprosic!");
+	else menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public invite_menu_handle(id, menu, item)
+{
+	if(!is_user_connected(id)  || !clan[id]) return PLUGIN_HANDLED;
 	
-	if(!iNumPlayers)
+	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		show_clan_menu(id, 1);
+
 		menu_destroy(menu);
-		cod_print_chat(id,  "Na serwerze nie ma gracza, ktorego moglbys zaprosic!");
-	}
-	return PLUGIN_CONTINUE;
-}
 
-public InviteMenu_Handler(id, menu, item)
-{
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_CONTINUE;
-		
-	client_cmd(id, "spk CodMod/select2");
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	if(item == MENU_EXIT)
+	new userName[64], itemData[6], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), userName, charsmax(userName), itemCallback);
+	
+	new player = str_to_num(itemData);
+
+	if(!is_user_connected(player))
 	{
-		ClanMenu(id);
-		return PLUGIN_HANDLED;
-	}
-	
-	new szName[32], szData[6], iAccess, iCallback;
-	menu_item_getinfo(menu, item, iAccess, szData, charsmax(szData), szName, charsmax(szName), iCallback);
-	
-	new iPlayer = str_to_num(szData);
+		cod_print_chat(id, "Wybranego gracza nie ma juz na serwerze.");
 
-	if(!is_user_connected(iPlayer))
 		return PLUGIN_HANDLED;
-		
-	if(!cod_check_account(id)) return PLUGIN_HANDLED;
+	} 
 	
-	ShowInviteConfirmMenu(id, iPlayer);
+	invite_confirm_menu(id, player);
 
-	cod_print_chat(id,  "Zaprosiles %s do do twojego klanu.", szName);
+	cod_print_chat(id, "Zaprosiles^x03 %s^x01 do do twojego klanu.", userName);
 	
-	ClanMenu(id);
+	show_clan_menu(id, 1);
 	
 	return PLUGIN_HANDLED;
 }
 
-public ShowInviteConfirmMenu(id, iPlayer)
+public invite_confirm_menu(id, player)
 {
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_CONTINUE;
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
 		
-	client_cmd(id, "spk CodMod/select2");
+	client_cmd(player, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new szMenuTitle[128], szName[32], szInfo[6], aClan[ClanInfo], menu;
+	new menuData[128], clanName[64], userName[64], userId[6];
 	
-	get_user_name(id, szName, charsmax(szName));
+	get_user_name(id, userName, charsmax(userName));
+
+	get_clan_info(clan[id], CLAN_NAME, clanName, charsmax(clanName));
 	
-	ArrayGetArray(gClans, iClan[id], aClan);
+	formatex(menuData, charsmax(menuData), "^x03%s^x01 zaprosil cie do klanu^x03 %s^x01.", userName, clanName);
 	
-	formatex(szMenuTitle, charsmax(szMenuTitle), "%s zaprosil cie do klanu %s", szName, aClan[NAME]);
+	new menu = menu_create(menuData, "invite_confirm_menu_handler");
 	
-	menu = menu_create(szMenuTitle, "InviteConfirmMenu_Handler");
+	num_to_str(id, userId, charsmax(userId));
 	
-	num_to_str(iClan[id], szInfo, charsmax(szInfo));
+	menu_additem(menu, "Dolacz", userId);
+	menu_additem(menu, "Odrzuc");
 	
-	menu_additem(menu, "Dolacz", szInfo);
-	menu_additem(menu, "Odrzuc", "-1");
-	
-	menu_display(iPlayer, menu, 0);	
-	return PLUGIN_CONTINUE;
+	menu_display(player, menu);	
+
+	return PLUGIN_HANDLED;
 }
 
-public InviteConfirmMenu_Handler(id, menu, item)
+public invite_confirm_menu_handler(id, menu, item)
 {
-	if(!is_user_connected(id) || iClan[id])
-		return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk CodMod/select2");
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
 	if(item == MENU_EXIT)
-		return PLUGIN_HANDLED;
-	
-	new szData[6], iAccess, iCallback;
-	menu_item_getinfo(menu, item, iAccess, szData, charsmax(szData), _, _, iCallback);
-	
-	new iPlayerClan = str_to_num(szData);
-	
-	if(!iPlayerClan) return PLUGIN_HANDLED;
-	
-	if(get_user_status(id, iClan[id]) == LEADER)
 	{
-		cod_print_chat(id,  "Nie mozesz dolaczyc do klanu, jesli jestes zalozycielem innego.");
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
 		return PLUGIN_HANDLED;
 	}
 	
-	new aClan[ClanInfo];
+	new itemData[6], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
 	
-	ArrayGetArray(gClans, iPlayerClan, aClan);
+	new player = str_to_num(itemData);
 	
-	if(((aClan[LEVEL]*iMembersPerLevel) + iMaxMembers) <= aClan[MEMBERS])
+	if(!is_user_connected(id))
 	{
-		cod_print_chat(id,  "Niestety, w tym klanie nie ma juz wolnego miejsca.");
+		cod_print_chat(id, "Gracza, ktory cie zaprosil nie ma juz na serwerze.");
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(player, "spk %s", codSounds[SOUND_SELECT]);
+	
+	if(clan[id])
+	{
+		cod_print_chat(id, "Nie mozesz dolaczyc do klanu, jesli nalezysz do innego.");
+
 		return PLUGIN_HANDLED;
 	}
 	
-	set_user_clan(id, iPlayerClan);
+	if(((get_clan_info(clan[player], CLAN_LEVEL) * membersPerLevel) + membersStart) <= get_clan_info(clan[player], CLAN_MEMBERS))
+	{
+		cod_print_chat(id, "Niestety, w tym klanie nie ma juz wolnego miejsca.");
+
+		return PLUGIN_HANDLED;
+	}
+
+	new clanName[64];
+
+	get_clan_info(clan[player], CLAN_NAME, clanName, charsmax(clanName));
 	
-	cod_print_chat(id,  "Dolaczyles do klanu^x03 %s^01.", aClan[NAME]);
+	set_user_clan(id, clan[player]);
+	
+	cod_print_chat(id, "Dolaczyles do klanu^x03 %s^01.", clanName);
 	
 	return PLUGIN_HANDLED;
 }
 
-public ChangeName_Handle(id)
+public change_name_handle(id)
 {
-	if(!iClan[id] || get_user_status(id, iClan[id]) != LEADER)
-		return PLUGIN_HANDLED;
-	
-	new szName[64], szTempName[64], szOldName[64];
-	
-	read_args(szName, charsmax(szName));
-	remove_quotes(szName);
-	
-	if(equal(szName, ""))
-	{
-		cod_print_chat(id,  "Nie wpisano nowej nazwy klanu.");
-		ClanMenu(id);
-		return PLUGIN_HANDLED;
-	}
-	
-	mysql_escape_string(szName, szTempName, charsmax(szTempName));
-	
-	if(CheckClanName(szTempName))
-	{
-		cod_print_chat(id,  "Klan z taka nazwa juz istnieje.");
-		ClanMenu(id);
-		return PLUGIN_HANDLED;
-	}
-	
-	new aClan[ClanInfo];
-	ArrayGetArray(gClans, iClan[id], aClan);
-	
-	mysql_escape_string(aClan[NAME], szOldName, charsmax(szOldName));
-	
-	copy(aClan[NAME], charsmax(aClan[NAME]), szName);
-	ArraySetArray(gClans, iClan[id], aClan);
-	
-	formatex(szCache, charsmax(szCache), "UPDATE `clans_members` SET clan = '%s' WHERE clan = '%s'", szTempName, szOldName);
-	SQL_ThreadQuery(hSqlTuple, "Table_Handle", szCache);
-	log_to_file("addons/amxmodx/logs/cod_clans.log", "Zmiana Nazwy Klanu (1): %s", szCache);
-	
-	formatex(szCache, charsmax(szCache), "UPDATE `clans` SET clan_name = '%s' WHERE clan_name = '%s'", szTempName, szOldName);
-	SQL_ThreadQuery(hSqlTuple, "Table_Handle", szCache);
-	log_to_file("addons/amxmodx/logs/cod_clans.log", "Zmiana Nazwy Klanu (2): %s", szCache);
-	
-	cod_print_chat(id,  "Zmieniles nazwe klanu na^x03 %s^x01.", aClan[NAME]);
-	
-	return PLUGIN_CONTINUE;
-}
-
-public ShowMembersMenu(id)
-{
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_CONTINUE;
+	if(!is_user_connected(id) || !cod_check_account(id) || get_user_status(id) != STATUS_LEADER) return PLUGIN_HANDLED;
 		
-	client_cmd(id, "spk CodMod/select2");
+	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 	
-	new szTempName[64], szData[1], aClan[ClanInfo];
+	new clanName[64];
 	
-	ArrayGetArray(gClans, iClan[id], aClan);
+	read_args(clanName, charsmax(clanName));
+	remove_quotes(clanName);
+	trim(clanName);
 	
-	mysql_escape_string(aClan[NAME], szTempName, charsmax(szTempName));
+	if(equal(clanName, ""))
+	{
+		cod_print_chat(id, "Nie wpisano nowej nazwy klanu.");
+
+		show_clan_menu(id, 1);
+
+		return PLUGIN_HANDLED;
+	}
+
+	if(strlen(clanName) < 3)
+	{
+		cod_print_chat(id, "Nazwa klanu musi miec co najmniej 3 znaki.");
+
+		show_clan_menu(id, 1);
+
+		return PLUGIN_HANDLED;
+	}
 	
-	szData[0] = id;
+	if(check_clan_name(clanName))
+	{
+		cod_print_chat(id, "Klan z taka nazwa juz istnieje.");
+
+		show_clan_menu(id, 1);
+
+		return PLUGIN_HANDLED;
+	}
+
+	set_clan_info(clan[id], CLAN_NAME, _, clanName, charsmax(clanName));
 	
-	formatex(szCache, charsmax(szCache), "SELECT * FROM `clans_members` WHERE clan = '%s' ORDER BY flag DESC", szTempName);
-	SQL_ThreadQuery(hSqlTuple, "MembersMenuHandler", szCache, szData, charsmax(szData));
+	cod_print_chat(id, "Zmieniles nazwe klanu na^x03 %s^x01.", clanName);
 	
 	return PLUGIN_CONTINUE;
 }
 
-public MembersMenuHandler(iFailState, Handle:hQuery, szError[], iError, szData[], iDataSize)
+public members_menu(id)
 {
-	if(iFailState != TQUERY_SUCCESS)
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
+
+	new queryData[128], tempId[1];
+	
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_members` WHERE clan = '%i' ORDER BY flag DESC", clan[id]);
+
+	SQL_ThreadQuery(sql, "members_menu_handle", queryData, tempId, sizeof(tempId));
+	
+	return PLUGIN_HANDLED;
+}
+
+public members_menu_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if(failState) 
 	{
-		log_to_file("addons/amxmodx/logs/cod_clans.log", "<Query> Error: %s", szError);
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		
 		return;
 	}
 	
-	new id = szData[0];
+	new id = tempId[0];
+	
+	if(!is_user_connected(id)) return;
 
-	new szName[33], szInfo[64], iStatus;
+	new itemData[64], userName[64], status, menu = menu_create("\wZarzadzaj \rCzlonkami:^n\rWybierz czlonka, aby pokazac mozliwe opcje.", "member_menu_handle");
 	
-	new menu = menu_create("\wZarzadzaj \rCzlonkami:^n\rWybierz czlonka, aby pokazac mozliwe opcje.", "MemberMenu_Handler");
-	
-	while(SQL_MoreResults(hQuery))
+	while(SQL_MoreResults(query))
 	{
-		SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "name"), szName, charsmax(szName));
-		iStatus = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "flag"));
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), userName, charsmax(userName));
+
+		status = SQL_ReadResult(query, SQL_FieldNameToNum(query, "flag"));
 		
-		formatex(szInfo, charsmax(szInfo), "%s#%i", szName, iStatus);
+		formatex(itemData, charsmax(itemData), "%s#%i", userName, status);
 		
-		switch(iStatus)
+		switch(status)
 		{
-			case MEMBER: add(szName, charsmax(szName), " \y[Czlonek]");
-			case DEPUTY: add(szName, charsmax(szName), " \y[Zastepca]");
-			case LEADER: add(szName, charsmax(szName), " \y[Przywodca]");
+			case STATUS_MEMBER: add(userName, charsmax(userName), " \y[Czlonek]");
+			case STATUS_DEPUTY: add(userName, charsmax(userName), " \y[Zastepca]");
+			case STATUS_LEADER: add(userName, charsmax(userName), " \y[Przywodca]");
 		}
 		
-		menu_additem(menu, szName, szInfo);
-		SQL_NextRow(hQuery);
+		menu_additem(menu, userName, itemData);
+
+		SQL_NextRow(query);
 	}
 	
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
 	
-	menu_display(id, menu, 0);
+	menu_display(id, menu);
 }
 
-public MemberMenu_Handler(id, menu, item)
+public member_menu_handle(id, menu, item)
 {
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk CodMod/select2");
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
 	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
-		ClanMenu(id);
+
 		return PLUGIN_HANDLED;
 	}
-	
-	new szInfo[64], szName[33], szTempFlag[2], iAccess, iCallback, iFlag, iID;
-	menu_item_getinfo(menu, item, iAccess, szInfo, charsmax(szInfo), _, _, iCallback);
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	new itemData[64], userName[64], tempFlag[6], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
 	
 	menu_destroy(menu);
 
-	strtok(szInfo, szName, charsmax(szName), szTempFlag, charsmax(szTempFlag), '#');
+	strtok(itemData, userName, charsmax(userName), tempFlag, charsmax(tempFlag), '#');
 	
-	iFlag = str_to_num(szTempFlag);
-	iID = get_user_index(szName);
+	new flag = str_to_num(tempFlag), userId = get_user_index(userName);
 
-	if(iID == id)
+	if(userId == id)
 	{
-		cod_print_chat(id,  "Nie mozesz zarzadzac soba!");
-		ShowMembersMenu(id);
+		cod_print_chat(id, "Nie mozesz zarzadzac soba!");
+
+		members_menu(id);
+
 		return PLUGIN_HANDLED;
 	}
 	
-	if(iClan[iID])	
-		iChosenID[id] = get_user_userid(iID);
+	if(clan[userId]) chosenId[id] = get_user_userid(userId);
 
-	if(iFlag == LEADER)
+	if(flag == STATUS_LEADER)
 	{
-		cod_print_chat(id,  "Nie mozna zarzadzac przywodca klanu!");
-		ShowMembersMenu(id);
+		cod_print_chat(id, "Nie mozna zarzadzac przywodca klanu!");
+
+		members_menu(id);
+
 		return PLUGIN_HANDLED;
 	}
 
-	formatex(szChosenName[id], charsmax(szChosenName), szName);
+	formatex(chosenName[id], charsmax(chosenName), userName);
 	
-	new menu = menu_create("\wWybierz \rOpcje:", "MemberOption_Handler");
+	new menu = menu_create("\wWybierz \rOpcje:", "member_options_menu_handle");
 	
-	if(get_user_status(id, iClan[id]) == LEADER)
+	if(get_user_status(id) == STATUS_LEADER)
 	{
 		menu_additem(menu, "Przekaz \yPrzywodctwo", "1");
 		
-		if(iFlag == MEMBER)
-			menu_additem(menu, "Mianuj \yZastepce", "2");
+		if(flag == STATUS_MEMBER) menu_additem(menu, "Mianuj \yZastepce", "2");
 
-		if(iFlag == DEPUTY)
-			menu_additem(menu, "Degraduj \yZastepce", "3");
+		if(flag == STATUS_DEPUTY) menu_additem(menu, "Degraduj \yZastepce", "3");
 	}
+
 	menu_additem(menu, "Wyrzuc \yGracza", "4");
 	
 	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
 	
-	menu_display(id, menu, 0);
+	menu_display(id, menu);
 	
 	return PLUGIN_CONTINUE;
 }
 
-public MemberOption_Handler(id, menu, item)
+public member_options_menu_handle(id, menu, item)
 {
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_HANDLED;
-		
-	client_cmd(id, "spk CodMod/select2");
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
 	if(item == MENU_EXIT)
 	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		show_clan_menu(id, 1);
+
 		menu_destroy(menu);
-		ClanMenu(id);
+
 		return PLUGIN_HANDLED;
 	}
-	
-	new szInfo[3], iAccess, iCallback;
-	menu_item_getinfo(menu, item, iAccess, szInfo, charsmax(szInfo), _, _, iCallback);
 
-	switch(str_to_num(szInfo))
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	new itemData[6], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
+
+	switch(str_to_num(itemData))
 	{
-		case 1: UpdateMember(id, LEADER);
-		case 2:	UpdateMember(id, DEPUTY);
-		case 3:	UpdateMember(id, MEMBER);
-		case 4: UpdateMember(id, NONE);
+		case 1: update_member(id, STATUS_LEADER);
+		case 2:	update_member(id, STATUS_DEPUTY);
+		case 3:	update_member(id, STATUS_MEMBER);
+		case 4: update_member(id, STATUS_NONE);
 	}
 	
 	menu_destroy(menu);
@@ -1302,561 +1119,542 @@ public MemberOption_Handler(id, menu, item)
 	return PLUGIN_CONTINUE;
 }
 
-public UpdateMember(id, status)
+public update_member(id, status)
 {
-	new iPlayers[32], iNum, iPlayer, bool:bPlayerOnline;
+	new players[32], playersNum, player, bool:playerOnline;
 	
-	get_players(iPlayers, iNum);
+	get_players(players, playersNum);
 
-	for(new i = 0; i < iNum; i++)
+	for(new i = 0; i < playersNum; i++)
 	{
-		iPlayer = iPlayers[i];
+		player = players[i];
 
-		if(iClan[iPlayer] != iClan[id] || is_user_hltv(iPlayer) || !is_user_connected(iPlayer))
-			continue;
+		if(clan[player] != clan[id] || is_user_hltv(player) || !is_user_connected(player)) continue;
 	
-		if(get_user_userid(iPlayer) == iChosenID[id])
+		if(get_user_userid(player) == chosenId[id])
 		{
 			switch(status)
 			{
-				case LEADER:
+				case STATUS_LEADER:
 				{
-					set_user_status(id, iClan[id], DEPUTY);
-					set_user_status(iPlayer, iClan[id], LEADER);
-					cod_print_chat(iPlayer,  "Zostales mianowany przywodca klanu!");
+					set_user_status(id, STATUS_DEPUTY);
+					set_user_status(player, STATUS_LEADER);
+
+					cod_print_chat(player,  "Zostales mianowany przywodca klanu!");
 				}
-				case DEPUTY:
+				case STATUS_DEPUTY:
 				{
-					set_user_status(iPlayer, iClan[id], DEPUTY);
-					cod_print_chat(iPlayer,  "^x01 Zostales zastepca przywodcy klanu!");		
+					set_user_status(player, STATUS_DEPUTY);
+
+					cod_print_chat(player,  "^x01 Zostales zastepca przywodcy klanu!");		
 				}
-				case MEMBER:
+				case STATUS_MEMBER:
 				{
-					set_user_status(iPlayer, iClan[id], MEMBER);
-					cod_print_chat(iPlayer,  "^x01 Zostales zdegradowany do rangi czlonka klanu.");
+					set_user_status(player, STATUS_MEMBER);
+
+					cod_print_chat(player,  "^x01 Zostales zdegradowany do rangi czlonka klanu.");
 				}
-				case NONE:
+				case STATUS_NONE:
 				{
-					log_to_file("addons/amxmodx/logs/cod_clans.log", "Wyrzucenie z Klanu: %s", szChosenName[id]);
-					set_user_clan(iPlayer);
-					cod_print_chat(iPlayer,  "Zostales wyrzucony z klanu.");
+					set_user_clan(player);
+
+					cod_print_chat(player,  "Zostales wyrzucony z klanu.");
 				}
 			}
 
-			bPlayerOnline = true;
+			playerOnline = true;
+
 			continue;
 		}
 		
 		switch(status)
 		{
-			case LEADER: cod_print_chat(iPlayer,  "^x03 %s^01 zostal nowym przywodca klanu.", szChosenName[id]);
-			case DEPUTY: cod_print_chat(iPlayer,  "^x03 %s^x01 zostal zastepca przywodcy klanu.", szChosenName[id]);
-			case MEMBER: cod_print_chat(iPlayer,  "^x03 %s^x01 zostal zdegradowany do rangi czlonka klanu.", szChosenName[id]);
-			case NONE: cod_print_chat(iPlayer,  "^x03 %s^01 zostal wyrzucony z klanu.", szChosenName[id]);
+			case STATUS_LEADER: cod_print_chat(player,  "^x03 %s^01 zostal nowym przywodca klanu.", chosenName[id]);
+			case STATUS_DEPUTY: cod_print_chat(player,  "^x03 %s^x01 zostal zastepca przywodcy klanu.", chosenName[id]);
+			case STATUS_MEMBER: cod_print_chat(player,  "^x03 %s^x01 zostal zdegradowany do rangi czlonka klanu.", chosenName[id]);
+			case STATUS_NONE: cod_print_chat(player,  "^x03 %s^01 zostal wyrzucony z klanu.", chosenName[id]);
 		}
 	}
 	
-	if(!bPlayerOnline)
+	if(!playerOnline)
 	{
-		new TempName[64];
-		mysql_escape_string(szChosenName[id], TempName, charsmax(TempName));
+		save_member(id, status, _, chosenName[id]);
 		
-		SaveMember(id, status, TempName);
-		
-		if(status == NONE)
+		if(status == STATUS_NONE)
 		{
-			new aClan[ClanInfo];
-			ArrayGetArray(gClans, iClan[id], aClan);
+			set_clan_info(clan[id], CLAN_MEMBERS, get_clan_info(clan[id], CLAN_MEMBERS) - 1);
 			
-			aClan[MEMBERS]--;
-			ArraySetArray(gClans, iClan[id], aClan);
-			
-			SaveClan(iClan[id]);
-			
-			log_to_file("addons/amxmodx/logs/cod_clans.log", "Wyrzucenie z Klanu: %s", szChosenName[id]);
+			save_clan(clan[id]);
 		}
 	}
 	
-	ClanMenu(id);
+	show_clan_menu(id, 1);
 	
 	return PLUGIN_HANDLED;
 }
 
-public DepositHonor_Handle(id)
+public deposit_honor_handle(id)
 {
-	if(!iClan[id])
-		return PLUGIN_HANDLED;
-		
-	if(!cod_check_account(id)) return PLUGIN_HANDLED;
-		
-	new szArgs[10], aClan[ClanInfo], iHonor;
+	if(!is_user_connected(id) || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
+
+	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 	
-	ArrayGetArray(gClans, iClan[id], aClan);
+	new honorData[16], honorAmount;
 	
-	read_args(szArgs, charsmax(szArgs));
-	remove_quotes(szArgs);
-	iHonor = str_to_num(szArgs);
+	read_args(honorData, charsmax(honorData));
+	remove_quotes(honorData);
+
+	honorAmount = str_to_num(honorData);
 	
-	if(!iHonor)
-	{
-		cod_print_chat(id,  "Probujesz wplacic ujemna lub zerowa ilosc Honoru!");
-		return PLUGIN_HANDLED;
-	}
-	
-	if(iHonor > cod_get_user_honor(id))
-	{
-		cod_print_chat(id,  "Nie masz tyle Honoru!");
+	if(honorAmount <= 0)
+	{ 
+		cod_print_chat(id, "Nie mozesz wplacic mniej niz^x03 1 honoru^x01!");
+
 		return PLUGIN_HANDLED;
 	}
 	
-	cod_set_user_honor(id, cod_get_user_honor(id) - iHonor);
+	if(cod_get_user_honor(id) < honorAmount) 
+	{ 
+		cod_print_chat(id, "Nie masz tyle^x03 honoru^x01!");
+
+		return PLUGIN_HANDLED;
+	}
+
+	cod_set_user_honor(id, cod_get_user_honor(id) - honorAmount);
 	
-	aClan[HONOR] += iHonor;
-	ArraySetArray(gClans, iClan[id], aClan);
+	set_clan_info(clan[id], CLAN_HONOR, get_clan_info(clan[id], CLAN_HONOR) + honorAmount);
 	
-	SaveClan(iClan[id]);
-	
-	cod_print_chat(id,  "Wplaciles^x03 %i^x01 Honoru na rzecz klanu.", iHonor);
-	cod_print_chat(id,  "Aktualnie twoj klan ma^x03 %i^x01 Honoru.", aClan[HONOR]);
+	cod_print_chat(id, "Wplaciles^x03 %i^x01 Honoru na rzecz klanu.", honorAmount);
+	cod_print_chat(id, "Aktualnie twoj klan ma^x03 %i^x01 Honoru.", get_clan_info(clan[id], CLAN_HONOR));
 	
 	return PLUGIN_HANDLED;
 }
 
-public Clans_Top15(id)
+public clans_top15(id)
 {
-	new szTemp[512], szData[1];
-	szData[0] = id;
-	
-	format(szTemp, charsmax(szTemp), "SELECT clan_name, members, honor, kills, level, speed, gravity, weapondrop, damage FROM `clans` ORDER BY kills DESC LIMIT 15");
-	SQL_ThreadQuery(hSqlTuple, "ShowClans_Top15", szTemp, szData, charsmax(szData));
-}
+	if(!is_user_connected(id) ) return PLUGIN_HANDLED;
 
-public ShowClans_Top15(iFailState, Handle:hQuery, szError[], iError, szData[], iDataSize)
-{
-	if(iFailState) 
-	{
-		log_to_file("addons/amxmodx/logs/cod_clans.log", "SQL Error: %s (%d)", szError, iError);
-		return PLUGIN_HANDLED;
-	}
+	new queryData[128], tempId[1];
 	
-	new id = szData[0];
-	
-	static iLen, iPlace = 0;
-	
-	iLen = format(szMessage, charsmax(szMessage), "<body bgcolor=#000000><font color=#FFB000><pre>");
-	iLen += format(szMessage[iLen], charsmax(szMessage) - iLen, "%1s %-22.22s %4s %8s %6s %8s %9s %12s %11s^n", "#", "Nazwa", "Czlonkowie", "Poziom", "Zabicia", "Honor", "Predkosc", "Grawitacja", "Obezwladnienie", "Obrazenia");
-	
-	while(SQL_MoreResults(hQuery))
-	{
-		iPlace++;
-		
-		static szName[32], iMembers, iLevel, iKills, iHonor, iSpeed, iGravity, iWeaponDrop, iDamage;
-		
-		SQL_ReadResult(hQuery, 0, szName, charsmax(szName));
-		replace_all(szName, charsmax(szName), "<", "");
-		replace_all(szName,charsmax(szName), ">", "");
-		
-		iMembers = SQL_ReadResult(hQuery, 1);
-		iHonor = SQL_ReadResult(hQuery, 2);
-		iKills = SQL_ReadResult(hQuery, 3);
-		iLevel = SQL_ReadResult(hQuery, 4);
-		iSpeed = SQL_ReadResult(hQuery, 5);
-		iGravity = SQL_ReadResult(hQuery, 6);
-		iWeaponDrop = SQL_ReadResult(hQuery, 7);
-		iDamage = SQL_ReadResult(hQuery, 8);
-		
-		if(iPlace >= 10)
-			iLen += format(szMessage[iLen], charsmax(szMessage) - iLen, "%1i %22.22s %5d %8d %10d %8d %7d %10d %14d^n", iPlace, szName, iMembers, iLevel, iKills, iHonor, iSpeed, iGravity, iWeaponDrop, iDamage);
-		else
-			iLen += format(szMessage[iLen], charsmax(szMessage) - iLen, "%1i %22.22s %6d %8d %10d %8d %7d %10d %14d^n", iPlace, szName, iMembers, iLevel, iKills, iHonor, iSpeed, iGravity, iWeaponDrop, iDamage);
+	tempId[0] = id;
 
-		SQL_NextRow(hQuery);
-	}
-	
-	show_motd(id, szMessage, "Top 15 Klanow");
+	formatex(queryData, charsmax(queryData), "SELECT clan_name, members, honor, kills, level, health, gravity, weapondrop, damage FROM `cod_clans` ORDER BY kills DESC LIMIT 15");
+
+	SQL_ThreadQuery(sql, "show_clans_top15", queryData, tempId, sizeof(tempId));
 	
 	return PLUGIN_HANDLED;
 }
 
-public HandleSayText(msgId, msgDest, msgEnt)
+public show_clans_top15(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if(failState) 
+	{
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		
+		return PLUGIN_HANDLED;
+	}
+	
+	new id = tempId[0];
+	
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	
+	static motdData[2048], clanName[64], motdLength, rank = 0, members = 0, honor = 0, kills = 0, level = 0, health = 0, gravity = 0, drop = 0, damage = 0;
+	
+	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
+	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %4s %8s %6s %8s %9s %12s %11s^n", "#", "Nazwa", "Czlonkowie", "Poziom", "Zabicia", "Honor", "Zycie", "Grawitacja", "Obezwladnienie", "Obrazenia");
+	
+	while(SQL_MoreResults(query))
+	{
+		rank++;
+		
+		SQL_ReadResult(query, 0, clanName, charsmax(clanName));
+		replace_all(clanName, charsmax(clanName), "<", "");
+		replace_all(clanName,charsmax(clanName), ">", "");
+		
+		members = SQL_ReadResult(query, 1);
+		honor = SQL_ReadResult(query, 2);
+		kills = SQL_ReadResult(query, 3);
+		level = SQL_ReadResult(query, 4);
+		health = SQL_ReadResult(query, 5);
+		gravity = SQL_ReadResult(query, 6);
+		drop = SQL_ReadResult(query, 7);
+		damage = SQL_ReadResult(query, 8);
+		
+		if(rank >= 10) motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %22.22s %5d %8d %10d %8d %7d %10d %14d^n", rank, clanName, members, level, kills, honor, health, gravity, drop, damage);
+		else motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %22.22s %6d %8d %10d %8d %7d %10d %14d^n", rank, clanName, members, level, kills, honor, health, gravity, drop, damage);
+
+		SQL_NextRow(query);
+	}
+	
+	show_motd(id, motdData, "Top 15 Klanow");
+	
+	return PLUGIN_HANDLED;
+}
+
+public say_text(msgId, msgDest, msgEnt)
 {
 	new id = get_msg_arg_int(1);
 	
-	if(!is_user_connected(id) || !iClan[id])
-		return PLUGIN_CONTINUE;
-	
-	new szTmp[192], szTmp2[192], szPrefix[20], aClan[ClanInfo], i = iClan[id];
-	
-	get_msg_arg_string(2, szTmp, charsmax(szTmp))
-
-	ArrayGetArray(gClans, i, aClan);
-	
-	formatex(szPrefix, charsmax(szPrefix), "^x04[%s]", aClan[NAME]);
-	
-	if(!equal(szTmp, "#Cstrike_Chat_All"))
+	if(is_user_connected(id))
 	{
-		add(szTmp2, charsmax(szTmp2), szPrefix);
-		add(szTmp2, charsmax(szTmp2), " ");
-		add(szTmp2, charsmax(szTmp2), szTmp);
-	}
-	else
-	{
-		add(szTmp2, charsmax(szTmp2), szPrefix);
-		add(szTmp2, charsmax(szTmp2), "^x03 %s1^x01 :  %s2");
-	}
-	
-	set_msg_arg_string(2, szTmp2);
-	
-	return PLUGIN_CONTINUE;
-}
-
-set_user_clan(id, iPlayerClan = 0, iOwner = 0)
-{
-	if(!is_user_connected(id))
-		return PLUGIN_CONTINUE;
-
-	new aClan[ClanInfo];
-	
-	if(iPlayerClan == 0)
-	{
-		ArrayGetArray(gClans, iClan[id], aClan);
-		aClan[MEMBERS]--;
-		ArraySetArray(gClans, iClan[id], aClan);
-		TrieDeleteKey(aClan[STATUS], szMemberName[id]);
+		new tempMessage[192], message[192], chatPrefix[64];
 		
-		SaveClan(iClan[id]);
+		get_msg_arg_string(2, tempMessage, charsmax(tempMessage));
+
+		get_clan_info(clan[id], CLAN_NAME, chatPrefix, charsmax(chatPrefix));
+
+		format(chatPrefix, charsmax(chatPrefix), "^x04[%s]", chatPrefix);
 		
-		SaveMember(id, NONE);
-		
-		Rem(id, iPassword);
-		
-		iClan[id] = 0;
-	}
-	else
-	{
-		iClan[id] = iPlayerClan;
-		
-		ArrayGetArray(gClans, iClan[id], aClan);
-		
-		new szTempName[64];
-		mysql_escape_string(aClan[NAME], szTempName, charsmax(szTempName));
-		
-		aClan[MEMBERS]++;
-		ArraySetArray(gClans, iClan[id], aClan);
-		TrieSetCell(aClan[STATUS], szMemberName[id], iOwner ? LEADER : MEMBER);
-		
-		SaveMember(id, iOwner ? LEADER : MEMBER, _, szTempName);
-		
-		SaveClan(iClan[id]);
-	}
-	
-	return PLUGIN_CONTINUE;
-}
-
-set_user_status(id, iPlayerClan, iStatus)
-{
-	if(!is_user_connected(id) || !iPlayerClan)
-		return PLUGIN_CONTINUE;
-		
-	new aClan[ClanInfo];
-	ArrayGetArray(gClans, iPlayerClan, aClan);
-	TrieSetCell(aClan[STATUS], szMemberName[id], iStatus);
-	
-	SaveMember(id, iStatus);
-	
-	return PLUGIN_CONTINUE;
-}
-
-get_user_status(id, iPlayerClan)
-{
-	if(!is_user_connected(id) || iPlayerClan == 0)
-		return NONE;
-	
-	new aClan[ClanInfo];
-	ArrayGetArray(gClans, iPlayerClan, aClan);
-	
-	new iStatus;
-	TrieGetCell(aClan[STATUS], szMemberName[id], iStatus);
-	
-	return iStatus;
-}
-
-public SqlInit()
-{
-	new szData[4][64];
-	get_cvar_string("cod_clans_sql_host", szData[0], charsmax(szData)); 
-	get_cvar_string("cod_clans_sql_user", szData[1], charsmax(szData)); 
-	get_cvar_string("cod_clans_sql_pass", szData[2], charsmax(szData)); 
-	get_cvar_string("cod_clans_sql_db", szData[3], charsmax(szData)); 
-	
-	hSqlTuple = SQL_MakeDbTuple(szData[0], szData[1], szData[2], szData[3]);
-	
-	formatex(szCache, charsmax(szCache), "CREATE TABLE IF NOT EXISTS `clans` (`clan_name` varchar(64) NOT NULL, `password` varchar(64) NOT NULL, `members` int(5) NOT NULL DEFAULT '1', `honor` int(5) NOT NULL DEFAULT '0', `kills` int(5) NOT NULL DEFAULT '0', ");
-	add(szCache, charsmax(szCache), "`level` int(5) NOT NULL DEFAULT '0', `speed` int(5) NOT NULL DEFAULT '0', `gravity` int(5) NOT NULL DEFAULT '0', `damage` int(5) NOT NULL DEFAULT '0', `weapondrop` int(5) NOT NULL DEFAULT '0', PRIMARY KEY (`clan_name`));");
-	SQL_ThreadQuery(hSqlTuple, "Table_Handle", szCache);
-	
-	formatex(szCache, charsmax(szCache), "CREATE TABLE IF NOT EXISTS `clans_members` (`name` varchar(64) NOT NULL, `clan` varchar(64) NOT NULL, `flag` int(5) NOT NULL DEFAULT '0', PRIMARY KEY (`name`));");
-	SQL_ThreadQuery(hSqlTuple, "Table_Handle", szCache);
-}
-
-public Table_Handle(iFailState, Handle:hQuery, szError[], iError, szData[], iDataSize)
-{
-	if(iFailState)
-	{
-		if(iFailState == TQUERY_CONNECT_FAILED)
-			log_to_file("addons/amxmodx/logs/cod_clans.log", "Table - Could not connect to SQL database.  [%d] %s", iError, szError);
-		else if(iFailState == TQUERY_QUERY_FAILED)
-			log_to_file("addons/amxmodx/logs/cod_clans.log", "Table Query failed. [%d] %s", iError, szError);
-
-		return;
-	}
-}
-
-public SaveClan(iClan)
-{
-	new szTempName[64], aClan[ClanInfo];
-	
-	ArrayGetArray(gClans, iClan, aClan);
-
-	mysql_escape_string(aClan[NAME], szTempName, charsmax(szTempName));
-	
-	formatex(szCache, charsmax(szCache), "UPDATE `clans` SET password = '%s', level = '%i', honor = '%i', kills = '%i', members = '%i', speed = '%i', gravity = '%i', weapondrop = '%i', damage = '%i' WHERE clan_name = '%s'", 
-	aClan[PASSWORD], aClan[LEVEL], aClan[HONOR], aClan[KILLS], aClan[MEMBERS], aClan[SPEED], aClan[GRAVITY], aClan[DROP], aClan[DAMAGE], szTempName);
-	SQL_ThreadQuery(hSqlTuple, "Table_Handle", szCache);
-	log_to_file("addons/amxmodx/logs/cod_clans.log", "Zapis Klanu: %s", szCache);
-}
-
-public LoadMember(id)
-{
-	get_user_name(id, szMemberName[id], charsmax(szMemberName));
-	mysql_escape_string(szMemberName[id], szMemberName[id], charsmax(szMemberName))
-	
-	new szData[1];
-	szData[0] = id;
-	
-	formatex(szCache, charsmax(szCache), "SELECT * FROM `clans_members` a JOIN `clans` b ON a.clan = b.clan_name WHERE a.name = '%s'", szMemberName[id]);
-	SQL_ThreadQuery(hSqlTuple, "LoadMember_Handle", szCache, szData, charsmax(szData));
-}
-
-SaveMember(id, iStatus, szName[] = "", szClan[] = "")
-{
-	if(!iClan[id])
-		return;
-	
-	if(iStatus)
-	{
-		if(strlen(szClan))
-			formatex(szCache, charsmax(szCache), "UPDATE `clans_members` SET clan = '%s', flag = '%i' WHERE name = '%s'", szClan, iStatus, szMemberName[id]);
-		else
-			formatex(szCache, charsmax(szCache), "UPDATE `clans_members` SET flag = '%i' WHERE name = '%s'", iStatus, !strlen(szName) ? szMemberName[id] : szName);
-	}
-	else
-		formatex(szCache, charsmax(szCache), "UPDATE `clans_members` SET clan = '', flag = '0' WHERE name = '%s'", !strlen(szName) ? szMemberName[id] : szName);
-
-	log_to_file("addons/amxmodx/logs/cod_clans.log", "Zapis Czlonka Klanu: %s", szCache);
-
-	SQL_ThreadQuery(hSqlTuple, "Table_Handle", szCache);
-}
-
-public LoadMember_Handle(iFailState, Handle:hQuery, szError[], iError, szData[], iDataSize)
-{
-	if(iFailState != TQUERY_SUCCESS)
-	{
-		log_to_file("addons/amxmodx/logs/cod_clans.log", "<Query> Error: %s", szError);
-		return;
-	}
-	
-	new id = szData[0];
-	
-	if(!is_user_connected(id))
-		return;
-	
-	if(SQL_NumRows(hQuery))
-	{
-		new szClan[64], szPassword[32], aClan[ClanInfo], iStatus;
-
-		SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "clan_name"), szClan, charsmax(szClan));
-		if(!GetClanID(szClan))
+		if(!equal(tempMessage, "#Cstrike_Chat_All"))
 		{
-			copy(aClan[NAME], charsmax(szClan), szClan);
-			aClan[STATUS] = _:TrieCreate();
-		
-			SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "password"), aClan[PASSWORD], charsmax(aClan[PASSWORD]));
-
-			aClan[LEVEL] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "level"));
-			aClan[HONOR] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "honor"));
-			aClan[SPEED] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "speed"));
-			aClan[GRAVITY] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "gravity"));
-			aClan[DROP] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "weapondrop"));
-			aClan[DAMAGE] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "damage"));
-			aClan[KILLS] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "kills"));
-			aClan[MEMBERS] = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "members"));
-
-			ArrayPushArray(gClans, aClan);
+			add(message, charsmax(message), chatPrefix);
+			add(message, charsmax(message), " ");
+			add(message, charsmax(message), tempMessage);
+		}
+		else
+		{
+			add(message, charsmax(message), chatPrefix);
+			add(message, charsmax(message), "^x03 %s1^x01 :  %s2");
 		}
 		
-		iClan[id] = GetClanID(szClan);
-		ArrayGetArray(gClans, iClan[id], aClan);
-		iStatus = SQL_ReadResult(hQuery, SQL_FieldNameToNum(hQuery, "flag"));
-		TrieSetCell(aClan[STATUS], szMemberName[id], iStatus);
+		set_msg_arg_string(2, message);
+	}
+	
+	return PLUGIN_CONTINUE;
+}
 
-		if(get_user_status(id, iClan[id]) < DEPUTY)
-			return;
+stock set_user_clan(id, playerClan = 0, owner = 0)
+{
+	if(!is_user_connected(id)) return;
+	
+	if(playerClan == 0)
+	{
+		set_clan_info(clan[id], CLAN_MEMBERS, get_clan_info(clan[id], CLAN_MEMBERS) + 1);
 
-		cmd_execute(id, "exec klan.cfg");
-		get_user_info(id, "_klan", szPassword, charsmax(szPassword));
-
-		if(equal(aClan[PASSWORD], szPassword))
-			Set(id, iPassword);
+		TrieDeleteKey(Trie:get_clan_info(clan[id], CLAN_STATUS), playerName[id]);
+		
+		save_member(id, STATUS_NONE);
+		
+		clan[id] = 0;
 	}
 	else
 	{
-		formatex(szCache, charsmax(szCache), "INSERT IGNORE INTO `clans_members` (`name`) VALUES ('%s');", szMemberName[id]);
-		SQL_ThreadQuery(hSqlTuple, "Table_Handle", szCache);
-	}
-}
-
-public CheckClanName(const szName[])
-{
-	new szCache[128], szError[128], iError, bool:bFound;
-	
-	formatex(szCache, charsmax(szCache), "SELECT * FROM `clans` WHERE `clan_name` = '%s'", szName);
-	
-	new Handle:g_Connect = SQL_Connect(hSqlTuple, iError, szError, charsmax(szError));
-	
-	if(iError)
-	{
-		log_to_file("addons/amxmodx/logs/cod_clans.log", "<Query> Error: %s", szError);
-		return true;
-	}
-	
-	new Handle:Query = SQL_PrepareQuery(g_Connect, szCache);
-	
-	SQL_Execute(Query);
-	
-	if(SQL_NumResults(Query))
-		bFound = true;
-
-	SQL_FreeHandle(Query);
-	SQL_FreeHandle(g_Connect);
-	
-	return bFound;
-}
-
-public ConfigLoad() 
-{
-	new szPath[64];
-	
-	get_localinfo("amxx_configsdir", szPath, charsmax(szPath));
-	format(szPath, charsmax(szPath), "%s/%s", szPath, szFile);
-    
-	if(!file_exists(szPath)) 
-	{
-		new szError[100];
+		clan[id] = playerClan;
 		
-		formatex(szError, charsmax(szError), "Brak pliku konfiguracyjnego: %s!", szPath);
-		set_fail_state(szError);
+		set_clan_info(clan[id], CLAN_MEMBERS, get_clan_info(clan[id], CLAN_MEMBERS) + 1);
+
+		TrieSetCell(Trie:get_clan_info(clan[id], CLAN_STATUS), playerName[id], owner ? STATUS_LEADER : STATUS_MEMBER);
+		
+		save_member(id, owner ? STATUS_LEADER : STATUS_MEMBER, 1);
+	}
+}
+
+stock set_user_status(id, status)
+{
+	if(!is_user_connected(id) || !clan[id]) return;
+
+	TrieSetCell(Trie:get_clan_info(clan[id], CLAN_STATUS), playerName[id], status);
+	
+	save_member(id, status);
+}
+
+get_user_status(id)
+{
+	if(!is_user_connected(id) || !clan[id]) return STATUS_NONE;
+	
+	new status;
+
+	TrieGetCell(Trie:get_clan_info(clan[id], CLAN_STATUS), playerName[id], status);
+	
+	return status;
+}
+
+public sql_init()
+{
+	new host[32], user[32], pass[32], database[32], queryData[256], error[128], errorNum;
+	
+	get_cvar_string("cod_sql_host", host, charsmax(host));
+	get_cvar_string("cod_sql_user", user, charsmax(user));
+	get_cvar_string("cod_sql_pass", pass, charsmax(pass));
+	get_cvar_string("cod_sql_database", database, charsmax(database));
+	
+	sql = SQL_MakeDbTuple(host, user, pass, database);
+
+	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	
+	if(errorNum)
+	{
+		log_to_file("cod_mod.log", "Error: %s", error);
 		
 		return;
 	}
-    
-	new szLine[256], szValue[256], szKey[64], iSection, iValue;
-	new iFile = fopen(szPath, "rt");
-    
-	while(iFile && !feof(iFile)) 
+	
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans` (`id` INT NOT NULL AUTO_INCREMENT, clan_name` varchar(64) NOT NULL, `members` int(5) NOT NULL DEFAULT '1', `honor` int(5) NOT NULL DEFAULT '0', `kills` int(5) NOT NULL DEFAULT '0', ");
+	add(queryData, charsmax(queryData), "`level` int(5) NOT NULL DEFAULT '0', `speed` int(5) NOT NULL DEFAULT '0', `gravity` int(5) NOT NULL DEFAULT '0', `damage` int(5) NOT NULL DEFAULT '0', `weapondrop` int(5) NOT NULL DEFAULT '0', PRIMARY KEY (`id`));");
+
+	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
+
+	SQL_Execute(query);
+
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_members` (`name` varchar(64) NOT NULL, `clan` INT NOT NULL, `flag` INT NOT NULL DEFAULT '0', PRIMARY KEY (`name`));");
+	
+	query = SQL_PrepareQuery(connectHandle, queryData);
+
+	SQL_Execute(query);
+
+	SQL_FreeHandle(query);
+	SQL_FreeHandle(connectHandle);
+}
+
+public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
+{
+	if (failState) 
 	{
-		fgets(iFile, szLine, charsmax(szLine));
-		replace(szLine, charsmax(szLine), "^n", "");
-       
-		if(!szLine[0] || szLine[0] == '/') continue;
-		if(szLine[0] == '[') { iSection++; continue; }
-       
-		strtok(szLine, szKey, charsmax(szKey), szValue, charsmax(szValue), '=');
-		trim(szKey);
-		trim(szValue);
+		if(failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
+		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "Query failed. [%d] %s", errorNum, error);
+	}
+	
+	return PLUGIN_CONTINUE;
+}
+
+public save_clan(clan)
+{
+	new queryData[256], safeName[64], codClan[clanInfo];
+	
+	ArrayGetArray(codClans, clan, codClan);
+
+	mysql_escape_string(codClan[CLAN_NAME], safeName, charsmax(safeName));
+	
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET name = '%s', level = '%i', honor = '%i', kills = '%i', members = '%i', speed = '%i', gravity = '%i', weapondrop = '%i', damage = '%i' WHERE clan_name = '%s'", 
+	safeName, codClan[CLAN_LEVEL], codClan[CLAN_HONOR], codClan[CLAN_KILLS], codClan[CLAN_MEMBERS], codClan[CLAN_HEALTH], codClan[CLAN_GRAVITY], codClan[CLAN_DROP], codClan[CLAN_DAMAGE], clan);
+	
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+}
+
+public load_data(id)
+{
+	if(!is_user_connected(id)) return;
+
+	new queryData[128], tempId[1];
+	
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_members` a JOIN `cod_clans` b ON a.id = b.clan WHERE a.name = '%s'", playerName[id]);
+	SQL_ThreadQuery(sql, "load_data_handle", queryData, tempId, sizeof(tempId));
+}
+
+stock save_member(id, status = 0, change = 0, const name[] = "")
+{
+	new queryData[128], safeName[64];
+
+	if(strlen(name)) mysql_escape_string(name, safeName, charsmax(safeName));
+	else copy(safeName, charsmax(safeName), playerName[id]);
+
+	if(status)
+	{
+		if(change) formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '%i', flag = '%i' WHERE name = '%s'", change, status, safeName);
+		else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET flag = '%i' WHERE name = '%s'", status, safeName);
+	}
+	else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '0', flag = '0' WHERE name = '%s'", safeName);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+}
+
+public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if(failState) 
+	{
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
 		
-		iValue = str_to_num(szValue);
-		
-		switch (iSection) 
-		{ 
-			case 1: 
-			{
-				if(equal(szKey, "CREATE_LEVEL"))
-					iCreateLevel = iValue;
-				else if(equal(szKey, "MAX_MEMBERS"))
-					iMaxMembers = iValue;
-				else if(equal(szKey, "LEVEL_MAX"))
-					iLevelMax = iValue;
-				else if(equal(szKey, "SPEED_MAX"))
-					iSpeedMax = iValue;
-				else if(equal(szKey, "GRAVITY_MAX"))
-					iGravityMax = iValue;
-				else if(equal(szKey, "DAMAGE_MAX"))
-					iDamageMax = iValue;
-				else if(equal(szKey, "DROP_MAX"))
-					iWeaponDropMax = iValue;
-			}
-			case 2: 
-			{
-				if(equal(szKey, "LEVEL_COST"))
-					iLevelCost = iValue;
-				else if(equal(szKey, "SPEED_COST"))
-					iSpeedCost = iValue;
-				else if(equal(szKey, "GRAVITY_COST"))
-					iGravityCost = iValue;
-				else if(equal(szKey, "DAMAGE_COST"))
-					iDamageCost = iValue;
-				else if(equal(szKey, "DROP_COST"))
-					iWeaponDropCost = iValue;
-				else if(equal(szKey, "LEVEL_COST_NEXT"))
-					iNextLevelCost = iValue;
-				else if(equal(szKey, "SPEED_COST_NEXT"))
-					iNextSpeedCost = iValue;
-				else if(equal(szKey, "GRAVITY_COST_NEXT"))
-					iNextGravityCost = iValue;
-				else if(equal(szKey, "DAMAGE_COST_NEXT"))
-					iNextDamageCost = iValue;
-				else if(equal(szKey, "DROP_COST_NEXT"))
-					iNextWeaponDropCost = iValue;
-			}
-			case 3: 
-			{
-				if(equal(szKey, "MEMBERS_PER"))
-					iMembersPerLevel = iValue;
-				else if(equal(szKey, "SPEED_PER"))
-					iSpeedPerLevel = iValue;
-				else if(equal(szKey, "GRAVITY_PER"))
-					iGravityPerLevel = iValue;
-				else if(equal(szKey, "DAMAGE_PER"))
-					iDamagePerLevel = iValue;
-				else if(equal(szKey, "DROP_PER"))
-					iWeaponDropPerLevel = iValue;
-			}
+		return;
+	}
+	
+	new id = tempId[0];
+	
+	if(!is_user_connected(id)) return;
+	
+	if(SQL_MoreResults(query))
+	{
+		new codClan[clanInfo];
+
+		codClan[CLAN_ID] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "id"));
+
+		if(!check_clan_loaded(codClan[CLAN_ID]))
+		{
+			SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), codClan[CLAN_NAME], charsmax(codClan[CLAN_NAME]));
+
+			codClan[CLAN_ID] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "id"));
+			codClan[CLAN_LEVEL] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "level"));
+			codClan[CLAN_HONOR] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
+			codClan[CLAN_HEALTH] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "health"));
+			codClan[CLAN_GRAVITY] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "gravity"));
+			codClan[CLAN_DROP] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "weapondrop"));
+			codClan[CLAN_DAMAGE] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "damage"));
+			codClan[CLAN_KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "kills"));
+			codClan[CLAN_MEMBERS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "members"));
+			codClan[CLAN_STATUS] = _:TrieCreate();
+
+			ArrayPushArray(codClans, codClan);
 		}
-	}
-	if(iFile) fclose(iFile);
-}
-
-stock GetClanID(const szClan[])
-{
-	new aClan[ClanInfo];
-	
-	for(new i = 1; i < ArraySize(gClans); i++)
-	{
-		ArrayGetArray(gClans, i, aClan);
 		
-		if(equal(aClan[NAME], szClan))
-			return i;
+		clan[id] = codClan[CLAN_ID];
+
+		new status = SQL_ReadResult(query, SQL_FieldNameToNum(query, "flag"));
+
+		cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + get_clan_info(clan[id], CLAN_HEALTH) * healthPerLevel);
+
+		TrieSetCell(Trie:get_clan_info(clan[id], CLAN_STATUS), playerName[id], status);
 	}
-	
-	return 0;
+	else
+	{
+		new queryData[128];
+
+		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_clans_members` (`name`) VALUES ('%s');", playerName[id]);
+
+		SQL_ThreadQuery(sql, "ignore_handle", queryData);
+	}
 }
 
-Ham:get_player_resetmaxspeed_func()
+public check_clan_name(const clanName[])
 {
-	#if defined Ham_CS_Player_ResetMaxSpeed
-	return IsHamValid(Ham_CS_Player_ResetMaxSpeed)?Ham_CS_Player_ResetMaxSpeed:Ham_Item_PreFrame;
-	#else
-	return Ham_Item_PreFrame;
-	#endif
+	new queryData[128], safeClanName[64], error[128], errorNum, bool:foundClan;
+
+	mysql_escape_string(clanName, safeClanName, charsmax(safeClanName));
+	
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans` WHERE `clan_name` = '%s'", safeClanName);
+	
+	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	
+	if(errorNum)
+	{
+		log_to_file("cod_mod.log", "Error: %s", error);
+		
+		return false;
+	}
+	
+	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
+	
+	SQL_Execute(query);
+	
+	if(SQL_NumResults(query)) foundClan = true;
+
+	SQL_FreeHandle(query);
+	SQL_FreeHandle(connectHandle);
+	
+	return foundClan;
+}
+
+stock create_clan(id, const clanName[])
+{
+	new codClan[clanInfo], queryData[128], safeClanName[64], error[128], errorNum;
+
+	mysql_escape_string(clanName, safeClanName, charsmax(safeClanName));
+	
+	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_clans` (`clan_name`) VALUES ('%s');", safeClanName);
+	
+	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	
+	if(errorNum)
+	{
+		log_to_file("cod_mod.log", "Error: %s", error);
+		
+		return;
+	}
+
+	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
+	
+	SQL_Execute(query);
+	
+	clan[id] = SQL_GetInsertId(query);
+
+	copy(codClan[CLAN_NAME], charsmax(codClan[CLAN_NAME]), clanName);
+	codClan[CLAN_STATUS] = _:TrieCreate();
+	codClan[CLAN_ID] = clan[id];
+	
+	ArrayPushArray(codClans, codClan);
+
+	set_user_clan(id, clan[id], 1);
+	set_user_status(id, STATUS_LEADER);
+
+	SQL_FreeHandle(query);
+	SQL_FreeHandle(connectHandle);
+}
+
+stock remove_clan(id)
+{
+	new players[32], playersNum, player;
+	
+	get_players(players, playersNum);
+	
+	for(new i = 0; i < playersNum; i++)
+	{
+		player = players[i];
+		
+		if(player == id || is_user_hltv(player) || !is_user_connected(player)) continue;
+
+		if(clan[player] == clan[id])
+		{
+			clan[player] = 0;
+		
+			cod_print_chat(player,  "Twoj klan zostal rozwiazany.");
+		}
+
+		if(clan[player] > clan[id]) clan[player]--;
+	}
+
+	ArrayDeleteItem(codClans, clan[id]);
+
+	clan[id] = 0;
+
+	new queryData[128];
+			
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans` WHERE clan_id = '%i'", clan[id]);
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+	
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET flag = '0', clan = '0' WHERE clan = '%i'", clan[id]);
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+}
+
+stock check_clan_loaded(clan)
+{
+	static codClan[clanInfo];
+	
+	for(new i = 1; i < ArraySize(codClans); i++)
+	{
+		ArrayGetArray(codClans, i, codClan);
+		
+		if(clan == codClan[CLAN_ID]) return true;
+	}
+	
+	return false;
+}
+
+stock get_clan_info(clan, info, dataReturn[] = "", dataLength = 0)
+{
+	static codClan[clanInfo];
+	
+	ArrayGetArray(codClans, clan, codClan);
+	
+	if(info == CLAN_NAME)
+	{
+		copy(dataReturn, dataLength, codClan[info]);
+		
+		return 0;
+	}
+	
+	return codClan[info];
+}
+
+stock set_clan_info(clan, info, value = 0, dataSet[] = "", dataLength = 0)
+{
+	static codClan[clanInfo];
+	
+	ArrayGetArray(codClans, clan, codClan);
+	
+	if(info == CLAN_NAME) formatex(codClan[info], dataLength, dataSet);
+	else codClan[info] = value;
+
+	ArraySetArray(codClans, clan, codClan);
+
+	save_clan(clan);
 }

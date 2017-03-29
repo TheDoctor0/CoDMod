@@ -251,12 +251,10 @@ native cod_inflict_damage(attacker, victim, Float:damage, Float:factor = 0.5, fl
 Zadaje obrazenia z uwzglednieniem inteligencji
 ------------------------------*/
 
-
 native cod_give_weapon(id, weapon);
 /*------------------------------
 Daje okreslona bron oraz pozwala na jej posiadanie
 ------------------------------*/
-
 
 native cod_take_weapon(id, weapon);
 /*------------------------------
@@ -273,12 +271,25 @@ native cod_get_user_resistance(id);
 Sprawdza odpornosc gracza na miny, rakiety, dynamit
 ------------------------------*/
 
+native cod_get_user_gravity(id)
+/*------------------------------
+Zwraca wartosc grawitacji gracza
+------------------------------*/
+
+native cod_set_user_gravity(id, value)
+/*------------------------------
+Ustawia podana wartosc grawitacji
+------------------------------*/
+
+native cod_add_user_gravity(id, value)
+/*------------------------------
+Dodaje podana wartosc grawitacji
+------------------------------*/
 
 native cod_register_item(const nazwa[], const opis[], min_wartosc=0, max_wartosc=0);
 /*------------------------------
 Rejestruje nowy item oraz zwraca jego numer
 ------------------------------*/
-
 
 native cod_register_class(const nazwa[], const opis[], bronie, punkty_zdrowia, punkty_kondycji, punkty_inteligencji, punkty_wytrzymalosci);
 /*------------------------------
