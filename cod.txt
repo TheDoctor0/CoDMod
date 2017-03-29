@@ -1,7 +1,6 @@
 Do zrobienia:
-- Refaktoryzacja pluginów
-- Zmiany w sklepie (w trakcie refaktoryzacji)
 - Przenoszenie expa
+- Rozbudowanie sklepu
 - Podania i wojny w klanach
 - Aktualizacja .inc
 - Kasyno
