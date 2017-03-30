@@ -21,7 +21,7 @@ new const commandTopTime[][] = { "say /ttop15", "say_team /ttop15", "say /toptim
 new const commandBestStats[][] = { "say /staty", "say_team /staty", "say /beststats", "say_team /beststats", "say /bstats", "say_team /bstats", "say /najlepszestaty", "say_team /najlepszestaty", "say /nstaty", "say_team /nstaty", "najlepszestaty" };
 new const commandTopStats[][] = { "say /stop15", "say_team /stop15", "say /topstats", "say_team /topstats", "say /topstaty", "say_team /topstaty", "topstaty" };
 
-new playerName[MAX_PLAYERS + 1][64], playerStats[MAX_PLAYERS + 1][statsInfo], Handle:sql, dataLoaded, visitInfo, maxPlayers;
+new playerName[MAX_PLAYERS + 1][64], playerStats[MAX_PLAYERS + 1][statsInfo], Handle:sql, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo, maxPlayers;
 
 public plugin_init() 
 {
@@ -403,6 +403,52 @@ public check_time(id)
 public cod_spawned(id)
 	if(get_bit(id, visitInfo)) set_task(5.0, "check_time", id + TASK_TIME);
 
+public first_round()
+	blockCount = false;
+
+public round_restart()
+	round = 0;
+
+public cod_new_round()
+{
+	showedOneAndOnly = false;
+
+	if(!round)
+	{
+		set_task(30.0, "first_round");
+
+		blockCount = true;
+	}
+
+	round++;
+
+	new bestId, bestFrags, tempFrags, bestDeaths, tempDeaths;
+
+	for(new id = 1; id <= MAX_PLAYERS; id++) 
+	{
+		if(!is_user_connected(id) || is_user_bot(id) || is_user_hltv(id)) continue;
+
+		tempFrags = get_user_frags(id);
+		tempDeaths = get_user_deaths(id);
+
+		if(tempFrags > 0 && tempFrags > bestFrags)
+		{
+			bestFrags = tempFrags;
+			bestDeaths = tempDeaths;
+			bestId = id;
+		}
+	}
+
+	if(is_user_connected(bestId)) 
+	{
+		new bestName[64];
+
+		get_user_name(bestId, bestName, charsmax(bestName));
+
+		cod_print_chat(0, "^x03 %s^x01 prowadzi w grze z^x04 %i^x01 fragami i^x04 %i^x01 zgonami.", bestName, bestFrags, bestDeaths);
+	}
+}
+
 public cod_killed(killer, victim, weaponId, hitPlace)
 {
 	playerStats[victim][CURRENT_DEATHS]++;
@@ -411,6 +457,112 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 	playerStats[killer][KILLS]++;
 		
 	if(hitPlace == HIT_HEAD) playerStats[killer][CURRENT_HS_KILLS]++;
+
+	new killerName[64];
+
+	get_user_name(killer, killerName, charsmax(killerName));
+
+	cod_print_chat(victim, "Zostales zabity przez^x03 %s^x01, ktoremu zostalo^x04 %i^x01 HP.", killerName, get_user_health(killer));
+
+	if(weaponId == CSW_KNIFE)
+	{
+		for(new i = 1; i <= MAX_PLAYERS; i++)
+		{
+			if(!is_user_connected(i)) continue;
+
+			if(pev(i, pev_iuser2) == victim || i == victim) client_cmd(i, "spk %s", codSounds[SOUND_HUMILIATION]);
+		}
+	}
+
+	if(blockCount) return;
+
+	new tCount, ctCount, lastT, lastCT;
+
+	for(new i = 1; i <= MAX_PLAYERS; i++)
+	{
+		if(!is_user_alive(i)) continue;
+
+		switch(get_user_team(i))
+		{
+			case 1: 
+			{
+				tCount++;
+				lastT = i;
+			}
+			case 2: 
+			{
+				ctCount++;
+				lastCT = i;
+			}
+		}
+	}
+	
+	if(tCount == 1 && ctCount == 1)
+	{
+		for(new i = 1; i <= MAX_PLAYERS; i++)
+		{
+			if(!is_user_connected(i)) continue;
+
+			if(pev(i, pev_iuser2) == lastT || pev(i, pev_iuser2) == lastCT || i == lastT || i == lastCT) client_cmd(i, "spk %s", codSounds[SOUND_FORCE]);
+		}
+
+		new lastTName[32], lastCTName[32], hudData[64];
+
+		get_user_name(lastT, lastTName, charsmax(lastTName));
+		get_user_name(lastCT, lastCTName, charsmax(lastCTName));
+
+		formatex(hudData, charsmax(hudData), "%s vs. %s", lastTName, lastCTName);
+
+		cod_show_hud(0, hudData, TYPE_DHUD, 255, 128, 0, -1.0, 0.30, 0, 5.0, 5.0, 0.5, 0.15);
+	}
+	if(tCount == 1 && ctCount > 1 && !showedOneAndOnly)
+	{
+		showedOneAndOnly = true;
+
+		for(new i = 1; i <= MAX_PLAYERS; i++)
+		{
+			if(!is_user_connected(i)) continue;
+
+			if((is_user_alive(i) && get_user_team(i) == 2) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 2)) client_cmd(i, "spk %s", codSounds[SOUND_LAST]);
+
+			if(pev(i, pev_iuser2) == lastT || i == lastT) client_cmd(i, "spk %s", codSounds[SOUND_ONE]);
+		}
+
+		new hudData[16];
+
+		formatex(hudData, charsmax(hudData), "%i vs %i", tCount, ctCount);
+
+		cod_show_hud(0, hudData, TYPE_DHUD, 255, 128, 0, -1.0, 0.30, 0, 5.0, 5.0, 0.5, 0.15);
+	}
+	if(tCount > 1 && ctCount == 1 && !showedOneAndOnly)
+	{
+		showedOneAndOnly = true;
+
+		for(new i = 1; i <= MAX_PLAYERS; i++)
+		{
+			if(!is_user_connected(i)) continue;
+			
+			if((is_user_alive(i) && get_user_team(i) == 1) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 1)) client_cmd(i, "spk %s", codSounds[SOUND_LAST]);
+
+			if(pev(i, pev_iuser2) == lastCT || i == lastCT) client_cmd(i, "spk %s", codSounds[SOUND_ONE]);
+		}
+
+		new hudData[16];
+
+		formatex(hudData, charsmax(hudData), "%i vs %i", ctCount, tCount);
+
+		cod_show_hud(0, hudData, TYPE_DHUD, 255, 128, 0, -1.0, 0.30, 0, 5.0, 5.0, 0.5, 0.15);
+	}
+}
+
+public bomb_planted(planter)
+{
+	for(new i = 1; i <= MAX_PLAYERS; i++)
+	{
+		if(!is_user_connected(i)) continue;
+
+		if((is_user_alive(i) && get_user_team(i) == 2) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 2)) client_cmd(i, "spk %s", codSounds[SOUND_BOMB]);
+	}
 }
 
 public message_intermission() 

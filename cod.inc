@@ -30,7 +30,7 @@
 
 enum _:hud { TYPE_HUD, TYPE_DHUD };
 
-enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3 };
+enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB };
 
 new const codSounds[sounds][] =
 {
@@ -40,7 +40,12 @@ new const codSounds[sounds][] =
 	"CoDMod/start2.wav",
 	"CoDMod/levelup.wav",
 	"CoDMod/levelup2.wav",
-	"CoDMod/levelup3.wav"
+	"CoDMod/levelup3.wav",
+	"CoDMod/one.wav",
+	"CoDMod/last.wav",
+	"CoDMod/force.wav",
+	"CoDMod/humiliation.wav",
+	"CoDMod/bomb.wav"
 };
 
 native cod_check_account(id);
