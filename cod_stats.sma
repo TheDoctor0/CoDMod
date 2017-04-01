@@ -634,14 +634,14 @@ public hostages_rescued()
 	
 public sql_init()
 {
-	new host[32], user[32], pass[32], database[32], queryData[256], error[128], errorNum;
+	new host[32], user[32], pass[32], db[32], queryData[512], error[128], errorNum;
 	
 	get_cvar_string("cod_sql_host", host, charsmax(host));
 	get_cvar_string("cod_sql_user", user, charsmax(user));
 	get_cvar_string("cod_sql_pass", pass, charsmax(pass));
-	get_cvar_string("cod_sql_database", database, charsmax(database));
+	get_cvar_string("cod_sql_db", db, charsmax(db));
 	
-	sql = SQL_MakeDbTuple(host, user, pass, database);
+	sql = SQL_MakeDbTuple(host, user, pass, db);
 
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
@@ -652,8 +652,9 @@ public sql_init()
 		return;
 	}
 	
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_stats` (`name` varchar(32) NOT NULL, `admin` int(10) NOT NULL, `kills` int(10) NOT NULL, `time` int(10) NOT NULL, `firstvisit` int(10) NOT NULL, ");
-	add(queryData, charsmax(queryData), "`lastvisit` int(10) NOT NULL, `bestkills` int(10) NOT NULL, `bestdeaths` int(10) NOT NULL, `besths` int(10) NOT NULL, `beststats` int(10) NOT NULL, PRIMARY KEY (`name`));");
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_stats` (`name` varchar(35) NOT NULL, `admin` INT NOT NULL, `kills` INT NOT NULL, ");
+	add(queryData, charsmax(queryData), "`time` INT NOT NULL, `firstvisit` INT NOT NULL, `lastvisit` INT NOT NULL, `bestkills` INT NOT NULL, ");
+	add(queryData, charsmax(queryData), "`bestdeaths` INT NOT NULL, `besths` INT NOT NULL, `beststats` INT NOT NULL, PRIMARY KEY (`name`));");
 
 	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
 
@@ -703,7 +704,7 @@ public load_stats_handle(failState, Handle:query, error[], errorNum, tempId[], d
 	{
 		new queryData[128];
 		
-		formatex(queryData, charsmax(queryData), "INSERT INTO `cod_honor` VALUES ('%s', '0')", playerName[id]);
+		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_stats` (`name`) VALUES ('%s')", playerName[id]);
 		
 		SQL_ThreadQuery(sql, "ignore_handle", queryData);
 	}

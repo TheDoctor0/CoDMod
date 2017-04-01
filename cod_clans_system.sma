@@ -1647,14 +1647,14 @@ stock get_user_status(id)
 
 public sql_init()
 {
-	new host[32], user[32], pass[32], database[32], queryData[256], error[128], errorNum;
+	new host[32], user[32], pass[32], db[32], queryData[512], error[128], errorNum;
 	
 	get_cvar_string("cod_sql_host", host, charsmax(host));
 	get_cvar_string("cod_sql_user", user, charsmax(user));
 	get_cvar_string("cod_sql_pass", pass, charsmax(pass));
-	get_cvar_string("cod_sql_database", database, charsmax(database));
+	get_cvar_string("cod_sql_db", db, charsmax(db));
 	
-	sql = SQL_MakeDbTuple(host, user, pass, database);
+	sql = SQL_MakeDbTuple(host, user, pass, db);
 
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
@@ -1665,20 +1665,21 @@ public sql_init()
 		return;
 	}
 	
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans` (`id` INT NOT NULL AUTO_INCREMENT, clan_name` varchar(64) NOT NULL, `members` int(5) NOT NULL DEFAULT '1', `honor` int(5) NOT NULL DEFAULT '0', `kills` int(5) NOT NULL DEFAULT '0', ");
-	add(queryData, charsmax(queryData), "`level` int(5) NOT NULL DEFAULT '0', `speed` int(5) NOT NULL DEFAULT '0', `gravity` int(5) NOT NULL DEFAULT '0', `damage` int(5) NOT NULL DEFAULT '0', `weapondrop` int(5) NOT NULL DEFAULT '0', PRIMARY KEY (`name`));");
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans` (`id` INT NOT NULL AUTO_INCREMENT, `name` varchar(64) NOT NULL, ");
+	add(queryData, charsmax(queryData), "`members` INT NOT NULL, `honor` INT NOT NULL, `kills` INT NOT NULL, `level` INT NOT NULL, `speed` INT NOT NULL, ");
+	add(queryData, charsmax(queryData), "`gravity` INT NOT NULL, `damage` INT NOT NULL, `weapondrop` INT NOT NULL, PRIMARY KEY (`id`));");
 
 	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
 
 	SQL_Execute(query);
 
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_members` (`id` INT NOT NULL AUTO_INCREMENT, `name` varchar(64) NOT NULL, `clan` INT NOT NULL, `flag` INT NOT NULL DEFAULT '0', PRIMARY KEY (`name`));");
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_members` (`name` varchar(64) NOT NULL, `clan` INT NOT NULL, `flag` INT NOT NULL, PRIMARY KEY (`name`));");
 	
 	query = SQL_PrepareQuery(connectHandle, queryData);
 
 	SQL_Execute(query);
 
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_applications` (`id` INT NOT NULL AUTO_INCREMENT, `name` varchar(64) NOT NULL, `clan` INT NOT NULL, PRIMARY KEY (`id`));");
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_applications` (`name` varchar(64) NOT NULL, `clan` INT NOT NULL, PRIMARY KEY (`name`, `clan`));");
 	
 	query = SQL_PrepareQuery(connectHandle, queryData);
 
@@ -1721,7 +1722,7 @@ public load_data(id)
 	
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_members` a JOIN `cod_clans` b ON a.id = b.clan WHERE a.name = '%s'", playerName[id]);
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_members` a JOIN `cod_clans` b ON a.clan = b.id WHERE a.name = '%s'", playerName[id]);
 	SQL_ThreadQuery(sql, "load_data_handle", queryData, tempId, sizeof(tempId));
 }
 

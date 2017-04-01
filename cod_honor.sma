@@ -68,6 +68,8 @@ public client_putinserver(id)
 	
 	rem_bit(id, dataLoaded);
 
+	if(is_user_bot(id) || is_user_hltv(id)) return;
+
 	get_user_name(id, playerName[id], charsmax(playerName[]));
 
 	mysql_escape_string(playerName[id], playerName[id], charsmax(playerName[]));
@@ -181,14 +183,14 @@ public message_intermission()
 
 public sql_init()
 {
-	new host[32], user[32], pass[32], database[32], queryData[128], error[128], errorNum;
+	new host[32], user[32], pass[32], db[32], queryData[128], error[128], errorNum;
 	
 	get_cvar_string("cod_sql_host", host, charsmax(host));
 	get_cvar_string("cod_sql_user", user, charsmax(user));
 	get_cvar_string("cod_sql_pass", pass, charsmax(pass));
-	get_cvar_string("cod_sql_database", database, charsmax(database));
+	get_cvar_string("cod_sql_db", db, charsmax(db));
 	
-	sql = SQL_MakeDbTuple(host, user, pass, database);
+	sql = SQL_MakeDbTuple(host, user, pass, db);
 
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
@@ -199,7 +201,7 @@ public sql_init()
 		return;
 	}
 	
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_honor` (name VARCHAR(35), honor INT(11), PRIMARY KEY(name));");
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_honor` (`name` VARCHAR(35), `honor` INT(11), PRIMARY KEY(`name`));");
 
 	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
 
@@ -239,7 +241,7 @@ public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], d
 	{
 		new queryData[128];
 		
-		formatex(queryData, charsmax(queryData), "INSERT INTO `cod_honor` VALUES ('%s', '0')", playerName[id]);
+		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_honor` (`name`) VALUES ('%s')", playerName[id]);
 		
 		SQL_ThreadQuery(sql, "ignore_handle", queryData);
 	}
@@ -324,7 +326,7 @@ public _cod_set_user_honor(id, amount)
 	return PLUGIN_CONTINUE;
 }
 
-public _add_set_user_honor(id, amount)
+public _cod_add_user_honor(id, amount)
 {
 	if(!is_user_valid(id)) return PLUGIN_CONTINUE;
 	

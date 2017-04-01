@@ -291,20 +291,15 @@ native cod_add_user_gravity(id, value)
 Dodaje podana wartosc grawitacji
 ------------------------------*/
 
-native cod_register_item(const nazwa[], const opis[], min_wartosc=0, max_wartosc=0);
+native cod_register_item(const nazwa[], const opis[]);
 /*------------------------------
 Rejestruje nowy item oraz zwraca jego numer
 ------------------------------*/
 
-native cod_register_class(const nazwa[], const opis[], bronie, punkty_zdrowia, punkty_kondycji, punkty_inteligencji, punkty_wytrzymalosci);
+native cod_register_class(const nazwa[], const opis[], const frakcja[], bronie, punkty_zdrowia, punkty_inteligencji, punkty_sily, punkty_wytrzymalosci, punkty_kondycji);
 /*------------------------------
 Rejestruje nowa klase oraz zwraca jej numer
 ------------------------------*/
-
-native cod_register_advance(z_klasy, od_levela, const nazwa[], const opis[], bronie, punkty_zdrowia, punkty_kondycji, punkty_inteligencji, punkty_wytrzymalosci, punkty_niewidzialnosci, bonus_niewidzialnosci);
-/*------------------------------
-Rejestruje nowa klase z awansem oraz zwraca jej numer
-------------------------------*/	
 
 
 native cod_get_level_xp(poziom);
@@ -358,6 +353,11 @@ Ustawia honor gracza.
 native cod_add_user_honor(id, wartosc);
 /*------------------------------
 Dodaje honor graczowi.
+------------------------------*/
+
+native cod_kill_player(attacker, victim, damageBits);
+/*------------------------------
+Zabija podanego gracza.
 ------------------------------*/
 
 forward cod_item_get(id, item);

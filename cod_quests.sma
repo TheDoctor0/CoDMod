@@ -42,10 +42,7 @@ public plugin_init()
 	
 	for(new i; i < sizeof commandQuest; i++) register_clcmd(commandQuest[i], "quest_menu");
 	
-	register_event("DeathMsg", "DeathMsg", "a");
-	register_event("Damage", "Damage", "b", "2!=0");
-	
-	register_logevent("logEventQuest", 3, "1=triggered");
+	register_logevent("log_event_quest", 3, "1=triggered");
 	
 	quests = nvault_open("cod_quests");
 	
@@ -397,35 +394,14 @@ public log_event_quest()
 	return PLUGIN_CONTINUE;
 }
 
-public cod_damage_post(attacker, victim, damage, damageBits)
+public cod_damage_post(attacker, victim, Float:damage, damageBits)
 {
 	if(playerData[PLAYER_TYPE][attacker] != TYPE_DAMAGE) return PLUGIN_CONTINUE;
 		
-	add_progress(attacker, damage);
+	add_progress(attacker, floatround(damage));
 
 	return PLUGIN_CONTINUE;
 }
-
-add_progress(id, amount = 1)
-{
-	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
-	
-	if(check_progress(id)) playerData[PLAYER_PROGRESS][id] += amount;
-	else give_reward(id);
-
-	save_quest(id);
-	
-	return PLUGIN_CONTINUE;
-}
-
-get_progress(id)
-	return playerData[PLAYER_PROGRESS][id] ? playerData[PLAYER_PROGRESS][id] : 0;
-
-get_progress_need(id)
-	return playerData[PLAYER_TYPE][id] ? get_quest_info(playerData[PLAYER_ID][id], QUEST_AMOUNT) : 0;
-
-check_progress(id)
-	return get_progress(id) >= get_progress_need(id) - 1 ? 0 : 1;
 
 public give_reward(id)
 {
@@ -527,3 +503,24 @@ stock get_quest_info(quest, info)
 	
 	return codQuest[info];
 }
+
+stock add_progress(id, amount = 1)
+{
+	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
+	
+	if(check_progress(id)) playerData[PLAYER_PROGRESS][id] += amount;
+	else give_reward(id);
+
+	save_quest(id);
+	
+	return PLUGIN_CONTINUE;
+}
+
+stock get_progress(id)
+	return playerData[PLAYER_PROGRESS][id] ? playerData[PLAYER_PROGRESS][id] : 0;
+
+stock get_progress_need(id)
+	return playerData[PLAYER_TYPE][id] ? get_quest_info(playerData[PLAYER_ID][id], QUEST_AMOUNT) : 0;
+
+stock check_progress(id)
+	return get_progress(id) >= get_progress_need(id) - 1 ? 0 : 1;

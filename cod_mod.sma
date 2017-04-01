@@ -100,12 +100,14 @@ new Handle:sql, bool:freezeTime, hudInfo, hudSync, playersNum, itemResistance, b
 
 public plugin_init() 
 {
-	register_plugin(PLUGIN, VERSION, AUTHOR);	
+	register_plugin(PLUGIN, VERSION, AUTHOR);
+
+	create_arrays();	
 	
 	register_cvar("cod_sql_host", "sql.pukawka.pl", FCVAR_SPONLY|FCVAR_PROTECTED); 
-	register_cvar("cod_sql_user", "299081", FCVAR_SPONLY|FCVAR_PROTECTED); 
-	register_cvar("cod_sql_pass", "t993KU5garchck1x", FCVAR_SPONLY|FCVAR_PROTECTED); 
-	register_cvar("cod_sql_db", "299081_cod", FCVAR_SPONLY|FCVAR_PROTECTED);
+	register_cvar("cod_sql_user", "590489", FCVAR_SPONLY|FCVAR_PROTECTED); 
+	register_cvar("cod_sql_pass", "rIMxucY8RIMUEv", FCVAR_SPONLY|FCVAR_PROTECTED); 
+	register_cvar("cod_sql_db", "590489_cod", FCVAR_SPONLY|FCVAR_PROTECTED);
 	
 	cvarExpKill = register_cvar("cod_killxp", "10");
 	cvarExpKillHS = register_cvar("cod_hsxp", "5");
@@ -198,16 +200,6 @@ public plugin_init()
 	codForwards[NEW_ROUND] = CreateMultiForward("cod_new_round", ET_IGNORE);
 	codForwards[START_ROUND] = CreateMultiForward("cod_start_round", ET_IGNORE);
 	codForwards[END_ROUND] = CreateMultiForward("cod_end_round", ET_IGNORE);
-	
-	codItems = ArrayCreate(itemInfo);
-	codClasses = ArrayCreate(classInfo);
-	codFractions = ArrayCreate();
-	
-	for(new i = 1; i <= MAX_PLAYERS; i++)
-	{
-		codPlayerClasses[i] = ArrayCreate(playerClassInfo);
-		codPlayerRender[i] = ArrayCreate(renderInfo);
-	}
 }
 
 public plugin_natives()
@@ -264,8 +256,8 @@ public plugin_natives()
 	register_native("cod_get_user_condition", "_cod_get_user_condition", 1);
 	
 	register_native("cod_get_user_max_health", "_cod_get_user_max_health", 1);
-	register_native("cod_set_user_max_health", "_cod_set_user_max_health", 1);
-	register_native("cod_add_user_max_health", "_cod_add_user_max_health", 1);
+	register_native("cod_set_user_health", "_cod_set_user_health", 1);
+	register_native("cod_add_user_health", "_cod_add_user_health", 1);
 	
 	register_native("cod_get_user_rockets", "_cod_get_user_rockets", 1);
 	register_native("cod_get_user_mines", "_cod_get_user_mines", 1);
@@ -321,30 +313,12 @@ public plugin_natives()
 
 public plugin_cfg()
 {
-	new configPath[64], codItem[itemInfo], codClass[classInfo], codRender[renderInfo];
+	new configPath[64];
 	
 	get_localinfo("amxx_configsdir", configPath, charsmax(configPath));
 	
 	server_cmd("exec %s/cod_mod.cfg", configPath);
 	server_exec();
-	
-	formatex(codItem[ITEM_NAME], charsmax(codItem[ITEM_NAME]), "Brak");
-	formatex(codItem[ITEM_DESC], charsmax(codItem[ITEM_DESC]), "Zabij kogos, aby zdobyc przedmiot");
-	
-	ArrayPushArray(codItems, codItem);
-	
-	formatex(codClass[CLASS_NAME], charsmax(codClass[CLASS_NAME]), "Brak");
-
-	ArrayPushArray(codClasses, codClass);
-
-	codRender[RENDER_VALUE] = 256;
-	codRender[RENDER_TYPE] = RENDER_CLASS;
-
-	for(new i = 1; i <= MAX_PLAYERS; i++) ArrayPushArray(codPlayerRender[i], codRender);
-
-	codRender[RENDER_TYPE] = RENDER_ITEM;
-
-	for(new i = 1; i <= MAX_PLAYERS; i++) ArrayPushArray(codPlayerRender[i], codRender);
 
 	server_cmd("sv_maxspeed 500");
 
@@ -424,6 +398,39 @@ public client_disconnected(id)
 	remove_tasks(id);
 	
 	remove_ents(id);
+}
+
+public create_arrays()
+{
+	new codItem[itemInfo], codClass[classInfo], codRender[renderInfo];
+
+	codItems = ArrayCreate(itemInfo);
+	codClasses = ArrayCreate(classInfo);
+	codFractions = ArrayCreate();
+	
+	for(new i = 1; i <= MAX_PLAYERS; i++)
+	{
+		codPlayerClasses[i] = ArrayCreate(playerClassInfo);
+		codPlayerRender[i] = ArrayCreate(renderInfo);
+	}
+
+	formatex(codItem[ITEM_NAME], charsmax(codItem[ITEM_NAME]), "Brak");
+	formatex(codItem[ITEM_DESC], charsmax(codItem[ITEM_DESC]), "Zabij kogos, aby zdobyc przedmiot");
+	
+	ArrayPushArray(codItems, codItem);
+	
+	formatex(codClass[CLASS_NAME], charsmax(codClass[CLASS_NAME]), "Brak");
+
+	ArrayPushArray(codClasses, codClass);
+
+	codRender[RENDER_VALUE] = 256;
+	codRender[RENDER_TYPE] = RENDER_CLASS;
+
+	for(new i = 1; i <= MAX_PLAYERS; i++) ArrayPushArray(codPlayerRender[i], codRender);
+
+	codRender[RENDER_TYPE] = RENDER_ITEM;
+
+	for(new i = 1; i <= MAX_PLAYERS; i++) ArrayPushArray(codPlayerRender[i], codRender);
 }
 
 public select_fraction(id)
@@ -1385,7 +1392,7 @@ public player_spawn(id)
 	return PLUGIN_CONTINUE;
 }
 
-public player_takedamage_pre(victim, inflictor, attacker, Float:damage, damageBits)
+public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageBits)
 {
 	if(!is_user_connected(attacker) || !is_user_connected(victim) || get_user_team(victim) == get_user_team(attacker)) return HAM_IGNORED;
 
@@ -1886,11 +1893,11 @@ public show_info(id)
 	exp = codPlayer[target][PLAYER_LEVEL] - 1 >= 0 ? get_level_exp(codPlayer[target][PLAYER_LEVEL] - 1) : 0;
 	levelPercent = (float((codPlayer[target][PLAYER_EXP] - exp)) / float((get_level_exp(codPlayer[target][PLAYER_LEVEL]) - exp))) * 100.0;
 	
-	formatex(hudData, charsmax(hudData), "[Klasa : %s]^n[Exp : %0.1f%%]^n[Poziom : %i]^n[Item: %s (%i/%i)]^n[Honor: %i]", className, levelPercent, codPlayer[target][PLAYER_LEVEL], itemName, codPlayer[target][PLAYER_ITEM_DURA], maxDurability, cod_get_user_honor(target));
+	formatex(hudData, charsmax(hudData), "[Klasa : %s]^n[Exp : %0.1f%s]^n[Poziom : %i]^n[Item: %s (%i/%i)]^n[Honor: %i]", className, levelPercent, "%%", codPlayer[target][PLAYER_LEVEL], itemName, codPlayer[target][PLAYER_ITEM_DURA], maxDurability, cod_get_user_honor(target));
 	
-	if(get_exp_bonus(target, 1) > 1) format(hudData, charsmax(hudData), "%s^n[Exp: %i%%]", hudInfo, get_exp_bonus(target, 1) * 100);
+	if(get_exp_bonus(target, 100) > 100) format(hudData, charsmax(hudData), "%s^n[Exp: %i%s]", hudData, get_exp_bonus(target, 100), "%%");
 
-	if(codPlayer[target][PLAYER_KS]) format(hudData, charsmax(hudData), "%s^n[KillStreak: %i (%i s)]", hudInfo, codPlayer[target][PLAYER_KS], codPlayer[target][PLAYER_TIME_KS]);
+	if(codPlayer[target][PLAYER_KS]) format(hudData, charsmax(hudData), "%s^n[KillStreak: %i (%i s)]", hudData, codPlayer[target][PLAYER_KS], codPlayer[target][PLAYER_TIME_KS]);
 
 	switch(codPlayer[target][PLAYER_HUD])
 	{
@@ -2315,14 +2322,14 @@ public set_cvars()
 
 public sql_init()
 {
-	new host[32], user[32], pass[32], database[32], queryData[512], error[128], errorNum;
+	new host[32], user[32], pass[32], db[32], queryData[512], error[128], errorNum;
 	
 	get_cvar_string("cod_sql_host", host, charsmax(host));
 	get_cvar_string("cod_sql_user", user, charsmax(user));
 	get_cvar_string("cod_sql_pass", pass, charsmax(pass));
-	get_cvar_string("cod_sql_database", database, charsmax(database));
+	get_cvar_string("cod_sql_db", db, charsmax(db));
 	
-	sql = SQL_MakeDbTuple(host, user, pass, database);
+	sql = SQL_MakeDbTuple(host, user, pass, db);
 
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
@@ -2333,8 +2340,8 @@ public sql_init()
 		return;
 	}
 	
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_mod` (name VARCHAR(35) NOT NULL, class VARCHAR(64) NOT NULL, exp INT UNSIGNED NOT NULL DEFAULT 0, lvl INT UNSIGNED NOT NULL DEFAULT 1, intelligence INT UNSIGNED NOT NULL DEFAULT 0, ");
-	add(queryData,  charsmax(queryData), "health INT UNSIGNED NOT NULL DEFAULT 0, stamina INT UNSIGNED NOT NULL DEFAULT 0, condition INT UNSIGNED NOT NULL DEFAULT 0, strength INT UNSIGNED NOT NULL DEFAULT 0, PRIMARY KEY(name, class));");	
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_mod` (`name` VARCHAR(35) NOT NULL, `class` VARCHAR(64) NOT NULL, `exp` INT UNSIGNED NOT NULL DEFAULT 0, `level` INT UNSIGNED NOT NULL DEFAULT 1, `intelligence` INT UNSIGNED NOT NULL DEFAULT 0, ");
+	add(queryData,  charsmax(queryData), "`health` INT UNSIGNED NOT NULL DEFAULT 0, `stamina` INT UNSIGNED NOT NULL DEFAULT 0, `condition` INT UNSIGNED NOT NULL DEFAULT 0, `strength` INT UNSIGNED NOT NULL DEFAULT 0, PRIMARY KEY(`name`, `class`));");	
 
 	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
 
@@ -2374,7 +2381,7 @@ public load_data_handle(failState, Handle:query, error[], errorNum, playerId[], 
 
 		if(classId)
 		{
-			codClass[PCLASS_LEVEL] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "lvl"));
+			codClass[PCLASS_LEVEL] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "level"));
 			codClass[PCLASS_EXP] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "exp"));
 			codClass[PCLASS_INT] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "intelligence"));
 			codClass[PCLASS_HEAL] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "health"));
@@ -2490,7 +2497,7 @@ public load_class(id, class)
 		
 		get_class_info(class, CLASS_NAME, className, charsmax(className));
 		
-		formatex(tempData, charsmax(tempData), "INSERT INTO `cod_mod` (`name`, `class`) VALUES ('%s', '%s') ON DUPLICATE KEY UPDATE name = name", codPlayer[id][PLAYER_NAME], className);
+		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`) VALUES ('%s', '%s')", codPlayer[id][PLAYER_NAME], className);
 		SQL_ThreadQuery(sql, "ignore_handle", tempData);
 	}
 	
@@ -2578,7 +2585,7 @@ public _cod_get_class_intelligence(class)
 public _cod_get_class_stamina(class)
 	return get_class_info(class, CLASS_STAM);
 
-public _cod_class_strength(class)
+public _cod_get_class_strength(class)
 	return get_class_info(class, CLASS_STR);
 
 public _cod_get_class_condition(class)
@@ -2689,7 +2696,7 @@ public _cod_max_item_durability(id)
 public _cod_get_user_bonus_health(id)
 	return codPlayer[id][PLAYER_EXTR_HEAL];
 
-public _cod_get_user_bonus_int(id)
+public _cod_get_user_bonus_intelligence(id)
 	return codPlayer[id][PLAYER_EXTR_INT];
 	
 public _cod_get_user_bonus_stamina(id)

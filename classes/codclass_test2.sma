@@ -3,7 +3,7 @@
 
 new class;
 
-new const nazwa[] = "Test";
+new const nazwa[] = "Test2";
 new const opis[] = "Natychmiastowe zabicie z noza(PPM)";
 new const frakcja[] = "Testy";
 new const bronie = 1<<CSW_DEAGLE;
