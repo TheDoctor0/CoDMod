@@ -438,6 +438,7 @@ public leader_menu(id)
 	menu_additem(menu, "\wUlepsz \yUmiejetnosci", _, _, callback);
 	menu_additem(menu, "\wZapros \yGracza", _, _, callback);
 	menu_additem(menu, "\wZarzadzaj \yCzlonkami", _, _, callback);
+	menu_additem(menu, "\wRozpatrz \yPodania", _, _, callback);
 	menu_additem(menu, "\wZmien \yNazwe Klanu^n", _, _, callback);
 	menu_additem(menu, "\wWroc", _, _, callback);
 		
@@ -453,7 +454,7 @@ public leader_menu_callback(id, menu, item)
 	switch(item)
 	{
 		case 1: get_user_status(id) == STATUS_LEADER ? ITEM_ENABLED : ITEM_DISABLED;
-		case 2: if(((get_clan_info(clan[id], CLAN_LEVEL) * membersPerLevel) + membersStart) <= get_clan_info(clan[id], CLAN_MEMBERS)) return ITEM_DISABLED;
+		case 2, 4: if(((get_clan_info(clan[id], CLAN_LEVEL) * membersPerLevel) + membersStart) <= get_clan_info(clan[id], CLAN_MEMBERS)) return ITEM_DISABLED;
 	}
 
 	return ITEM_ENABLED;
@@ -482,8 +483,9 @@ public leader_menu_handle(id, menu, item)
 		case 1: skills_menu(id);
 		case 2: invite_menu(id);
 		case 3: members_menu(id);
-		case 4: client_cmd(id, "messagemode PODAJ_NOWA_NAZWE_KLANU");
-		case 5: show_clan_menu(id, 1);
+		case 4: applications_menu(id);
+		case 5: client_cmd(id, "messagemode PODAJ_NOWA_NAZWE_KLANU");
+		case 6: show_clan_menu(id, 1);
 	}
 	return PLUGIN_HANDLED;
 }
@@ -870,7 +872,7 @@ public invite_confirm_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT)
+	if(item == MENU_EXIT || item)
 	{
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
@@ -1197,6 +1199,126 @@ public update_member(id, status)
 	return PLUGIN_HANDLED;
 }
 
+public applications_menu(id)
+{
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
+
+	new queryData[256], tempId[1];
+	
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT a.name, (SELECT level FROM `cod_mod` WHERE name = a.name ORDER BY level DESC LIMIT 1) as level FROM `cod_clans_application` a WHERE clan = '%i' ORDER BY a.id", clan[id]);
+
+	SQL_ThreadQuery(sql, "applications_menu_handle", queryData, tempId, sizeof(tempId));
+	
+	return PLUGIN_HANDLED;
+}
+
+public applications_menu_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if(failState) 
+	{
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		
+		return;
+	}
+	
+	new id = tempId[0];
+	
+	if(!is_user_connected(id)) return;
+
+	new itemName[128], userName[64], level, menu = menu_create("\wWybierz podanie, aby je zatwierdzic lub odrzucic.", "applications_confirm_menu");
+	
+	while(SQL_MoreResults(query))
+	{
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), userName, charsmax(userName));
+
+		level = SQL_ReadResult(query, SQL_FieldNameToNum(query, "level"));
+		
+		formatex(itemName, charsmax(itemName), "\w%s y(Najwyzszy poziom: \r%i\y)", userName, level);
+		
+		menu_additem(menu, itemName, userName);
+
+		SQL_NextRow(query);
+	}
+	
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
+	
+	menu_display(id, menu);
+}
+
+public applications_confirm_menu(id, menu, item)
+{
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	
+	if(item == MENU_EXIT)
+	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	new menuData[128], userName[64], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, userName, charsmax(userName), _, _, itemCallback);
+	
+	menu_destroy(menu);
+
+	formatex(menuData, charsmax(menuData), "Czy chcesz przyjac \y%s \wdo klanu?", userName);
+	
+	new menu = menu_create(menuData, "applications_confirm_handle");
+	
+	menu_additem(menu, "Tak", userName);
+	menu_additem(menu, "Nie");
+	
+	menu_display(id, menu);
+	
+	return PLUGIN_CONTINUE;
+}
+
+public applications_confirm_handle(id, menu, item)
+{
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	
+	if(item == MENU_EXIT || item)
+	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+	
+	new userName[64], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, userName, charsmax(userName), _, _, itemCallback);
+	
+	menu_destroy(menu);
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	if(check_user_clan(userName))
+	{
+		cod_print_chat(id, "Gracz dolaczyl juz do innego klanu!");
+
+		show_clan_menu(id, 1);
+
+		return PLUGIN_HANDLED;
+	}
+
+	accept_application(id, userName);
+
+	cod_print_chat(id, "Zaakceptowales podanie ^x03 %s^01 o dolaczenie do klanu.", userName);
+	
+	return PLUGIN_HANDLED;
+}
+
 public deposit_honor_handle(id)
 {
 	if(!is_user_connected(id) || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
@@ -1438,7 +1560,7 @@ public application_confirm_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT)
+	if(item == MENU_EXIT || item)
 	{
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
@@ -1684,11 +1806,44 @@ stock save_member(id, status = 0, change = 0, const name[] = "")
 
 stock add_application(id, clanId)
 {
-	new queryData[128];
+	new queryData[128], userName[32];
 
 	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_clans_applications` (`name`, `clan`) VALUES ('%s', '%i');", playerName[id], clanId);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+
+	get_user_name(id, userName, charsmax(userName));
+
+	for(new i = 1; i <= MAX_PLAYERS; i++)
+	{
+		if(!is_user_connected(id) || is_user_bot(id) || is_user_hltv(id) || clan[id] != clanId || get_user_status(id) <= STATUS_MEMBER) continue;
+
+		client_print_color(i, id, "^x03%s^x01 zlozyl podanie do klanu!", userName);
+	}
+}
+
+stock accept_application(id, const userName[])
+{
+	new player = get_user_index(userName);
+
+	if(is_user_connected(player))
+	{
+		new clanName[64];
+
+		get_clan_info(clan[id], CLAN_NAME, clanName, charsmax(clanName));
+
+		set_user_clan(player, clan[id]);
+
+		client_print_color(player, player, "Zostales przyjety do klanu^x03 %s^x01!", clanName);
+	}
+	else 
+	{
+		set_clan_info(clan[id], CLAN_MEMBERS, get_clan_info(clan[id], CLAN_MEMBERS) + 1);
+	
+		save_clan(clan[id]);
+	}
+
+	remove_applications(id, userName);
 }
 
 stock check_applications(id, clanId)
@@ -1737,6 +1892,35 @@ stock check_clan_name(const clanName[])
 	mysql_escape_string(clanName, safeClanName, charsmax(safeClanName));
 	
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans` WHERE `clan_name` = '%s'", safeClanName);
+	
+	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	
+	if(errorNum)
+	{
+		log_to_file("cod_mod.log", "Error: %s", error);
+		
+		return false;
+	}
+	
+	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
+	
+	SQL_Execute(query);
+	
+	if(SQL_NumResults(query)) foundClan = true;
+
+	SQL_FreeHandle(query);
+	SQL_FreeHandle(connectHandle);
+	
+	return foundClan;
+}
+
+stock check_user_clan(const userName[])
+{
+	new queryData[128], safeUserName[64], error[128], errorNum, bool:foundClan;
+
+	mysql_escape_string(userName, safeUserName, charsmax(safeUserName));
+	
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_members` WHERE `name` = '%s' AND clan > 0", userName);
 	
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	

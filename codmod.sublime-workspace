@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"MENU",
+				"MENU_EXIT  \tamxconst.inc - define: -3"
+			],
+			[
 				"bomb",
 				"bomb_planted  \tcsx.inc - forward"
 			],
@@ -51,34 +55,7 @@
 			"file": "cod.txt",
 			"settings":
 			{
-				"buffer_size": 229,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "cod_clans_system.sma",
-			"settings":
-			{
-				"buffer_size": 43586,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "cod_mod.sma",
-			"settings":
-			{
-				"buffer_size": 99314,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/D/Dawid/Workplace/AMXX/scripting/ozone_security.sma",
-			"settings":
-			{
-				"buffer_size": 14837,
+				"buffer_size": 209,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -191,6 +168,15 @@
 	],
 	"file_history":
 	[
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_clans_system.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_mod.sma",
+		"/D/Dawid/Workplace/AMXX/scripting/ozone_security.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/sklepsms_usluga_cod_honor.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/sklepsms_usluga_cod_exp.sma",
+		"/D/Dawid/Workplace/AMXX/include/cod.inc",
+		"/D/Dawid/Workplace/Mods/CoDMod/sklepsms_usluga_cod_transfer.sma",
+		"/D/Dawid/Workplace/AMXX Old/sklepsms/sklepsms_usluga_admin.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_honor.sma",
 		"/C/Users/Dawid/Desktop/sql.cfg",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sql.cfg",
 		"/D/Dawid/Workplace/AMXX/scripting/ozone_banconfig.sma",
@@ -206,7 +192,6 @@
 		"/D/Dawid/Workplace/AMXX Old/sklepsms/shopsms_service_admin.sp",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/db.config.inc.php",
 		"/C/Users/Dawid/Desktop/sklep_sms.cfg",
-		"/D/Dawid/Workplace/AMXX Old/sklepsms/sklepsms_usluga_admin.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/index.php",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/config.php",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/config.inc.php",
@@ -236,9 +221,7 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sys_error.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/debug.log",
 		"/D/Downloads/GoogleChrome/crx_winmessages.sma",
-		"/D/Dawid/Workplace/AMXX/include/cod.inc",
 		"/D/Dawid/Workplace/New Mods/CoDMod/cod_stats.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/ozone_security.sma",
 		"/C/Users/Dawid/Desktop/Ultimate Sounds_Pack/addons/amxmodx/scripting/ultimate_sounds.sma",
 		"/D/Dawid/Workplace/AMXX/scripting/supervip.sma",
 		"/D/Dawid/Workplace/AMXX/scripting/vip_4fun.sma",
@@ -312,13 +295,7 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/index.html.twig",
 		"/C/Users/Dawid/Desktop/ffa/cstrike/addons/amxmodx/configs/amxx.cfg",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/servers.ini",
-		"/C/Users/Dawid/Desktop/ffa/cstrike/addons/amxmodx/configs/plugins.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins-sklep_sms.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/serverlist.ini",
-		"/D/Dawid/Workplace/AMXX Old/admincmd.sma",
-		"/C/Users/Dawid/Desktop/ffa/cstrike/motd.txt",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/motd.txt",
-		"/C/Users/Dawid/Desktop/ffa/reunion.cfg"
+		"/C/Users/Dawid/Desktop/ffa/cstrike/addons/amxmodx/configs/plugins.ini"
 	],
 	"find":
 	{
@@ -342,6 +319,18 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"PLAYER_GAINED_EXP",
+			"PLAYER_POINTS",
+			"codPlayer[id][PLAYER_GAINED_EXP]",
+			"_cod_set_user_exp",
+			"cod_set_user_exp",
+			"zp_set_user_exp",
+			"zp_get_user_exp",
+			"zp_set_user_class",
+			"zp_get_user_class",
+			"Return",
+			"klasa",
+			"zp_get_class_name",
 			"pev_health",
 			"g_LBEO",
 			"takedamage",
@@ -457,19 +446,7 @@
 			"iAccess",
 			"szInfo",
 			"get_user_status",
-			"save_member",
-			"playerClan",
-			"iOwner",
-			"iClan",
-			"save_clan",
-			"szOldName",
-			"iUpgraded",
-			"iRemaining",
-			"szPassword",
-			"save_clan",
-			"bPlayerOnline",
-			"update_member",
-			"UpdateMember"
+			"save_member"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -542,7 +519,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -551,7 +528,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 229,
+						"buffer_size": 209,
 						"regions":
 						{
 						},
@@ -597,61 +574,61 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
 								"bh_c_define_close",
 								"bh_c_define_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
-								"bh_square_content"
+								"bh_square_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
 							"git_gutter_enabled": true,
@@ -661,383 +638,6 @@
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "cod_clans_system.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 43586,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1360,
-								1360
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										2485,
-										2486
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/curly_bracket.png",
-										"brackethighlighter.default"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										1161,
-										1162
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content"
-							],
-							"git_gutter_enabled": true,
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod\\cod_clans_system.sma",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 794.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "cod_mod.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 99314,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								400,
-								400
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content"
-							],
-							"git_gutter_enabled": true,
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod\\cod_mod.sma",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "/D/Dawid/Workplace/AMXX/scripting/ozone_security.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 14837,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5429,
-								5429
-							]
-						],
-						"settings":
-						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										5610,
-										5611
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/curly_bracket.png",
-										"brackethighlighter.default"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										4997,
-										4998
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content"
-							],
-							"git_gutter_enabled": true,
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\AMXX\\scripting\\ozone_security.sma",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\AMXX",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 2503.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
