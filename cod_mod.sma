@@ -2351,6 +2351,7 @@ public load_data(id)
 	playerId[0] = id;
 	
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_mod` WHERE name = '%s'", codPlayer[id][PLAYER_NAME]);
+	
 	SQL_ThreadQuery(sql, "load_data_handle", queryData, playerId, sizeof(playerId));
 }
 

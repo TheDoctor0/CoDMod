@@ -147,7 +147,7 @@ public show_clan_menu(id, sound)
 		menu = menu_create(menuData, "show_clan_menu_handle");
 		
 		if(get_user_status(id) > STATUS_MEMBER) menu_additem(menu, "\wZarzadzaj \yKlanem");
-		else 
+		else
 		{
 			formatex(menuData, charsmax(menuData), "\wStworz \yKlan \r(Wymagany %i Poziom)", createLevel);
 
@@ -168,6 +168,8 @@ public show_clan_menu(id, sound)
 	menu_additem(menu, "\wCzlonkowie \yOnline", _, _, callback);
 	menu_additem(menu, "\wWplac \yHonor", _, _, callback);
 	menu_additem(menu, "\wTop15 \yKlanow", _, _, callback);
+
+	if(!clan[id]) menu_additem(menu, "\wZloz \yPodanie", _, _, callback);
 	
 	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
 	
@@ -182,6 +184,7 @@ public show_clan_menu_callback(id, menu, item)
 	{
 		case 1, 3, 4: return clan[id] ? ITEM_ENABLED : ITEM_DISABLED;
 		case 2: if(get_user_status(id) < STATUS_DEPUTY || ((get_clan_info(clan[id], CLAN_LEVEL) * membersPerLevel) + membersStart) <= get_clan_info(clan[id], CLAN_MEMBERS)) return ITEM_DISABLED;
+		case 5: return clan[id] ? ITEM_DISABLED: ITEM_ENABLED; 
 	}
 
 	return ITEM_ENABLED;
@@ -240,6 +243,7 @@ public show_clan_menu_handle(id, menu, item)
 			cod_print_chat(id, "Wpisz ilosc Honoru, ktora chcesz wplacic.");
 		}
 		case 4: clans_top15(id);
+		case 5: application_menu(id);
 	}
 	
 	menu_destroy(menu);
@@ -848,9 +852,9 @@ public invite_confirm_menu(id, player)
 
 	get_clan_info(clan[id], CLAN_NAME, clanName, charsmax(clanName));
 	
-	formatex(menuData, charsmax(menuData), "^x03%s^x01 zaprosil cie do klanu^x03 %s^x01.", userName, clanName);
+	formatex(menuData, charsmax(menuData), "\r%s\w zaprosil cie do klanu \y%s\w.", userName, clanName);
 	
-	new menu = menu_create(menuData, "invite_confirm_menu_handler");
+	new menu = menu_create(menuData, "invite_confirm_menu_handle");
 	
 	num_to_str(id, userId, charsmax(userId));
 	
@@ -862,7 +866,7 @@ public invite_confirm_menu(id, player)
 	return PLUGIN_HANDLED;
 }
 
-public invite_confirm_menu_handler(id, menu, item)
+public invite_confirm_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
@@ -1323,6 +1327,154 @@ public say_text(msgId, msgDest, msgEnt)
 	return PLUGIN_CONTINUE;
 }
 
+public application_menu(id)
+{
+	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
+
+	new queryData[128], tempId[1];
+	
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT a.id, a.name as 'clan', b.name FROM `cod_clans` a JOIN `cod_clans_members` b ON a.id = b.clan WHERE flag = '3' ORDER BY a.kills DESC");
+
+	SQL_ThreadQuery(sql, "application_menu_handle", queryData, tempId, sizeof(tempId));
+	
+	return PLUGIN_HANDLED;
+}
+
+public application_menu_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if(failState) 
+	{
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		
+		return;
+	}
+	
+	new id = tempId[0];
+	
+	if(!is_user_connected(id)) return;
+
+	new itemName[128], itemData[64], clanName[64], userName[64], clanId, menu = menu_create("\wWybierz \rKlan:^n\wWybierz \rklan\w, do ktorego chcesz zlozyc \ypodanie\w.", "application_handle");
+	
+	while(SQL_MoreResults(query))
+	{
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "clan"), clanName, charsmax(clanName));
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), userName, charsmax(userName));
+
+		clanId = SQL_ReadResult(query, SQL_FieldNameToNum(query, "id"));
+		
+		formatex(itemName, charsmax(itemName), "%s \y(Lider: \r%s\y)", clanName, userName);
+		formatex(itemData, charsmax(itemData), "%i#%s", clanId, clanName);
+		
+		menu_additem(menu, itemName, itemData);
+
+		SQL_NextRow(query);
+	}
+	
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
+	
+	menu_display(id, menu);
+}
+
+public application_handle(id, menu, item)
+{
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	
+	if(item == MENU_EXIT)
+	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	if(clan[id])
+	{
+		cod_print_chat(id, "Nie mozesz zlozyc podania, jesli jestes juz w klanie!");
+
+		show_clan_menu(id, 1);
+
+		return PLUGIN_HANDLED;
+	}
+
+	new itemData[64], clanName[64], tempClanId[6], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
+	
+	menu_destroy(menu);
+
+	strtok(itemData, clanName, charsmax(clanName), tempClanId, charsmax(tempClanId), '#');
+
+	if(check_applications(id, str_to_num(tempClanId)))
+	{
+		cod_print_chat(id, "Juz zlozyles podanie do tego klanu!");
+
+		show_clan_menu(id, 1);
+
+		return PLUGIN_HANDLED;
+	}
+
+	new menuData[128];
+
+	formatex(menuData, charsmax(menuData), "Czy na pewno chcesz zlozyc podanie do klanu \y%s\w?", clanName);
+	
+	new menu = menu_create(menuData, "application_confirm_handle");
+	
+	menu_additem(menu, "Tak", itemData);
+	menu_additem(menu, "Nie");
+	
+	menu_display(id, menu);	
+
+	return PLUGIN_HANDLED;
+}
+
+public application_confirm_handle(id, menu, item)
+{
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	
+	if(item == MENU_EXIT)
+	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+	
+	new itemData[64], clanName[64], tempClanId[6], itemAccess, itemCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
+	
+	menu_destroy(menu);
+
+	strtok(itemData, clanName, charsmax(clanName), tempClanId, charsmax(tempClanId), '#');
+	
+	new clanId = str_to_num(itemData);
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	if(clan[id])
+	{
+		cod_print_chat(id, "Nie mozesz zlozyc podania, jesli jestes juz w klanie!");
+
+		show_clan_menu(id, 1);
+
+		return PLUGIN_HANDLED;
+	}
+
+	add_application(id, clanId);
+
+	cod_print_chat(id, "Zlozyles podanie do klanu^x03 %s^01.", clanName);
+	
+	return PLUGIN_HANDLED;
+}
+
 stock set_user_clan(id, playerClan = 0, owner = 0)
 {
 	if(!is_user_connected(id)) return;
@@ -1346,6 +1498,8 @@ stock set_user_clan(id, playerClan = 0, owner = 0)
 		TrieSetCell(Trie:get_clan_info(clan[id], CLAN_STATUS), playerName[id], owner ? STATUS_LEADER : STATUS_MEMBER);
 		
 		save_member(id, owner ? STATUS_LEADER : STATUS_MEMBER, 1);
+
+		remove_applications(id);
 	}
 }
 
@@ -1358,7 +1512,7 @@ stock set_user_status(id, status)
 	save_member(id, status);
 }
 
-get_user_status(id)
+stock get_user_status(id)
 {
 	if(!is_user_connected(id) || !clan[id]) return STATUS_NONE;
 	
@@ -1390,13 +1544,19 @@ public sql_init()
 	}
 	
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans` (`id` INT NOT NULL AUTO_INCREMENT, clan_name` varchar(64) NOT NULL, `members` int(5) NOT NULL DEFAULT '1', `honor` int(5) NOT NULL DEFAULT '0', `kills` int(5) NOT NULL DEFAULT '0', ");
-	add(queryData, charsmax(queryData), "`level` int(5) NOT NULL DEFAULT '0', `speed` int(5) NOT NULL DEFAULT '0', `gravity` int(5) NOT NULL DEFAULT '0', `damage` int(5) NOT NULL DEFAULT '0', `weapondrop` int(5) NOT NULL DEFAULT '0', PRIMARY KEY (`id`));");
+	add(queryData, charsmax(queryData), "`level` int(5) NOT NULL DEFAULT '0', `speed` int(5) NOT NULL DEFAULT '0', `gravity` int(5) NOT NULL DEFAULT '0', `damage` int(5) NOT NULL DEFAULT '0', `weapondrop` int(5) NOT NULL DEFAULT '0', PRIMARY KEY (`name`));");
 
 	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
 
 	SQL_Execute(query);
 
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_members` (`name` varchar(64) NOT NULL, `clan` INT NOT NULL, `flag` INT NOT NULL DEFAULT '0', PRIMARY KEY (`name`));");
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_members` (`id` INT NOT NULL AUTO_INCREMENT, `name` varchar(64) NOT NULL, `clan` INT NOT NULL, `flag` INT NOT NULL DEFAULT '0', PRIMARY KEY (`name`));");
+	
+	query = SQL_PrepareQuery(connectHandle, queryData);
+
+	SQL_Execute(query);
+
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_applications` (`id` INT NOT NULL AUTO_INCREMENT, `name` varchar(64) NOT NULL, `clan` INT NOT NULL, PRIMARY KEY (`id`));");
 	
 	query = SQL_PrepareQuery(connectHandle, queryData);
 
@@ -1441,23 +1601,6 @@ public load_data(id)
 
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_members` a JOIN `cod_clans` b ON a.id = b.clan WHERE a.name = '%s'", playerName[id]);
 	SQL_ThreadQuery(sql, "load_data_handle", queryData, tempId, sizeof(tempId));
-}
-
-stock save_member(id, status = 0, change = 0, const name[] = "")
-{
-	new queryData[128], safeName[64];
-
-	if(strlen(name)) mysql_escape_string(name, safeName, charsmax(safeName));
-	else copy(safeName, charsmax(safeName), playerName[id]);
-
-	if(status)
-	{
-		if(change) formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '%i', flag = '%i' WHERE name = '%s'", change, status, safeName);
-		else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET flag = '%i' WHERE name = '%s'", status, safeName);
-	}
-	else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '0', flag = '0' WHERE name = '%s'", safeName);
-
-	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
 
 public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
@@ -1515,7 +1658,79 @@ public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], da
 	}
 }
 
-public check_clan_name(const clanName[])
+stock save_member(id, status = 0, change = 0, const name[] = "")
+{
+	new queryData[128], safeName[64];
+
+	if(strlen(name)) mysql_escape_string(name, safeName, charsmax(safeName));
+	else copy(safeName, charsmax(safeName), playerName[id]);
+
+	if(status)
+	{
+		if(change) formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '%i', flag = '%i' WHERE name = '%s'", change, status, safeName);
+		else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET flag = '%i' WHERE name = '%s'", status, safeName);
+	}
+	else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '0', flag = '0' WHERE name = '%s'", safeName);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+
+	if(change)
+	{
+		formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_applications` WHERE name = '%s'", change, safeName);
+
+		SQL_ThreadQuery(sql, "ignore_handle", queryData);
+	}
+}
+
+stock add_application(id, clanId)
+{
+	new queryData[128];
+
+	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_clans_applications` (`name`, `clan`) VALUES ('%s', '%i');", playerName[id], clanId);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+}
+
+stock check_applications(id, clanId)
+{
+	new queryData[128], error[128], errorNum, bool:foundApplication;
+	
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_applications` WHERE `name` = '%s' AND clan = '%i'", playerName[id], clanId);
+	
+	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	
+	if(errorNum)
+	{
+		log_to_file("cod_mod.log", "Error: %s", error);
+		
+		return false;
+	}
+	
+	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
+	
+	SQL_Execute(query);
+	
+	if(SQL_NumResults(query)) foundApplication = true;
+
+	SQL_FreeHandle(query);
+	SQL_FreeHandle(connectHandle);
+	
+	return foundApplication;
+}
+
+stock remove_applications(id, const name[] = "")
+{
+	new queryData[128], safeName[64];
+
+	if(strlen(name)) mysql_escape_string(name, safeName, charsmax(safeName));
+	else copy(safeName, charsmax(safeName), playerName[id]);
+
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_applications` WHERE name = '%s'", safeName);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+}
+
+stock check_clan_name(const clanName[])
 {
 	new queryData[128], safeClanName[64], error[128], errorNum, bool:foundClan;
 
