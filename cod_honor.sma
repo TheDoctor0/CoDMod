@@ -54,8 +54,9 @@ public plugin_cfg()
 
 public plugin_natives()
 {
-	register_native("cod_get_user_honor", "_cod_get_user_honor");
-	register_native("cod_set_user_honor", "_cod_get_user_honor");
+	register_native("cod_get_user_honor", "_cod_get_user_honor", 1);
+	register_native("cod_set_user_honor", "_cod_get_user_honor", 1);
+	register_native("cod_add_user_honor", "_cod_add_user_honor", 1);
 }
 
 public plugin_end()
@@ -305,31 +306,35 @@ public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSiz
 	return PLUGIN_CONTINUE;
 }
 
-public _cod_get_user_honor(plugin, params)
+public _cod_get_user_honor(id)
 {
-	if(params != 1) return PLUGIN_CONTINUE;
-		
-	new id = get_param(1);
-	
-	if(!is_user_valid(id)) return PLUGIN_CONTINUE;
+	if(!is_user_valid(id)) return 0;
 	
 	return playerHonor[id];
 }
 
-public _cod_set_user_honor(plugin, params)
+public _cod_set_user_honor(id, amount)
 {
-	if(params != 1) return PLUGIN_CONTINUE;
-		
-	new id = get_param(1);
-	
 	if(!is_user_valid(id)) return PLUGIN_CONTINUE;
 	
-	playerHonor[id] = max(0, get_param(2));
+	playerHonor[id] = max(0, amount);
 	
 	save_honor(id);
 	
 	return PLUGIN_CONTINUE;
 }
+
+public _add_set_user_honor(id, amount)
+{
+	if(!is_user_valid(id)) return PLUGIN_CONTINUE;
+	
+	playerHonor[id] += amount;
+	
+	save_honor(id);
+	
+	return PLUGIN_CONTINUE;
+}
+
 
 stock get_loguser_index()
 {

@@ -355,6 +355,11 @@ native cod_set_user_honor(id, wartosc);
 Ustawia honor gracza.
 ------------------------------*/
 
+native cod_add_user_honor(id, wartosc);
+/*------------------------------
+Dodaje honor graczowi.
+------------------------------*/
+
 forward cod_item_get(id, item);
 /*------------------------------
 Forward wysylany do wszystkich pluginow w momencie znalezienia itemu
