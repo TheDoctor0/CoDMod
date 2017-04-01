@@ -1,5 +1,4 @@
 Do zrobienia:
-- Przenoszenie expa
 - Rozbudowanie sklepu
 - Podania i wojny w klanach
 - Aktualizacja .inc
