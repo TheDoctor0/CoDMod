@@ -3,6 +3,7 @@
 #include <fakemeta>
 #include <engine>
 #include <hamsandwich>
+#include <nvault>
 #include <fun>
 #include <xs>
 #include <csx>
@@ -86,7 +87,7 @@ enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_LEVEL, PLAYER_GAINED_
 
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 	
-enum save { NORMAL, DISCONNECT, MAP_END };
+enum _:save { NORMAL, DISCONNECT, MAP_END };
 
 new expKill, expKillHS, expDamage, expWinRound, expPlant, expDefuse, expRescue, levelLimit, levelRatio, 
 	killStreakTime, minPlayers, minBonusPlayers, maxDurability, minDamageDurability, maxDamageDurability;
@@ -96,7 +97,7 @@ new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpWinRound, cvarExpPlant, cv
 
 new Array:codItems, Array:codClasses, Array:codFractions, Array:codPlayerClasses[MAX_PLAYERS + 1], Array:codPlayerRender[MAX_PLAYERS + 1], codForwards[forwards];
 
-new Handle:sql, bool:freezeTime, hudInfo, hudSync, playersNum, itemResistance, bunnyHop, dataLoaded, resetStats, userConnected, renderTimer, lastInfo;
+new Handle:sql, bool:freezeTime, hudInfo, hudSync, hudVault, playersNum, itemResistance, bunnyHop, dataLoaded, resetStats, userConnected, renderTimer, lastInfo;
 
 public plugin_init() 
 {
@@ -186,6 +187,10 @@ public plugin_init()
 	
 	hudSync = CreateHudSyncObj();
 	hudInfo = CreateHudSyncObj();
+
+	hudVault = nvault_open("cod_hud");
+	
+	if(hudVault == INVALID_HANDLE) set_fail_state("[COD] Nie mozna otworzyc pliku cod_hud.vault");
 	
 	codForwards[CLASS_CHANGED] = CreateMultiForward("cod_class_changed", ET_CONTINUE, FP_CELL, FP_CELL);
 	codForwards[ITEM_CHANGED] = CreateMultiForward("cod_item_changed", ET_CONTINUE, FP_CELL, FP_CELL, FP_CELL);
@@ -200,6 +205,8 @@ public plugin_init()
 	codForwards[NEW_ROUND] = CreateMultiForward("cod_new_round", ET_IGNORE);
 	codForwards[START_ROUND] = CreateMultiForward("cod_start_round", ET_IGNORE);
 	codForwards[END_ROUND] = CreateMultiForward("cod_end_round", ET_IGNORE);
+
+	register_clcmd("say /test", "show_bonus_info");
 }
 
 public plugin_natives()
@@ -400,8 +407,6 @@ public client_putinserver(id)
 public client_disconnected(id)
 {
 	if(get_bit(id, userConnected)) playersNum--;
-	
-	show_bonus_info();
 	
 	save_data(id, DISCONNECT);
 
@@ -966,12 +971,14 @@ public change_hud_handle(id, menu, item)
 			codPlayer[id][PLAYER_HUD_RED] = 0;
 			codPlayer[id][PLAYER_HUD_GREEN] = 255;
 			codPlayer[id][PLAYER_HUD_BLUE] = 0;
-			codPlayer[id][PLAYER_HUD_POSX] = 66;
+			codPlayer[id][PLAYER_HUD_POSX] = 70;
 			codPlayer[id][PLAYER_HUD_POSY] = 6;
 		}
 	}
 
 	menu_destroy(id);
+
+	save_hud(id);
 	
 	change_hud(id, 1);
 	
@@ -1783,7 +1790,7 @@ public cmd_start(id, ucHandle)
 
 	speed = vector_length(velocity);
 
-	if(Float:codPlayer[id][PLAYER_SPEED] > speed * 1.8) set_pev(id, pev_flTimeStepSound, 300);
+	if(get_user_maxspeed(id) > speed * 1.8) set_pev(id, pev_flTimeStepSound, 300);
 
 	if(speed == 0.0) playerState |= RENDER_STAND;
 	else playerState |= RENDER_MOVE;
@@ -1873,8 +1880,8 @@ public show_info(id)
 	{
 		target = pev(id, pev_iuser2);
 		
-		if (!codPlayer[target][PLAYER_HUD]) set_hudmessage(255, 255, 255, 0.6, -1.0, 0, 0.0, 0.3, 0.0, 0.0, 4);
-		else set_dhudmessage(255, 255, 255, 0.6, -1.0, 0, 0.0, 0.3, 0.0, 0.0);
+		if (!codPlayer[target][PLAYER_HUD]) set_hudmessage(255, 255, 255, 0.7, -1.0, 0, 0.0, 0.3, 0.0, 0.0, 4);
+		else set_dhudmessage(255, 255, 255, 0.7, -1.0, 0, 0.0, 0.3, 0.0, 0.0);
 	}
 	else
 	{
@@ -1890,7 +1897,7 @@ public show_info(id)
 	exp = codPlayer[target][PLAYER_LEVEL] - 1 >= 0 ? get_level_exp(codPlayer[target][PLAYER_LEVEL] - 1) : 0;
 	levelPercent = (float((codPlayer[target][PLAYER_EXP] - exp)) / float((get_level_exp(codPlayer[target][PLAYER_LEVEL]) - exp))) * 100.0;
 	
-	formatex(hudData, charsmax(hudData), "[Klasa : %s]^n[Exp : %0.1f%s]^n[Poziom : %i]^n[Item: %s (%i/%i)]^n[Honor: %i]", className, levelPercent, "%%", codPlayer[target][PLAYER_LEVEL], itemName, codPlayer[target][PLAYER_ITEM_DURA], maxDurability, cod_get_user_honor(target));
+	formatex(hudData, charsmax(hudData), "[Klasa : %s]^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot: %s (%i/%i)]^n[Zycie: %i]^n[Honor: %i]", className, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, codPlayer[target][PLAYER_ITEM_DURA], maxDurability, get_user_health(id), cod_get_user_honor(target));
 	
 	if(get_exp_bonus(target, 100) > 100) format(hudData, charsmax(hudData), "%s^n[Exp Bonus: %i%s]", hudData, get_exp_bonus(target, 100), "%%");
 
@@ -2138,7 +2145,7 @@ public reset_player(id)
 	codPlayer[id][PLAYER_HUD_RED] = 0;
 	codPlayer[id][PLAYER_HUD_GREEN] = 255;
 	codPlayer[id][PLAYER_HUD_BLUE] = 0;
-	codPlayer[id][PLAYER_HUD_POSX] = 66;
+	codPlayer[id][PLAYER_HUD_POSX] = 70;
 	codPlayer[id][PLAYER_HUD_POSY] = 6;
 	
 	set_new_class(id);
@@ -2217,14 +2224,14 @@ stock remove_ents(id = 0)
 
 public show_bonus_info()
 {
-	if(get_players_amount() > 0 && (lastInfo + 5.0 > get_gametime() || get_players_amount() == minBonusPlayers))
+	if(get_players_amount() > 0 && (lastInfo + 5.0 < get_gametime() || get_players_amount() == minBonusPlayers))
 	{
 		if(get_players_amount() == minBonusPlayers) cod_print_chat(0, "Serwer jest pelny, a to oznacza^x03 EXP x 2^x01!");
-		else 
+		else
 		{
 			new playersToFull = minBonusPlayers - get_players_amount();
 
-			cod_print_chat(0, "Do pelnego serwera brakuje^x03 %i osob%s^x01. Exp jest wiekszy o^x03 %i%s^x01!", playersToFull, playersToFull == 1 ? "a" : (playersToFull < 5 ? "y" : ""), get_players_amount() * 10, "%%");
+			cod_print_chat(0, "Do pelnego serwera brakuj%s^x03 %i osob%s^x01. Exp jest wiekszy o^x03 %i%%^x01!", playersToFull, playersToFull > 1 ? (playersToFull < 5 ? "a" : "e") : "e", playersToFull == 1 ? "a" : (playersToFull < 5 ? "y" : ""), get_players_amount() * 10);
 		}
 		
 		lastInfo = floatround(get_gametime());
@@ -2345,6 +2352,8 @@ public sql_init()
 
 public load_data(id)
 {
+	load_hud(id);
+
 	new playerId[1], queryData[128];
 	
 	playerId[0] = id;
@@ -2459,6 +2468,43 @@ public save_data(id, end)
 	
 	if(end) rem_bit(id, dataLoaded);
 }
+
+public save_hud(id)
+{
+	new vaultKey[64], vaultData[64];
+	
+	formatex(vaultKey, charsmax(vaultKey), "%s-cod_hud", codPlayer[id][PLAYER_NAME]);
+	formatex(vaultData, charsmax(vaultData), "%d#%d#%d#%d#%d#%d", codPlayer[id][PLAYER_HUD], codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], codPlayer[id][PLAYER_HUD_POSX], codPlayer[id][PLAYER_HUD_POSY]);
+	
+	nvault_set(hudVault, vaultKey, vaultData);
+	
+	return PLUGIN_CONTINUE;
+}
+
+public load_hud(id)
+{
+	new vaultKey[64], vaultData[64];
+	
+	formatex(vaultKey, charsmax(vaultKey), "%s-cod_hud", codPlayer[id][PLAYER_NAME]);
+	
+	if(nvault_get(hudVault, vaultKey, vaultData, charsmax(vaultData)))
+	{
+		replace_all(vaultData, charsmax(vaultData), "#", " ");
+	 
+		new hudData[6][6];
+	
+		parse(vaultData, hudData[0], charsmax(hudData), hudData[1], charsmax(hudData), hudData[2], charsmax(hudData), hudData[3], charsmax(hudData), hudData[4], charsmax(hudData), hudData[5], charsmax(hudData));
+	
+		codPlayer[id][PLAYER_HUD] = str_to_num(hudData[0]);
+		codPlayer[id][PLAYER_HUD_RED] = str_to_num(hudData[1]);
+		codPlayer[id][PLAYER_HUD_GREEN] = str_to_num(hudData[2]);
+		codPlayer[id][PLAYER_HUD_BLUE] = str_to_num(hudData[3]);
+		codPlayer[id][PLAYER_HUD_POSX] = str_to_num(hudData[4]);
+		codPlayer[id][PLAYER_HUD_POSY] = str_to_num(hudData[5]);
+	}
+
+	return PLUGIN_CONTINUE;
+} 
 
 public load_class(id, class)
 {

@@ -25,8 +25,6 @@ public plugin_init()
 	cvarBombDefused = register_cvar("cod_honor_bombdefused", "2");
 	cvarRescueHostage = register_cvar("cod_honor_rescuehostage", "1");
 	cvarKillHostage = register_cvar("cod_honor_killhostage", "4");
-
-	register_clcmd("say /honor", "get_user_honor");
 	
 	register_event("SendAudio", "t_win_round" , "a", "2&%!MRAD_terwin");
 	register_event("SendAudio", "ct_win_round", "a", "2&%!MRAD_ct_win_round");
@@ -292,11 +290,6 @@ public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSiz
 	}
 	
 	return PLUGIN_CONTINUE;
-}
-
-public get_user_honor(id)
-{
-	client_print(id, print_chat, "Honor: %i", playerHonor[id])
 }
 
 public _cod_get_user_honor(id)

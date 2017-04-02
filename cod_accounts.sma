@@ -170,7 +170,14 @@ public kick_player(id)
 }
 public account_menu(id, sound)
 {
-	if(!get_bit(id, dataLoaded) || !is_user_connected(id) || !is_user_valid(id)) return PLUGIN_HANDLED;
+	if(!is_user_connected(id) || !is_user_valid(id)) return PLUGIN_HANDLED;
+
+	if(!get_bit(id, dataLoaded))
+	{
+		set_task(0.1, "account_menu", id);
+
+		return PLUGIN_HANDLED;
+	}
 
 	if(playerStatus[id] <= NOT_LOGGED) if(!task_exists(id + TASK_PASSWORD)) set_task(60.0, "kick_player", id + TASK_PASSWORD);
 
