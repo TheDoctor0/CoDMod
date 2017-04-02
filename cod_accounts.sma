@@ -179,6 +179,13 @@ public account_menu(id, sound)
 		return PLUGIN_HANDLED;
 	}
 
+	if(!get_user_team(id) && playerStatus[id] == LOGGED)
+	{
+		engclient_cmd(id, "chooseteam");
+
+		return PLUGIN_HANDLED;
+	}
+
 	if(playerStatus[id] <= NOT_LOGGED) if(!task_exists(id + TASK_PASSWORD)) set_task(60.0, "kick_player", id + TASK_PASSWORD);
 
 	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);

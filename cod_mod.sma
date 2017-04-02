@@ -1909,7 +1909,7 @@ public show_info(id)
 		return PLUGIN_CONTINUE;
 	}
 	
-	static hudData[512], className[MAX_NAME], itemName[MAX_NAME], Float:levelPercent, exp, target;
+	static hudData[512], className[MAX_NAME], itemName[MAX_NAME], clanName[MAX_NAME], Float:levelPercent, exp, target;
 	
 	target = id;
 	
@@ -1917,8 +1917,8 @@ public show_info(id)
 	{
 		target = pev(id, pev_iuser2);
 		
-		if (!codPlayer[target][PLAYER_HUD]) set_hudmessage(255, 255, 255, 0.7, -1.0, 0, 0.0, 0.3, 0.0, 0.0, 4);
-		else set_dhudmessage(255, 255, 255, 0.7, -1.0, 0, 0.0, 0.3, 0.0, 0.0);
+		if (!codPlayer[target][PLAYER_HUD]) set_hudmessage(255, 255, 255, 0.7, 0.4, 0, 0.0, 0.3, 0.0, 0.0, 4);
+		else set_dhudmessage(255, 255, 255, 0.7, 0.4, 0, 0.0, 0.3, 0.0, 0.0);
 	}
 	else
 	{
@@ -1930,13 +1930,16 @@ public show_info(id)
 	
 	get_class_info(codPlayer[target][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 	get_item_info(codPlayer[target][PLAYER_ITEM], ITEM_NAME, itemName, charsmax(itemName));
+	cod_get_clan_name(cod_get_user_clan(target), clanName, charsmax(clanName));
+
+	format(clanName, charsmax(clanName), "^n[Klan: %s]", clanName);
 
 	exp = codPlayer[target][PLAYER_LEVEL] - 1 >= 0 ? get_level_exp(codPlayer[target][PLAYER_LEVEL] - 1) : 0;
 	levelPercent = (float((codPlayer[target][PLAYER_EXP] - exp)) / float((get_level_exp(codPlayer[target][PLAYER_LEVEL]) - exp))) * 100.0;
 	
-	formatex(hudData, charsmax(hudData), "[Klasa : %s]^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot: %s (%i/%i)]^n[Zycie: %i]^n[Honor: %i]", className, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, codPlayer[target][PLAYER_ITEM_DURA], maxDurability, get_user_health(id), cod_get_user_honor(target));
+	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot: %s (%i/%i)]^n[Zycie: %i]^n[Honor: %i]", className, clanName, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, codPlayer[target][PLAYER_ITEM_DURA], maxDurability, get_user_health(id), cod_get_user_honor(target));
 	
-	if(get_exp_bonus(target, 100) > 100) format(hudData, charsmax(hudData), "%s^n[Exp Bonus: %i%s]", hudData, get_exp_bonus(target, 100), "%%");
+	if(get_exp_bonus(target, 100) > 100) format(hudData, charsmax(hudData), "%s^n[Exp Bonus: %i%s]", hudData, get_exp_bonus(target, 100) - 100, "%%");
 
 	if(codPlayer[target][PLAYER_KS]) format(hudData, charsmax(hudData), "%s^n[KillStreak: %i (%i s)]", hudData, codPlayer[target][PLAYER_KS], codPlayer[target][PLAYER_TIME_KS]);
 
@@ -2643,14 +2646,14 @@ public _cod_get_class_name(class, dataReturn[], dataLength)
 {
 	param_convert(2);
 	
-	get_class_info(class, CLASS_NAME, dataReturn, charsmax(dataLength));
+	get_class_info(class, CLASS_NAME, dataReturn, dataLength);
 }
 
 public _cod_get_class_desc(class, dataReturn[], dataLength)
 {
 	param_convert(2);
 	
-	get_class_info(class, CLASS_DESC, dataReturn, charsmax(dataLength));
+	get_class_info(class, CLASS_DESC, dataReturn, dataLength);
 }
 
 public _cod_get_class_health(class)
@@ -2748,14 +2751,14 @@ public _cod_get_item_name(item, dataReturn[], dataLength)
 {
 	param_convert(2);
 	
-	get_item_info(item, ITEM_NAME, dataReturn, charsmax(dataLength));
+	get_item_info(item, ITEM_NAME, dataReturn, dataLength);
 }
 
 public _cod_get_item_desc(item, dataReturn[], dataLength)
 {
 	param_convert(2);
 	
-	get_item_info(item, ITEM_DESC, dataReturn, charsmax(dataLength));
+	get_item_info(item, ITEM_DESC, dataReturn, dataLength);
 }
 
 public _cod_get_items_num()
@@ -2842,8 +2845,8 @@ public _cod_get_user_teleports(id)
 public _cod_get_user_multijump(id)
 	return codPlayer[id][PLAYER_JUMPS];
 	
-public Float:_cod_get_user_gravity(id)
-	return Float:codPlayer[id][PLAYER_GRAVITY];
+public _cod_get_user_gravity(id)
+	return codPlayer[id][PLAYER_GRAVITY] * 800;
 
 public _cod_set_user_rockets(id, value)
 	codPlayer[id][PLAYER_ROCKETS] = max(0, value);
@@ -2863,9 +2866,9 @@ public _cod_set_user_teleports(id, value)
 public _cod_set_user_multijump(id, value)
 	codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS] = max(0, value);
 	
-public _cod_set_user_gravity(id, Float:value)
+public _cod_set_user_gravity(id, value)
 {
-	codPlayer[id][PLAYER_GRAVITY] = _:floatmax(0.01, value);
+	codPlayer[id][PLAYER_GRAVITY] = _:floatmax(0.01, value/800.0);
 
 	gravity_change(id);
 }
@@ -2888,9 +2891,9 @@ public _cod_add_user_teleports(id, value)
 public _cod_add_user_multijump(id, value)
 	codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS] += max(0, value);
 	
-public _cod_add_user_gravity(id, Float:value)
+public _cod_add_user_gravity(id, value)
 {
-	codPlayer[id][PLAYER_GRAVITY] = _:floatmax(0.01, Float:codPlayer[id][PLAYER_GRAVITY] + value);
+	codPlayer[id][PLAYER_GRAVITY] = _:floatmax(0.01, Float:codPlayer[id][PLAYER_GRAVITY] + value/800.0);
 	
 	gravity_change(id);
 }

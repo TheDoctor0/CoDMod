@@ -345,6 +345,16 @@ native cod_check_register_system(id);
 Sprawdza, czy gracz wpisal juz haslo i ewentualnie wymusza jego wpisanie
 ------------------------------*/
 
+native cod_get_user_clan(id);
+/*------------------------------
+Zwraca klan gracza
+------------------------------*/
+
+native cod_get_clan_name(clan, dataReturn[], dataLength);
+/*------------------------------
+Zwraca nazwe klanu
+------------------------------*/
+
 native cod_get_user_honor(id);
 /*------------------------------
 Zwraca honor gracza
