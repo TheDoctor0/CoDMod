@@ -205,8 +205,6 @@ public plugin_init()
 	codForwards[NEW_ROUND] = CreateMultiForward("cod_new_round", ET_IGNORE);
 	codForwards[START_ROUND] = CreateMultiForward("cod_start_round", ET_IGNORE);
 	codForwards[END_ROUND] = CreateMultiForward("cod_end_round", ET_IGNORE);
-
-	register_clcmd("say /test", "killstreak");
 }
 
 public plugin_natives()
