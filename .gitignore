@@ -47,4 +47,5 @@ Temporary Items
 .apdisk
 
 *.sublime-workspace
-*.sublime-workspace
+compiled
+compile.dat
