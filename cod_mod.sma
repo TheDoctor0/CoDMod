@@ -871,7 +871,7 @@ public assign_points_handler(id, menu, item)
 	
 	if(codPlayer[id][PLAYER_POINTS] < 1) return PLUGIN_CONTINUE;
 
-	new pointsDistributionAmount = (pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]] > codPlayer[id][PLAYER_POINTS]) ? codPlayer[id][PLAYER_POINTS] : codPlayer[id][PLAYER_POINTS_SPEED];
+	new pointsDistributionAmount = (pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]] > codPlayer[id][PLAYER_POINTS]) ? codPlayer[id][PLAYER_POINTS] : pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]];
 	
 	switch(item) 
 	{ 

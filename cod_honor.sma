@@ -185,7 +185,7 @@ public sql_init()
 		return;
 	}
 	
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_honor` (`name` VARCHAR(35), `honor` INT(11), PRIMARY KEY(`name`));");
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_honor` (`name` VARCHAR(35), `honor` INT(11) NOT NULL, PRIMARY KEY(`name`));");
 
 	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
 

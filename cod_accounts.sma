@@ -713,7 +713,9 @@ public load_account_handle(failState, Handle:query, error[], errorNum, tempId[],
 		
 		if(!equal(playerPassword[id], ""))
 		{
-			new password[33];
+			new password[33], info[32];
+
+			get_user_info(id, "name", info, charsmax(info));
 		
 			cmd_execute(id, "exec %s.cfg", CONFIG);
 		
@@ -726,6 +728,8 @@ public load_account_handle(failState, Handle:query, error[], errorNum, tempId[],
 				set_bit(id, autoLogin);
 			}
 			else playerStatus[id] = NOT_LOGGED;
+
+			cmd_execute(id, "exec config.cfg");
 		}
 	}
 
