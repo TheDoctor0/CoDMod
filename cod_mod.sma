@@ -656,7 +656,7 @@ public display_classes_description_handle(id, menu, item)
 	
 	ArrayGetArray(codClasses, item, codClass);
 	
-	format(menuData, charsmax(menuData), "\yKlasa: \w%s^n\yFrakcja: \w%i^n\yZycie: \w%i^n\yBronie:\w%s^n\yOpis: \w%s^n%s", codClass[CLASS_NAME], 100 + codClass[CLASS_HEAL], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_DESC], codClass[CLASS_DESC][79]);
+	format(menuData, charsmax(menuData), "\yKlasa: \w%s^n\yFrakcja: \w%i^n\yZycie: \w%i^n\yBronie:\w%s^n\yOpis: \w%s^n%s", codClass[CLASS_NAME], codClass[CLASS_FRACTION], 100 + codClass[CLASS_HEAL], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_DESC], codClass[CLASS_DESC][79]);
 	
 	show_menu(id, 0, menuData);
 	

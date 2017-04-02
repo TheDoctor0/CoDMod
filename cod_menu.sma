@@ -69,7 +69,7 @@ public display_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if(item == 1) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new itemData[4], itemAccess, itemCallback;
 	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
