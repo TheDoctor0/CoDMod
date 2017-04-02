@@ -1421,7 +1421,7 @@ public say_text(msgId, msgDest, msgEnt)
 {
 	new id = get_msg_arg_int(1);
 	
-	if(is_user_connected(id))
+	if(is_user_connected(id) && clan[id])
 	{
 		new tempMessage[192], message[192], chatPrefix[64];
 		

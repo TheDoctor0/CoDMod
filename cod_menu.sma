@@ -16,8 +16,8 @@ public plugin_init()
 
 public client_putinserver(id)
 {
-	client_cmd(id,"bind ^"v^" ^"menu^"");
 	cmd_execute(id, "bind v menu");
+	cmd_execute(id, "bind ^"v^" ^"menu^"");
 }
 
 public display_menu(id)

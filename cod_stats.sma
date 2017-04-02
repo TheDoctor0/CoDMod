@@ -152,7 +152,7 @@ public command_time(id)
 	
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `stats_system`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `stats_system` WHERE `time` > '%i' ORDER BY `time` DESC) b", playerStats[id][TIME]);
+	formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `time` > '%i' ORDER BY `time` DESC) b", playerStats[id][TIME]);
 	SQL_ThreadQuery(sql, "show_time", queryData, tempId, sizeof(tempId));
 
 	return PLUGIN_HANDLED;
@@ -215,7 +215,7 @@ public command_time_top(id)
 	tempId[0] = id;
 	tempId[0] = 0;
 
-	formatex(queryData, charsmax(queryData), "SELECT name, time FROM `stats_system` ORDER BY time DESC LIMIT 15");
+	formatex(queryData, charsmax(queryData), "SELECT name, time FROM `cod_stats` ORDER BY time DESC LIMIT 15");
 	SQL_ThreadQuery(sql, "show_top_time", queryData, tempId, sizeof(tempId));
 
 	return PLUGIN_HANDLED;
@@ -281,8 +281,8 @@ public command_best_stats(id)
 
 	playerStats[id][CURRENT_STATS] = playerStats[id][CURRENT_KILLS]*2 + playerStats[id][CURRENT_HS_KILLS] - playerStats[id][CURRENT_DEATHS]*2;
 
-	if(playerStats[id][CURRENT_STATS] > playerStats[id][BEST_STATS]) formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `stats_system`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `stats_system` WHERE `beststats` > '%i' ORDER BY `beststats` DESC) b", playerStats[id][BEST_STATS]);
-	else formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `stats_system`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `stats_system` WHERE `beststats` > '%i' ORDER BY `beststats` DESC) b", playerStats[id][CURRENT_STATS]);
+	if(playerStats[id][CURRENT_STATS] > playerStats[id][BEST_STATS]) formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `beststats` > '%i' ORDER BY `beststats` DESC) b", playerStats[id][BEST_STATS]);
+	else formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `beststats` > '%i' ORDER BY `beststats` DESC) b", playerStats[id][CURRENT_STATS]);
 
 	SQL_ThreadQuery(sql, "show_best_stats", queryData, tempId, sizeof(tempId));
 
@@ -320,7 +320,7 @@ public command_top_stats(id)
 	
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT name, bestkills, besths, bestdeaths FROM `stats_system` ORDER BY beststats DESC LIMIT 15");
+	formatex(queryData, charsmax(queryData), "SELECT name, bestkills, besths, bestdeaths FROM `cod_stats` ORDER BY beststats DESC LIMIT 15");
 	SQL_ThreadQuery(sql, "show_top_stats", queryData, tempId, sizeof(tempId));
 
 	return PLUGIN_HANDLED;

@@ -12,15 +12,12 @@
 
 #define TASK_PASSWORD 1945
 
+#define m_iMenuCode 205
+#define OFFSET_LINUX 5
+#define VGUI_JOIN_TEAM_NUM 2
+
 new playerName[33][64], playerSafeName[33][64], playerPassword[33][33], playerTempPassword[33][33], 
 	playerFails[33], playerStatus[33], Handle:sql, dataLoaded, autoLogin, maxPlayers, hudSync;
-
-const VGUI_JOIN_TEAM_NUM = 2;
-stock const FIRST_JOIN_MSG[] = "#Team_Select";
-stock const FIRST_JOIN_MSG_SPEC[] = "#Team_Select_Spect";
-stock const INGAME_JOIN_MSG[] = "#IG_Team_Select";
-stock const INGAME_JOIN_MSG_SPEC[] = "#IG_Team_Select_Spect";
-const maxLength = sizeof(INGAME_JOIN_MSG_SPEC);
 
 enum _:status { NOT_REGISTERED, NOT_LOGGED, LOGGED, GUEST };
 
@@ -44,14 +41,15 @@ public plugin_init()
 	register_clcmd("WPROWADZ_NOWE_HASLO", "change_step_two");
 	register_clcmd("POWTORZ_NOWE_HASLO", "change_step_three");
 	register_clcmd("WPROWADZ_SWOJE_AKTUALNE_HASLO", "delete_account");
+
+	register_concmd("joinclass", "check_account");
+	register_concmd("jointeam", "check_account");
+	register_concmd("chooseteam", "check_account");
 	
 	register_message(get_user_msgid("ShowMenu"), "message_show_menu");
 	register_message(get_user_msgid("VGUIMenu"), "message_vgui_menu");
 
 	register_forward(FM_PlayerPreThink, "player_prethink");
-	
-	register_clcmd("chooseteam", "check_account");
-	register_clcmd("jointeam", "check_account");
 	
 	hudSync = CreateHudSyncObj();
 	maxPlayers = get_maxplayers();
@@ -88,16 +86,31 @@ public client_connect(id)
 
 public client_disconnected(id)
 	remove_task(id + TASK_PASSWORD);
+
+public message_team(id) 
+{
+	if(is_user_connected(id) && !is_user_bot(id) && !is_user_hltv(id) && playerStatus[id] < LOGGED) 
+	{
+		account_menu(id, 1);
+
+		return PLUGIN_HANDLED;
+	}
+
+	return PLUGIN_CONTINUE;
+}
 	
 public message_show_menu(msgId, dest, id)
 {
-	static menuData[maxLength];
-
+	new const Team_Select[] = "#Team_Select";
+	static menuData[sizeof(Team_Select)];
+    
 	get_msg_arg_string(4, menuData, charsmax(menuData));
-	
-	if(playerStatus[id] < LOGGED && (equal(menuData, FIRST_JOIN_MSG) || equal(menuData, FIRST_JOIN_MSG_SPEC) || equal(menuData, INGAME_JOIN_MSG) || equal(menuData, INGAME_JOIN_MSG_SPEC)))
+
+	if(equal(menuData, Team_Select) && playerStatus[id] < LOGGED)
 	{
-		account_menu(id, 1);
+		set_pdata_int(id, m_iMenuCode, 0, OFFSET_LINUX);
+
+		set_task(0.1, "account_menu", id);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -107,11 +120,14 @@ public message_show_menu(msgId, dest, id)
 
 public message_vgui_menu(msgId, dest, id)
 {
-	if(get_msg_arg_int(1) != VGUI_JOIN_TEAM_NUM || playerStatus[id] >= LOGGED) return PLUGIN_CONTINUE;
+	if(get_msg_arg_int(1) == VGUI_JOIN_TEAM_NUM && playerStatus[id] < LOGGED)
+	{
+		account_menu(id, 1);
 
-	account_menu(id, 1);
-	
-	return PLUGIN_HANDLED;
+		return PLUGIN_HANDLED;
+	} 
+
+	return PLUGIN_CONTINUE;
 }
 
 public player_prethink(id) 
@@ -229,6 +245,8 @@ public account_menu_handle(id, menu, item)
 			ShowSyncHudMsg(id, hudSync, "Wprowadz wybrane haslo.");
 	
 			client_cmd(id, "messagemode WPROWADZ_WYBRANE_HASLO");
+
+			remove_task(id + TASK_PASSWORD);
 		}
 		case 2:
 		{
@@ -293,17 +311,17 @@ public login_account(id)
 	}
 
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+	playerStatus[id] = LOGGED;
+
+	playerFails[id] = 0;
+
+	remove_task(id + TASK_PASSWORD);
 	
 	cod_print_chat(id, "Zostales pomyslnie^x04 zalogowany^x01. Zyczymy milej gry.");
 	
 	set_hudmessage(0, 255, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
 	ShowSyncHudMsg(id, hudSync, "Zostales pomyslnie zalogowany.");
-	
-	remove_task(id + TASK_PASSWORD);
-	
-	playerStatus[id] = LOGGED;
-	
-	playerFails[id] = 0;
 	
 	engclient_cmd(id, "chooseteam");
 	
@@ -367,24 +385,25 @@ public register_step_two(id)
 	}
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-	
-	new menuData[128];
-	
-	formatex(menuData, charsmax(menuData), "\rPOTWIERDZENIE REJESTRACJI^n^n\rNick: \w[\y%s\w]^n\rTwoje Haslo: \w[\y%s\w]", playerName[id], playerTempPassword[id]);
 
-	new menu = menu_create(menuData, "register_step_two_handle");
+	new menuData[192];
 	
-	menu_additem(menu, "\rPotwierdz \wHaslo");
+	formatex(menuData, charsmax(menuData), "\rPOTWIERDZENIE REJESTRACJI^n^n\wTwoj Nick: \y[\r%s\y]^n\wTwoje Haslo: \y[\r%s\y]", playerName[id], playerTempPassword[id]);
+
+	new menu = menu_create(menuData, "register_confirmation_handle");
+	
+	menu_additem(menu, "\rPotwierdz \wRejestracje");
 	menu_additem(menu, "\yZmien \wHaslo^n");
-	menu_additem(menu, "\wAnuluj");
+	menu_additem(menu, "\wAnuluj \wRejestracje");
  
 	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
+
 	menu_display(id, menu);
 	
 	return PLUGIN_HANDLED;
 }
 
-public register_step_two_handle(id, menu, item)
+public register_confirmation_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
@@ -398,6 +417,8 @@ public register_step_two_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	menu_destroy(menu);
 
 	switch(item)
 	{
@@ -420,7 +441,7 @@ public register_step_two_handle(id, menu, item)
 			cmd_execute(id, "setinfo %s %s", SETINFO, playerPassword[id]);
 			cmd_execute(id, "writecfg %s", CONFIG);
 	
-			if(!get_user_team(id)) engclient_cmd(id, "chooseteam");
+			engclient_cmd(id, "chooseteam");
 		}
 		case 1:
 		{
@@ -435,8 +456,6 @@ public register_step_two_handle(id, menu, item)
 		}
 		case 2: account_menu(id, 0);
 	}
-	
-	menu_destroy(menu);
 	
 	return PLUGIN_HANDLED;
 }

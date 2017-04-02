@@ -7,7 +7,9 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-enum _:knife { NAME, BONUS, MODEL, DEFAULT, HEALTH, INTELLIGENCE, STAMINA, STRENGTH, CONDITION };
+enum _:knifeInfo { NAME, BONUS, MODEL };
+
+enum _:knivesTypes { DEFAULT, HEALTH, INTELLIGENCE, STAMINA, STRENGTH, CONDITION };
 
 new const knifeModels[][][] =
 {
@@ -56,13 +58,13 @@ public change_knife(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new knifeData[64], knifeId[3], menu = menu_create("\wWybierz \yModel Noza\w:", "change_knife_handle");
+	new knifeData[64], knifeId[3], menu = menu_create("\wWybierz \rModel Noza\w:", "change_knife_handle");
 	
 	for(new i = 0; i < sizeof(knifeModels); i++)
 	{
-		formatex(knifeData, charsmax(knifeData), "%s \r%s", knifeModels[i][NAME], knifeModels[i][BONUS]);
+		formatex(knifeData, charsmax(knifeData), "%s \y%s", knifeModels[i][NAME], knifeModels[i][BONUS]);
 
-		num_to_str(i + DEFAULT, knifeId, charsmax(knifeId));
+		num_to_str(i, knifeId, charsmax(knifeId));
 		
 		menu_additem(menu, knifeData, knifeId);
 	}
@@ -76,7 +78,7 @@ public change_knife(id)
 	return PLUGIN_HANDLED;
 }
 
-public ChangeKnife_Handler(id, menu, item)
+public change_knife_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
@@ -99,7 +101,7 @@ public ChangeKnife_Handler(id, menu, item)
 	
 	save_knife(id);
 	
-	cod_print_chat(id, "Twoj nowy noz to:^x03 %s %s^x01!", knifeModels[id][NAME], knifeModels[id][BONUS]);
+	cod_print_chat(id, "Twoj nowy noz to:^x03 %s %s^x01.", knifeModels[playerKnife[id]][NAME], knifeModels[playerKnife[id]][BONUS]);
 
 	menu_destroy(menu);
 
@@ -112,11 +114,11 @@ public cod_weapon_deploy(id, weapon, ent)
 public cod_spawn(id)
 	set_knife(id, 1);
 
-stock set_knife(id, check = 1)
+stock set_knife(id, check = 0)
 {
 	if(!is_user_alive(id) || (check && get_user_weapon(id) != CSW_KNIFE)) return PLUGIN_CONTINUE;
 	
-	set_pev(id, pev_viewmodel2, knifeModels[MODEL][playerKnife[id]]); 
+	set_pev(id, pev_viewmodel2, knifeModels[playerKnife[id]][MODEL]); 
 
 	return PLUGIN_CONTINUE;
 }
@@ -142,7 +144,7 @@ public set_bonus(id, oldKnife, newKnife)
 
 	switch(newKnife)
 	{
-		 case DEFAULT:
+		case DEFAULT:
 		{
 			cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + 2);
 			cod_set_user_bonus_intelligence(id, cod_get_user_bonus_intelligence(id) + 2);

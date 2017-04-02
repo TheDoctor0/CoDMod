@@ -11,7 +11,7 @@ enum _:events { KILL, KILL_HS, WIN_ROUND, BOMB_DEFUSE, BOMB_PLANT, HOST_RESCUE, 
 
 new cvarMinPlayers, cvarKill, cvarKillHS, cvarWinRound, cvarBombPlated, cvarBombDefused, cvarRescueHostage, cvarKillHostage;
 
-new playerName[MAX_PLAYERS + 1][64], playerHonor[MAX_PLAYERS + 1], Handle:sql, honorEvent[events], minPlayers, maxPlayers, dataLoaded;
+new playerName[MAX_PLAYERS + 1][64], playerHonor[MAX_PLAYERS + 1], Handle:sql, honorEvent[events], minPlayers, dataLoaded;
 
 public plugin_init()
 {	
@@ -25,6 +25,8 @@ public plugin_init()
 	cvarBombDefused = register_cvar("cod_honor_bombdefused", "2");
 	cvarRescueHostage = register_cvar("cod_honor_rescuehostage", "1");
 	cvarKillHostage = register_cvar("cod_honor_killhostage", "4");
+
+	register_clcmd("say /honor", "get_user_honor");
 	
 	register_event("SendAudio", "t_win_round" , "a", "2&%!MRAD_terwin");
 	register_event("SendAudio", "ct_win_round", "a", "2&%!MRAD_ct_win_round");
@@ -33,8 +35,6 @@ public plugin_init()
 	register_logevent("hostage_killed", 3, "1=triggered", "2=Killed_A_Hostage");
 	
 	register_message(SVC_INTERMISSION, "message_intermission");
-	
-	maxPlayers = get_maxplayers();
 }
 
 public plugin_cfg()
@@ -55,7 +55,7 @@ public plugin_cfg()
 public plugin_natives()
 {
 	register_native("cod_get_user_honor", "_cod_get_user_honor", 1);
-	register_native("cod_set_user_honor", "_cod_get_user_honor", 1);
+	register_native("cod_set_user_honor", "_cod_set_user_honor", 1);
 	register_native("cod_add_user_honor", "_cod_add_user_honor", 1);
 }
 
@@ -99,16 +99,10 @@ public ct_win_round()
 
 public round_winner(const szTeam[])
 {
-	new playersList[32], playersNum, id;
-	
-	get_players(playersList, playersNum, "aeh", szTeam);
-	
 	if(get_playersnum() < minPlayers) return;
 
-	for (new i = 0; i < playersNum; i++) 
+	for(new id = 1; id < MAX_PLAYERS; id++) 
 	{
-		id = playersList[i];
-		
 		if(!cod_get_user_class(id)) continue;
 
 		playerHonor[id] += cod_get_user_vip(id) ? honorEvent[WIN_ROUND] * 2 : honorEvent[WIN_ROUND];
@@ -163,16 +157,8 @@ public hostage_killed()
 
 public message_intermission() 
 {
-	new playersList[32], id, players;
-
-	get_players(playersList, players, "h");
-	
-	if(!players) return PLUGIN_CONTINUE;
-
-	for (new i = 0; i < players; i++)
+	for(new id = 1; id < MAX_PLAYERS; id++)
 	{
-		id = playersList[i];
-		
 		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
 		
 		save_honor(id, 1);
@@ -268,7 +254,7 @@ stock save_honor(id, end = 0)
 
 			if(!sqlConnection)
 			{
-				log_to_file("cod_mod.log", "Save - Could not connect to SQL database.  [%d] %s", error, error);
+				log_to_file("cod_mod.log", "Save - Could not connect to SQL database. [%d] %s", error, error);
 				
 				SQL_FreeHandle(sqlConnection);
 				
@@ -308,33 +294,30 @@ public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSiz
 	return PLUGIN_CONTINUE;
 }
 
-public _cod_get_user_honor(id)
+public get_user_honor(id)
 {
-	if(!is_user_valid(id)) return 0;
-	
-	return playerHonor[id];
+	client_print(id, print_chat, "Honor: %i", playerHonor[id])
 }
+
+public _cod_get_user_honor(id)
+	return playerHonor[id];
 
 public _cod_set_user_honor(id, amount)
 {
-	if(!is_user_valid(id)) return PLUGIN_CONTINUE;
+	log_amx("ID: %i | Amount: %i", id, amount)
 	
 	playerHonor[id] = max(0, amount);
+
+	log_amx("Honor Amount: %i", playerHonor[id])
 	
 	save_honor(id);
-	
-	return PLUGIN_CONTINUE;
 }
 
 public _cod_add_user_honor(id, amount)
 {
-	if(!is_user_valid(id)) return PLUGIN_CONTINUE;
-	
-	playerHonor[id] += amount;
+	playerHonor[id] += max(0, amount);
 	
 	save_honor(id);
-	
-	return PLUGIN_CONTINUE;
 }
 
 

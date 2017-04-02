@@ -8,14 +8,14 @@
 
 #define MAX_ITEMS 5
 
-enum _:items { ID, ITEM, VALUE, DURABILITY, OWNER, TYPE, PRICE, NAME[64] };
+enum _:itemInfo { ID, ITEM, VALUE, DURABILITY, OWNER, PRICE, NAME[64] };
 
 new const commandMarket[][] = { "say /market", "say_team /market", "say /rynek", "say_team /rynek", "rynek" };
 new const commandSell[][] = { "say /sell", "say_team /sell", "say /wystaw", "say_team /wystaw", "say /sprzedaj", "say_team /sprzedaj", "sprzedaj" };
 new const commandBuy[][] = { "say /buy", "say_team /buy", "say /kup", "say_team /kup", "kup" };
 new const commandWithdraw[][] = { "say /withdraw", "say_team /withdraw", "say /wycofaj", "say_team /wycofaj", "wycofaj" };
 
-new playerName[MAX_PLAYERS + 1][64], priceType[MAX_PLAYERS + 1], Array:marketItems, itemId;
+new playerName[MAX_PLAYERS + 1][64], Array:marketItems, items;
 
 public plugin_init() 
 {
@@ -31,7 +31,7 @@ public plugin_init()
 
 	register_concmd("CENA_PRZEDMIOTU", "set_item_price");
 	
-	marketItems = ArrayCreate(items);
+	marketItems = ArrayCreate(itemInfo);
 }
 
 public client_disconnected(id)
@@ -51,6 +51,8 @@ public market_menu(id)
 	menu_additem(menu, "Wystaw \yPrzedmiot \r(/wystaw)", _, _, callback);
 	menu_additem(menu, "Kup \yPrzedmiot \r(/kup)", _, _, callback);
 	menu_additem(menu, "Wycofaj \yPrzedmiot \r(/wycofaj)", _, _, callback);
+
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
 	menu_display(id, menu);
 	
@@ -102,33 +104,6 @@ public sell_item(id, sound)
 		
 	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new menu = menu_create("\wRodzaj \rOferty", "sell_item_handle");
-	
-	menu_additem(menu, "Sprzedaz \rza \yDolary");
-	menu_additem(menu, "Sprzedaz \rza \yHonor");
-	
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	
-	menu_display(id, menu);
-	
-	return PLUGIN_HANDLED;
-}
-
-public sell_item_handle(id, menu, item)
-{
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-	
-	if(item == MENU_EXIT)
-	{
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
-
-		menu_destroy(menu);
-
-		return PLUGIN_HANDLED;
-	}
-
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-	
 	if(!cod_get_user_item(id))	
 	{
 		cod_print_chat(id, "Nie masz zadnego itemu!");
@@ -142,8 +117,6 @@ public sell_item_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
-
-	priceType[id] = item;
 	
 	client_cmd(id, "messagemode CENA_PRZEDMIOTU");
 	
@@ -188,13 +161,12 @@ public set_item_price(id)
 		return PLUGIN_HANDLED;
 	}
 
-	new marketItem[items];
+	new marketItem[itemInfo];
 	
-	marketItem[ID] = itemId++;
+	marketItem[ID] = items++;
 	marketItem[ITEM] = cod_get_user_item(id, marketItem[VALUE]);
 	marketItem[DURABILITY] = cod_get_item_durability(id);
 	marketItem[OWNER] = id;
-	marketItem[TYPE] = priceType[id];
 	marketItem[PRICE] = price;
 
 	cod_get_item_name(cod_get_user_item(id), marketItem[NAME], charsmax(marketItem[NAME]));
@@ -203,7 +175,7 @@ public set_item_price(id)
 	
 	cod_set_user_item(id);
 	
-	cod_print_chat(0, "^x03%s^x01 wystawil^x03 %s^x01 na rynek za^x03 %i%s^x01.", playerName[id], marketItem[NAME], marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
+	cod_print_chat(0, "^x03%s^x01 wystawil^x03 %s^x01 na rynek za^x03 %i%s^x01 Honoru.", playerName[id], marketItem[NAME], marketItem[PRICE]);
 	
 	return PLUGIN_HANDLED;
 }
@@ -216,7 +188,7 @@ public buy_item(id, sound)
 
 	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new marketItem[items], itemData[128], itemId[2], itemsCounts = 0, menu = menu_create("\wKup \rPrzedmiot", "buy_item_handle");
+	new marketItem[itemInfo], itemData[128], itemId[5], itemsCounts = 0, menu = menu_create("\wKup \rPrzedmiot", "buy_item_handle");
 	
 	for(new i = 0; i < ArraySize(marketItems); i++)
 	{
@@ -226,7 +198,7 @@ public buy_item(id, sound)
 
 		num_to_str(marketItem[ID], itemId, charsmax(itemId));
 		
-		formatex(itemData, charsmax(itemData), "\w%s \y(%i/%i Wytrzymalosci) \r(%i%s)", marketItem[NAME], marketItem[DURABILITY], cod_max_item_durability(), marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
+		formatex(itemData, charsmax(itemData), "\w%s \y(%i/%i Wytrzymalosci) \r(%i Honoru)", marketItem[NAME], marketItem[DURABILITY], cod_max_item_durability(), marketItem[PRICE]);
 		
 		menu_additem(menu, itemData, itemId);
 
@@ -259,7 +231,7 @@ public buy_item_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new itemId[2], itemAccess, itemCallback;
+	new itemId[5], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, itemId, charsmax(itemId), _, _, itemCallback);
 
@@ -274,7 +246,7 @@ public buy_item_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 	
-	new marketItem[items], menuData[512], itemDescription[64], length = 0, maxLength = sizeof(menuData) - 1;
+	new marketItem[itemInfo], menuData[512], itemDescription[64], length = 0, maxLength = charsmax(menuData);
 
 	ArrayGetArray(marketItems, item, marketItem);
 	
@@ -283,7 +255,7 @@ public buy_item_handle(id, menu, item)
 	length += formatex(menuData[length], maxLength - length, "Potwierdzenie kupna od: \y%s^n", playerName[marketItem[OWNER]]);
 	length += formatex(menuData[length], maxLength - length, "\wPrzedmiot: \y%s^n", marketItem[NAME]);
 	length += formatex(menuData[length], maxLength - length, "\wOpis: \y%s^n", itemDescription);
-	length += formatex(menuData[length], maxLength - length, "\wKoszt: \y%d%s^n", marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
+	length += formatex(menuData[length], maxLength - length, "\wKoszt: \y%i Honoru^n", marketItem[PRICE]);
 	length += formatex(menuData[length], maxLength - length, "\wWytrzymalosc: \y%d/%i^n", marketItem[DURABILITY], cod_max_item_durability());
 	length += formatex(menuData[length], maxLength - length, "\wCzy chcesz \rkupic\w ten przedmiot?^n^n");
 	
@@ -314,7 +286,7 @@ public buy_question_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new itemId[2], itemAccess, itemCallback;
+	new itemId[5], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, itemId, charsmax(itemId), _, _, itemCallback);
 
@@ -329,40 +301,20 @@ public buy_question_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	new marketItem[items];
+	new marketItem[itemInfo];
 
 	ArrayGetArray(marketItems, item, marketItem);
 	
-	switch(marketItem[TYPE])
+	if(cod_get_user_honor(id) < marketItem[PRICE])
 	{
-		case 0:
-		{
-			if(cs_get_user_money(id) < marketItem[PRICE])
-			{
-				cod_print_chat(id, "Nie masz wystarczajacej ilosci kasy!");
+		cod_print_chat(id, "Nie masz wystarczajacej ilosci Honoru!");
 
-				return PLUGIN_HANDLED;
-			}
-			else
-			{
-				cs_set_user_money(marketItem[OWNER], cs_get_user_money(marketItem[OWNER]) + marketItem[PRICE]);
-				cs_set_user_money(id, cs_get_user_money(id) - marketItem[PRICE]);
-			}
-		}
-		case 1:
-		{
-			if(cod_get_user_honor(id) < marketItem[PRICE])
-			{
-				cod_print_chat(id, "Nie masz wystarczajacej ilosci honoru!");
-
-				return PLUGIN_HANDLED;
-			}
-			else
-			{
-				cod_set_user_honor(marketItem[OWNER], cod_get_user_honor(marketItem[OWNER]) + marketItem[PRICE]);
-				cod_set_user_honor(id, cod_get_user_honor(id) - marketItem[PRICE]);
-			}
-		}
+		return PLUGIN_HANDLED;
+	}
+	else
+	{
+		cod_set_user_honor(marketItem[OWNER], cod_get_user_honor(marketItem[OWNER]) + marketItem[PRICE]);
+		cod_set_user_honor(id, cod_get_user_honor(id) - marketItem[PRICE]);
 	}
 
 	new itemDescription[64];
@@ -374,7 +326,7 @@ public buy_question_handle(id, menu, item)
 	cod_get_item_desc(marketItem[ITEM], itemDescription, charsmax(itemDescription));
 	
 	cod_print_chat(id, "Przedmiot^x03 %s^x01 zostal pomyslnie zakupiony.", itemDescription);
-	cod_print_chat(marketItem[OWNER], "Twoj przedmiot^x03 %s zostal zakupiony przez^x03 %s^x01. Otrzymujesz^x03 %i%s^x01.", marketItem[NAME], playerName[id], marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
+	cod_print_chat(marketItem[OWNER], "Twoj przedmiot^x03 %s zostal zakupiony przez^x03 %s^x01. Otrzymujesz^x03 %i^x01 Honoru.", marketItem[NAME], playerName[id], marketItem[PRICE]);
 	
 	return PLUGIN_CONTINUE;
 }
@@ -387,7 +339,7 @@ public withdraw_item(id, sound)
 
 	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new marketItem[items], itemData[128], itemId[2], itemsCounts = 0, menu = menu_create("\wWycofaj \rPrzedmiot", "withdraw_item_handle");
+	new marketItem[itemInfo], itemData[128], itemId[5], itemsCounts = 0, menu = menu_create("\wWycofaj \rPrzedmiot", "withdraw_item_handle");
 	
 	for(new i = 0; i < ArraySize(marketItems); i++)
 	{
@@ -397,7 +349,7 @@ public withdraw_item(id, sound)
 
 		num_to_str(marketItem[ID], itemId, charsmax(itemId));
 		
-		formatex(itemData, charsmax(itemData), "\w%s \y(%i/%i Wytrzymalosci) \r(%i%s)", marketItem[NAME], marketItem[DURABILITY], cod_max_item_durability(), marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
+		formatex(itemData, charsmax(itemData), "\w%s \y(%i/%i Wytrzymalosci) \r(%i Honoru)", marketItem[NAME], marketItem[DURABILITY], cod_max_item_durability(), marketItem[PRICE]);
 		
 		menu_additem(menu, itemData, itemId);
 
@@ -430,7 +382,7 @@ public withdraw_item_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new itemId[2], itemAccess, itemCallback;
+	new itemId[5], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, itemId, charsmax(itemId), _, _, itemCallback);
 
@@ -445,7 +397,7 @@ public withdraw_item_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 	
-	new marketItem[items], menuData[512], itemDescription[64], length = 0, maxLength = sizeof(menuData) - 1;
+	new marketItem[itemInfo], menuData[512], itemDescription[64], length = 0, maxLength = sizeof(menuData) - 1;
 
 	ArrayGetArray(marketItems, item, marketItem);
 	
@@ -454,7 +406,7 @@ public withdraw_item_handle(id, menu, item)
 	length += formatex(menuData[length], maxLength - length, "Potwierdzenie wycofania przedmiotu^n");
 	length += formatex(menuData[length], maxLength - length, "\wItem: \y%s^n", marketItem[NAME]);
 	length += formatex(menuData[length], maxLength - length, "\wOpis: \y%s^n", itemDescription);
-	length += formatex(menuData[length], maxLength - length, "\wKoszt: \y%d%s^n", marketItem[PRICE], marketItem[TYPE] ? " Honoru" : "$");
+	length += formatex(menuData[length], maxLength - length, "\wKoszt: \y%i Honoru^n", marketItem[PRICE]);
 	length += formatex(menuData[length], maxLength - length, "\wWytrzymalosc: \y%d/%i^n^n", marketItem[DURABILITY], cod_max_item_durability());
 	length += formatex(menuData[length], maxLength - length, "\wCzy chcesz \rwycofac\w ten przedmiot?");
 	
@@ -485,7 +437,7 @@ public withdraw_question_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new itemId[2], itemAccess, itemCallback;
+	new itemId[5], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, itemId, charsmax(itemId), _, _, itemCallback);
 
@@ -500,7 +452,7 @@ public withdraw_question_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	new marketItem[items];
+	new marketItem[itemInfo];
 
 	ArrayGetArray(marketItems, item, marketItem);
 	
@@ -517,7 +469,7 @@ stock get_items_amount(id)
 {
 	if(!is_user_connected(id)) return 0;
 
-	new amount = 0, marketItem[items];
+	new amount = 0, marketItem[itemInfo];
 	
 	for(new i = 0; i < ArraySize(marketItems); i++) 
 	{
@@ -531,7 +483,7 @@ stock get_items_amount(id)
 
 stock check_item_id(item)
 {
-	new marketItem[items];
+	new marketItem[itemInfo];
 	
 	for(new i = 0; i < ArraySize(marketItems); i++) 
 	{
@@ -545,7 +497,7 @@ stock check_item_id(item)
 
 stock remove_seller(id)
 {
-	new marketItem[items];
+	new marketItem[itemInfo];
 	
 	for(new i = 0; i < ArraySize(marketItems); i++) 
 	{

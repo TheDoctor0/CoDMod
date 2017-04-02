@@ -28,7 +28,7 @@ public plugin_init()
 	cvarCostSmallExp = register_cvar("cod_shop_smallexp_cost", "6");
 	cvarCostBigExp = register_cvar("cod_shop_bigexp_cost", "12");
 	
-	cvarExchangeRatio = register_cvar("cod_shop_exchange_ratio", "1500");
+	cvarExchangeRatio = register_cvar("cod_shop_exchange_ratio", "1000");
 	cvarDurability = register_cvar("cod_shop_durability", "30");
 	cvarMinSmallExp = register_cvar("cod_shop_min_smallexp", "25");
 	cvarMaxSmallExp = register_cvar("cod_shop_max_smallexp", "75");
@@ -60,26 +60,26 @@ public shop_menu(id)
 	
 	new menuData[128], menuPrice[8], menu = menu_create("\wSklep \rCoD Mod", "shop_menu_handle");
 
-	formatex(menuData, charsmax(menuData), "Kantor Walutowy\r[Wymiana Kasy na Honor] \yKoszt:\r %i$/1H", exchangeRatio);
+	formatex(menuData, charsmax(menuData), "Kantor Walutowy \r[\yWymiana Kasy na Honor\r] \wKoszt:\r %i$/1 Honor", exchangeRatio);
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "Napraw Przedmiot \r[+%i Wytrzymalosci] \yKoszt:\r %iH", itemDurability, costRepair);
+	formatex(menuData, charsmax(menuData), "Napraw Przedmiot \r[\y+%i Wytrzymalosci\r] \wKoszt:\r %i Honoru", itemDurability, costRepair);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costRepair);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Kup Przedmiot \r[Losowy Przedmiot] \yKoszt:\r %iH", costItem);
+	formatex(menuData, charsmax(menuData), "Kup Przedmiot \r[\yLosowy Przedmiot\r] \wKoszt:\r %i Honoru", costItem);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costItem);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Ulepsz Przedmiot \r[Wzmocnienie Przedmiotu] \yKoszt:\r %iH", costUpgrade);
+	formatex(menuData, charsmax(menuData), "Ulepsz Przedmiot \r[\yWzmocnienie Przedmiotu\r] \wKoszt:\r %i Honoru", costUpgrade);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costUpgrade);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Maly Exp \r[Losowo od %i do %i Expa] \yKoszt:\r %iH", minSmallExp, maxSmallExp, costSmallExp);
+	formatex(menuData, charsmax(menuData), "Maly Exp \r[\yLosowo od %i do %i Expa\r] \wKoszt:\r %i Honoru", minSmallExp, maxSmallExp, costSmallExp);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costSmallExp);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Duzy Exp \r[Losowo od %i do %i Expa] \yKoszt:\r %iH", minBigExp, maxBigExp, costBigExp);
+	formatex(menuData, charsmax(menuData), "Duzy Exp \r[\yLosowo od %i do %i Expa\r] \wKoszt:\r %i Honoru", minBigExp, maxBigExp, costBigExp);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costBigExp);
 	menu_additem(menu, menuData, menuPrice);
 
@@ -109,9 +109,9 @@ public shop_menu_handle(id, menu, item)
 
 	if(item == 0)
 	{
-		client_print(id, print_center, "Wpisz ile honoru chcesz kupic.");
+		client_print(id, print_center, "Wpisz ile Honoru chcesz kupic.");
 
-		cod_print_chat(id, "Wpisz ile^x03 honoru^x01 chcesz kupic.");
+		cod_print_chat(id, "Wpisz ile^x03 Honoru^x01 chcesz kupic.");
 
 		client_cmd(id, "messagemode KUPNO_HONORU");
 
@@ -143,9 +143,9 @@ public shop_menu_handle(id, menu, item)
 	
 	new price = str_to_num(itemPrice);
 	
-	if(cod_get_user_honor(id < price))
+	if(cod_get_user_honor(id) < price)
 	{
-		cod_print_chat(id, "Nie masz wystarczajaco duzo honoru!");
+		cod_print_chat(id, "Nie masz wystarczajaco duzo^x03 Honoru^x01!");
 
 		return PLUGIN_HANDLED;
 	}
@@ -232,15 +232,15 @@ public buy_honor_handle(id)
 	
 	if(cs_get_user_money(id) < honorAmount * exchangeRatio) 
 	{ 
-		cod_print_chat(id, "Nie masz wystarczajaco^x03 kasy^x01, aby kupic tyle^x03 honoru^x01!");
+		cod_print_chat(id, "Nie masz wystarczajaco^x03 kasy^x01, aby kupic tyle^x03 Honoru^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 	
 	cs_set_user_money(id, cs_get_user_money(id) - honorAmount * exchangeRatio);
-	cod_set_user_honor(id, cod_get_user_honor(id) + honorAmount);
+	cod_add_user_honor(id, honorAmount);
 	
-	cod_print_chat(id, "Kupiles^x03 %i^x01 honoru^x01!", honorAmount);
+	cod_print_chat(id, "Wymieniles^x03 %i$^x01 na ^x03%i Honoru^x01.", honorAmount * exchangeRatio, honorAmount);
 	
 	return PLUGIN_HANDLED;
 }
