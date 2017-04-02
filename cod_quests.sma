@@ -233,9 +233,9 @@ public select_quest(id, menu, item)
 		}
 	}
 	
-	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
-	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
 	menu_display(id, menu, 0);
 	
@@ -296,8 +296,8 @@ public select_class(id)
 	}
 	
 	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
-	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
-	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
 	menu_display(id, menu, 0);
 	
@@ -322,8 +322,8 @@ public select_item(id)
 	}
 	
 	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
-	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
-	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
 	menu_display(id, menu, 0);
 	

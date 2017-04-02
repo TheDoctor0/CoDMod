@@ -475,8 +475,8 @@ public select_fraction(id)
 		}
 	
 		menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-		menu_setprop(menu, MPROP_BACKNAME, "Wroc");
-		menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
+		menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+		menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 
 		menu_display(id, menu);
 	}
@@ -529,8 +529,8 @@ public select_fraction_handle(id, menu, item)
 	if(classId) load_class(id, classId);
 	
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
-	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
 	menu_display(id, menu);
 	
@@ -565,8 +565,8 @@ public select_class(id)
 	if(classId) load_class(id, classId);
 	
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
-	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
 	menu_display(id, menu);
 	
@@ -611,26 +611,28 @@ public select_class_handle(id, menu, item)
 	return PLUGIN_HANDLED;
 }
 
-public display_classes_description(id)
+public display_classes_description(id, class, sound)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new className[MAX_NAME], menu = menu_create("\wWybierz \rKlase:", "display_classes_description_handle");
+	new className[MAX_NAME], classId[5], menu = menu_create("\wWybierz \rKlase:", "display_classes_description_handle");
 
 	for(new i = 1; i < ArraySize(codClasses); i++)
 	{
 		get_class_info(i, CLASS_NAME, className, charsmax(className));
+
+		num_to_str(i, classId, charsmax(classId));
 		
-		menu_additem(menu, className);
+		menu_additem(menu, className, classId);
 	}
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjdz", 0);
-	menu_setprop(menu, MPROP_BACKNAME, "Poprzednia strona");
-	menu_setprop(menu, MPROP_NEXTNAME, "Nastepna strona");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
-	menu_display(id, menu);
+	menu_display(id, menu, class / 7);
 
 	return PLUGIN_HANDLED;
 }
@@ -650,16 +652,53 @@ public display_classes_description_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
+	new menuData[192], codClass[classInfo], classId[5], itemAccess, menuCallback;
+	
+	menu_item_getinfo(menu, item, itemAccess, classId, charsmax(classId), _, _, menuCallback);
+	
+	new class = str_to_num(classId);
+
 	menu_destroy(menu);
 	
-	new menuData[256], codClass[classInfo];
+	ArrayGetArray(codClasses, class, codClass);
 	
-	ArrayGetArray(codClasses, item, codClass);
+	format(menuData, charsmax(menuData), "\wOpis \rKlasy^n^n\yKlasa: \w%s^n\yFrakcja: \w%s^n\yZycie: \w%i^n\yBronie:\w%s^n\yOpis: \w%s^n%s", codClass[CLASS_NAME], codClass[CLASS_FRACTION], 100 + codClass[CLASS_HEAL], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_DESC], codClass[CLASS_DESC][79]);
+
+	menu = menu_create(menuData, "classes_description_handle");
+
+	menu_additem(menu, "Powrot", classId);
+	menu_additem(menu, "Wyjscie");
+
+	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
+
+	menu_display(id, menu);
 	
-	format(menuData, charsmax(menuData), "\yKlasa: \w%s^n\yFrakcja: \w%i^n\yZycie: \w%i^n\yBronie:\w%s^n\yOpis: \w%s^n%s", codClass[CLASS_NAME], codClass[CLASS_FRACTION], 100 + codClass[CLASS_HEAL], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_DESC], codClass[CLASS_DESC][79]);
+	return PLUGIN_HANDLED;
+}
+
+public classes_description_handle(id, menu, item)
+{
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	show_menu(id, 0, menuData);
+	if(item == 1)
+	{
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	new classId[5], itemAccess, menuCallback;
 	
+	menu_item_getinfo(menu, item, itemAccess, classId, charsmax(classId), _, _, menuCallback);
+
+	menu_destroy(menu);
+
+	display_classes_description(id, str_to_num(classId), 1);
+
 	return PLUGIN_HANDLED;
 }
 
@@ -681,9 +720,9 @@ public display_items_description(id, page, sound)
 		menu_additem(menu, itemName);
 	}
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjdz", 0);
-	menu_setprop(menu, MPROP_BACKNAME, "Poprzednia strona");
-	menu_setprop(menu, MPROP_NEXTNAME, "Nastepna strona");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
 	menu_display(id, menu, page);
 
@@ -810,7 +849,7 @@ public assign_points(id, sound)
 	format(menuData, charsmax(menuData), "Kondycja: \r%i \y(Zwieksza predkosc poruszania)", get_condition(id, 0, 1, 1));
 	menu_additem(menu, menuData);
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjdz", 0);
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
 	menu_display(id, menu);
 
@@ -935,7 +974,7 @@ public change_hud(id, sound)
 	format(menuData, charsmax(menuData), "\yDomyslne \rUstawienia");
 	menu_additem(menu, menuData);
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjdz", 0);
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
 	menu_display(id, menu);
 

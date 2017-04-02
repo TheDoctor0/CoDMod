@@ -83,9 +83,9 @@ public shop_menu(id)
 	formatex(menuPrice, charsmax(menuPrice), "%i", costBigExp);
 	menu_additem(menu, menuData, menuPrice);
 
-	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
-	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
 	menu_display(id, menu);
 

@@ -38,7 +38,7 @@ public exchange_menu(id)
 	
 	menu_additem(menu, menuData);
 	
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjdz");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
 	menu_display(id, menu);
 
@@ -110,9 +110,9 @@ public exchange_item(id, sound)
 		players++;
 	}
 	
-	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
-	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 
 	if(!players)
 	{
@@ -197,7 +197,7 @@ public exchange_item_handle(id, menu, item)
 	menu_additem(menu, "Tak", playerId);
 	menu_additem(menu, "Nie", playerId);
 	
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjdz");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 
 	menu_display(player, menu);
 	
@@ -308,9 +308,9 @@ public give_item(id)
 		players++;
 	}
 	
-	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
-	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 
 	if(!players)
 	{

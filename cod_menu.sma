@@ -28,30 +28,29 @@ public display_menu(id)
 	
 	new menu = menu_create("\wMenu \rCoD Mod", "display_menu_handle");
  
-	menu_additem(menu, "\wSklep \rSMS \y(/sklepsms)", "1");
-	menu_additem(menu, "\wWybierz \rKlase \y(/klasa)", "2");
-	menu_additem(menu, "\wOpisy \rKlas \y(/klasy)", "3");
-	menu_additem(menu, "\wOpis \rItemu \y(/item)", "4");
-	menu_additem(menu, "\wOpisy \rItemow \y(/itemy)", "5");
-	menu_additem(menu, "\wWyrzuc \rItem \y(/wyrzuc)", "6");
-	menu_additem(menu, "\wSklep \y(/sklep)", "7");
-	menu_additem(menu, "\wRynek \y(/rynek)", "8");
-	menu_additem(menu, "\wKlan \y(/klan)", "9");
-	menu_additem(menu, "\wQuesty \y(/questy)", "10");
-	menu_additem(menu, "\wHaslo \y(/haslo)", "11");
-	menu_additem(menu, "\wStaty \y(/staty)", "12");
-	menu_additem(menu, "\wWymien \rItem \y(/wymien)", "13");
-	menu_additem(menu, "\wOddaj \rItem \y(/daj)", "14");
-	menu_additem(menu, "\wZmien \rSerwer \y(/serwer)", "15");
-	menu_additem(menu, "\wInformacje o \rVIPie \y(/vip)", "16");
-	menu_additem(menu, "\wLista \rVIPow \y(/vipy)", "17");
+	menu_additem(menu, "\wSklep \rSMS \y(/sklepsms)");
+	menu_additem(menu, "\wWybierz \rKlase \y(/klasa)");
+	menu_additem(menu, "\wOpisy \rKlas \y(/klasy)");
+	menu_additem(menu, "\wOpis \rItemu \y(/item)");
+	menu_additem(menu, "\wOpisy \rItemow \y(/itemy)");
+	menu_additem(menu, "\wWyrzuc \rItem \y(/wyrzuc)");
+	menu_additem(menu, "\wSklep \y(/sklep)");
+	menu_additem(menu, "\wRynek \y(/rynek)");
+	menu_additem(menu, "\wKlan \y(/klan)");
+	menu_additem(menu, "\wQuesty \y(/questy)");
+	menu_additem(menu, "\wHaslo \y(/haslo)");
+	menu_additem(menu, "\wStaty \y(/staty)");
+	menu_additem(menu, "\wWymien \rItem \y(/wymien)");
+	menu_additem(menu, "\wOddaj \rItem \y(/daj)");
+	menu_additem(menu, "\wZmien \rSerwer \y(/serwer)");
+	menu_additem(menu, "\wInformacje o \rVIPie \y(/vip)");
+	menu_additem(menu, "\wLista \rVIPow \y(/vipy)");
     
-	menu_setprop(menu, MPROP_EXIT, MEXIT_ALL);
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
-	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
-	menu_display(id, menu, 0);
+	menu_display(id, menu);
 
 	return PLUGIN_HANDLED;
 }  
@@ -70,11 +69,6 @@ public display_menu_handle(id, menu, item)
 	}
 
 	if(item == 1) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-	
-	new itemData[4], itemAccess, itemCallback;
-	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
-    
-	new item = str_to_num(itemData);
     
 	switch(item)
 	{ 

@@ -99,10 +99,7 @@ public stats_menu(id)
 	menu_additem(menu, "\wNajlepsze \rStaty \y(/staty)", "4");
 	menu_additem(menu, "\wTop \rStatow \y(/stop15)", "5");
     
-	menu_setprop(menu, MPROP_EXIT, MEXIT_ALL);
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
-	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
 	
 	menu_display(id, menu);
 

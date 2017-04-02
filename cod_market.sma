@@ -205,6 +205,10 @@ public buy_item(id, sound)
 		itemsCounts++;
 	}
 
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+
 	if(!itemsCounts)
 	{
 		menu_destroy(menu);
@@ -355,6 +359,10 @@ public withdraw_item(id, sound)
 
 		itemsCounts++;
 	}
+
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 
 	if(!itemsCounts)
 	{

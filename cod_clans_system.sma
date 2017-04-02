@@ -171,7 +171,7 @@ public show_clan_menu(id, sound)
 
 	if(!clan[id]) menu_additem(menu, "\wZloz \yPodanie", _, _, callback);
 	
-	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
 	menu_display(id, menu);
 	
@@ -320,7 +320,7 @@ public leave_confim_menu(id)
 	menu_additem(menu, "Tak");
 	menu_additem(menu, "Nie^n");
 	
-	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
 	menu_display(id, menu);
 
@@ -396,7 +396,9 @@ public members_online_menu(id)
 		menu_additem(menu, clanName);
 	}
 	
-	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
 	if(!playersAvailable) cod_print_chat(id, "Na serwerze nie ma zadnego czlonka twojego klanu!");
 	else menu_display(id, menu);
@@ -442,7 +444,7 @@ public leader_menu(id)
 	menu_additem(menu, "\wZmien \yNazwe Klanu^n", _, _, callback);
 	menu_additem(menu, "\wWroc", _, _, callback);
 		
-	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
 	menu_display(id, menu);
 
@@ -499,7 +501,7 @@ public disband_menu(id)
 	menu_additem(menu, "Tak", "0");
 	menu_additem(menu, "Nie^n", "1");
 	
-	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
 	menu_display(id, menu);
 
@@ -566,7 +568,7 @@ public skills_menu(id)
 	formatex(menuData, charsmax(menuData), "Obezwladnienie \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_DROP], skillMax, skillCost + nextSkillCost * codClan[CLAN_DROP]);
 	menu_additem(menu, menuData);
 	
-	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
 	menu_display(id, menu);
 	
@@ -1017,9 +1019,9 @@ public members_menu_handle(failState, Handle:query, error[], errorNum, tempId[],
 		SQL_NextRow(query);
 	}
 	
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
-	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
 	
 	menu_display(id, menu);
 }
@@ -1084,7 +1086,7 @@ public member_menu_handle(id, menu, item)
 
 	menu_additem(menu, "Wyrzuc \yGracza", "4");
 	
-	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
 	menu_display(id, menu);
 	
@@ -1242,9 +1244,9 @@ public applications_menu_handle(failState, Handle:query, error[], errorNum, temp
 		SQL_NextRow(query);
 	}
 	
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
-	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
 	
 	menu_display(id, menu);
 }
@@ -1494,9 +1496,9 @@ public application_menu_handle(failState, Handle:query, error[], errorNum, tempI
 		SQL_NextRow(query);
 	}
 	
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
-	menu_setprop(menu, MPROP_EXITNAME, "\wWyjdz");
 	
 	menu_display(id, menu);
 }
