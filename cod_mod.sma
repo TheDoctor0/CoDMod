@@ -206,7 +206,7 @@ public plugin_init()
 	codForwards[START_ROUND] = CreateMultiForward("cod_start_round", ET_IGNORE);
 	codForwards[END_ROUND] = CreateMultiForward("cod_end_round", ET_IGNORE);
 
-	register_clcmd("say /test", "show_bonus_info");
+	register_clcmd("say /test", "killstreak");
 }
 
 public plugin_natives()
@@ -1971,6 +1971,8 @@ public set_new_class(id)
 	codPlayer[id][PLAYER_NEW_CLASS] = 0;
 	
 	load_class(id, codPlayer[id][PLAYER_CLASS]);
+
+	if(codPlayer[id][PLAYER_POINTS] > 0) assign_points(id, 0);
 
 	set_task(0.1, "set_attributes", id);
 	
