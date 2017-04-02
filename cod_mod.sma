@@ -1658,26 +1658,20 @@ public message_health(id)
 }
 	
 public t_win_round()
-	round_winner("TERRORIST");
+	round_winner(1);
 	
 public ct_win_round()
-	round_winner("CT");
+	round_winner(2);
 
-public round_winner(const team[])
+public round_winner(team)
 {
-	new playersList[32], playersNum, id, exp;
-	
-	get_players(playersList, playersNum, "aeh", team);
-	
 	if(get_playersnum() < minPlayers) return;
 
-	for (new i = 0; i < playersNum; i++) 
+	for(new id = 1; id < MAX_PLAYERS; id++) 
 	{
-		id = playersList[i];
-		
-		if(!codPlayer[id][PLAYER_CLASS]) continue;
+		if(!codPlayer[id][PLAYER_CLASS] || get_user_team(id) != team) continue;
 
-		exp = get_exp_bonus(id, expWinRound);
+		new exp = get_exp_bonus(id, expWinRound);
 		
 		codPlayer[id][PLAYER_GAINED_EXP] += exp;
 		
@@ -1898,7 +1892,7 @@ public show_info(id)
 	
 	formatex(hudData, charsmax(hudData), "[Klasa : %s]^n[Exp : %0.1f%s]^n[Poziom : %i]^n[Item: %s (%i/%i)]^n[Honor: %i]", className, levelPercent, "%%", codPlayer[target][PLAYER_LEVEL], itemName, codPlayer[target][PLAYER_ITEM_DURA], maxDurability, cod_get_user_honor(target));
 	
-	if(get_exp_bonus(target, 100) > 100) format(hudData, charsmax(hudData), "%s^n[Exp: %i%s]", hudData, get_exp_bonus(target, 100), "%%");
+	if(get_exp_bonus(target, 100) > 100) format(hudData, charsmax(hudData), "%s^n[Exp Bonus: %i%s]", hudData, get_exp_bonus(target, 100), "%%");
 
 	if(codPlayer[target][PLAYER_KS]) format(hudData, charsmax(hudData), "%s^n[KillStreak: %i (%i s)]", hudData, codPlayer[target][PLAYER_KS], codPlayer[target][PLAYER_TIME_KS]);
 
@@ -2226,7 +2220,12 @@ public show_bonus_info()
 	if(get_players_amount() > 0 && (lastInfo + 5.0 > get_gametime() || get_players_amount() == minBonusPlayers))
 	{
 		if(get_players_amount() == minBonusPlayers) cod_print_chat(0, "Serwer jest pelny, a to oznacza^x03 EXP x 2^x01!");
-		else cod_print_chat(0, "Do pelnego serwera brakuje^x03 %i osob^x01. Exp jest wiekszy o^x03 %i%%^x01!", minBonusPlayers - get_players_amount(), get_players_amount() * 10);
+		else 
+		{
+			new playersToFull = minBonusPlayers - get_players_amount();
+
+			cod_print_chat(0, "Do pelnego serwera brakuje^x03 %i osob%s^x01. Exp jest wiekszy o^x03 %i%s^x01!", playersToFull, playersToFull == 1 ? "a" : (playersToFull < 5 ? "y" : ""), get_players_amount() * 10, "%%");
+		}
 		
 		lastInfo = floatround(get_gametime());
 	}
@@ -2993,7 +2992,7 @@ stock get_exp_bonus(id, exp)
 {
 	new Float:bonus = 1.0;
 	
-	if(cod_get_user_vip(id)) bonus += 0.5;
+	if(cod_get_user_vip(id)) bonus += 0.25;
 
 	bonus += floatmin(codPlayer[id][PLAYER_KS] * 0.2, 1.0);
 	
@@ -3004,7 +3003,7 @@ stock get_exp_bonus(id, exp)
 
 stock get_players_amount()
 {
-	if(get_maxplayers() - playersNum <= minBonusPlayers) return (get_maxplayers() - playersNum);
+	if(get_maxplayers() - playersNum <= minBonusPlayers) return (minBonusPlayers - (get_maxplayers() - playersNum));
 
 	return 0;
 }

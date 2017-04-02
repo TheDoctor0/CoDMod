@@ -92,18 +92,18 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 }
 
 public t_win_round()
-	round_winner("TERRORIST");
+	round_winner(1);
 	
 public ct_win_round()
-	round_winner("CT");
+	round_winner(2);
 
-public round_winner(const szTeam[])
+public round_winner(team)
 {
 	if(get_playersnum() < minPlayers) return;
 
 	for(new id = 1; id < MAX_PLAYERS; id++) 
 	{
-		if(!cod_get_user_class(id)) continue;
+		if(!cod_get_user_class(id) || get_user_team(id) != team) continue;
 
 		playerHonor[id] += cod_get_user_vip(id) ? honorEvent[WIN_ROUND] * 2 : honorEvent[WIN_ROUND];
 
@@ -304,11 +304,7 @@ public _cod_get_user_honor(id)
 
 public _cod_set_user_honor(id, amount)
 {
-	log_amx("ID: %i | Amount: %i", id, amount)
-	
 	playerHonor[id] = max(0, amount);
-
-	log_amx("Honor Amount: %i", playerHonor[id])
 	
 	save_honor(id);
 }
