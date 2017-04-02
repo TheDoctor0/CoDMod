@@ -105,6 +105,8 @@ public change_knife_handle(id, menu, item)
 
 	menu_destroy(menu);
 
+	set_knife(id, 1);
+
 	return PLUGIN_HANDLED;
 }
 

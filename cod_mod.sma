@@ -1015,7 +1015,7 @@ public change_hud_handle(id, menu, item)
 		}
 	}
 
-	menu_destroy(id);
+	menu_destroy(menu);
 
 	save_hud(id);
 	
