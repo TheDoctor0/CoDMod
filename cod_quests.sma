@@ -407,7 +407,7 @@ public give_reward(id)
 {
 	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
 	
-	new reward = get_quest_info(playerData[PLAYER_ID][id], QUEST_REWARD);
+	new reward = cod_get_user_bonus_exp(id, get_quest_info(playerData[PLAYER_ID][id], QUEST_REWARD));
 	
 	cod_set_user_exp(id, cod_get_user_exp(id) + reward);
 	

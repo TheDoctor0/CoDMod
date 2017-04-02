@@ -71,9 +71,9 @@ public message_intermission()
 	{
 		switch(i)
 		{
-			case THIRD: exp = get_pcvar_num(cvarThirdReward);
-			case SECOND: exp = get_pcvar_num(cvarSecondReward);
-			case FIRST: exp = get_pcvar_num(cvarFirstReward);
+			case THIRD: exp = cod_get_user_bonus_exp(0, get_pcvar_num(cvarThirdReward));
+			case SECOND: exp = cod_get_user_bonus_exp(0, get_pcvar_num(cvarSecondReward));
+			case FIRST: exp = cod_get_user_bonus_exp(0, get_pcvar_num(cvarFirstReward));
 		}
 		
 		cod_set_user_exp(winnersId[i], cod_get_user_exp(winnersId[i]) + exp);

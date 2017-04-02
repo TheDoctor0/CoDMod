@@ -320,7 +320,7 @@ Pobiera wytrzymalosc itemu gracza
 ------------------------------*/
 
 
-native cod_max_item_durability()
+native cod_max_item_durability();
 /*------------------------------
 Zwraca maksymalna wytrzymalosc itemu
 ------------------------------*/
@@ -330,12 +330,17 @@ native cod_show_hud(id, const text[], type=0, red=255, green=255, blue=255, Floa
 Wyświetla hud o podanych parametrach
 ------------------------------*/
 
+native cod_get_user_bonus_exp(id, value);
+/*------------------------------
+Zwraca exp powiekszony bonus dla danego gracza
+------------------------------*/
+
 native cod_display_fade(id, duration, holdtime, fadetype, red, green, blue, alpha);
 /*------------------------------
 Wyświetla fade o podanych parametrach
 ------------------------------*/
 
-native cod_check_register_system(id)
+native cod_check_register_system(id);
 /*------------------------------
 Sprawdza, czy gracz wpisal juz haslo i ewentualnie wymusza jego wpisanie
 ------------------------------*/
