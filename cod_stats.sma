@@ -210,7 +210,7 @@ public command_time_top(id)
 	new queryData[128], tempId[2];
 	
 	tempId[0] = id;
-	tempId[0] = 0;
+	tempId[1] = 0;
 
 	formatex(queryData, charsmax(queryData), "SELECT name, time FROM `cod_stats` ORDER BY time DESC LIMIT 15");
 	SQL_ThreadQuery(sql, "show_top_time", queryData, tempId, sizeof(tempId));
@@ -232,6 +232,8 @@ public show_top_time(failState, Handle:query, error[], errorNum, tempData[], dat
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
 	static motdData[2048], userName[64], motdLength, rank = 0, seconds = 0, minutes = 0, hours = 0;
+
+	rank = 0;
 	
 	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
 	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %13s^n", "#", "Nick", "Czas Gry");
@@ -299,7 +301,7 @@ public show_best_stats(failState, Handle:query, error[], errorNum, tempId[], dat
 	
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	new rank = SQL_ReadResult(query, 0), players = SQL_ReadResult(query, 1);
+	new rank = SQL_ReadResult(query, 0) + 1, players = SQL_ReadResult(query, 1);
 	
 	if(playerStats[id][CURRENT_STATS] > playerStats[id][BEST_STATS]) cod_print_chat(id, "Twoje najlepsze staty to^x04 %i^x01 zabic (w tym^x04 %i^x01 z HS) i^x04 %i^x01 zgonow^x01.", playerStats[id][CURRENT_KILLS], playerStats[id][CURRENT_HS_KILLS], playerStats[id][CURRENT_DEATHS]);
 	else cod_print_chat(id, "Twoje najlepsze staty to^x04 %i^x01 zabic (w tym^x04 %i^x01 z HS) i^x04 %i^x01 zgonow^x01.", playerStats[id][BEST_KILLS], playerStats[id][BEST_HS_KILLS], playerStats[id][BEST_DEATHS]);
@@ -337,6 +339,8 @@ public show_top_stats(failState, Handle:query, error[], errorNum, tempId[], data
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	static motdData[2048], userName[64], motdLength, rank = 0, kills = 0, hs = 0, deaths = 0;
+
+	rank = 0;
 	
 	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
 	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %19s %4s^n", "#", "Nick", "Zabojstwa", "Zgony");
