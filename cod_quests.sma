@@ -109,7 +109,7 @@ public quest_menu(id)
 	menu_additem(menu, "Postep \yMisji", _, _, callback);
 	
 	menu_addtext(menu, "^n\wPo wykonaniu \ymisji\w zostaniesz wynagrodzony \rdoswiadczeniem\w.", 0);
-	menu_addtext(menu, "^n\wMozesz \ywielokrotnie\w wykonywac ta sama misje.", 0);
+	menu_addtext(menu, "\wMozesz \ywielokrotnie\w wykonywac ta sama misje.", 0);
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
@@ -271,7 +271,7 @@ public select_quest_handle(id, menu, item)
 	{
 		case TYPE_CLASS: select_class(id);
 		case TYPE_ITEM: select_item(id);
-		default: cod_print_chat(id, "Rozpoczales wykonywac^x03misje^x01. Powodzenia!");
+		default: cod_print_chat(id, "Rozpoczales wykonywac^x03 misje^x01. Powodzenia!");
 	}
 	
 	menu_destroy(menu);
@@ -352,7 +352,7 @@ public select_handle(id, menu, item)
 	
 	playerData[PLAYER_ADDITIONAL][id] = str_to_num(questData);
 	
-	cod_print_chat(id, "Rozpoczales wykonywac^x03misje^x01. Powodzenia!");
+	cod_print_chat(id, "Rozpoczales wykonywac^x03 misje^x01. Powodzenia!");
 
 	menu_destroy(menu);
 	
