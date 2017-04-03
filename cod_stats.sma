@@ -96,7 +96,7 @@ public stats_menu(id)
 	menu_additem(menu, "\wMoj \rCzas \y(/czas)", "1");
 	if(get_user_flags(id) & ADMIN_BAN) menu_additem(menu, "\wCzas \rAdminow \y(/adminczas)", "2");
 	menu_additem(menu, "\wTop \rCzasu \y(/ctop15)", "3");
-	menu_additem(menu, "\wNajlepsze \rStaty \y(/staty)", "4");
+	menu_additem(menu, "\wNajlepsze \rStaty \y(/nstaty)", "4");
 	menu_additem(menu, "\wTop \rStatow \y(/stop15)", "5");
     
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
@@ -145,7 +145,7 @@ public command_time(id)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new queryData[128], tempId[1];
+	new queryData[256], tempId[1];
 	
 	tempId[0] = id;
 
@@ -272,7 +272,7 @@ public command_best_stats(id)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new queryData[128], tempId[1];
+	new queryData[256], tempId[1];
 	
 	tempId[0] = id;
 
@@ -564,16 +564,8 @@ public bomb_planted(planter)
 
 public message_intermission() 
 {
-	new playersList[32], id, players;
-
-	get_players(playersList, players, "h");
-	
-	if(!players) return PLUGIN_CONTINUE;
-
-	for (new i = 0; i < players; i++)
+	for(new id = 1; id <= MAX_PLAYERS; id++)
 	{
-		id = playersList[i];
-		
 		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
 		
 		save_stats(id, 1);

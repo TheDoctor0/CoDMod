@@ -22,16 +22,10 @@ public plugin_init()
 	
 public message_intermission() 
 {
-	new playerName[32], playersList[32], winnersId[3], winnersFrags[3], tempFrags, swapFrags, swapId, id, players, exp;
+	new playerName[32],winnersId[3], winnersFrags[3], tempFrags, swapFrags, swapId, exp;
 
-	get_players(playersList, players, "h");
-	
-	if(!players) return PLUGIN_CONTINUE;
-
-	for(new i = 0; i < players; i++)
+	for(new id = 1; id <= MAX_PLAYERS; id++)
 	{
-		id = playersList[i];
-		
 		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
 		
 		tempFrags = get_user_frags(id);
