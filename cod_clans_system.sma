@@ -1324,7 +1324,7 @@ public applications_confirm_handle(id, menu, item)
 		}
 		case 1:
 		{
-			remove_application(id, userName, clan[id]);
+			remove_application(id, userName);
 
 			cod_print_chat(id, "Odrzuciles podanie gracza^x03 %s^01 o dolaczenie do klanu.", userName);
 		}
@@ -1559,7 +1559,7 @@ public application_handle(id, menu, item)
 
 	if(check_applications(id, str_to_num(tempClanId)))
 	{
-		cod_print_chat(id, "Juz zlozyles podanie do tego klanu!");
+		cod_print_chat(id, "Juz zlozyles podanie do tego klanu, poczekaj na jego rozpatrzenie!");
 
 		show_clan_menu(id, 1);
 
@@ -1568,7 +1568,7 @@ public application_handle(id, menu, item)
 
 	new menuData[128];
 
-	formatex(menuData, charsmax(menuData), "\wCzy na pewno chcesz zlozyc \rpodanie\w do klanu \y%s\w?", clanName);
+	formatex(menuData, charsmax(menuData), "\wZlozenie \rPodania^n\wCzy na pewno chcesz zlozyc \rpodanie\w do klanu \y%s\w?", clanName);
 	
 	new menu = menu_create(menuData, "application_confirm_handle");
 	
@@ -1909,14 +1909,26 @@ stock accept_application(id, const userName[])
 	remove_applications(id, userName);
 }
 
-stock remove_application(id, const name[] = "", clan)
+stock remove_application(id, const name[] = "")
 {
+	new player = get_user_index(name);
+
+	if(is_user_connected(player))
+	{
+		new clanName[64], userName[32];
+
+		get_clan_info(clan[id], CLAN_NAME, clanName, charsmax(clanName));
+		get_user_name(id, userName, charsmax(userName));
+
+		client_print_color(player, player, "^x03%s^x01 odrzucil twoje podanie do klanu^x03 %s^x01!", userName, clanName);
+	}
+
 	new queryData[128], safeName[64];
 
 	if(strlen(name)) mysql_escape_string(name, safeName, charsmax(safeName));
 	else copy(safeName, charsmax(safeName), playerName[id]);
 
-	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_applications` WHERE name = '%s' AND clan = '%i'", safeName, clan);
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_applications` WHERE name = '%s' AND clan = '%i'", safeName, clan[id]);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }

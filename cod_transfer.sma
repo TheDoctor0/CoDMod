@@ -6,14 +6,17 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
+new const commandTransfer[][] = { "say /przelew", "say_team /przelew", "say /przelej", "say_team /przelej", "przelej" };
 new const commandHonor[][] = { "say /przelewh", "say_team /przelewh", "say /przelejh", "say_team /przelejh", "przelejh" };
-new const commandCash[][] = { "say /przelew", "say_team /przelew", "say /przelej", "say_team /przelej", "przelej" };
+new const commandCash[][] = { "say /przelewc", "say_team /przelewc", "say /przelejc", "say_team /przelejc", "przelejc" };
 
 new transferPlayer[MAX_PLAYERS + 1], maxPlayers;
 
 public plugin_init() 
 {  
 	register_plugin(PLUGIN, VERSION, AUTHOR);
+
+	for(new i; i < sizeof commandTransfer; i++) register_clcmd(commandTransfer[i], "transfer_menu");
 	
 	for(new i; i < sizeof commandHonor; i++) register_clcmd(commandHonor[i], "transfer_honor_menu");
 		
@@ -24,6 +27,48 @@ public plugin_init()
 
 	maxPlayers = get_maxplayers();
 } 
+
+public transfer_menu(id)
+{
+	if(!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	
+	new menu = menu_create("\wMenu \rPrzelewu", "transfer_menu_handle");
+	
+	menu_additem(menu, "Przelej \yKase \r(/przelewc)");
+	menu_additem(menu, "Przelej \yHonor \r(/przelewh)");
+	
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	
+	menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public transfer_menu_handle(id, menu, item)
+{
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	
+	if(item == MENU_EXIT)
+	{
+		menu_destroy(menu);
+
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		return PLUGIN_HANDLED;
+	}
+	
+	switch(item)
+	{
+		case 0: transfer_cash_menu(id);
+		case 1: transfer_honor_menu(id);	
+	}
+
+	menu_destroy(menu);
+
+	return PLUGIN_HANDLED;
+}
 
 public transfer_honor_menu(id) 
 { 
