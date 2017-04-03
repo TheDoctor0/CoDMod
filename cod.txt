@@ -1,7 +1,6 @@
 Do zrobienia:
 - Dokonczyc medale
 - Rozbudowanie sklepu
-- Podania i wojny w klanach
 - Aktualizacja .inc
 - Kasyno
 - Ikony bomby
