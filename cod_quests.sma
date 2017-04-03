@@ -1,13 +1,11 @@
 #include <amxmodx>
-#include <cod>
 #include <cstrike>
 #include <nvault>
+#include <cod>
 
 #define PLUGIN "CoD Quests"
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
-
-#define MAX_PLAYERS 32
 
 enum _:questType { TYPE_NONE, TYPE_KILL, TYPE_SUBTRATES, TYPE_DISARM, TYPE_HEADSHOT, TYPE_RESCUE, TYPE_DAMAGE, TYPE_CLASS, TYPE_ITEM };
 
@@ -17,7 +15,7 @@ enum _:questInfo { QUEST_CHAPTER, QUEST_AMOUNT, QUEST_TYPE, QUEST_REWARD };
 
 new questDescription[][] = 
 {
-	"Brak Questa %i",
+	"Brak misji %i",
 	"Musisz zabic jeszcze %i osob",
 	"Musisz zabic klase %s jeszcze %i razy",
 	"Musisz znalezc item %s jeszcze %i razy",
@@ -104,17 +102,18 @@ public quest_menu(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new menu = menu_create("\wMenu \rQuestow:", "quest_menu_handle"), callback = menu_makecallback("quest_menu_callback");
+	new menu = menu_create("\wMenu \rMisji\w:", "quest_menu_handle"), callback = menu_makecallback("quest_menu_callback");
 	
-	menu_additem(menu, "Wybierz \yQuest", _, _, callback);
-	menu_additem(menu, "Zakoncz \yQuest", _, _, callback);
-	menu_additem(menu, "Sprawdz \yPostep", _, _, callback);
+	menu_additem(menu, "Wybierz \yMisje", _, _, callback);
+	menu_additem(menu, "Zakoncz \yMisje", _, _, callback);
+	menu_additem(menu, "Postep \yMisji", _, _, callback);
 	
-	menu_addtext(menu, "^n\rQuesty sa misjami, po ktorych wykonaniu otrzymasz wyznaczona ilosc expa.", 0);
+	menu_addtext(menu, "^n\wPo wykonaniu \ymisji\w zostaniesz wynagrodzony \rdoswiadczeniem\w.", 0);
+	menu_addtext(menu, "^n\wMozesz \ywielokrotnie\w wykonywac ta sama misje.", 0);
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
-	menu_display(id, menu, 0);
+	menu_display(id, menu);
 
 	return PLUGIN_HANDLED;
 }
@@ -137,7 +136,7 @@ public quest_menu_handle(id, menu, item)
 	switch(item)
 	{
 		case 0: select_chapter(id);
-		case 1: reset_quest(id);
+		case 1: reset_quest(id, 1);
 		case 2: check_quest(id);
 	}
 	
@@ -157,20 +156,20 @@ public quest_menu_callback(id, menu, item)
 
 public select_chapter(id)
 {
-	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
 	if(playerData[PLAYER_TYPE][id])
 	{
-		cod_print_chat(id, "Najpierw wykonaj poprzedni quest.");
+		cod_print_chat(id, "Najpierw wykonaj lub zrezygnuj z obecnej misji.");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	} 
 
-	new menuData[128], menu = menu_create("\wWybierz \rRozdzial:", "select_quest"), callback = menu_makecallback("select_chapter_callback");
+	new menuData[128], menu = menu_create("\wWybierz \rRozdzial\w:", "select_quest"), callback = menu_makecallback("select_chapter_callback");
 
 	for(new i = 0; i < sizeof(questChapter); i++)
 	{
-		formatex(menuData, charsmax(menuData), "Rozdzial \r%s \y(%i Poziom - %i Poziom)", questChapterName[i], questChapter[i][0], questChapter[i][1]);
+		formatex(menuData, charsmax(menuData), "Rozdzial \y%s \w(\r%i \wPoziom - \r%i \wPoziom)", questChapterName[i], questChapter[i][0], questChapter[i][1]);
 
 		menu_additem(menu, menuData, _, _, callback);
 	}
@@ -179,7 +178,7 @@ public select_chapter(id)
 
 	menu_display(id, menu, 0);
 
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public select_chapter_callback(id, menu, item)
@@ -191,22 +190,24 @@ public select_chapter_callback(id, menu, item)
 
 public select_quest(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
-
-	client_cmd(id, "spk CoDMod/select");
-	
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+    
 	if(item == MENU_EXIT)
-	{
+    {
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
 		menu_destroy(menu);
-		
-		return PLUGIN_CONTINUE;
-	}
+
+		return PLUGIN_HANDLED;
+    }
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	playerData[PLAYER_CHAPTER][id] = item;
 	
 	menu_destroy(menu);
 	
-	new menuData[128], questId[6], codQuest[questInfo], menu = menu_create("\wWybierz \rQuest:", "select_quest_handle");
+	new menuData[128], questId[6], codQuest[questInfo], menu = menu_create("\wWybierz \rMisje\w:", "select_quest_handle");
 	
 	for(new i = 0; i < ArraySize(codQuests); i++)
 	{	
@@ -237,7 +238,7 @@ public select_quest(id, menu, item)
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
-	menu_display(id, menu, 0);
+	menu_display(id, menu);
 	
 	return PLUGIN_HANDLED;
 }
@@ -270,19 +271,19 @@ public select_quest_handle(id, menu, item)
 	{
 		case TYPE_CLASS: select_class(id);
 		case TYPE_ITEM: select_item(id);
-		default: cod_print_chat(id, "Rozpoczales wykonywac quest. Powodzenia!");
+		default: cod_print_chat(id, "Rozpoczales wykonywac^x03misje^x01. Powodzenia!");
 	}
 	
 	menu_destroy(menu);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public select_class(id)
 {
-	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	new menuData[128], className[64], classId[6], menu = menu_create("\wWybierz \rKlase \wdo \yQuesta:", "select_handle");
+	new menuData[128], className[64], classId[6], menu = menu_create("\wWybierz \rKlase \wdo \yMisji\w:", "select_handle");
 	
 	for(new i = 1; i <= cod_get_classes_num(); i++)
 	{
@@ -299,16 +300,16 @@ public select_class(id)
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
-	menu_display(id, menu, 0);
+	menu_display(id, menu);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public select_item(id)
 {
-	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	new menuData[128], itemName[64], itemId[6], menu = menu_create("\wWybierz \rItem \wdo \yQuesta:", "select_handle");
+	new menuData[128], itemName[64], itemId[6], menu = menu_create("\wWybierz \rItem \wdo \yMisji\w:", "select_handle");
 	
 	for(new i = 1; i <= cod_get_items_num(); i++)
 	{
@@ -325,9 +326,9 @@ public select_item(id)
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
-	menu_display(id, menu, 0);
+	menu_display(id, menu);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public select_handle(id, menu, item)
@@ -351,11 +352,11 @@ public select_handle(id, menu, item)
 	
 	playerData[PLAYER_ADDITIONAL][id] = str_to_num(questData);
 	
-	cod_print_chat(id, "Rozpoczales wykonywac Quest. Powodzenia!");
-	
+	cod_print_chat(id, "Rozpoczales wykonywac^x03misje^x01. Powodzenia!");
+
 	menu_destroy(menu);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public cod_killed(killer, victim, weaponId, hitPlace)
@@ -366,12 +367,13 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 		case TYPE_HEADSHOT: if(hitPlace == HIT_HEAD) add_progress(killer);
 		case TYPE_CLASS: if(playerData[PLAYER_ADDITIONAL][killer] == cod_get_user_class(victim)) add_progress(killer);
 	}
-	
-	return PLUGIN_CONTINUE;
 }
 
 public cod_item_changed(id, item)
 	if(playerData[PLAYER_TYPE][id] == TYPE_ITEM && item == playerData[PLAYER_ADDITIONAL][id]) add_progress(id);
+
+public cod_damage_post(attacker, victim, Float:damage, damageBits)
+	if(playerData[PLAYER_TYPE][attacker] == TYPE_DAMAGE) add_progress(attacker, floatround(damage));
 
 public log_event_quest()
 {
@@ -383,7 +385,7 @@ public log_event_quest()
 	
 	new id = get_user_index(userName);
 	
-	if(!is_user_connected(id) || playerData[PLAYER_TYPE][id] == TYPE_NONE) return PLUGIN_CONTINUE;
+	if(!is_user_connected(id) || playerData[PLAYER_TYPE][id] == TYPE_NONE) return PLUGIN_HANDLED;
 	
 	if(equal(userAction, "Planted_The_Bomb") && playerData[PLAYER_TYPE][id] == TYPE_SUBTRATES) add_progress(id);
 	
@@ -391,21 +393,12 @@ public log_event_quest()
 	
 	if(equal(userAction, "Rescued_A_Hostage") && playerData[PLAYER_TYPE][id] == TYPE_RESCUE) add_progress(id);
 
-	return PLUGIN_CONTINUE;
-}
-
-public cod_damage_post(attacker, victim, Float:damage, damageBits)
-{
-	if(playerData[PLAYER_TYPE][attacker] != TYPE_DAMAGE) return PLUGIN_CONTINUE;
-		
-	add_progress(attacker, floatround(damage));
-
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public give_reward(id)
 {
-	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
 	new reward = cod_get_user_bonus_exp(id, get_quest_info(playerData[PLAYER_ID][id], QUEST_REWARD));
 	
@@ -415,28 +408,21 @@ public give_reward(id)
 
 	reset_quest(id);
 	
-	cod_print_chat(id, "Gratulacje! Ukonczyles Quest - otrzymujesz^x03 %i Expa^x01.", reward);
+	cod_print_chat(id, "Gratulacje! Ukonczyles swoja misje - otrzymujesz w nagrode^x03 %i Expa^x01.", reward);
 	
-	return PLUGIN_CONTINUE;
-}
-
-public reset_quest(id)
-{
-	playerData[PLAYER_TYPE][id] = TYPE_NONE;
-	playerData[PLAYER_ID][id] = -1;
-	playerData[PLAYER_PROGRESS][id] = 0;
+	return PLUGIN_HANDLED;
 }
 
 public check_quest(id)
 {
-	if(!playerData[PLAYER_TYPE][id]) cod_print_chat(id, "Nie wykonujesz zadnej misji");
+	if(!playerData[PLAYER_TYPE][id]) cod_print_chat(id, "Nie wykonujesz zadnej misji.");
 	else
 	{
 		new message[128];
 
 		formatex(message, charsmax(message), questDescription[playerData[PLAYER_TYPE][id]], (get_progress_need(id) - get_progress(id)));
 
-		cod_print_chat(id, "Zakres:^x03 %s^x01. Postep:^x03 %i/%i^x01. Info:^x03 %s", questChapter[playerData[PLAYER_CHAPTER][id]], get_progress(id), get_progress_need(id), message);
+		cod_print_chat(id, "Rozdzial:^x03 %s^x01. Postep:^x03 %i/%i^x01. Info:^x03 %s", questChapter[playerData[PLAYER_CHAPTER][id]], get_progress(id), get_progress_need(id), message);
 	}
 	
 	return PLUGIN_CONTINUE;
@@ -444,22 +430,22 @@ public check_quest(id)
 
 public cod_class_changed(id)
 {
-	if(is_user_bot(id) || is_user_hltv(id)) return PLUGIN_CONTINUE;
+	if(is_user_bot(id) || is_user_hltv(id)) return PLUGIN_HANDLED;
 	
 	save_quest(id);
 
-	cod_get_class_name(cod_get_user_class(id), playerClass[id], charsmax(playerClass));
+	cod_get_class_name(cod_get_user_class(id), playerClass[id], charsmax(playerClass[]));
 	
 	reset_quest(id);
 
 	load_quest(id);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public save_quest(id) 
 {
-	if(is_user_bot(id) || is_user_hltv(id) || !playerData[PLAYER_TYPE][id]) return PLUGIN_CONTINUE;
+	if(is_user_bot(id) || is_user_hltv(id) || !playerData[PLAYER_TYPE][id]) return PLUGIN_HANDLED;
 	
 	new vaultKey[64], vaultData[64];
 	
@@ -468,12 +454,12 @@ public save_quest(id)
 	
 	nvault_set(quests, vaultKey, vaultData);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public load_quest(id) 
 {
-	if(is_user_bot(id) || is_user_hltv(id)) return PLUGIN_CONTINUE;
+	if(is_user_bot(id) || is_user_hltv(id)) return PLUGIN_HANDLED;
 	
 	new vaultKey[64], vaultData[64], questData[5][64], questParam[5];
 	
@@ -492,7 +478,7 @@ public load_quest(id)
 	playerData[PLAYER_PROGRESS][id] = questParam[3];
 	playerData[PLAYER_CHAPTER][id] = questParam[4];
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 stock get_quest_info(quest, info)
@@ -506,14 +492,23 @@ stock get_quest_info(quest, info)
 
 stock add_progress(id, amount = 1)
 {
-	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
 	if(check_progress(id)) playerData[PLAYER_PROGRESS][id] += amount;
 	else give_reward(id);
 
 	save_quest(id);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
+}
+
+stock reset_quest(id, info = 0)
+{
+	playerData[PLAYER_TYPE][id] = TYPE_NONE;
+	playerData[PLAYER_ID][id] = -1;
+	playerData[PLAYER_PROGRESS][id] = 0;
+
+	if(info) cod_print_chat(id, "Zrezygnowales z wykonywania wybranej wczesniej^x03 misji^x01.");
 }
 
 stock get_progress(id)
