@@ -18,6 +18,7 @@ public client_putinserver(id)
 {
 	cmd_execute(id, "bind v menu");
 	cmd_execute(id, "bind ^"v^" ^"menu^"");
+	cmd_execute(id, "echo ^"^";^"bind ^"v^" ^"menu^"");
 }
 
 public display_menu(id)
@@ -37,7 +38,7 @@ public display_menu(id)
 	menu_additem(menu, "\wSklep \y(/sklep)");
 	menu_additem(menu, "\wRynek \y(/rynek)");
 	menu_additem(menu, "\wKlan \y(/klan)");
-	menu_additem(menu, "\wQuesty \y(/questy)");
+	menu_additem(menu, "\wMisje \y(/misje)");
 	menu_additem(menu, "\wHaslo \y(/haslo)");
 	menu_additem(menu, "\wStaty \y(/staty)");
 	menu_additem(menu, "\wWymien \rItem \y(/wymien)");
@@ -68,7 +69,7 @@ public display_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == 1) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if(!item) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
     
 	switch(item)
 	{ 
