@@ -11,8 +11,10 @@
 
 #define TASK_TIME 9054
 
-enum _:statsInfo { ADMIN, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BEST_STATS, BEST_KILLS, 
-	BEST_HS_KILLS, BEST_DEATHS, CURRENT_STATS, CURRENT_KILLS, CURRENT_HS_KILLS, CURRENT_DEATHS };
+enum _:statsInfo { ADMIN, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE, SILVER, GOLD, MEDALS, BEST_STATS, 
+	BEST_KILLS, BEST_HS_KILLS, BEST_DEATHS, CURRENT_STATS, CURRENT_KILLS, CURRENT_HS_KILLS, CURRENT_DEATHS };
+
+enum _:winers { THIRD, SECOND, FIRST };
 
 new const commandMenu[][] = { "say /statsmenu", "say_team /statsmenu", "say /menustaty", "say_team /menustaty", "menustaty" };
 new const commandTime[][] = { "say /time", "say_team /time", "say /czas", "say_team /czas", "czas" };
@@ -20,12 +22,20 @@ new const commandAdminTime[][] = { "say /timeadmin", "say_team /timeadmin", "say
 new const commandTopTime[][] = { "say /ttop15", "say_team /ttop15", "say /toptime", "say_team /toptime", "say /ctop15", "say_team /ctop15", "say /topczas", "say_team /topczas", "topczas" };
 new const commandBestStats[][] = { "say /staty", "say_team /staty", "say /beststats", "say_team /beststats", "say /bstats", "say_team /bstats", "say /najlepszestaty", "say_team /najlepszestaty", "say /nstaty", "say_team /nstaty", "najlepszestaty" };
 new const commandTopStats[][] = { "say /stop15", "say_team /stop15", "say /topstats", "say_team /topstats", "say /topstaty", "say_team /topstaty", "topstaty" };
+new const commandMedals[][] = { "say /medal", "say_team /medal", "say /medale", "say_team /medale", "say /medals", "say_team /medals", "medale" };
+new const commandTopMedals[][] = { "say /mtop15", "say_team /mtop15", "say /topmedals", "say_team /topmedals", "say /topmedale", "say_team /topmedale", "topmedale" };
 
 new playerName[MAX_PLAYERS + 1][64], playerStats[MAX_PLAYERS + 1][statsInfo], Handle:sql, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo, maxPlayers;
+
+new cvarGoldReward, cvarSilverReward, cvarBronzeReward;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
+
+	cvarGoldReward = register_cvar("cod_rewards_gold", "300");
+	cvarSilverReward = register_cvar("cod_rewards_silver", "200");
+	cvarBronzeReward = register_cvar("cod_rewards_bronze", "100");
 
 	for(new i; i < sizeof commandMenu; i++) register_clcmd(commandMenu[i], "stats_menu");
 		
@@ -38,6 +48,10 @@ public plugin_init()
 	for(new i; i < sizeof commandBestStats; i++) register_clcmd(commandBestStats[i], "command_best_stats");
 		
 	for(new i; i < sizeof commandTopStats; i++) register_clcmd(commandTopStats[i], "command_top_stats");
+
+	for(new i; i < sizeof commandMedals; i++) register_clcmd(commandMedals[i], "command_medals");
+		
+	for(new i; i < sizeof commandTopMedals; i++) register_clcmd(commandTopMedals[i], "command_top_medals");
 
 	register_event("TextMsg", "hostages_rescued", "a", "2&#All_Hostages_R");
 
@@ -568,6 +582,80 @@ public bomb_planted(planter)
 
 public message_intermission() 
 {
+	new playerName[32], winnersId[3], winnersFrags[3], tempFrags, swapFrags, swapId, exp;
+
+	for(new id = 1; id <= MAX_PLAYERS; id++)
+	{
+		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
+		
+		tempFrags = get_user_frags(id);
+		
+		if(tempFrags > winnersFrags[THIRD])
+		{
+			winnersFrags[THIRD] = tempFrags;
+			winnersId[THIRD] = id;
+			
+			if(tempFrags > winnersFrags[SECOND])
+			{
+				swapFrags = winnersFrags[SECOND];
+				swapId = winnersId[SECOND];
+				winnersFrags[SECOND] = tempFrags;
+				winnersId[SECOND] = id;
+				winnersFrags[THIRD] = swapFrags;
+				winnersId[THIRD] = swapId;
+				
+				if(tempFrags > winnersFrags[FIRST])
+				{
+					swapFrags = winnersFrags[FIRST];
+					swapId = winnersId[FIRST];
+					winnersFrags[FIRST] = tempFrags;
+					winnersId[FIRST] = id;
+					winnersFrags[SECOND] = swapFrags;
+					winnersId[SECOND] = swapId;
+				}
+			}
+		}
+	}
+	
+	if(!winnersId[FIRST]) return PLUGIN_CONTINUE;
+
+	new const medals[][] = { "Brazowy", "Srebrny", "Zloty" };
+	
+	cod_print_chat(0, "Gratulacje dla^x03 Najlepszych Graczy^x01!");
+	
+	for(new i = 2; i >= 0; i--)
+	{
+		switch(i)
+		{
+			case THIRD:
+			{
+				exp = cod_get_user_bonus_exp(0, get_pcvar_num(cvarBronzeReward));
+
+				playerStats[winnersId[i]][BRONZE]++;
+			}
+			case SECOND: 
+			{
+				exp = cod_get_user_bonus_exp(0, get_pcvar_num(cvarSilverReward));
+
+				playerStats[winnersId[i]][SILVER]++;
+			}
+			case FIRST:
+			{
+				exp = cod_get_user_bonus_exp(0, get_pcvar_num(cvarGoldReward));
+
+				playerStats[winnersId[i]][GOLD]++;
+			}
+		}
+
+		save_stats(winnersId[i], 1);
+		
+		cod_set_user_exp(winnersId[i], cod_get_user_exp(winnersId[i]) + exp);
+		
+		get_user_name(winnersId[i], playerName, charsmax(playerName));
+
+		cod_print_chat(0, "^x03 %s^x01 -^x03 %i^x01 Zabojstw - %s Medal (+^x03%i^x01 Doswiadczenia).", playerName, winnersFrags[i], medals[i], exp);
+	}
+	
 	for(new id = 1; id <= MAX_PLAYERS; id++)
 	{
 		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
@@ -645,9 +733,9 @@ public sql_init()
 		return;
 	}
 	
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_stats` (`name` varchar(35) NOT NULL, `admin` INT NOT NULL, `kills` INT NOT NULL, ");
-	add(queryData, charsmax(queryData), "`time` INT NOT NULL, `firstvisit` INT NOT NULL, `lastvisit` INT NOT NULL, `bestkills` INT NOT NULL, ");
-	add(queryData, charsmax(queryData), "`bestdeaths` INT NOT NULL, `besths` INT NOT NULL, `beststats` INT NOT NULL, PRIMARY KEY (`name`));");
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_stats` (`name` varchar(35) NOT NULL, `admin` INT NOT NULL, `kills` INT NOT NULL, `time` INT NOT NULL, ");
+	add(queryData, charsmax(queryData), "`firstvisit` INT NOT NULL, `lastvisit` INT NOT NULL, `bestkills` INT NOT NULL, `bestdeaths` INT NOT NULL, `besths` INT NOT NULL, ");
+	add(queryData, charsmax(queryData), "`beststats` INT NOT NULL, `bronze` INT NOT NULL, `silver` INT NOT NULL, `gold` INT NOT NULL, `medals` INT NOT NULL, PRIMARY KEY (`name`));");
 
 	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
 
@@ -688,6 +776,10 @@ public load_stats_handle(failState, Handle:query, error[], errorNum, tempId[], d
 		playerStats[id][TIME] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "time"));
 		playerStats[id][FIRST_VISIT] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "firstvisit"));
 		playerStats[id][LAST_VISIT] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "lastvisit"));
+		playerStats[id][BRONZE] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "bronze"));
+		playerStats[id][SILVER] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "silver"));
+		playerStats[id][GOLD] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "gold"));
+		playerStats[id][MEDALS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "medals"));
 		playerStats[id][BEST_STATS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "beststats"));
 		playerStats[id][BEST_KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "bestkills"));
 		playerStats[id][BEST_HS_KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "besths"));

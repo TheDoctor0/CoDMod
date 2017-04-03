@@ -1888,7 +1888,7 @@ public message_intermission()
 
 public save_players()
 {
-	for(new id = 1; id < MAX_PLAYERS; id++)
+	for(new id = 1; id <= MAX_PLAYERS; id++)
 	{
 		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
 
