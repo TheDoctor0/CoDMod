@@ -8,6 +8,8 @@
 
 new const commandShopMenu[][] = { "say /shop", "say_team /shop", "say /sklep", "say_team /sklep", "sklep" };
 
+enum _:shopInfo { EXCHANGE, REPAIR, BUY, UPGRADE, SMALL_EXP, BIG_EXP };
+
 new cvarCostRepair, cvarCostItem, cvarCostUpgrade, cvarCostSmallExp, cvarCostBigExp,
 	costRepair, costItem, costUpgrade, costSmallExp, costBigExp;
 
@@ -107,7 +109,7 @@ public shop_menu_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	if(item == 0)
+	if(item == EXCHANGE)
 	{
 		client_print(id, print_center, "Wpisz ile Honoru chcesz kupic.");
 
@@ -117,8 +119,15 @@ public shop_menu_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	if(item == REPAIR && cod_get_item_durability(id) >= cod_max_item_durability())
+	{
+		cod_print_chat(id, "Twoj przedmiot jest juz w pelni naprawiony!");
+
+		return PLUGIN_HANDLED;
+	}
 	
-	if(item == 1)
+	if(item == UPGRADE)
 	{
 		new itemValue, playerItem = cod_get_user_item(id, itemValue);
 
@@ -154,7 +163,7 @@ public shop_menu_handle(id, menu, item)
 	
 	switch(item)
 	{
-		case 1:
+		case REPAIR:
 		{
 			cod_print_chat(id, "Kupiles ^x03+%i^x01 wytrzymalosci przedmiotu!", itemDurability);
 			
@@ -171,19 +180,19 @@ public shop_menu_handle(id, menu, item)
 				cod_print_chat(id, "Wytrzymalosc twojego przedmiotu wynosi ^x03%i^x01!", cod_get_item_durability(id));
 			}
 		}
-		case 2:
+		case BUY:
 		{
 			cod_print_chat(id, "Kupiles^x03 losowy przedmiot^x01!");
 			
 			cod_set_user_item(id, -1, -1);
 		}
-		case 3:
+		case UPGRADE:
 		{
 			cod_print_chat(id, "Kupiles^x03 ulepszenie przedmiotu^x01!");
 			
 			cod_upgrade_user_item(id);
 		}
-		case 4:
+		case SMALL_EXP:
 		{
 			cod_print_chat(id, "Kupiles^x03 maly exp^x01!");
 			
@@ -193,7 +202,7 @@ public shop_menu_handle(id, menu, item)
 			
 			cod_set_user_exp(id, cod_get_user_exp(id) + exp);
 		}
-		case 5:
+		case BIG_EXP:
 		{
 			cod_print_chat(id, "Kupiles^x03 duzy exp^x01!");
 			
