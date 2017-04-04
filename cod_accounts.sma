@@ -122,7 +122,7 @@ public message_vgui_menu(msgId, dest, id)
 {
 	if(get_msg_arg_int(1) == VGUI_JOIN_TEAM_NUM && playerStatus[id] < LOGGED)
 	{
-		account_menu(id, 1);
+		set_task(0.1, "account_menu", id);
 
 		return PLUGIN_HANDLED;
 	} 
@@ -154,7 +154,7 @@ public check_account(id)
 {
 	if(playerStatus[id] < LOGGED)
 	{
-		account_menu(id, 0);
+		account_menu(id, 1);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -174,6 +174,8 @@ public account_menu(id, sound)
 
 	if(!get_bit(id, dataLoaded))
 	{
+		remove_task(id);
+
 		set_task(0.1, "account_menu", id);
 
 		return PLUGIN_HANDLED;
@@ -188,7 +190,7 @@ public account_menu(id, sound)
 
 	if(playerStatus[id] <= NOT_LOGGED) if(!task_exists(id + TASK_PASSWORD)) set_task(60.0, "kick_player", id + TASK_PASSWORD);
 
-	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if(sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	static menuData[192];
 
@@ -203,7 +205,7 @@ public account_menu(id, sound)
 	menu_additem(menu, "\yZmien \wHaslo", _, _, callback);
 	menu_additem(menu, "\ySkasuj \wKonto^n", _, _, callback);
 	menu_additem(menu, "\yZaloguj jako \wGosc \r(NIEZALECANE)^n", _, _, callback);
-	menu_additem(menu, "\wWyjdz", _, _, callback);
+	if(playerStatus[id] == LOGGED) menu_additem(menu, "\wWyjdz", _, _, callback);
  
 	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
 
@@ -319,7 +321,7 @@ public login_account(id)
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
 		ShowSyncHudMsg(id, hudSync, "Podane haslo jest nieprawidlowe.");
 		
-		account_menu(id, 0);
+		account_menu(id, 1);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -358,7 +360,7 @@ public register_step_one(id)
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
 		ShowSyncHudMsg(id, hudSync, "Haslo musi miec co najmniej 5 znakow.");
 		
-		account_menu(id, 0);
+		account_menu(id, 1);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -393,7 +395,7 @@ public register_step_two(id)
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
 		ShowSyncHudMsg(id, hudSync, "Podane hasla roznia sie od siebie.");
 		
-		account_menu(id, 0);
+		account_menu(id, 1);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -492,7 +494,7 @@ public change_step_one(id)
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
 		ShowSyncHudMsg(id, hudSync, "Podane haslo jest nieprawidlowe.");
 		
-		account_menu(id, 0);
+		account_menu(id, 1);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -525,7 +527,7 @@ public change_step_two(id)
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
 		ShowSyncHudMsg(id, hudSync, "Nowe haslo jest takie samo jak aktualne.");
 		
-		account_menu(id, 0);
+		account_menu(id, 1);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -537,7 +539,7 @@ public change_step_two(id)
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
 		ShowSyncHudMsg(id, hudSync, "Nowe haslo musi miec co najmniej 5 znakow.");
 		
-		account_menu(id, 0);
+		account_menu(id, 1);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -572,7 +574,7 @@ public change_step_three(id)
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
 		ShowSyncHudMsg(id, hudSync, "Podane hasla roznia sie od siebie.");
 		
-		account_menu(id, 0);
+		account_menu(id, 1);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -613,7 +615,7 @@ public delete_account(id)
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
 		ShowSyncHudMsg(id, hudSync, "Podane haslo jest nieprawidlowe.");
 		
-		account_menu(id, 0);
+		account_menu(id, 1);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -780,7 +782,7 @@ public _cod_check_account(plugin_id, num_params)
 	{
 		cod_print_chat(id, "Musisz sie^x04 zalogowac^x01, aby miec dostep do glownych funkcji!");
 		
-		account_menu(id, 0);
+		account_menu(id, 1);
 		
 		return 0;
 	}
