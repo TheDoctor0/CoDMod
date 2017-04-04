@@ -512,7 +512,7 @@ public check_time(id)
 }
 
 public cod_spawned(id)
-	if(get_bit(id, visitInfo)) set_task(5.0, "check_time", id + TASK_TIME);
+	if(!get_bit(id, visitInfo)) set_task(5.0, "check_time", id + TASK_TIME);
 
 public first_round()
 	blockCount = false;

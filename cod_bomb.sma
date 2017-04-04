@@ -23,16 +23,6 @@
 #include <csx> 
 #include <cstrike> 
 #include <hamsandwich>
-#include <okapi>
-#include <cvar_util>
-
-#if !defined _okapi_included
-	#assert "okapi.inc library required ! Get it from https://forums.alliedmods.net/showthread.php?t=234986"
-#endif
-
-#if !defined _cvar_util_included
-	#assert "cvar_util.inc library required ! Get it from https://forums.alliedmods.net/showthread.php?t=154642"
-#endif
 
 #define FBitSet(%1,%2)   (%1 |=  (1 << (%2 & 31))) 
 #define FBitGet(%1,%2)   (%1 &   (1 << (%2 & 31))) 
@@ -88,7 +78,6 @@ new bool:IsBombPlanted
 new bool:IsBombExploded   
 new bool:IsBombPlanting   
 new bool:IsBombDefusing 
-new bool:IsThrowableC4Running 
 
 new Float:BombSitesOrigins[2][3] 
 new Float:BombOrigin[3] 
@@ -154,44 +143,21 @@ public plugin_init()
 	
 	DisableHamForward(HandleHamHook[WeaponIdle] = RegisterHam(Ham_Weapon_WeaponIdle, "weapon_c4", "CBaseEntity_C4Idle", false))
 	
-	CvarCache(register_cvar("bomb_status_team"      , "0"  ), CvarType_Int, HandleCvar[TeamAcces       ])
-	CvarCache(register_cvar("hud_r_color"           , "0"  ), CvarType_Int, HandleCvar[ColorR          ])
-	CvarCache(register_cvar("hud_g_color"           , "255"), CvarType_Int, HandleCvar[ColorG          ])
-	CvarCache(register_cvar("hud_b_color"           , "85" ), CvarType_Int, HandleCvar[ColorB          ])
-	CvarCache(register_cvar("bomb_status_commands"  , "1"  ), CvarType_Int, HandleCvar[CommandsStatus  ])
-	CvarCache(register_cvar("bomb_status_c_spamtime", "10" ), CvarType_Int, HandleCvar[CommandsSpamTime])
-	CvarCache(register_cvar("bomb_status_logs"      , "0"  ), CvarType_Int, HandleCvar[LogsStatus      ])
-	CvarCache(register_cvar("bomb_status_disable_tp", "0"  ), CvarType_Int, HandleCvar[DisableTeleport ])
-	CvarCache(get_cvar_pointer("mp_c4timer"                ), CvarType_Int, HandleCvar[C4Timer         ])
+	register_cvar("bomb_status_team"      , "0"  );
+	register_cvar("hud_r_color"           , "0"  );
+	register_cvar("hud_g_color"           , "255");
+	register_cvar("hud_b_color"           , "85" );
+	register_cvar("bomb_status_commands"  , "1"  );
+	register_cvar("bomb_status_c_spamtime", "10" );
+	register_cvar("bomb_status_logs"      , "0"  );
+	register_cvar("bomb_status_disable_tp", "0"  );
+	HandleCvar[C4Timer] = get_cvar_pointer("mp_c4timer");
 	
 	HandleHudSyncObject = CreateHudSyncObj()
 	
 	register_clcmd("say /ch_hud_state" , "ClientCommand_ChHudState") 
 	register_clcmd("say_team /ch_hud_state" , "ClientCommand_ChHudState") 
 	register_clcmd("bombstatus_cfgmenu", "ClientCommand_CfgMenu", AdminAcces)
-	
-	new const ShootSatchelChargeSignature[] = {0x83, 0xDEF, 0xDEF, 0x53, 0x56, 0x57, 0xFF, 0xDEF, 0xDEF, 0xDEF, 0xDEF, 0xDEF, 0x33}
-	new const ShootSatchelChargeSymbol   [] = "_ZN8CGrenade18ShootSatchelChargeEP9entvars_s6VectorS2_"
-
-	new HandleShootSatchelChargeFunc
-	if
-	(
-		(HandleShootSatchelChargeFunc = okapi_mod_get_symbol_ptr(ShootSatchelChargeSymbol)) || 
-		(HandleShootSatchelChargeFunc = okapi_mod_find_sig(ShootSatchelChargeSignature, sizeof ShootSatchelChargeSignature)) 
-	) 
-	{ 
-		okapi_add_hook(okapi_build_function(HandleShootSatchelChargeFunc, arg_cbase, arg_entvars, arg_vec, arg_vec), "OnShootSatchelCharge", .post = 1) 
-	} 
-	else
-	{
-		#if AMXX_VERSION_NUM < 183
-			new FailReason[100]
-			formatex(FailReason, charsmax(FailReason), "%L", LANG_SERVER, "BOMBSTATUS_FAIL")
-			set_fail_state(FailReason)
-		#else
-			set_fail_state("%L", LANG_SERVER, "BOMBSTATUS_FAIL")
-		#endif
-	}
 }
 
 public plugin_cfg() 
@@ -229,12 +195,15 @@ public plugin_cfg()
 	
 	LoadConfigurationFile()
 	FindAndAssignBombSites()
-	
-	//If throwablec4 is running end origin of the c4 needs to be predicted
-	if(is_plugin_loaded("Throwable C4", false) != -1)
-	{
-		IsThrowableC4Running = true
-	}
+
+	HandleCvar[TeamAcces] = get_cvar_num("bomb_status_team")
+	HandleCvar[ColorR] = get_cvar_num("hud_r_color")
+	HandleCvar[ColorG] = get_cvar_num("hud_g_color")
+	HandleCvar[ColorB] = get_cvar_num("hud_b_color")
+	HandleCvar[CommandsStatus] = get_cvar_num("bomb_status_commands")
+	HandleCvar[CommandsSpamTime] = get_cvar_num("bomb_status_c_spamtime")
+	HandleCvar[LogsStatus] = get_cvar_num("bomb_status_logs")
+	HandleCvar[DisableTeleport] = get_cvar_num("bomb_status_disable_tp")
 	
 	if(DetectionMethod == 2)
 	{
@@ -881,21 +850,3 @@ public CBaseEntity_C4Idle(iEnt)
 		IsBombPlanting = false
 	}
 }
-
-public OnShootSatchelCharge(iOwner, iEnt, Float: EntOrigin[3], Float: EntAngles[])
-{
-	//Get c4 ent id
-	BombEntIndex = okapi_get_orig_return()
-	if(!IsThrowableC4Running)
-	{
-		pev(BombEntIndex, pev_origin, BombOrigin)
-	}
-	else
-	{
-		//Send a trace so we can get the end origin of the c4, in case throwablec4 is running
-		new HandleTrace = create_tr2()
-		engfunc(EngFunc_TraceToss, BombEntIndex, IGNORE_MONSTERS, HandleTrace)
-		get_tr2(HandleTrace, TR_vecEndPos, BombOrigin)
-		free_tr2(HandleTrace)
-	}
-}  
