@@ -16,7 +16,7 @@ enum _:statsInfo { ADMIN, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE, SILVER, 
 
 enum _:winers { THIRD, SECOND, FIRST };
 
-new const commandMenu[][] = { "say /statsmenu", "say_team /statsmenu", "say /menustaty", "say_team /menustaty", "menustaty" };
+new const commandMenu[][] = { "say /statsmenu", "say_team /statsmenu", "say /statymenu", "say_team /statymenu", "say /menustaty", "say_team /menustaty", "menustaty" };
 new const commandTime[][] = { "say /time", "say_team /time", "say /czas", "say_team /czas", "czas" };
 new const commandAdminTime[][] = { "say /timeadmin", "say_team /timeadmin", "say /tadmin", "say_team /tadmin", "say /czasadmin", "say_team /czasadmin", "say /cadmin", "say_team /cadmin", "say /adminczas", "say_team /adminczas", "czasadmin" };
 new const commandTopTime[][] = { "say /ttop15", "say_team /ttop15", "say /toptime", "say_team /toptime", "say /ctop15", "say_team /ctop15", "say /topczas", "say_team /topczas", "topczas" };
@@ -71,9 +71,7 @@ public plugin_end()
 public plugin_natives()
 {
 	register_native("cod_stats_add_kill", "_cod_stats_add_kill", 1);
-
 	register_native("cod_get_user_time", "_cod_get_user_time", 1);
-	
 	register_native("cod_get_user_time_text", "_cod_get_user_time_text", 1);
 }
 
@@ -110,8 +108,10 @@ public stats_menu(id)
 	menu_additem(menu, "\wMoj \rCzas \y(/czas)", "1");
 	if(get_user_flags(id) & ADMIN_BAN) menu_additem(menu, "\wCzas \rAdminow \y(/adminczas)", "2");
 	menu_additem(menu, "\wTop \rCzasu \y(/ctop15)", "3");
-	menu_additem(menu, "\wNajlepsze \rStaty \y(/nstaty)", "4");
+	menu_additem(menu, "\wNajlepsze \rStaty \y(/staty)", "4");
 	menu_additem(menu, "\wTop \rStatow \y(/stop15)", "5");
+	menu_additem(menu, "\wMoje \rMedale \y(/medale)", "6");
+	menu_additem(menu, "\wTop \rMedali \y(/mtop15)", "7");
     
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
@@ -148,6 +148,8 @@ public stats_menu_handle(id, menu, item)
 		case 3: command_time_top(id);
 		case 4: command_best_stats(id);
 		case 5: command_top_stats(id);
+		case 6: command_medals(id);
+		case 7: command_top_medals(id);
 	}
 	
 	menu_destroy(menu);
@@ -245,7 +247,7 @@ public show_top_time(failState, Handle:query, error[], errorNum, tempData[], dat
 	
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	static motdData[2048], userName[64], motdLength, rank = 0, seconds = 0, minutes = 0, hours = 0;
+	static motdData[2048], userName[64], motdLength, rank, seconds, minutes, hours;
 
 	rank = 0;
 	
@@ -352,7 +354,7 @@ public show_top_stats(failState, Handle:query, error[], errorNum, tempId[], data
 	
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	static motdData[2048], userName[64], motdLength, rank = 0, kills = 0, hs = 0, deaths = 0;
+	static motdData[2048], userName[64], motdLength, rank, kills, hs, deaths;
 
 	rank = 0;
 	
@@ -379,6 +381,100 @@ public show_top_stats(failState, Handle:query, error[], errorNum, tempId[], data
 	}
 	
 	show_motd(id, motdData, "Top15 Statystyk");
+	
+	return PLUGIN_HANDLED;
+}
+
+public command_medals(id)
+{
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	new queryData[256], tempId[1];
+	
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `medals` > '%i' ORDER BY `medals` DESC) b", playerStats[id][MEDALS]);
+	SQL_ThreadQuery(sql, "show_medals", queryData, tempId, sizeof(tempId));
+
+	return PLUGIN_HANDLED;
+}
+
+public show_medals(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if(failState) 
+	{
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		
+		return PLUGIN_HANDLED;
+	}
+	
+	new id = tempId[0];
+	
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	new rank = SQL_ReadResult(query, 0) + 1, players = SQL_ReadResult(query, 1);
+	
+	cod_print_chat(id, "Twoje medale:^x04 %i Zlote^x01,^x04 %i Srebre^x01,^x04 %i Brazowe^x01.", playerStats[id][GOLD], playerStats[id][SILVER], playerStats[id][BRONZE]);
+	cod_print_chat(id, "Zajmujesz^x04 %i/%i^x01 miejsce w rankingu medalowym.", rank, players);
+	
+	return PLUGIN_HANDLED;
+}
+
+public command_top_medals(id)
+{
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	new queryData[128], tempId[1];
+	
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT name, gold, silver, bronze, medals FROM `cod_stats` ORDER BY medals DESC LIMIT 15");
+	SQL_ThreadQuery(sql, "show_top_medals", queryData, tempId, sizeof(tempId));
+
+	return PLUGIN_HANDLED;
+}
+
+public show_top_medals(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if(failState) 
+	{
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		
+		return PLUGIN_HANDLED;
+	}
+	
+	new id = tempId[0];
+	
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	static motdData[2048], userName[64], motdLength, rank, gold, silver, bronze, medals;
+
+	rank = 0;
+	
+	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
+	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %6s %8s %8s %5s^n", "#", "Nick", "Zlote", "Srebrne", "Brazowe", "Suma");
+	
+	while(SQL_MoreResults(query))
+	{
+		rank++;
+		
+		SQL_ReadResult(query, 0, userName, charsmax(userName));
+
+		gold = SQL_ReadResult(query, 1);
+		silver = SQL_ReadResult(query, 2);
+		bronze = SQL_ReadResult(query, 3);
+		medals = SQL_ReadResult(query, 3);
+		
+		replace_all(userName, charsmax(userName), "<", "");
+		replace_all(userName, charsmax(userName), ">", "");
+		
+		if(rank >= 10) motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %-22.22s %2d %7d %8d %7d^n", rank, userName, gold, silver, bronze, medals);
+		else motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %-22.22s %3d %7d %8d %7d^n", rank, userName, gold, silver, bronze, medals);
+		
+		SQL_NextRow(query);
+	}
+	
+	show_motd(id, motdData, "Top15 Medali");
 	
 	return PLUGIN_HANDLED;
 }
@@ -801,20 +897,28 @@ save_stats(id, end = 0)
 {
 	if(!get_bit(id, dataLoaded)) return;
 
-	new queryData[256], queryTemp[128];
+	static queryData[256], queryStats[128], queryMedals[128], medals;
 		
 	playerStats[id][CURRENT_STATS] = playerStats[id][CURRENT_KILLS]*2 + playerStats[id][CURRENT_HS_KILLS] - playerStats[id][CURRENT_DEATHS]*2;
 	
 	if(playerStats[id][CURRENT_STATS] > playerStats[id][BEST_STATS])
 	{			
-		formatex(queryTemp, charsmax(queryTemp), ", `bestkills` = %d, `besths` = %d, `bestdeaths` = %d, `beststats` = %d", 
+		formatex(queryStats, charsmax(queryStats), ", `bestkills` = %d, `besths` = %d, `bestdeaths` = %d, `beststats` = %d", 
 		playerStats[id][CURRENT_KILLS], playerStats[id][CURRENT_HS_KILLS], playerStats[id][CURRENT_DEATHS], playerStats[id][CURRENT_STATS]);
+	}
+
+	medals = playerStats[id][GOLD]*3 + playerStats[id][SILVER]*2 + playerStats[id][BRONZE];
+	
+	if(medals > playerStats[id][MEDALS])
+	{			
+		formatex(queryStats, charsmax(queryStats), ", `gold` = %d, `silver` = %d, `bronze` = %d, `medals` = %d", 
+		playerStats[id][GOLD], playerStats[id][SILVER], playerStats[id][BRONZE], medals);
 	}
 
 	playerStats[id][TIME] += get_user_time(id);
 
-	formatex(queryData, charsmax(queryData), "UPDATE `cod_stats` SET `admin` = %i, `kills` = %i, `time` = %i, `lastvisit` = %i%s WHERE name = '%s' AND `time` <= %i", 
-	playerStats[id][ADMIN], playerStats[id][KILLS], playerStats[id][TIME], get_systime(), queryTemp, playerName[id], playerStats[id][TIME]);
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_stats` SET `admin` = %i, `kills` = %i, `time` = %i, `lastvisit` = %i%s%s WHERE name = '%s' AND `time` <= %i", 
+	playerStats[id][ADMIN], playerStats[id][KILLS], playerStats[id][TIME], get_systime(), queryStats, queryMedals, playerName[id], playerStats[id][TIME]);
 		
 	switch(end)
 	{

@@ -37,7 +37,7 @@ new const commandItem[][] = { "item", "say /item", "say_team /item", "say /przed
 new const commandItems[][] = { "itemy", "say /itemy", "say_team /itemy", "say /przedmioty", "say_team /przedmioty", "say /iy", "say_team /iy", "say /py", "say_team /py" };
 new const commandDrop[][] = { "wyrzuc", "say /wyrzuc", "say_team /wyrzuc", "say /drop", "say_team /drop", "say /w", "say_team /w", "say /d", "say_team /d" };
 new const commandReset[][] = { "reset", "say /reset", "say_team /reset", "say /r", "say_team /r" };
-new const commandPoints[][] = { "staty", "say /staty", "say_team /staty", "say /punkty", "say_team /punkty", "say /s", "say_team /s", "say /p", "say_team /p" };
+new const commandPoints[][] = { "statystyki", "say /statystyki", "say_team /statystyki", "say /punkty", "say_team /punkty", "say /s", "say_team /s", "say /p", "say_team /p" };
 new const commandHud[][] = { "hud", "say /hud", "say_team /hud", "say /zmienhud", "say_team /zmienhud", "say /change_hud", "say_team /change_hud" };
 new const commandBlock[][] = { "fullupdate", "cl_autobuy", "cl_rebuy", "cl_setautobuy", "rebuy", "autobuy", "hegren", "sgren", "flash", "-rocket", "-mine", "-dynamite", "-medkit", "-teleport" };
 
