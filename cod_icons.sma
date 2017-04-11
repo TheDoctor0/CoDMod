@@ -9,6 +9,7 @@
 #define VERSION "1.0"
 #define AUTHOR  "O'Zone"
 
+#define TASK_PLANT 6583
 #define TASK_PLANTED 7603
 #define TASK_DROPPED 8931
 #define TASK_REMOVE 9548
@@ -76,7 +77,7 @@ public plugin_init()
 
 	register_event("TeamInfo", "team_assign", "a");
 
-	register_logevent("bomb_planted", 3, "2=Planted_The_Bomb");
+	register_logevent("bomb_plant", 3, "2=Planted_The_Bomb");
 	register_logevent("bomb_drop", 3, "2=Dropped_The_Bomb");
 	register_logevent("bomb_picked", 3, "2=Got_The_Bomb");
 
@@ -126,11 +127,11 @@ public team_assign()
 }
 
 public bomb_drop()
-	set_task(0.25, "bomb_dropped", TASK_DROPPED, .flags = "a", .repeat = 5);
+	set_task(0.2, "bomb_dropped", TASK_DROPPED, .flags = "a", .repeat = 5);
 
 public bomb_dropped()
 {
-	remove_ent(iconEntity[BOMB_DROPPED]);
+	remove_ent(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
 
 	new bombEnt;
 
@@ -141,21 +142,25 @@ public bomb_picked()
 {
 	remove_task(TASK_DROPPED);
 
-	remove_ent(iconEntity[BOMB_DROPPED]);
+	remove_ent(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
+}
+
+public bomb_plant()
+{
+	bombTimer = get_pcvar_num(cvarC4);
+	
+	set_task(1.0, "bomb_timer", TASK_PLANTED, "", 0, "b");
+
+	set_task(0.2, "bomb_planted", TASK_PLANT, .flags = "a", .repeat = 5);
 }
 
 public bomb_planted()
 {
+	remove_ent(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
+
 	new bombEnt;
 
-	if((bombEnt = fm_find_ent_by_model(-1, "grenade", "models/w_c4.mdl")))
-	{
-		bombTimer = get_pcvar_num(cvarC4);
-	
-		set_task(1.0, "bomb_timer", TASK_PLANTED, "", 0, "b");
-
-		spawn_sprite(bombEnt, BOMB_PLANTED);
-	}
+	if((bombEnt = fm_find_ent_by_model(-1, "grenade", "models/w_c4.mdl"))) spawn_sprite(bombEnt, BOMB_PLANTED);
 }
 
 public bomb_timer()
@@ -169,7 +174,7 @@ public bomb_timer()
 
 	if(--bombTimer == 10)
 	{
-		remove_ent(iconEntity[BOMB_PLANTED]);
+		remove_ent(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
 
 		spawn_sprite(bombEntity[BOMB_PLANTED], BOMB_EXPLODE);
 	}
@@ -177,9 +182,9 @@ public bomb_timer()
 
 public cod_new_round()
 {
-	remove_ent(iconEntity[BOMB_DROPPED]);
-	remove_ent(iconEntity[BOMB_PLANTED]);
-	remove_ent(iconEntity[BOMB_EXPLODE]);
+	remove_ent(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
+	remove_ent(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
+	remove_ent(iconEntity[BOMB_EXPLODE], BOMB_EXPLODE);
 }
 
 public cod_start_round()
@@ -193,11 +198,13 @@ public cod_end_round()
 
 	bombEntity[BOMB_PLANTED] = 0;
 
-	remove_ent(iconEntity[BOMB_DROPPED]);
-	remove_ent(iconEntity[BOMB_PLANTED]);
-	remove_ent(iconEntity[BOMB_EXPLODE]);
+	remove_ent(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
+	remove_ent(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
+	remove_ent(iconEntity[BOMB_EXPLODE], BOMB_EXPLODE);
 
+	remove_task(TASK_PLANT);
 	remove_task(TASK_PLANTED);
+	remove_task(TASK_DROPPED);
 }
 
 public spawn_sprite(entity, sprite)
@@ -215,9 +222,7 @@ public spawn_sprite(entity, sprite)
 
 	if(sprite == BOMB_PLANTED) bombEntity[sprite] = entity;
 
-	if(sprite == BOMB_DROPPED || sprite == BOX) origin[2] += 35.0;
-
-	if(sprite == BOMB_PLANTED || sprite == BOMB_EXPLODE) origin[2] += 20.0;
+	if(sprite != BOMBSITE_A && sprite != BOMBSITE_B) origin[2] += sprite == BOX ? 35.0 : 25.0;
 
 	set_pev(ent, pev_classname, iconSprite[sprite]);
 	set_pev(ent, pev_origin, origin);
@@ -296,9 +301,9 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 	
 	xs_vec_add(wallOffset, hostOrigin, spriteOffset);
 
-	if(equal(className, iconSprite[BOMB_DROPPED])) spriteOffset[2] += 20.0;
+	if(equal(className, iconSprite[BOMB_DROPPED]) || equal(className, iconSprite[BOMB_PLANTED]) || equal(className, iconSprite[BOMB_EXPLODE])) spriteOffset[2] += 25.0;
 
-	if(equal(className, iconSprite[BOX]) || equal(className, iconSprite[BOMB_EXPLODE])) spriteOffset[2] += 35.0;
+	if(equal(className, iconSprite[BOX])) spriteOffset[2] += 35.0;
 
 	set_es(es, ES_Origin, spriteOffset);
 	
@@ -410,7 +415,7 @@ public _cod_remove_box_icon(ent)
 
 		if(pev_valid(icon)) remove_entity(icon);
 		
-		remove_entity(ent);
+		remove_ent(ent, BOX);
 	}
 }
 
@@ -430,5 +435,12 @@ stock check_classname(const className[])
 	return false;
 }
 
-stock remove_ent(ent)
-	if(pev_valid(ent)) remove_entity(ent);
+stock remove_ent(ent, sprite)
+{
+	if(pev_valid(ent))
+	{
+		remove_entity(ent);
+
+		iconEntity[sprite] = 0;
+	}
+}
