@@ -30,7 +30,7 @@ public exchange_menu(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new menuData[64], menu = menu_create("\wMenu \rWymiany", "exchange_menu_handle");
+	new menuData[64], menu = menu_create("\yMenu \rWymiany", "exchange_menu_handle");
 	
 	menu_additem(menu, "Wymien \yPrzedmiot \r(/wymien)^n");
 	
@@ -91,7 +91,7 @@ public exchange_item(id, sound)
 	
 	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new menuData[128], playerName[64], itemName[64], playerId[3], players, menu = menu_create("\wWymien \rPrzedmiot", "exchange_item_handle");
+	new menuData[128], playerName[64], itemName[64], playerId[3], players, menu = menu_create("\yWymien \rPrzedmiot", "exchange_item_handle");
 
 	for(new player = 1; player <= maxPlayers; player++)
 	{
@@ -188,7 +188,7 @@ public exchange_item_handle(id, menu, item)
 	cod_get_item_name(cod_get_user_item(id), itemName, charsmax(itemName));
 	get_user_name(id, playerName, charsmax(playerName));
 	
-	formatex(menuData, charsmax(menuData), "Wymien sie przedmiotem z %s (%s):", playerName, itemName);
+	formatex(menuData, charsmax(menuData), "\wWymien sie przedmiotem z \y%s \w(\r%s\w):", playerName, itemName);
 	
 	new menu = menu_create(menuData, "exchange_item_question");
 
@@ -293,7 +293,7 @@ public give_item(id)
 	
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new playerName[64], playerId[3], players, menu = menu_create("\wOddaj \rPrzedmiot", "give_item_handle");
+	new playerName[64], playerId[3], players, menu = menu_create("\yOddaj \rPrzedmiot", "give_item_handle");
 
 	for(new player = 1; player <= maxPlayers; player++)
 	{

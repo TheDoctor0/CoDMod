@@ -1,5 +1,4 @@
 Do zrobienia:
-- Dokonczyc medale
 - Rozbudowanie sklepu
 - Aktualizacja .inc
 - Kasyno
@@ -13,3 +12,8 @@ Kasyno:
 - 2048
 - Blackjack
 - Poker
+
+Awanse:
+- 50/150/300 lvl (cvary)
+- Zaawansowany/Elitarny/Mistrzowski
+- switch w klasach do określenia mocy

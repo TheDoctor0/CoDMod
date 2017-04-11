@@ -9,7 +9,7 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new const boxClass[] = "cod_box", boxModel[] = "models/CoDMod/box.mdl", boxSound[] =  "CoDMod/get_box.wav";
+new const boxClass[] = "cod_box", boxModel[] = "models/CoDMod/box.mdl";
 
 new spriteGreen, spriteAcid, cvarBoxChance;
 
@@ -19,13 +19,12 @@ public plugin_init()
 	
 	register_touch(boxClass, "player", "touch_box");
 	
-	cvarBoxChance = register_cvar("cod_box_chance", "5");
+	cvarBoxChance = register_cvar("cod_box_chance", "6");
 }
 
 public plugin_precache()
 {
 	precache_model(boxModel);
-	precache_sound(boxSound);
 	
 	spriteGreen = precache_model("sprites/CoDMod/green.spr");
 	spriteAcid = precache_model("sprites/CoDMod/acid_pou.spr");
@@ -34,17 +33,37 @@ public plugin_precache()
 public cod_killed(killer, victim, weaponId, hitPlace)
 	if(random_num(1, get_pcvar_num(cvarBoxChance)) == 1) create_box(victim);
 
+public cod_new_round()
+	set_task(0.1, "remove_ents");
+
+public remove_ents()
+{
+	new ent = find_ent_by_class(-1, boxClass);
+	
+	while(ent > 0)
+	{
+		cod_remove_box_icon(ent);
+		
+		ent = find_ent_by_class(ent, boxClass);
+	}
+}
+
 public create_box(id)
 {
 	new ent, Float:origin[3];
 	
 	entity_get_vector(id, EV_VEC_origin, origin);
+
+	origin[0] += 30.0;
+	origin[2] -= distance_to_floor(origin);
 	
 	ent = fm_create_entity("info_target");
 	
 	set_pev(ent, pev_classname, boxClass);
 
-	engfunc(EngFunc_SetModel, ent, boxModel);
+	entity_set_model(ent, boxModel);
+
+	entity_set_origin(ent, origin);
 	
 	set_pev(ent, pev_mins, Float:{ -10.0, -10.0, 0.0 });
 	set_pev(ent, pev_maxs, Float:{ 10.0, 10.0, 50.0 });
@@ -53,16 +72,13 @@ public create_box(id)
 	
 	entity_set_int(ent, EV_INT_solid, SOLID_BBOX);
 	set_pev(ent, pev_movetype, MOVETYPE_FLY);
-	entity_set_origin(ent, origin);
-	entity_set_int(ent, EV_INT_sequence, 1);
-	entity_set_float(ent, EV_FL_animtime, 360.0);
-	entity_set_float(ent, EV_FL_framerate,  1.0);
-	entity_set_float(ent, EV_FL_frame, 0.0);
+
+	cod_spawn_box_icon(ent);
 	
 	return PLUGIN_CONTINUE;
 }
 
-public touch_box(entity, id)
+public touch_box(ent, id)
 {
 	if(!is_user_alive(id)) return PLUGIN_CONTINUE;
 
@@ -98,16 +114,16 @@ public touch_box(entity, id)
 	write_byte(10);
 	message_end();
 	
-	engfunc(EngFunc_EmitSound, id, CHAN_WEAPON, boxSound, 1.0, ATTN_NORM, 0, PITCH_NORM);
+	engfunc(EngFunc_EmitSound, id, CHAN_WEAPON, SOUND_BOX, 1.0, ATTN_NORM, 0, PITCH_NORM);
 
-	remove_entity(entity);
+	cod_remove_box_icon(ent);
 	
 	return PLUGIN_CONTINUE;
 }
 
 public get_box(id) 
 {
-	switch(random_num(1, 12))
+	switch(random_num(1, 10))
 	{
 		case 1:
 		{
@@ -115,33 +131,17 @@ public get_box(id)
 			
 			set_user_frags(id, get_user_frags(id) + frags);
 			
-			cod_print_chat(id, "Niezle... Dostales^x04 %i frag%s^x01!", frags, frags == 1 ? "a" : "i");
+			cod_print_chat(id, "Dostales^x04 %i frag%s^x01!", frags, frags == 1 ? "a" : "i");
 		}
 		case 2:
-		{
-			new frags = random_num(1, 2);
-			
-			set_user_frags(id, get_user_frags(id) - frags);
-			
-			cod_print_chat(id, "Ups... Znikn%s ci^x04 %i frag%s^x01!", frags == 1 ? "al" : "ely", frags, frags == 1 ? "" : "i");
-		}
-		case 3:
 		{
 			new deaths = random_num(1, 3);
 			
 			cs_set_user_deaths(id, cs_get_user_deaths(id) - deaths);
 			
-			cod_print_chat(id, "Niezle... Masz o^x04 %i zgon%s^x01 mniej!", deaths, deaths == 1 ? "" : "y");
+			cod_print_chat(id, "Masz o^x04 %i zgon%s^x01 mniej!", deaths, deaths == 1 ? "" : "y");
 		}
-		case 4:
-		{
-			new deaths = random_num(1, 3);
-			
-			cs_set_user_deaths(id, cs_get_user_deaths(id) + deaths);
-			
-			cod_print_chat(id, "Ups... Masz o^x04 %i zgon%s^x01 wiecej!", deaths, deaths == 1 ? "" : "y");
-		}
-		case 5:
+		case 3:
 		{
 			if(cod_get_user_item(id))
 			{
@@ -152,70 +152,73 @@ public get_box(id)
 			
 			cod_set_user_item(id, -1, -1);
 			
-			cod_print_chat(id, "Wow... Trafiles na^x04 losowy item^x01!");
+			cod_print_chat(id, "Trafiles na^x04 losowy item^x01!");
 		}
-		case 6:
+		case 4:
 		{
-			new health = random_num(50, 150);
+			new health = random_num(15, 75);
 			
 			set_user_health(id, get_user_health(id) + health);
 			
-			cod_print_chat(id, "Yeah... Dostales^x04 +%i HP^x01!", health);
+			cod_print_chat(id, "Dostales^x04 +%i HP^x01!", health);
 		}
-		case 7:
-		{
-			new health = random_num(25, 75);
-			
-			if(get_user_health(id) < health)
-			{
-				user_kill(id);
-				
-				cod_print_chat(id, "Yyy... Zaliczyles^x04 zgon^x01!");
-			}
-			else
-			{
-				set_user_health(id, get_user_health(id) - health);
-
-				cod_print_chat(id, "Yyy... Ubylo ci^x04 %i HP^x01!", health);
-			}
-		}
-		case 8:
+		case 5:
 		{
 			new exp = random_num(25, 100);
 			
 			cod_set_user_exp(id, cod_get_user_exp(id) + exp);
 
-			cod_print_chat(id, "Ladnie... Dostales^x04 %i Expa^x01!", exp);
+			cod_print_chat(id, "Dostales^x04 %i Expa^x01!", exp);
 		}
-		case 9:
+		case 6:
 		{
-			new honor = random_num(10, 50);
+			new honor = random_num(5, 25);
 			
 			cod_set_user_honor(id, cod_get_user_honor(id) + honor);
 
-			cod_print_chat(id, "Ladnie... Dostales^x04 %i Honoru^x01!", honor);
+			cod_print_chat(id, "Dostales^x04 %i Honoru^x01!", honor);
 		}
-		case 10:
-		{
-			new honor = random_num(5, 20);
-			
-			cod_set_user_honor(id, cod_get_user_honor(id) - honor);
-
-			cod_print_chat(id, "Niestety... Straciles^x04 %i Honoru^x01!", honor);
-		}
-		case 11:
+		case 7:
 		{
 			cod_set_user_rockets(id, cod_get_user_rockets(id) + 1);
 			
-			cod_print_chat(id, "Yeah... Dostales^x04 Rakiete^x01!");
+			cod_print_chat(id, "Dostales^x04 Rakiete^x01!");
 		}
-		case 12:
+		case 8:
 		{
 			cod_set_user_mines(id, cod_get_user_mines(id) + 1);
 			
-			cod_print_chat(id, "Nice... Dostales^x04 Mine^x01!");
+			cod_print_chat(id, "Dostales^x04 Mine^x01!");
+		}
+		case 9:
+		{
+			cod_set_user_medkits(id, cod_get_user_medkits(id) + 1);
+			
+			cod_print_chat(id, "Dostales^x04 Apteczke^x01!");
+		}
+		case 10:
+		{
+			cod_set_user_dynamites(id, cod_get_user_dynamites(id) + 1);
+			
+			cod_print_chat(id, "Dostales^x04 Dynamit^x01!");
 		}
 	}
 
 	return PLUGIN_CONTINUE;
+}
+
+stock Float:distance_to_floor(Float:start[3], ignoremonsters = 1)
+{
+	new Float:dest[3], Float:end[3];
+
+	dest[0] = start[0];
+	dest[1] = start[1];
+	dest[2] = -8191.0;
+
+	engfunc(EngFunc_TraceLine, start, dest, ignoremonsters, 0, 0);
+	get_tr2(0, TR_vecEndPos, end);
+
+	new Float:ret = start[2] - end[2];
+
+	return ret > 0 ? ret : 0.0;
 }

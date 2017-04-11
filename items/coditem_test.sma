@@ -14,7 +14,7 @@ public plugin_init()
 	cod_register_item("Test", "Testowy item");
 }
 
-public cod_perk_enabled(id)
+public cod_item_enabled(id, value)
 	set_bit(id, item);
 
 public cod_item_disabled(id)

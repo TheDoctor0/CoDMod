@@ -30,7 +30,7 @@
 
 enum _:hud { TYPE_HUD, TYPE_DHUD };
 
-enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB };
+enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_BOX };
 
 new const codSounds[sounds][] =
 {
@@ -45,7 +45,8 @@ new const codSounds[sounds][] =
 	"CoDMod/last.wav",
 	"CoDMod/force.wav",
 	"CoDMod/humiliation.wav",
-	"CoDMod/bomb.wav"
+	"CoDMod/bomb.wav",
+	"CoDMod/box.wav"
 };
 
 native cod_check_account(id);
@@ -143,27 +144,47 @@ Zwraca opis itemu.
 
 native cod_get_items_num();
 /*------------------------------
-Zwraca nazwe itemu.
+Zwraca liczbe itemow.
 ------------------------------*/
 
 native cod_get_user_rockets(id);
 /*------------------------------
-Zwraca ilosc rakiet gracza
+Zwraca liczbe rakiet gracza
 ------------------------------*/
 
 native cod_set_user_rockets(id, value);
 /*------------------------------
-Ustawia ilosc rakiet gracza
+Ustawia liczbe rakiet gracza
 ------------------------------*/
 
 native cod_get_user_mines(id);
 /*------------------------------
-Zwraca ilosc min gracza
+Zwraca liczbe min gracza
 ------------------------------*/
 
 native cod_set_user_mines(id, value);
 /*------------------------------
-Ustawia ilosc min gracza
+Ustawia liczbe min gracza
+------------------------------*/
+
+native cod_get_user_medkits(id);
+/*------------------------------
+Zwraca liczbe apteczek gracza
+------------------------------*/
+
+native cod_set_user_medkits(id, value);
+/*------------------------------
+Ustawia liczbe apteczek gracza
+------------------------------*/
+
+native cod_get_user_dynamites(id);
+/*------------------------------
+Zwraca liczbe dynamitow gracza
+------------------------------*/
+
+native cod_set_user_dynamites(id, value);
+/*------------------------------
+Ustawia liczbe dynamitow gracza
 ------------------------------*/
 
 native cod_get_user_vip(id);
@@ -373,6 +394,16 @@ Dodaje honor graczowi.
 native cod_kill_player(attacker, victim, damageBits);
 /*------------------------------
 Zabija podanego gracza.
+------------------------------*/
+
+native cod_spawn_box_icon(ent);
+/*------------------------------
+Wyswietla ikone nad paczka.
+------------------------------*/
+
+native cod_remove_box_icon(ent);
+/*------------------------------
+Usuwa ent paczki i jej ikony.
 ------------------------------*/
 
 forward cod_item_get(id, item);

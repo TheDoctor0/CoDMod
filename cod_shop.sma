@@ -60,7 +60,7 @@ public shop_menu(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new menuData[128], menuPrice[8], menu = menu_create("\wSklep \rCoD Mod", "shop_menu_handle");
+	new menuData[128], menuPrice[8], menu = menu_create("\ySklep \rCoD Mod", "shop_menu_handle");
 
 	formatex(menuData, charsmax(menuData), "Kantor Walutowy \r[\yWymiana Kasy na Honor\r] \wKoszt:\r %i$/1 Honor", exchangeRatio);
 	menu_additem(menu, menuData);

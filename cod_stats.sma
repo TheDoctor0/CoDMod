@@ -103,7 +103,7 @@ public stats_menu(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new menu = menu_create("\wMenu \yStatow\r", "stats_menu_handle");
+	new menu = menu_create("\yMenu \yStatystyk\r", "stats_menu_handle");
  
 	menu_additem(menu, "\wMoj \rCzas \y(/czas)", "1");
 	if(get_user_flags(id) & ADMIN_BAN) menu_additem(menu, "\wCzas \rAdminow \y(/adminczas)", "2");
@@ -556,7 +556,7 @@ public cod_new_round()
 
 		get_user_name(bestId, bestName, charsmax(bestName));
 
-		cod_print_chat(0, "^x03 %s^x01 prowadzi w grze z^x04 %i^x01 fragami i^x04 %i^x01 zgonami.", bestName, bestFrags, bestDeaths);
+		cod_print_chat(0, "^x03%s^x01 prowadzi w grze z^x04 %i^x01 fragami i^x04 %i^x01 zgonami.", bestName, bestFrags, bestDeaths);
 	}
 }
 

@@ -37,7 +37,7 @@ new const commandItem[][] = { "item", "say /item", "say_team /item", "say /przed
 new const commandItems[][] = { "itemy", "say /itemy", "say_team /itemy", "say /przedmioty", "say_team /przedmioty", "say /iy", "say_team /iy", "say /py", "say_team /py" };
 new const commandDrop[][] = { "wyrzuc", "say /wyrzuc", "say_team /wyrzuc", "say /drop", "say_team /drop", "say /w", "say_team /w", "say /d", "say_team /d" };
 new const commandReset[][] = { "reset", "say /reset", "say_team /reset", "say /r", "say_team /r" };
-new const commandPoints[][] = { "statystyki", "say /statystyki", "say_team /statystyki", "say /punkty", "say_team /punkty", "say /s", "say_team /s", "say /p", "say_team /p" };
+new const commandPoints[][] = { "punkty", "say /statystyki", "say_team /statystyki", "say /punkty", "say_team /punkty", "say /s", "say_team /s", "say /p", "say_team /p" };
 new const commandHud[][] = { "hud", "say /hud", "say_team /hud", "say /zmienhud", "say_team /zmienhud", "say /change_hud", "say_team /change_hud" };
 new const commandBlock[][] = { "fullupdate", "cl_autobuy", "cl_rebuy", "cl_setautobuy", "rebuy", "autobuy", "hegren", "sgren", "flash", "-rocket", "-mine", "-dynamite", "-medkit", "-teleport" };
 
@@ -117,7 +117,7 @@ public plugin_init()
 	cvarExpPlant = register_cvar("cod_bombxp", "15");
 	cvarExpDefuse = register_cvar("cod_defusexp", "15");
 	cvarExpRescue = register_cvar("cod_hostxp", "15");
-	cvarLevelLimit = register_cvar("cod_maxlevel", "500");
+	cvarLevelLimit = register_cvar("cod_maxlevel", "501");
 	cvarLevelRatio = register_cvar("cod_levelratio", "35");
 	cvarKillStreakTime = register_cvar("cod_killstreaktime", "15");
 	cvarMinPlayers = register_cvar("cod_minplayers", "4");
@@ -463,7 +463,7 @@ public select_fraction(id)
 	{
 		client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-		new fractionName[MAX_NAME], menu = menu_create("\wWybierz \rFrakcje:", "select_fraction_handle");
+		new fractionName[MAX_NAME], menu = menu_create("\yWybierz \rFrakcje\w:", "select_fraction_handle");
 	
 		for(new i = 0; i < ArraySize(codFractions); i++)
 		{
@@ -504,7 +504,7 @@ public select_fraction_handle(id, menu, item)
 	
 	menu_destroy(menu);
 	
-	new menuClassId[5], menu = menu_create("\wWybierz \rKlase:", "select_class_handle");
+	new menuClassId[5], menu = menu_create("\yWybierz \rKlase\w:", "select_class_handle");
 	
 	classId = codPlayer[id][PLAYER_CLASS];
 
@@ -543,7 +543,7 @@ public select_class(id)
 		
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new menuData[128], menuClassId[5], codClass[classInfo], classId, menu = menu_create("\wWybierz \rKlase:", "select_class_handle");
+	new menuData[128], menuClassId[5], codClass[classInfo], classId, menu = menu_create("\yWybierz \rKlase\w:", "select_class_handle");
 	
 	classId = codPlayer[id][PLAYER_CLASS];
 
@@ -613,9 +613,9 @@ public display_classes_description(id, class, sound)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
-	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if(sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new className[MAX_NAME], classId[5], menu = menu_create("\wWybierz \rKlase:", "display_classes_description_handle");
+	new className[MAX_NAME], classId[5], menu = menu_create("\yWybierz \rKlase\w:", "display_classes_description_handle");
 
 	for(new i = 1; i < ArraySize(codClasses); i++)
 	{
@@ -660,7 +660,7 @@ public display_classes_description_handle(id, menu, item)
 	
 	ArrayGetArray(codClasses, class, codClass);
 	
-	format(menuData, charsmax(menuData), "\wOpis \rKlasy^n^n\yKlasa: \w%s^n\yFrakcja: \w%s^n\yZycie: \w%i^n\yBronie:\w%s^n\yOpis: \w%s^n%s", codClass[CLASS_NAME], codClass[CLASS_FRACTION], 100 + codClass[CLASS_HEAL], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_DESC], codClass[CLASS_DESC][79]);
+	format(menuData, charsmax(menuData), "\wOpis \rKlasy^n^n\yKlasa: \w%s^n\yFrakcja: \w%s^n\yZycie: \w%i^n\yBronie:\w %s^n\yOpis: \w%s^n%s", codClass[CLASS_NAME], codClass[CLASS_FRACTION], 100 + codClass[CLASS_HEAL], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_DESC], codClass[CLASS_DESC][79]);
 
 	menu = menu_create(menuData, "classes_description_handle");
 
@@ -701,15 +701,19 @@ public classes_description_handle(id, menu, item)
 }
 
 public display_item_description(id)
+{
 	show_item_description(id, codPlayer[id][PLAYER_ITEM]);
+
+	return PLUGIN_HANDLED;
+}
 	
 public display_items_description(id, page, sound)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if(sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new itemName[MAX_NAME], menu = menu_create("\wWybierz \rPrzedmiot:", "display_items_description_handle");
+	new itemName[MAX_NAME], menu = menu_create("\yWybierz \rPrzedmiot\w:", "display_items_description_handle");
 	
 	for(new i = 1; i < ArraySize(codItems); i++)
 	{
@@ -744,9 +748,9 @@ public display_items_description_handle(id, menu, item)
 
 	menu_destroy(menu);
 	
-	show_item_description(id, item);
+	show_item_description(id, item + 1);
 
-	display_items_description(id, (item - 1) / 7, 1);
+	display_items_description(id, item / 7, 1);
 	
 	return PLUGIN_HANDLED;
 }
@@ -755,11 +759,13 @@ public show_item_description(id, item)
 {
 	new itemDescription[MAX_DESC], itemName[MAX_NAME];
 
-	get_item_info(item, MAX_DESC, itemDescription, charsmax(itemDescription));
+	get_item_info(item, ITEM_DESC, itemDescription, charsmax(itemDescription));
 	get_item_info(item, ITEM_NAME, itemName, charsmax(itemName));
 
 	cod_print_chat(id, "Przedmiot:^x03 %s^x01.", itemName);
 	cod_print_chat(id, "Opis:^x03 %s^x01.", itemDescription);
+
+	return PLUGIN_HANDLED;
 }
 
 public drop_item(id)
@@ -821,7 +827,7 @@ public assign_points(id, sound)
 
 	new menuData[128];
 	
-	format(menuData, charsmax(menuData), "\wPrzydziel \rPunkty \y(%i):", codPlayer[id][PLAYER_POINTS]);
+	format(menuData, charsmax(menuData), "\yPrzydziel \rPunkty \y(\r%i\y)\w:", codPlayer[id][PLAYER_POINTS]);
 	
 	new menu = menu_create(menuData, "assign_points_handler");
 	
@@ -875,9 +881,9 @@ public assign_points_handler(id, menu, item)
 	
 	switch(item) 
 	{ 
-		case 0: if(++codPlayer[id][PLAYER_POINTS_SPEED] >= charsmax(pointsDistribution)) codPlayer[id][PLAYER_POINTS_SPEED] = 0;     
+		case 0: if(++codPlayer[id][PLAYER_POINTS_SPEED] >= sizeof(pointsDistribution)) codPlayer[id][PLAYER_POINTS_SPEED] = 0;     
 		case 1: 
-		{       
+		{
 			if(codPlayer[id][PLAYER_HEAL] < levelLimit/5) 
 			{
 				if(pointsDistributionAmount > levelLimit/5 - codPlayer[id][PLAYER_HEAL]) pointsDistributionAmount = levelLimit/5 - codPlayer[id][PLAYER_HEAL];
@@ -934,6 +940,8 @@ public assign_points_handler(id, menu, item)
 		}
 	}
 
+	if(item) save_data(id, NORMAL);
+
 	menu_destroy(menu);
 
 	if(codPlayer[id][PLAYER_POINTS] > 0) assign_points(id, 1);
@@ -949,7 +957,7 @@ public change_hud(id, sound)
 		
 	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new menuData[128], menu = menu_create("\yCoD Mod: \rKonfiguracja HUD", "change_hud_handle");
+	new menuData[128], menu = menu_create("\yKonfiguracja \rHUD\w", "change_hud_handle");
 	
 	format(menuData, charsmax(menuData), "\wSposob \yWyswietlania: \r%s", codPlayer[id][PLAYER_HUD] > TYPE_HUD ? "DHUD" : "HUD");
 	menu_additem(menu, menuData);
@@ -1935,7 +1943,7 @@ public show_info(id)
 	format(clanName, charsmax(clanName), "^n[Klan: %s]", clanName);
 
 	exp = codPlayer[target][PLAYER_LEVEL] - 1 >= 0 ? get_level_exp(codPlayer[target][PLAYER_LEVEL] - 1) : 0;
-	levelPercent = (float((codPlayer[target][PLAYER_EXP] - exp)) / float((get_level_exp(codPlayer[target][PLAYER_LEVEL]) - exp))) * 100.0;
+	levelPercent = codPlayer[target][PLAYER_LEVEL] < levelLimit ? (float((codPlayer[target][PLAYER_EXP] - exp)) / float((get_level_exp(codPlayer[target][PLAYER_LEVEL]) - exp))) * 100.0 : 0.0;
 	
 	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot: %s (%i/%i)]^n[Zycie: %i]^n[Honor: %i]", className, cod_get_user_clan(target) ? clanName : "", codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, codPlayer[target][PLAYER_ITEM_DURA], maxDurability, get_user_health(id), cod_get_user_honor(target));
 	
@@ -2027,7 +2035,7 @@ stock set_item(id, item = 0, value = 0)
 	
 	new ret;
 	
-	ExecuteForward(get_item_info(item, ITEM_GIVE), ret, id, item, value);
+	ExecuteForward(get_item_info(item, ITEM_GIVE), ret, id, value);
 	
 	if(ret == COD_STOP)
 	{
@@ -2062,10 +2070,7 @@ public check_level(id)
 	
 	while((codPlayer[id][PLAYER_GAINED_EXP] + codPlayer[id][PLAYER_EXP]) >= get_level_exp(codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL]) && codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] < levelLimit) codPlayer[id][PLAYER_GAINED_LEVEL]++;
 	
-	if(!codPlayer[id][PLAYER_GAINED_LEVEL])
-	{
-		while((codPlayer[id][PLAYER_GAINED_EXP] + codPlayer[id][PLAYER_EXP]) < get_level_exp(codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] - 1)) codPlayer[id][PLAYER_GAINED_LEVEL]--;
-	}
+	if(!codPlayer[id][PLAYER_GAINED_LEVEL]) while((codPlayer[id][PLAYER_GAINED_EXP] + codPlayer[id][PLAYER_EXP]) < get_level_exp(codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] - 1)) codPlayer[id][PLAYER_GAINED_LEVEL]--;
 
 	if(codPlayer[id][PLAYER_GAINED_LEVEL])
 	{
@@ -3025,7 +3030,7 @@ public _cod_register_item(plugin, params)
 	
 	codItem[ITEM_PLUGIN] = plugin;
 	
-	codItem[ITEM_GIVE] = CreateOneForward(plugin, "cod_item_enabled", FP_CELL, FP_CELL, FP_CELL);
+	codItem[ITEM_GIVE] = CreateOneForward(plugin, "cod_item_enabled", FP_CELL, FP_CELL);
 	codItem[ITEM_DROP] = CreateOneForward(plugin, "cod_item_disabled", FP_CELL);
 	codItem[ITEM_SPAWNED] = CreateOneForward(plugin, "cod_item_spawned", FP_CELL);
 	codItem[ITEM_KILLED] = CreateOneForward(plugin, "cod_item_killed", FP_CELL);

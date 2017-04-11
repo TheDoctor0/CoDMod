@@ -27,25 +27,28 @@ public display_menu(id)
 		
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new menu = menu_create("\wMenu \rCoD Mod", "display_menu_handle");
+	new menu = menu_create("\yMenu \rCoD Mod\w", "display_menu_handle");
  
 	menu_additem(menu, "\wSklep \rSMS \y(/sklepsms)");
+	menu_additem(menu, "\wInformacje o \rVIPie \y(/vip)");
+	menu_additem(menu, "\wZmien \rSerwer \y(/serwer)");
 	menu_additem(menu, "\wWybierz \rKlase \y(/klasa)");
 	menu_additem(menu, "\wOpisy \rKlas \y(/klasy)");
-	menu_additem(menu, "\wOpis \rItemu \y(/item)");
-	menu_additem(menu, "\wOpisy \rItemow \y(/itemy)");
-	menu_additem(menu, "\wWyrzuc \rItem \y(/wyrzuc)");
+	menu_additem(menu, "\wOpis \rPrzedmiotu \y(/item)");
+	menu_additem(menu, "\wOpisy \rPrzedmiotow \y(/itemy)");
 	menu_additem(menu, "\wSklep \y(/sklep)");
 	menu_additem(menu, "\wRynek \y(/rynek)");
 	menu_additem(menu, "\wKlan \y(/klan)");
 	menu_additem(menu, "\wMisje \y(/misje)");
-	menu_additem(menu, "\wHaslo \y(/haslo)");
-	menu_additem(menu, "\wStaty \y(/staty)");
+	menu_additem(menu, "\wUstawienia \rIkon \y(/ikony)");
+	menu_additem(menu, "\wUstawienia \rHUD \y(/hud)");
+	menu_additem(menu, "\wNajlepsze \rStaty \y(/staty)");
+	menu_additem(menu, "\wTwoje \rKonto \y(/konto)");
 	menu_additem(menu, "\wWymien \rItem \y(/wymien)");
 	menu_additem(menu, "\wOddaj \rItem \y(/daj)");
-	menu_additem(menu, "\wZmien \rSerwer \y(/serwer)");
-	menu_additem(menu, "\wInformacje o \rVIPie \y(/vip)");
-	menu_additem(menu, "\wLista \rVIPow \y(/vipy)");
+	menu_additem(menu, "\wWyrzuc \rItem \y(/wyrzuc)");
+	menu_additem(menu, "\wPunkty \rStatystyk \y(/punkty)");
+	menu_additem(menu, "\wReset \rPunktow \y(/reset)");
     
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
@@ -73,23 +76,26 @@ public display_menu_handle(id, menu, item)
     
 	switch(item)
 	{ 
-		case 1: client_cmd(id, "say /sklepsms"); 
-		case 2: client_cmd(id, "klasa"); 
-		case 3: client_cmd(id, "klasy"); 
-		case 4: client_cmd(id, "item"); 
-		case 5: client_cmd(id, "itemy"); 
-		case 6: client_cmd(id, "wyrzuc"); 
+		case 0: client_cmd(id, "say /sklepsms");
+		case 1: client_cmd(id, "vip");
+		case 2: client_cmd(id, "serwer");
+		case 3: client_cmd(id, "klasa"); 
+		case 4: client_cmd(id, "klasy"); 
+		case 5: client_cmd(id, "item"); 
+		case 6: client_cmd(id, "itemy");  
 		case 7: client_cmd(id, "sklep"); 
 		case 8: client_cmd(id, "rynek");
 		case 9: client_cmd(id, "klan");
-		case 10: client_cmd(id, "questy");
-		case 11: client_cmd(id, "haslo");
-		case 12: client_cmd(id, "staty");
-		case 13: client_cmd(id, "wymien");
-		case 14: client_cmd(id, "daj");
-		case 15: client_cmd(id, "serwer");
-		case 16: client_cmd(id, "vip");
-		case 17: client_cmd(id, "vipy");
+		case 10: client_cmd(id, "misje");
+		case 11: client_cmd(id, "ikony");
+		case 12: client_cmd(id, "hud");
+		case 13: client_cmd(id, "staty");
+		case 14: client_cmd(id, "konto");
+		case 15: client_cmd(id, "wymien");
+		case 16: client_cmd(id, "daj");
+		case 17: client_cmd(id, "wyrzuc");
+		case 18: client_cmd(id, "punkty");
+		case 19: client_cmd(id, "reset");
 	}
 	
 	menu_destroy(menu);

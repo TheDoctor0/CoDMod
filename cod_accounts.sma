@@ -26,7 +26,7 @@ enum _:queries { UPDATE, INSERT, DELETE };
 new const accountStatus[status][] = { "Niezarejestrowany", "Niezalogowany", "Zalogowany", "Gosc" };
 
 new const commandAccount[][] = { "say /haslo", "say_team /haslo", "say /password", "say_team /password", 
-	"say /konto", "say_team /konto", "say /account", "say_team /account", "haslo" };
+	"say /konto", "say_team /konto", "say /account", "say_team /account", "konto" };
 
 public plugin_init() 
 {

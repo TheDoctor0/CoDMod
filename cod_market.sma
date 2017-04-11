@@ -46,7 +46,7 @@ public market_menu(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new menu = menu_create("\wMenu \rRynku", "market_menu_handle"), callback = menu_makecallback("market_menu_callback");
+	new menu = menu_create("\yMenu \rRynku", "market_menu_handle"), callback = menu_makecallback("market_menu_callback");
 	
 	menu_additem(menu, "Wystaw \yPrzedmiot \r(/wystaw)", _, _, callback);
 	menu_additem(menu, "Kup \yPrzedmiot \r(/kup)", _, _, callback);
@@ -188,7 +188,7 @@ public buy_item(id, sound)
 
 	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new marketItem[itemInfo], itemData[128], itemId[5], itemsCounts = 0, menu = menu_create("\wKup \rPrzedmiot", "buy_item_handle");
+	new marketItem[itemInfo], itemData[128], itemId[5], itemsCounts = 0, menu = menu_create("\yKup \rPrzedmiot", "buy_item_handle");
 	
 	for(new i = 0; i < ArraySize(marketItems); i++)
 	{
@@ -340,7 +340,7 @@ public withdraw_item(id, sound)
 
 	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new marketItem[itemInfo], itemData[128], itemId[5], itemsCounts = 0, menu = menu_create("\wWycofaj \rPrzedmiot", "withdraw_item_handle");
+	new marketItem[itemInfo], itemData[128], itemId[5], itemsCounts = 0, menu = menu_create("\yWycofaj \rPrzedmiot", "withdraw_item_handle");
 	
 	for(new i = 0; i < ArraySize(marketItems); i++)
 	{

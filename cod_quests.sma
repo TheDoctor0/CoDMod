@@ -30,7 +30,7 @@ new questChapter[][] = { {1, 100}, {101, 200}, {201, 300}, {301, 400}, {401, 501
 
 new questChapterName[][] = { "Nowy Poczatek", "Walka Na Froncie", "Za Linia Wroga", "Wszystko Albo Nic", "Legenda Zyje Wiecznie" };
 
-new const commandQuest[][] = { "say /quest", "say_team /quest", "say /misje", "say_team /misje", "say /questy", "say_team /questy", "questy" };
+new const commandQuest[][] = { "say /quest", "say_team /quest", "say /misja", "say_team /misja", "say /misje", "say_team /misje", "say /questy", "say_team /questy", "misje" };
 
 new playerClass[MAX_PLAYERS + 1][64], playerName[MAX_PLAYERS + 1][64], playerData[playerInfo][MAX_PLAYERS + 1], Array:codQuests, quests;
 
@@ -102,7 +102,7 @@ public quest_menu(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new menu = menu_create("\wMenu \rMisji\w:", "quest_menu_handle"), callback = menu_makecallback("quest_menu_callback");
+	new menu = menu_create("\yMenu \rMisji\w:", "quest_menu_handle"), callback = menu_makecallback("quest_menu_callback");
 	
 	menu_additem(menu, "Wybierz \yMisje", _, _, callback);
 	menu_additem(menu, "Zakoncz \yMisje", _, _, callback);
@@ -165,7 +165,7 @@ public select_chapter(id)
 		return PLUGIN_HANDLED;
 	} 
 
-	new menuData[128], menu = menu_create("\wWybierz \rRozdzial\w:", "select_quest"), callback = menu_makecallback("select_chapter_callback");
+	new menuData[128], menu = menu_create("\yWybierz \rRozdzial\w:", "select_quest"), callback = menu_makecallback("select_chapter_callback");
 
 	for(new i = 0; i < sizeof(questChapter); i++)
 	{
@@ -207,7 +207,7 @@ public select_quest(id, menu, item)
 	
 	menu_destroy(menu);
 	
-	new menuData[128], questId[6], codQuest[questInfo], menu = menu_create("\wWybierz \rMisje\w:", "select_quest_handle");
+	new menuData[128], questId[6], codQuest[questInfo], menu = menu_create("\yWybierz \rMisje\w:", "select_quest_handle");
 	
 	for(new i = 0; i < ArraySize(codQuests); i++)
 	{	
@@ -283,7 +283,7 @@ public select_class(id)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	new menuData[128], className[64], classId[6], menu = menu_create("\wWybierz \rKlase \wdo \yMisji\w:", "select_handle");
+	new menuData[128], className[64], classId[6], menu = menu_create("\yWybierz \rKlase \ydo \yMisji\w:", "select_handle");
 	
 	for(new i = 1; i <= cod_get_classes_num(); i++)
 	{
@@ -309,7 +309,7 @@ public select_item(id)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	new menuData[128], itemName[64], itemId[6], menu = menu_create("\wWybierz \rItem \wdo \yMisji\w:", "select_handle");
+	new menuData[128], itemName[64], itemId[6], menu = menu_create("\yWybierz \rItem \ydo \yMisji\w:", "select_handle");
 	
 	for(new i = 1; i <= cod_get_items_num(); i++)
 	{

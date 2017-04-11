@@ -34,7 +34,7 @@ public transfer_menu(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new menu = menu_create("\wMenu \rPrzelewu", "transfer_menu_handle");
+	new menu = menu_create("\yMenu \rPrzelewu", "transfer_menu_handle");
 	
 	menu_additem(menu, "Przelej \yKase \r(/przelewc)");
 	menu_additem(menu, "Przelej \yHonor \r(/przelewh)");
@@ -76,7 +76,7 @@ public transfer_honor_menu(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new menuData[256], playerName[64], playerId[3], players, menu = menu_create("\wWybierz \rGracza\w, ktoremu chcesz przelac \yHonor:", "transfer_honor_menu_handle");
+	new menuData[256], playerName[64], playerId[3], players, menu = menu_create("\yWybierz \rGracza\y, ktoremu chcesz przelac \rHonor\w:", "transfer_honor_menu_handle");
 	
 	for(new player = 1; player <= maxPlayers; player++)
 	{
@@ -202,7 +202,7 @@ public transfer_cash_menu(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new menuData[256], playerName[64], playerId[3], players, menu = menu_create("\wWybierz \rGracza\w, ktoremu chcesz przelac \yKase:", "transfer_cash_menu_handle");
+	new menuData[256], playerName[64], playerId[3], players, menu = menu_create("\yWybierz \rGracza\y, ktoremu chcesz przelac \rKase\w:", "transfer_cash_menu_handle");
 	
 	for(new player = 1; player <= maxPlayers; player++)
 	{

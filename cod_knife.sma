@@ -58,7 +58,7 @@ public change_knife(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new knifeData[64], knifeId[3], menu = menu_create("\wWybierz \rModel Noza\w:", "change_knife_handle");
+	new knifeData[64], knifeId[3], menu = menu_create("\yWybierz \rModel Noza\w:", "change_knife_handle");
 	
 	for(new i = 0; i < sizeof(knifeModels); i++)
 	{

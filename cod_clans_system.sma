@@ -148,7 +148,7 @@ public show_clan_menu(id, sound)
 	{
 		ArrayGetArray(codClans, get_clan_id(clan[id]), codClan);
 		
-		formatex(menuData, charsmax(menuData), "\wMenu \rKlanu^n\wAktualny Klan:\y %s^n\wStan: \y%i/%i %s \w| \y%i Honoru\w", codClan[CLAN_NAME], codClan[CLAN_MEMBERS], codClan[CLAN_LEVEL] * membersPerLevel + membersStart, codClan[CLAN_MEMBERS] > 1 ? "Czlonkow" : "Czlonek", codClan[CLAN_HONOR]);
+		formatex(menuData, charsmax(menuData), "\yMenu \rKlanu^n\wAktualny Klan:\y %s^n\wStan: \y%i/%i %s \w| \y%i Honoru\w", codClan[CLAN_NAME], codClan[CLAN_MEMBERS], codClan[CLAN_LEVEL] * membersPerLevel + membersStart, codClan[CLAN_MEMBERS] > 1 ? "Czlonkow" : "Czlonek", codClan[CLAN_HONOR]);
 		
 		menu = menu_create(menuData, "show_clan_menu_handle");
 
@@ -159,7 +159,7 @@ public show_clan_menu(id, sound)
 	}
 	else
 	{
-		menu = menu_create("\wMenu \rKlanu^n\wAktualny Klan:\y Brak", "show_clan_menu_handle");
+		menu = menu_create("\yMenu \rKlanu^n\wAktualny Klan:\y Brak", "show_clan_menu_handle");
 
 		formatex(menuData, charsmax(menuData), "\wStworz \yKlan \r(Wymagany %i Poziom)", createLevel);
 
@@ -376,7 +376,7 @@ public members_online_menu(id)
 	
 	new clanName[64], playersAvailable = 0;
 	
-	new menu = menu_create("\wCzlonkowie \rOnline:", "members_online_menu_handle");
+	new menu = menu_create("\yCzlonkowie \rOnline:", "members_online_menu_handle");
 	
 	for(new player = 1; player <= MAX_PLAYERS; player++)
 	{
@@ -433,7 +433,7 @@ public leader_menu(id)
 {
 	if(!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
 	
-	new menu = menu_create("\wZarzadzaj \rKlanem", "leader_menu_handle"), callback = menu_makecallback("leader_menu_callback");
+	new menu = menu_create("\yZarzadzaj \rKlanem", "leader_menu_handle"), callback = menu_makecallback("leader_menu_callback");
 
 	menu_additem(menu, "\wRozwiaz \yKlan", _, _, callback);
 	menu_additem(menu, "\wUlepsz \yUmiejetnosci", _, _, callback);
@@ -549,7 +549,7 @@ public skills_menu(id)
 
 	ArrayGetArray(codClans, get_clan_id(clan[id]), codClan);
 	
-	formatex(menuData, charsmax(menuData), "\wMenu \rUmiejetnosci^n\wHonor Klanu: \y%i", codClan[CLAN_HONOR]);
+	formatex(menuData, charsmax(menuData), "\yMenu \rUmiejetnosci^n\wHonor Klanu: \y%i", codClan[CLAN_HONOR]);
 
 	new menu = menu_create(menuData, "skills_menu_handle");
 	
@@ -777,7 +777,7 @@ public invite_menu(id)
 	
 	new userName[64], userId[6], playersAvailable = 0;
 	
-	new menu = menu_create("\wWybierz \rGracza \wdo zaproszenia:", "invite_menu_handle");
+	new menu = menu_create("\yWybierz \rGracza \ydo zaproszenia:", "invite_menu_handle");
 	
 	for(new player = 1; player <= MAX_PLAYERS; player++)
 	{
@@ -990,7 +990,7 @@ public members_menu_handle(failState, Handle:query, error[], errorNum, tempId[],
 	
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new itemData[64], userName[64], status, menu = menu_create("\wZarzadzaj \rCzlonkami:^n\wWybierz \yczlonka\w, aby pokazac mozliwe opcje.", "member_menu_handle");
+	new itemData[64], userName[64], status, menu = menu_create("\yZarzadzaj \rCzlonkami:^n\wWybierz \yczlonka\w, aby pokazac mozliwe opcje.", "member_menu_handle");
 	
 	while(SQL_MoreResults(query))
 	{
@@ -1068,7 +1068,7 @@ public member_menu_handle(id, menu, item)
 
 	formatex(chosenName[id], charsmax(chosenName), userName);
 	
-	new menu = menu_create("\wWybierz \rOpcje:", "member_options_menu_handle");
+	new menu = menu_create("\yWybierz \rOpcje:", "member_options_menu_handle");
 	
 	if(get_user_status(id) == STATUS_LEADER)
 	{
@@ -1217,7 +1217,7 @@ public applications_menu_handle(failState, Handle:query, error[], errorNum, temp
 	
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new itemName[128], userName[64], level, usersCount = 0, menu = menu_create("\wRozpatrzanie \rPodan:^n\wWybierz \rpodanie\w, aby je \yzatwierdzic\w lub \yodrzucic\w.", "applications_confirm_menu");
+	new itemName[128], userName[64], level, usersCount = 0, menu = menu_create("\yRozpatrywanie \rPodan:^n\wWybierz \rpodanie\w, aby je \yzatwierdzic\w lub \yodrzucic\w.", "applications_confirm_menu");
 	
 	while(SQL_MoreResults(query))
 	{
@@ -1314,6 +1314,13 @@ public applications_confirm_handle(id, menu, item)
 				cod_print_chat(id, "Gracz dolaczyl juz do innego klanu!");
 
 				show_clan_menu(id, 1);
+
+				return PLUGIN_HANDLED;
+			}
+
+			if(((get_clan_info(clan[id], CLAN_LEVEL) * membersPerLevel) + membersStart) <= get_clan_info(clan[id], CLAN_MEMBERS))
+			{
+				cod_print_chat(id, "Klan osiagnal maksymalna na ten moment liczbe czlonkow!");
 
 				return PLUGIN_HANDLED;
 			}
@@ -1491,7 +1498,7 @@ public application_menu_handle(failState, Handle:query, error[], errorNum, tempI
 	
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new itemName[128], itemData[64], clanName[64], userName[64], clanId, clansCount = 0, menu = menu_create("\wZlozenie \rPodania:^n\wWybierz \rklan\w, do ktorego chcesz zlozyc \ypodanie\w.", "application_handle");
+	new itemName[128], itemData[64], clanName[64], userName[64], clanId, clansCount = 0, menu = menu_create("\yZlozenie \rPodania:^n\wWybierz \rklan\w, do ktorego chcesz zlozyc \ypodanie\w.", "application_handle");
 	
 	while(SQL_MoreResults(query))
 	{
@@ -1568,7 +1575,7 @@ public application_handle(id, menu, item)
 
 	new menuData[128];
 
-	formatex(menuData, charsmax(menuData), "\wZlozenie \rPodania^n\wCzy na pewno chcesz zlozyc \rpodanie\w do klanu \y%s\w?", clanName);
+	formatex(menuData, charsmax(menuData), "\yZlozenie \rPodania^n\wCzy na pewno chcesz zlozyc \rpodanie\w do klanu \y%s\w?", clanName);
 	
 	new menu = menu_create(menuData, "application_confirm_handle");
 	
