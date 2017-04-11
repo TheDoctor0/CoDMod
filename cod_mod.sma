@@ -182,6 +182,7 @@ public plugin_init()
 	register_event("TextMsg", "hostages_rescued", "a", "2&#All_Hostages_R");
 	
 	register_forward(FM_CmdStart, "cmd_start");
+	register_forward(FM_EmitSound, "sound_emit");
 	
 	register_message(SVC_INTERMISSION, "message_intermission");
 	
@@ -201,7 +202,7 @@ public plugin_init()
 	codForwards[WEAPON_DEPLOY] = CreateMultiForward("cod_weapon_deploy", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[KILLED] = CreateMultiForward("cod_killed", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[SPAWNED] = CreateMultiForward("cod_spawned", ET_IGNORE, FP_CELL);
-	codForwards[CMD_START] = CreateMultiForward("cod_cmd_start", ET_IGNORE, FP_CELL);
+	codForwards[CMD_START] = CreateMultiForward("cod_cmd_start", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[NEW_ROUND] = CreateMultiForward("cod_new_round", ET_IGNORE);
 	codForwards[START_ROUND] = CreateMultiForward("cod_start_round", ET_IGNORE);
 	codForwards[END_ROUND] = CreateMultiForward("cod_end_round", ET_IGNORE);
@@ -1822,14 +1823,14 @@ public render_reset(id)
 public cmd_start(id, ucHandle)
 {
 	if(!is_user_alive(id) || freezeTime) return FMRES_IGNORED;
-	
-	execute_forward_ignore_one_param(codForwards[CMD_START], id);
 
-	static Float:velocity[3], Float:speed, button, oldButton, playerState;
+	static Float:velocity[3], Float:speed, button, oldButton, playerState, ret;
 
 	button = get_uc(ucHandle, UC_Buttons);
 	oldButton = pev(id, pev_oldbuttons);
 	playerState = RENDER_ALWAYS;
+
+	ExecuteForward(codForwards[CMD_START], ret, id, button, oldButton);
 	
 	pev(id, pev_velocity, velocity);
 
@@ -1862,6 +1863,27 @@ public cmd_start(id, ucHandle)
 	}
 	else if(flags & FL_ONGROUND) codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS];
 
+	return FMRES_IGNORED;
+}
+
+public sound_emit(id, channel, sound[], Float:volume, Float:attn, flags, pitch) 
+{
+	if(!is_user_alive(id) || !codPlayer[id][PLAYER_CLASS]) return FMRES_IGNORED;
+
+	if(equal(sound, "items/ammopickup2.wav"))
+	{
+		cs_set_user_armor(id, 0, CS_ARMOR_NONE);
+
+		return FMRES_SUPERCEDE;
+	}
+	
+	if(equal(sound, "items/equip_nvg.wav"))
+	{
+		cs_set_user_nvg(id, 0);
+
+		return FMRES_SUPERCEDE;
+	}
+	
 	return FMRES_IGNORED;
 }
 
