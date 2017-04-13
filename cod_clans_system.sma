@@ -156,6 +156,7 @@ public show_clan_menu(id, sound)
 		menu_additem(menu, "\wOpusc \yKlan", "2", _, callback);
 		menu_additem(menu, "\wCzlonkowie \yOnline", "3", _, callback);
 		menu_additem(menu, "\wWplac \yHonor", "4", _, callback);
+		menu_additem(menu, "\wLista \yWplacajacych", "5", _, callback);
 	}
 	else
 	{
@@ -165,10 +166,10 @@ public show_clan_menu(id, sound)
 
 		menu_additem(menu, menuData, "0", _, callback);
 
-		menu_additem(menu, "\wZloz \yPodanie", "6", _, callback);
+		menu_additem(menu, "\wZloz \yPodanie", "7", _, callback);
 	}
 
-	menu_additem(menu, "\wTop15 \yKlanow", "5", _, callback);
+	menu_additem(menu, "\wTop15 \yKlanow", "6", _, callback);
 	
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	
@@ -252,8 +253,9 @@ public show_clan_menu_handle(id, menu, item)
 
 			cod_print_chat(id, "Wpisz ilosc Honoru, ktora chcesz wplacic.");
 		}
-		case 5: clans_top15(id);
-		case 6: application_menu(id);
+		case 5: depositors_list(id);
+		case 6: clans_top15(id);
+		case 7: application_menu(id);
 	}
 	
 	menu_destroy(menu);
@@ -1197,7 +1199,7 @@ public applications_menu(id)
 	
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT a.name, (SELECT level FROM `cod_mod` WHERE name = a.name ORDER BY level DESC LIMIT 1) as level FROM `cod_clans_applications` a WHERE clan = '%i'", clan[id]);
+	formatex(queryData, charsmax(queryData), "SELECT a.name, (SELECT level FROM `cod_mod` WHERE name = a.name ORDER BY level DESC LIMIT 1) as level, (SELECT honor FROM `cod_honor` WHERE name = a.name) as level FROM `cod_clans_applications` a WHERE clan = '%i'", clan[id]);
 
 	SQL_ThreadQuery(sql, "applications_menu_handle", queryData, tempId, sizeof(tempId));
 	
@@ -1217,15 +1219,16 @@ public applications_menu_handle(failState, Handle:query, error[], errorNum, temp
 	
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new itemName[128], userName[64], level, usersCount = 0, menu = menu_create("\yRozpatrywanie \rPodan:^n\wWybierz \rpodanie\w, aby je \yzatwierdzic\w lub \yodrzucic\w.", "applications_confirm_menu");
+	new itemName[128], userName[64], level, honor, usersCount = 0, menu = menu_create("\yRozpatrywanie \rPodan:^n\wWybierz \rpodanie\w, aby je \yzatwierdzic\w lub \yodrzucic\w.", "applications_confirm_menu");
 	
 	while(SQL_MoreResults(query))
 	{
 		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), userName, charsmax(userName));
 
 		level = SQL_ReadResult(query, SQL_FieldNameToNum(query, "level"));
+		honor = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
 		
-		formatex(itemName, charsmax(itemName), "\w%s \y(Najwyzszy poziom: \r%i\y)", userName, level);
+		formatex(itemName, charsmax(itemName), "\w%s \y(Najwyzszy poziom: \r%i\y | Honor: \r%i\y)", userName, level, honor);
 		
 		menu_additem(menu, itemName, userName);
 
@@ -1370,9 +1373,67 @@ public deposit_honor_handle(id)
 	cod_set_user_honor(id, cod_get_user_honor(id) - honorAmount);
 	
 	set_clan_info(clan[id], CLAN_HONOR, get_clan_info(clan[id], CLAN_HONOR) + honorAmount);
+
+	add_deposited_honor(id, honorAmount);
 	
 	cod_print_chat(id, "Wplaciles^x03 %i^x01 Honoru na rzecz klanu.", honorAmount);
 	cod_print_chat(id, "Aktualnie twoj klan ma^x03 %i^x01 Honoru.", get_clan_info(clan[id], CLAN_HONOR));
+	
+	return PLUGIN_HANDLED;
+}
+
+public depositors_list(id)
+{
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	new queryData[128], tempId[1];
+	
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT name, honor FROM `cod_members` WHERE honor > 0 ORDER BY honor DESC");
+
+	SQL_ThreadQuery(sql, "show_depositors_list", queryData, tempId, sizeof(tempId));
+	
+	return PLUGIN_HANDLED;
+}
+
+public show_depositors_list(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if(failState) 
+	{
+		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		
+		return PLUGIN_HANDLED;
+	}
+	
+	new id = tempId[0];
+	
+	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	
+	static motdData[2048], playerName[64], motdLength, rank, honor;
+
+	rank = 0;
+	
+	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
+	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %12s^n", "#", "Nick", "Honor");
+	
+	while(SQL_MoreResults(query))
+	{
+		rank++;
+		
+		SQL_ReadResult(query, 0, playerName, charsmax(playerName));
+		replace_all(playerName, charsmax(playerName), "<", "");
+		replace_all(playerName,charsmax(playerName), ">", "");
+		
+		honor = SQL_ReadResult(query, 1);
+		
+		if(rank >= 10) motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %22.22s %5d^n", rank, playerName, honor);
+		else motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %22.22s %6d^n", rank, playerName, honor);
+
+		SQL_NextRow(query);
+	}
+	
+	show_motd(id, motdData, "Lista Wplacajacych");
 	
 	return PLUGIN_HANDLED;
 }
@@ -1405,7 +1466,9 @@ public show_clans_top15(failState, Handle:query, error[], errorNum, tempId[], da
 	
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	static motdData[2048], clanName[64], motdLength, rank = 0, members = 0, honor = 0, kills = 0, level = 0, health = 0, gravity = 0, drop = 0, damage = 0;
+	static motdData[2048], clanName[64], motdLength, rank, members, honor, kills, level, health, gravity, drop, damage;
+
+	rank = 0;
 	
 	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
 	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %4s %8s %6s %8s %9s %12s %11s^n", "#", "Nazwa", "Czlonkowie", "Poziom", "Zabicia", "Honor", "Zycie", "Grawitacja", "Obezwladnienie", "Obrazenia");
@@ -1704,7 +1767,7 @@ public sql_init()
 
 	SQL_Execute(query);
 
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_members` (`name` varchar(64) NOT NULL, `clan` INT NOT NULL, `flag` INT NOT NULL, PRIMARY KEY (`name`));");
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_members` (`name` varchar(64) NOT NULL, `clan` INT NOT NULL, `flag` INT NOT NULL, `honor` INT NOR NULL, PRIMARY KEY (`name`));");
 	
 	query = SQL_PrepareQuery(connectHandle, queryData);
 
@@ -1812,9 +1875,7 @@ public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], da
 }
 
 public _cod_get_user_clan(id)
-{
 	return clan[id];
-}
 
 public _cod_get_clan_name(clanId, dataReturn[], dataLength)
 {
@@ -1835,7 +1896,7 @@ stock save_member(id, status = 0, change = 0, const name[] = "")
 		if(change) formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '%i', flag = '%i' WHERE name = '%s'", change, status, safeName);
 		else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET flag = '%i' WHERE name = '%s'", status, safeName);
 	}
-	else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '0', flag = '0' WHERE name = '%s'", safeName);
+	else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '0', flag = '0', honor = '0' WHERE name = '%s'", safeName);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
@@ -1845,6 +1906,15 @@ stock save_member(id, status = 0, change = 0, const name[] = "")
 
 		SQL_ThreadQuery(sql, "ignore_handle", queryData);
 	}
+}
+
+stock add_deposited_honor(id, honor)
+{
+	new queryData[128];
+
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clan_members` SET honor = honor + %d WHERE name = '%s'", honor, playerName[id]);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
 
 stock add_application(id, clanId)
