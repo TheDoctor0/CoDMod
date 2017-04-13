@@ -104,14 +104,22 @@ public client_disconnected(id)
 
 public client_putinserver(id)
 {
-	if(is_user_bot(id) || is_user_hltv(id)) return;
+	if(is_user_bot(id) || is_user_hltv(id))
+	{
+		rem_bit(id, iconBombSites);
+		rem_bit(id, iconDropped);
+		rem_bit(id, iconPlanted);
+		rem_bit(id, iconBox);
+	}
+	else
+	{
+		set_bit(id, iconBombSites);
+		set_bit(id, iconDropped);
+		set_bit(id, iconPlanted);
+		set_bit(id, iconBox);
 
-	set_bit(id, iconBombSites);
-	set_bit(id, iconDropped);
-	set_bit(id, iconPlanted);
-	set_bit(id, iconBox);
-
-	load_icons(id);
+		load_icons(id);
+	}
 }
 
 public team_assign()

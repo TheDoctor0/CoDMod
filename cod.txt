@@ -2,7 +2,6 @@ Do zrobienia:
 - Rozbudowanie sklepu
 - Aktualizacja .inc
 - Kasyno
-- Ikony bomby
 - Awanse klas
 - Statystyki WWW
 
@@ -16,4 +15,4 @@ Kasyno:
 Awanse:
 - 50/150/300 lvl (cvary)
 - Zaawansowany/Elitarny/Mistrzowski
-- switch w klasach do określenia mocy
+- Switch w klasach do okreslenia mocy
