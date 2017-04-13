@@ -231,8 +231,6 @@ public account_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 		
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-	
 	if(item == MENU_EXIT || item == 5)
 	{
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -241,6 +239,8 @@ public account_menu_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	switch(item)
 	{
