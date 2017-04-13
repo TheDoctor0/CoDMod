@@ -95,7 +95,7 @@ public client_authorized(id)
 	playerStats[id][ADMIN] = get_user_flags(id) & ADMIN_BAN ? 1 : 0;
 	
 public client_disconnected(id)
-	save_stats(id);
+	save_stats(id, 1);
 	
 public stats_menu(id)
 {
@@ -165,7 +165,7 @@ public command_time(id)
 	
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `time` > '%i' ORDER BY `time` DESC) b", playerStats[id][TIME]);
+	formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `time` > '%i' ORDER BY `time` DESC) b", playerStats[id][TIME] + get_user_time(id));
 	SQL_ThreadQuery(sql, "show_time", queryData, tempId, sizeof(tempId));
 
 	return PLUGIN_HANDLED;
@@ -512,7 +512,11 @@ public check_time(id)
 }
 
 public cod_spawned(id)
+{
 	if(!get_bit(id, visitInfo)) set_task(5.0, "check_time", id + TASK_TIME);
+
+	save_stats(id);
+}
 
 public first_round()
 	blockCount = false;
@@ -915,10 +919,8 @@ save_stats(id, end = 0)
 		playerStats[id][GOLD], playerStats[id][SILVER], playerStats[id][BRONZE], medals);
 	}
 
-	playerStats[id][TIME] += get_user_time(id);
-
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_stats` SET `admin` = %i, `kills` = %i, `time` = %i, `lastvisit` = %i%s%s WHERE name = '%s' AND `time` <= %i", 
-	playerStats[id][ADMIN], playerStats[id][KILLS], playerStats[id][TIME], get_systime(), queryStats, queryMedals, playerName[id], playerStats[id][TIME]);
+	playerStats[id][ADMIN], playerStats[id][KILLS], playerStats[id][TIME] + get_user_time(id), get_systime(), queryStats, queryMedals, playerName[id], playerStats[id][TIME] + get_user_time(id));
 		
 	switch(end)
 	{
