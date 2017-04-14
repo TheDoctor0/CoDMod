@@ -80,28 +80,22 @@
 	"buffers":
 	[
 		{
+			"contents": "Do zrobienia:\n- Rozbudowanie sklepu\n- Aktualizacja .inc\n- Kasyno\n- Awanse klas\n- Statystyki WWW\n\nKasyno:\n- Kostka (high/low i 1-6)\n- Automat\n- 2048\n- Blackjack\n- Poker\n\nAwanse:\n- 50/150/300 lvl (cvary)\n- Zaawansowany/Elitarny/Mistrzowski\n- Switch w klasach do okreslenia mocy\n\n- Enable: id, promotion\n- Disable: id, promotion",
 			"file": "cod.txt",
+			"file_size": 292,
+			"file_write_time": 131365779419807697,
 			"settings":
 			{
-				"buffer_size": 304,
+				"buffer_size": 325,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/mapcycle_male.txt",
+			"file": "include/cod.inc",
 			"settings":
 			{
-				"buffer_size": 233,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "cod_mod.sma",
-			"settings":
-			{
-				"buffer_size": 103064,
+				"buffer_size": 14626,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -112,23 +106,6 @@
 			{
 				"buffer_size": 17329,
 				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/zp_lasermine_28.sma",
-			"settings":
-			{
-				"buffer_size": 38221,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "cod_clans_system.sma",
-			"settings":
-			{
-				"buffer_size": 56986,
 				"line_ending": "Windows"
 			}
 		}
@@ -241,11 +218,31 @@
 	],
 	"file_history":
 	[
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/errors_20170331.log",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_mod.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.179/QTM_CodMod.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_accounts.sma",
+		"/D/Dawid/Workplace/AMXX/scripting/afk_kicker.sma",
+		"/D/Dawid/Workplace/AMXX/scripting/spect_switch.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 2.ini",
+		"/D/Dawid/Workplace/AMXX/scripting/tbm.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins.ini",
+		"/D/Downloads/GoogleChrome/block_spawn_for_reconnect.sma",
+		"/D/Dawid/Workplace/AMXX/scripting/przelej.sma",
+		"/D/Dawid/Workplace/AMXX/scripting/block_team_flash.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/server.cfg",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 5.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 4.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 3.ini",
+		"/D/Dawid/Workplace/AMXX/scripting/csstatsx_sql.sma",
 		"/D/Dawid/Workplace/AMXX/scripting/stats_system.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_stats.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_clans_system.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/zp_lasermine_28.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/mapcycle_male.txt",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170331.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/errors_20170331.log",
 		"/D/Dawid/Workplace/AMXX/scripting/rank_system.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/config.ini",
-		"/D/Dawid/Workplace/New Mods/CoDMod/cod_accounts.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/servers 5.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/servers 4.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/servers 3.ini",
@@ -294,10 +291,6 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/name_change 6.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170412 3.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/name_change 5.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 4.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 2.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 3.ini",
 		"/D/Dawid/Workplace/AMXX/scripting/inf_smierc.sma",
 		"/D/Downloads/GoogleChrome/dead_name_change (1).sma",
 		"/D/Downloads/GoogleChrome/RegisterSystem (1).sma",
@@ -309,7 +302,6 @@
 		"/D/Downloads/GoogleChrome/amx_onename.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names 2.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/server 2.cfg",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/server.cfg",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/tbm.cfg",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/server 4.cfg",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/pomoc.txt",
@@ -318,7 +310,6 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/advertisements.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170412.log",
 		"/D/Dawid/Workplace/AMXX/scripting/statsx.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/csstatsx_sql.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/server 3.cfg",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/pausecfg.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412183.log",
@@ -330,7 +321,6 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 6.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412171.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/stats.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 5.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170412 2.log",
 		"/D/Downloads/GoogleChrome/inf_smierc (1).sma",
 		"/D/Dawid/Workplace/AMXX/scripting/statsx_old.sma",
@@ -355,20 +345,7 @@
 		"/D/Downloads/GoogleChrome/Vip.sp",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/errors_20170412.log",
 		"/D/Downloads/GoogleChrome/shopsms.sp",
-		"/D/Downloads/GoogleChrome/kontakt.sma",
-		"/D/Downloads/GoogleChrome/jail_gangi.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/walls.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/reunion.cfg",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sklep_sms.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170411.log",
-		"/D/Dawid/Workplace/New Mods/CoDMod/cod_stats.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412023.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412024.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412025.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412003.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412002.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412001.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412000.log"
+		"/D/Downloads/GoogleChrome/kontakt.sma"
 	],
 	"find":
 	{
@@ -399,6 +376,29 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"check_promotion",
+			"set_new_cla",
+			"promotion",
+			"load_class",
+			"klasa_zmieniona",
+			"cod_class_changed",
+			"load_class",
+			"check_promotion",
+			"set_new_class",
+			"load_class",
+			"clcmd_JoinTeam",
+			"ukrytego",
+			"CVAR_UPDATESTYLE",
+			"DB_SaveAll",
+			"DB_SavePlayerData",
+			"save",
+			"playerStats[id][TIME] ",
+			"playerStats[id][TIME]",
+			"SaveStats",
+			"save_stats",
+			"clans_top15",
+			"deposited_honor",
+			"cod_clans_applications",
 			"cmdsound",
 			"maytheforce",
 			"CmdSound",
@@ -503,30 +503,7 @@
 			"256",
 			"remove_ents",
 			"codForwards[NEW_ROUND]",
-			"cod_new_round",
-			"picked",
-			"remove_ent",
-			"remove_ents",
-			"remove_en",
-			"fMul",
-			"fOut",
-			"fIn",
-			"get_brush_entity_origin",
-			"bomb_dropp",
-			"distance_to_floor",
-			"valid",
-			"find_bomb_targets",
-			"g_locations",
-			"PreThink",
-			"fw_EvBombDrop",
-			"    ",
-			"DB_SavePlayerData",
-			"infocha",
-			"client_putinserver",
-			"create_icon_origin",
-			"g_iBombSiteEntity",
-			"supl",
-			"kill_all_entity"
+			"cod_new_round"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -612,15 +589,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 304,
+						"buffer_size": 325,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								265,
-								265
+								325,
+								325
 							]
 						],
 						"settings":
@@ -654,26 +631,41 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
 								"bh_default",
 								"bh_default_center",
 								"bh_default_open",
 								"bh_default_close",
 								"bh_default_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
@@ -689,26 +681,11 @@
 								"bh_angle_open",
 								"bh_angle_close",
 								"bh_angle_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content"
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
 							"git_gutter_enabled": true,
@@ -725,19 +702,19 @@
 				},
 				{
 					"buffer": 1,
-					"file": "/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/mapcycle_male.txt",
+					"file": "include/cod.inc",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 233,
+						"buffer_size": 14626,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								226,
-								226
+								520,
+								520
 							]
 						],
 						"settings":
@@ -758,12 +735,27 @@
 							{
 								"close":
 								{
+									"1":
+									[
+										519,
+										520
+									]
 								},
 								"icon":
 								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/round_bracket.png",
+										"brackethighlighter.default"
+									]
 								},
 								"open":
 								{
+									"1":
+									[
+										514,
+										515
+									]
 								},
 								"unmatched":
 								{
@@ -771,31 +763,41 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
 								"bh_default",
 								"bh_default_center",
 								"bh_default_open",
 								"bh_default_close",
 								"bh_default_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
 								"bh_round_close",
 								"bh_round_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
@@ -806,29 +808,22 @@
 								"bh_angle_open",
 								"bh_angle_close",
 								"bh_angle_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content"
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content"
 							],
-							"git_savvy.file_path": "C:\\Users\\Dawid\\AppData\\Local\\Temp\\fz3temp-2\\mapcycle_male.txt",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"git_gutter_enabled": true,
+							"git_savvy.file_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod\\cod.inc",
+							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod",
+							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -839,139 +834,6 @@
 				},
 				{
 					"buffer": 2,
-					"file": "cod_mod.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 103064,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								57893,
-								57893
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										58773,
-										58774
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/curly_bracket.png",
-										"brackethighlighter.default"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										57575,
-										57576
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
-							"git_gutter_enabled": true,
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod\\cod_mod.sma",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 25177.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
 					"file": "/D/Dawid/Workplace/AMXX/scripting/ozone_security.sma",
 					"semi_transient": false,
 					"settings":
@@ -1033,61 +895,61 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
 								"bh_round_close",
 								"bh_round_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
 								"bh_square_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
 								"bh_regex",
 								"bh_regex_center",
 								"bh_regex_open",
 								"bh_regex_close",
-								"bh_regex_content"
+								"bh_regex_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
 							"git_gutter_enabled": true,
@@ -1098,253 +960,6 @@
 						},
 						"translation.x": 0.0,
 						"translation.y": 1831.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/zp_lasermine_28.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 38221,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								8899,
-								8899
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										9152,
-										9153
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/curly_bracket.png",
-										"brackethighlighter.default"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										8050,
-										8051
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content"
-							],
-							"git_savvy.file_path": "C:\\Users\\Dawid\\AppData\\Local\\Temp\\fz3temp-2\\zp_lasermine_28.sma",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 3337.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "cod_clans_system.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 56986,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content"
-							],
-							"git_gutter_enabled": true,
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod\\cod_clans_system.sma",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": -0.0,
-						"translation.y": 1244.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,

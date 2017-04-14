@@ -41,6 +41,14 @@ new const commandPoints[][] = { "punkty", "say /statystyki", "say_team /statysty
 new const commandHud[][] = { "hud", "say /hud", "say_team /hud", "say /zmienhud", "say_team /zmienhud", "say /change_hud", "say_team /change_hud" };
 new const commandBlock[][] = { "fullupdate", "cl_autobuy", "cl_rebuy", "cl_setautobuy", "rebuy", "autobuy", "hegren", "sgren", "flash", "-rocket", "-mine", "-dynamite", "-medkit", "-teleport" };
 
+new const codPromotions[promotions][] =
+{
+	"Brak",
+	"Zaawansowany",
+	"Elitarny",
+	"Mistrzowski"
+};
+
 enum _:models { MODEL_ROCKET, MODEL_MINE, MODEL_DYNAMITE, MODEL_MEDKIT };
 
 new const codModels[models][] =
@@ -78,7 +86,7 @@ enum _:renderInfo { RENDER_TYPE, RENDER_VALUE, RENDER_STATUS, RENDER_WEAPON };
 enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, DAMAGE_PRE, 
 	DAMAGE_POST, WEAPON_DEPLOY, KILLED, SPAWNED, CMD_START, NEW_ROUND, START_ROUND, END_ROUND };
 
-enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL,
+enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL,
 	PLAYER_INT, PLAYER_STAM, PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTR_HEAL, PLAYER_EXTR_INT, PLAYER_EXTR_STAM, 
 	PLAYER_EXTR_STR, PLAYER_EXTR_COND, PLAYER_EXTR_WPNS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_MAX_HP, PLAYER_SPEED, PLAYER_WEAPON, PLAYER_STATUS,
 	PLAYER_GRAVITY, PLAYER_DMG_REDUCE, PLAYER_ROCKETS, PLAYER_LAST_ROCKET, PLAYER_MINES, PLAYER_LAST_MINE, PLAYER_DYNAMITE, PLAYER_DYNAMITES, 
@@ -89,11 +97,11 @@ new codPlayer[MAX_PLAYERS + 1][playerInfo];
 	
 enum _:save { NORMAL, DISCONNECT, MAP_END };
 
-new expKill, expKillHS, expDamage, expWinRound, expPlant, expDefuse, expRescue, levelLimit, levelRatio, 
-	killStreakTime, minPlayers, minBonusPlayers, maxDurability, minDamageDurability, maxDamageDurability;
+new expKill, expKillHS, expDamage, expWinRound, expPlant, expDefuse, expRescue, levelLimit, levelRatio, levelPromotionFirst, levelPromotionSecond, 
+	levelPromotionThird, killStreakTime, minPlayers, minBonusPlayers, maxDurability, minDamageDurability, maxDamageDurability;
 
-new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpWinRound, cvarExpPlant, cvarExpDefuse, cvarExpRescue, cvarLevelLimit, cvarLevelRatio, 
-	cvarKillStreakTime, cvarMinPlayers, cvarMinBonusPlayers, cvarMaxDurability, cvarMinDamageDurability, cvarMaxDamageDurability;
+new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpWinRound, cvarExpPlant, cvarExpDefuse, cvarExpRescue, cvarLevelLimit, cvarLevelRatio, cvarLevelPromotionFirst,
+	cvarLevelPromotionSecond, cvarLevelPromotionThird, cvarKillStreakTime, cvarMinPlayers, cvarMinBonusPlayers, cvarMaxDurability, cvarMinDamageDurability, cvarMaxDamageDurability;
 
 new Array:codItems, Array:codClasses, Array:codFractions, Array:codPlayerClasses[MAX_PLAYERS + 1], Array:codPlayerRender[MAX_PLAYERS + 1], codForwards[forwards];
 
@@ -119,6 +127,9 @@ public plugin_init()
 	cvarExpRescue = register_cvar("cod_hostxp", "15");
 	cvarLevelLimit = register_cvar("cod_maxlevel", "501");
 	cvarLevelRatio = register_cvar("cod_levelratio", "35");
+	cvarLevelPromotionFirst = register_cvar("cod_levelpromotionfirst", "50");
+	cvarLevelPromotionSecond = register_cvar("cod_levelpromotionsecond", "150");
+	cvarLevelPromotionThird = register_cvar("cod_levelpromotionthird", "300");
 	cvarKillStreakTime = register_cvar("cod_killstreaktime", "15");
 	cvarMinPlayers = register_cvar("cod_minplayers", "4");
 	cvarMinBonusPlayers = register_cvar("cod_minbonusplayers", "10");
@@ -561,7 +572,7 @@ public select_class(id)
 		menu_additem(menu, menuData, menuClassId);
 	}
 	
-	if(classId) load_class(id, classId);
+	load_class(id, classId);
 	
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
@@ -1962,6 +1973,8 @@ public show_info(id)
 	get_item_info(codPlayer[target][PLAYER_ITEM], ITEM_NAME, itemName, charsmax(itemName));
 	cod_get_clan_name(cod_get_user_clan(target), clanName, charsmax(clanName));
 
+	if(codPlayer[target][PLAYER_PROMOTION] > PROMOTION_NONE) format(className, charsmax(className), "%s %s", codPromotions[codPlayer[target][PLAYER_PROMOTION]], className);
+
 	format(clanName, charsmax(clanName), "^n[Klan: %s]", clanName);
 
 	exp = codPlayer[target][PLAYER_LEVEL] - 1 >= 0 ? get_level_exp(codPlayer[target][PLAYER_LEVEL] - 1) : 0;
@@ -2009,38 +2022,38 @@ public set_new_class(id)
 {
 	if(!is_user_connected(id)) return PLUGIN_CONTINUE;
 	
-	new ret;
-	
-	ExecuteForward(get_class_info(codPlayer[id][PLAYER_NEW_CLASS], CLASS_ENABLED), ret, id);
-	
-	if(ret == COD_STOP)	
-	{
-		codPlayer[id][PLAYER_NEW_CLASS] = 0;
-		
-		select_fraction(id);
-		
-		return PLUGIN_CONTINUE;
-	}
-	
+	new ret, class = codPlayer[id][PLAYER_CLASS];
+
 	if(codPlayer[id][PLAYER_CLASS]) 
 	{
 		save_data(id, NORMAL);
-		
-		execute_forward_ignore_one_param(get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_DISABLED), id);
+
+		execute_forward_ignore_two_params(get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_DISABLED), id, codPlayer[id][PLAYER_PROMOTION]);
 
 		remove_render_type(id, RENDER_CLASS);
 
 		reset_attributes(id);
 	}
 
-	ExecuteForward(get_class_info(codPlayer[id][PLAYER_NEW_CLASS], CLASS_ENABLED), ret, id);
+	load_class(id, codPlayer[id][PLAYER_NEW_CLASS]);
+	
+	ExecuteForward(get_class_info(codPlayer[id][PLAYER_NEW_CLASS], CLASS_ENABLED), ret, id, codPlayer[id][PLAYER_PROMOTION]);
+	
+	if(ret == COD_STOP)	
+	{
+		codPlayer[id][PLAYER_NEW_CLASS] = 0;
+
+		load_class(id, codPlayer[id][class]);
+		
+		select_fraction(id);
+		
+		return PLUGIN_CONTINUE;
+	}
 	
 	execute_forward_ignore_two_params(codForwards[CLASS_CHANGED], id, codPlayer[id][PLAYER_NEW_CLASS]);
 	
 	codPlayer[id][PLAYER_CLASS] = codPlayer[id][PLAYER_NEW_CLASS];
 	codPlayer[id][PLAYER_NEW_CLASS] = 0;
-	
-	load_class(id, codPlayer[id][PLAYER_CLASS]);
 
 	if(codPlayer[id][PLAYER_POINTS] > 0) assign_points(id, 0);
 
@@ -2100,6 +2113,8 @@ public check_level(id)
 		
 		set_dhudmessage(212, 255, 85, 0.31, 0.32, 0, 0.0, 1.5, 0.0, 0.0);
 		show_dhudmessage(id, "Awansowales do %i poziomu!", codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL]);
+
+		check_promotion(id, 1);
 
 		switch(random_num(1, 3))
 		{
@@ -2370,6 +2385,9 @@ public set_cvars()
 {
 	levelLimit = get_pcvar_num(cvarLevelLimit);
 	levelRatio = get_pcvar_num(cvarLevelRatio);
+	levelPromotionFirst = get_pcvar_num(cvarLevelPromotionFirst);
+	levelPromotionSecond = get_pcvar_num(cvarLevelPromotionSecond);
+	levelPromotionThird = get_pcvar_num(cvarLevelPromotionThird);
 	
 	minPlayers = get_pcvar_num(cvarMinPlayers);
 	minBonusPlayers = get_pcvar_num(cvarMinBonusPlayers);
@@ -2592,6 +2610,8 @@ public load_class(id, class)
 	codPlayer[id][PLAYER_STAM] = codClass[PCLASS_STAM];
 	codPlayer[id][PLAYER_STR] = codClass[PCLASS_STR];
 	codPlayer[id][PLAYER_COND] = codClass[PCLASS_COND];
+
+	check_promotion(id);
 
 	if(!codPlayer[id][PLAYER_LEVEL])
 	{
@@ -3121,6 +3141,34 @@ stock get_players_amount()
 	if(get_maxplayers() - playersNum <= minBonusPlayers) return (minBonusPlayers - (get_maxplayers() - playersNum));
 
 	return 0;
+}
+
+stock check_promotion(id, info = 0)
+{
+	new promotion = PROMOTION_NONE;
+	
+	if(codPlayer[id][PLAYER_PROMOTION] < PROMOTION_FIRST && codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] >= levelPromotionFirst) promotion = PROMOTION_FIRST;
+
+	if(codPlayer[id][PLAYER_PROMOTION] < PROMOTION_SECOND && codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] >= levelPromotionSecond) promotion = PROMOTION_SECOND;
+
+	if(codPlayer[id][PLAYER_PROMOTION] < PROMOTION_THIRD && codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] >= levelPromotionThird) promotion = PROMOTION_THIRD;
+
+	if(promotion > codPlayer[id][PLAYER_PROMOTION])
+	{
+		codPlayer[id][PLAYER_PROMOTION] = promotion;
+
+		if(info)
+		{
+			new className[MAX_NAME];
+
+			codPlayer[id][PLAYER_NEW_CLASS] = codPlayer[id][PLAYER_CLASS];
+
+			get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
+
+			set_dhudmessage(0, 255, 34, 0.31, 0.52, 0, 0.0, 1.5, 0.0, 0.0);
+			show_dhudmessage(id, "Awansowales! Twoja klasa to teraz %s %s!", className, codPromotions[codPlayer[id][PLAYER_PROMOTION]]);
+		}
+	}
 }
 
 stock check_fraction(const fractionName[])

@@ -11,8 +11,3 @@ Kasyno:
 - 2048
 - Blackjack
 - Poker
-
-Awanse:
-- 50/150/300 lvl (cvary)
-- Zaawansowany/Elitarny/Mistrzowski
-- Switch w klasach do okreslenia mocy
