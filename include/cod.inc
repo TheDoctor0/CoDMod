@@ -9,8 +9,6 @@
 
 #define is_user_valid(%1) (1 <= %1 <= maxPlayers)
 
-#define MAX_PLAYERS 32
-
 #define COD_CONTINUE 0
 #define COD_STOP 4
 
@@ -24,9 +22,9 @@
 #define	RENDER_DUCK (1<<4)
 #define	RENDER_SHIFT (1<<5)
 
-#define RENDER_CLASS 0
-#define RENDER_ITEM 1
-#define RENDER_ADDITIONAL 2
+enum _:promotions { PROMOTION_NONE, PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION_THIRD };
+
+enum _:renderType { RENDER_CLASS, RENDER_ITEM, RENDER_ADDITIONAL };
 
 enum _:hud { TYPE_HUD, TYPE_DHUD };
 
