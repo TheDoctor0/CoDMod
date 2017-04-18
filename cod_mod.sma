@@ -72,8 +72,8 @@ new codSprite[sizeof codSprites];
 new teamWeapons[] = { 0, 1<<CSW_GLOCK18, 1<<CSW_USP },
 	allowedWeapons = 1<<CSW_KNIFE | 1<<CSW_C4;
 
-enum _:itemInfo { ITEM_NAME[MAX_NAME], ITEM_DESC[MAX_DESC], ITEM_PLUGIN, ITEM_GIVE, ITEM_DROP,
-	ITEM_SPAWNED, ITEM_KILLED, ITEM_SKILL_USED, ITEM_UPGRADE, ITEM_DAMAGE_ATTACKER, ITEM_DAMAGE_VICTIM };
+enum _:itemInfo { ITEM_NAME[MAX_NAME], ITEM_DESC[MAX_DESC], ITEM_PLUGIN, ITEM_GIVE, ITEM_DROP, ITEM_SPAWNED, 
+	ITEM_KILLED, ITEM_SKILL_USED, ITEM_UPGRADE, ITEM_VALUE, ITEM_DAMAGE_ATTACKER, ITEM_DAMAGE_VICTIM };
 
 enum _:classInfo { CLASS_NAME[MAX_NAME], CLASS_DESC[MAX_DESC], CLASS_FRACTION[MAX_NAME], CLASS_HEAL, 
 	CLASS_INT, CLASS_STR, CLASS_COND, CLASS_STAM,CLASS_WEAPONS, CLASS_PLUGIN, CLASS_ENABLED, CLASS_DISABLED, 
@@ -281,24 +281,27 @@ public plugin_natives()
 	register_native("cod_get_user_dynamites", "_cod_get_user_dynamites", 1);
 	register_native("cod_get_user_medkits", "_cod_get_user_medkits", 1);
 	register_native("cod_get_user_teleports", "_cod_get_user_teleports", 1);
-	register_native("cod_get_user_multijump", "_cod_get_user_multijump", 1);
+	register_native("cod_get_user_multijumps", "_cod_get_user_multijumps", 1);
 	register_native("cod_get_user_gravity", "_cod_get_user_gravity", 1);
+	register_native("cod_get_user_armor", "_cod_get_user_armor", 1);
 	
 	register_native("cod_set_user_rockets", "_cod_set_user_rockets", 1);
 	register_native("cod_set_user_mines", "_cod_set_user_mines", 1);
 	register_native("cod_set_user_dynamites", "_cod_set_user_dynamites", 1);
 	register_native("cod_set_user_medkits", "_cod_set_user_medkits", 1);
 	register_native("cod_set_user_teleports", "_cod_set_user_teleports", 1);
-	register_native("cod_set_user_multijump", "_cod_set_user_multijump", 1);
+	register_native("cod_set_user_multijumps", "_cod_set_user_multijumps", 1);
 	register_native("cod_set_user_gravity", "_cod_set_user_gravity", 1);
+	register_native("cod_set_user_armor", "_cod_set_user_armor", 1);
 	
 	register_native("cod_add_user_rockets", "_cod_add_user_rockets", 1);
 	register_native("cod_add_user_mines", "_cod_add_user_mines", 1);
 	register_native("cod_add_user_dynamites", "_cod_add_user_dynamites", 1);
 	register_native("cod_add_user_medkits", "_cod_add_user_medkits", 1);
 	register_native("cod_add_user_teleports", "_cod_add_user_teleports", 1);
-	register_native("cod_add_user_multijump", "_cod_add_user_multijump", 1);
+	register_native("cod_add_user_multijumps", "_cod_add_user_multijumps", 1);
 	register_native("cod_add_user_gravity", "_cod_add_user_gravity", 1);
+	register_native("cod_add_user_armor", "_cod_add_user_armor", 1);
 	
 	register_native("cod_get_user_resistance", "_cod_get_user_resistance", 1);
 	register_native("cod_get_user_bunnyhop", "_cod_get_user_bunnyhop", 1);
@@ -1054,7 +1057,7 @@ public use_rocket(id)
 		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
 		show_dhudmessage(id, "Wykorzystales juz wszystkie rakiety!");
 		
-		return PLUGIN_HANDLED;
+		return PLUGIN_CONTINUE;
 	}
 	
 	if(codPlayer[id][PLAYER_LAST_ROCKET] + 3.0 > get_gametime())
@@ -1062,7 +1065,7 @@ public use_rocket(id)
 		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
 		show_dhudmessage(id, "Rakiet mozesz uzywac co 3 sekundy!");
 		
-		return PLUGIN_HANDLED;
+		return PLUGIN_CONTINUE;
 	}
 	
 	codPlayer[id][PLAYER_LAST_ROCKET] = floatround(get_gametime());
@@ -1124,7 +1127,7 @@ public use_mine(id)
 		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
 		show_dhudmessage(id, "Wykorzystales juz wszystkie miny!");
 		
-		return PLUGIN_HANDLED;
+		return PLUGIN_CONTINUE;
 	}
 	
 	if(codPlayer[id][PLAYER_LAST_MINE] + 3.0 > get_gametime())
@@ -1132,7 +1135,7 @@ public use_mine(id)
 		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
 		show_dhudmessage(id, "Miny mozesz stawiac co 3 sekundy!");
 		
-		return PLUGIN_HANDLED;
+		return PLUGIN_CONTINUE;
 	}
 
 	if(!(pev(id, pev_flags) & FL_ONGROUND))
@@ -1140,7 +1143,7 @@ public use_mine(id)
 		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
 		show_dhudmessage(id, "Musisz stac na podlozu, aby podlozyc mine!");
 
-		return PLUGIN_HANDLED;
+		return PLUGIN_CONTINUE;
 	}
 	
 	if(!is_enough_space(id))
@@ -1148,7 +1151,7 @@ public use_mine(id)
 		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
 		show_dhudmessage(id, "Nie mozesz postawic miny w przejsciu!");
 
-		return PLUGIN_HANDLED;
+		return PLUGIN_CONTINUE;
 	}
 	
 	codPlayer[id][PLAYER_LAST_MINE] = floatround(get_gametime());
@@ -1229,7 +1232,7 @@ public use_dynamite(id)
 		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
 		show_dhudmessage(id, "Wykorzystales juz wszystkie dynamity!");
 		
-		return PLUGIN_HANDLED;
+		return PLUGIN_CONTINUE;
 	}
 	
 	if(codPlayer[id][PLAYER_LAST_DYNAMITE] + 3.0 > get_gametime())
@@ -1237,7 +1240,7 @@ public use_dynamite(id)
 		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
 		show_dhudmessage(id, "Dynamity mozesz klasc co 3 sekundy!");
 		
-		return PLUGIN_HANDLED;
+		return PLUGIN_CONTINUE;
 	}
 
 	if(!(pev(id, pev_flags) & FL_ONGROUND))
@@ -1245,7 +1248,7 @@ public use_dynamite(id)
 		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
 		show_dhudmessage(id, "Musisz stac na podlozu, aby postawic dynamit!");
 
-		return PLUGIN_HANDLED;
+		return PLUGIN_CONTINUE;
 	}
 	
 	if(!is_enough_space(id))
@@ -1253,7 +1256,7 @@ public use_dynamite(id)
 		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
 		show_dhudmessage(id, "Nie mozesz postawic dynamitu w przejsciu!");
 
-		return PLUGIN_HANDLED;
+		return PLUGIN_CONTINUE;
 	}
 	
 	codPlayer[id][PLAYER_LAST_DYNAMITE] = floatround(get_gametime());
@@ -1288,7 +1291,7 @@ public use_medkit(id)
 		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
 		show_dhudmessage(id, "Wykorzystales juz wszystkie apteczki!");
 		
-		return PLUGIN_HANDLED;
+		return PLUGIN_CONTINUE;
 	}
 	
 	if(codPlayer[id][PLAYER_LAST_MEDKIT] + 3.0 > get_gametime())
@@ -1296,7 +1299,7 @@ public use_medkit(id)
 		set_dhudmessage(218, 40, 67, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
 		show_dhudmessage(id, "Apteczki mozesz klasc co 3 sekundy!");
 		
-		return PLUGIN_HANDLED;
+		return PLUGIN_CONTINUE;
 	}
 	
 	codPlayer[id][PLAYER_LAST_MEDKIT] = floatround(get_gametime());
@@ -2143,6 +2146,8 @@ public reset_attributes(id)
 
 	set_user_rendering(id);
 
+	set_user_footsteps(id, 0);
+
 	codPlayer[id][PLAYER_GRAVITY] = _:1.0;
 	codPlayer[id][PLAYER_LAST_ROCKET] = _:0.0;
 	codPlayer[id][PLAYER_LAST_MINE] = _:0.0;
@@ -2723,7 +2728,7 @@ public _cod_get_classes_num()
 
 public _cod_get_user_item(id, &value)
 {
-	new function = get_func_id("cod_get_item_value", get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_PLUGIN));
+	new function = get_class_info(codPlayer[id][PLAYER_ITEM], ITEM_VALUE);
 
 	if(function != -1)
 	{
@@ -2739,13 +2744,15 @@ public _cod_get_user_item(id, &value)
 public _cod_set_user_item(id, item, value)
 	set_item(id, item, value);
 
-public _cod_upgrade_user_item(id)
+public _cod_upgrade_user_item(id, check)
 {
-	if(!ArraySize(codItems)) return;
+	if(!ArraySize(codItems)) return false;
+
+	if(check) get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_UPGRADE) ? true : false;
 	
 	switch(random_num(1, 4))
 	{
-		case 1:
+		case 1, 2:
 		{
 			new durability = random_num(minDamageDurability, maxDamageDurability);
 			
@@ -2756,26 +2763,28 @@ public _cod_upgrade_user_item(id)
 				set_item(id);
 		
 				cod_print_chat(id, "Ulepszenie^x03 nieudane^x01! Twoj przedmiot ulegl^x03 zniszczeniu^x01.");
-				
-				return;
 			}
-			
-			cod_print_chat(id, "Ulepszenie^x03 nieudane^x01! Straciles^x03 %i^x01 wytrzymalosci przedmiotu.", durability);
+			else cod_print_chat(id, "Ulepszenie^x03 nieudane^x01! Straciles^x03 %i^x01 wytrzymalosci przedmiotu.", durability);
 		}
-		case 2:
+		case 3:
 		{
 			set_item(id);
 		
 			cod_print_chat(id, "Ulepszenie^x03 nieudane^x01! Twoj przedmiot ulegl^x03 zniszczeniu^x01.");
 		}
-		case 3, 4:
+		case 4, 5:
 		{
-			new forwardHandle = CreateOneForward(get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_PLUGIN), "cod_item_upgrade", FP_CELL);
-	
-			ExecuteForward(forwardHandle, id, id);
-			DestroyForward(forwardHandle);	
+			new ret;
+
+			ExecuteForward(get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_UPGRADE), ret, id);
+
+			if(ret == COD_STOP) return false;
+
+			cod_print_chat(id, "Twoj przedmiot zostal pomyslnie^x03 ulepszony^x01.");
 		}
 	}
+
+	return true;
 }
 
 public _cod_get_itemid(itemName[])
@@ -2895,6 +2904,9 @@ public _cod_get_user_multijump(id)
 public _cod_get_user_gravity(id)
 	return codPlayer[id][PLAYER_GRAVITY] * 800;
 
+public _cod_get_user_armor(id, value)
+	return cs_get_user_armor(id);
+
 public _cod_set_user_rockets(id, value)
 	codPlayer[id][PLAYER_ROCKETS] = max(0, value);
 
@@ -2919,6 +2931,9 @@ public _cod_set_user_gravity(id, value)
 
 	gravity_change(id);
 }
+
+public _cod_set_user_armor(id, value)
+	cs_set_user_armor(id, value, CS_ARMOR_KEVLAR);
 	
 public _cod_add_user_rockets(id, value)
 	codPlayer[id][PLAYER_ROCKETS] += max(0, value);
@@ -2935,7 +2950,7 @@ public _cod_add_user_medkits(id, value)
 public _cod_add_user_teleports(id, value)
 	codPlayer[id][PLAYER_TELEPORTS] = codPlayer[id][PLAYER_TELEPORTS] == -1 ? -1 : (codPlayer[id][PLAYER_TELEPORTS] + value);
 	
-public _cod_add_user_multijump(id, value)
+public _cod_add_user_multijumps(id, value)
 	codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS] += max(0, value);
 	
 public _cod_add_user_gravity(id, value)
@@ -2945,6 +2960,9 @@ public _cod_add_user_gravity(id, value)
 	gravity_change(id);
 }
 
+public _cod_add_user_armor(id, value)
+	cs_set_user_armor(id, cs_get_user_armor(id) + value, CS_ARMOR_KEVLAR);
+
 public _cod_get_user_resistance(id, value)
 	return get_bit(id, itemResistance);
 	
@@ -2952,7 +2970,7 @@ public _cod_get_user_bunnyhop(id, value)
 	return get_bit(id, bunnyHop);
 	
 public _cod_get_user_footsteps(id)
-	get_user_footsteps(id);
+	return get_user_footsteps(id);
 	
 public _cod_set_user_resistance(id, value)
 	value ? set_bit(id, itemResistance) : rem_bit(id, itemResistance);
@@ -3078,7 +3096,7 @@ public _cod_register_item(plugin, params)
 	codItem[ITEM_KILLED] = CreateOneForward(plugin, "cod_item_killed", FP_CELL);
 	codItem[ITEM_SKILL_USED] = CreateOneForward(plugin, "cod_item_skill_used", FP_CELL);
 	codItem[ITEM_UPGRADE] = CreateOneForward(plugin, "cod_item_upgrade", FP_CELL);
-	
+	codItem[ITEM_VALUE] = get_func_id("cod_item_value", plugin);
 	codItem[ITEM_DAMAGE_ATTACKER] = get_func_id("cod_item_damage_attacker", plugin);
 	codItem[ITEM_DAMAGE_VICTIM] = get_func_id("cod_item_damage_victim", plugin);
 	

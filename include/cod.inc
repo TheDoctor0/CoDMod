@@ -120,9 +120,11 @@ Jezeli item = -1 item bedzie losowy.
 Jezeli value = -1 wartosc itemu bedzie losowa.
 ------------------------------*/
 
-native cod_upgrade_user_item(id);
+native cod_upgrade_user_item(id, check = 0);
 /*------------------------------
 Ulepsza item gracza
+Parametr check pozwala na sprawdzenie,
+czy dany przedmiot da sie ulepszych
 ------------------------------*/
 
 native cod_get_itemid(szItem[]);
@@ -155,6 +157,11 @@ native cod_set_user_rockets(id, value);
 Ustawia liczbe rakiet gracza
 ------------------------------*/
 
+native cod_add_user_rockets(id, value);
+/*------------------------------
+Dodaje graczowi liczbe rakiet
+------------------------------*/
+
 native cod_get_user_mines(id);
 /*------------------------------
 Zwraca liczbe min gracza
@@ -163,6 +170,11 @@ Zwraca liczbe min gracza
 native cod_set_user_mines(id, value);
 /*------------------------------
 Ustawia liczbe min gracza
+------------------------------*/
+
+native cod_add_user_mines(id, value);
+/*------------------------------
+Dodaje graczowi liczbe min
 ------------------------------*/
 
 native cod_get_user_medkits(id);
@@ -175,6 +187,11 @@ native cod_set_user_medkits(id, value);
 Ustawia liczbe apteczek gracza
 ------------------------------*/
 
+native cod_add_user_medkits(id, value);
+/*------------------------------
+Dodaje graczowi liczbe apteczek
+------------------------------*/
+
 native cod_get_user_dynamites(id);
 /*------------------------------
 Zwraca liczbe dynamitow gracza
@@ -183,6 +200,61 @@ Zwraca liczbe dynamitow gracza
 native cod_set_user_dynamites(id, value);
 /*------------------------------
 Ustawia liczbe dynamitow gracza
+------------------------------*/
+
+native cod_add_user_dynamites(id, value);
+/*------------------------------
+Dodaje graczowi liczbe dynamitow
+------------------------------*/
+
+native cod_get_user_multijumps(id);
+/*------------------------------
+Zwraca liczbe skokow gracza
+------------------------------*/
+
+native cod_set_user_multijumps(id, value);
+/*------------------------------
+Ustawia liczbe skoskow gracza
+------------------------------*/
+
+native cod_add_user_multijumps(id, value);
+/*------------------------------
+Dodaje graczowi liczbe skoskow
+------------------------------*/
+
+native cod_get_user_armor(id);
+/*------------------------------
+Zwraca punkty kamizelki gracza
+------------------------------*/
+
+native cod_set_user_armor(id, value);
+/*------------------------------
+Ustawia punkty kamizelki gracza
+------------------------------*/
+
+native cod_add_user_armor(id, value);
+/*------------------------------
+Dodaje graczowi punkty kamizelki
+------------------------------*/
+
+native cod_get_user_bunnyhop(id);
+/*------------------------------
+Zwraca czy gracz ma bunnyhop
+------------------------------*/
+
+native cod_set_user_bunnyhop(id, value);
+/*------------------------------
+Ustawia graczowi wartosc logiczna bunnyhop
+------------------------------*/
+
+native cod_get_user_footsteps(id);
+/*------------------------------
+Zwraca czy gracz ma ciche chodzenie
+------------------------------*/
+
+native cod_set_user_footsteps(id, value);
+/*------------------------------
+Ustawia graczowi wartosc logiczna cichego chodzenia
 ------------------------------*/
 
 native cod_get_user_vip(id);

@@ -80,31 +80,37 @@
 	"buffers":
 	[
 		{
-			"contents": "Do zrobienia:\n- Rozbudowanie sklepu\n- Aktualizacja .inc\n- Kasyno\n- Awanse klas\n- Statystyki WWW\n\nKasyno:\n- Kostka (high/low i 1-6)\n- Automat\n- 2048\n- Blackjack\n- Poker\n\nAwanse:\n- 50/150/300 lvl (cvary)\n- Zaawansowany/Elitarny/Mistrzowski\n- Switch w klasach do okreslenia mocy\n\n- Enable: id, promotion\n- Disable: id, promotion",
 			"file": "cod.txt",
-			"file_size": 292,
-			"file_write_time": 131365779419807697,
 			"settings":
 			{
-				"buffer_size": 325,
+				"buffer_size": 168,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "include/cod.inc",
+			"file": "/D/Dawid/Workplace/AMXX/include/cod.inc",
 			"settings":
 			{
-				"buffer_size": 14626,
+				"buffer_size": 16662,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/D/Dawid/Workplace/AMXX/scripting/ozone_security.sma",
+			"file": "cod_mod.sma",
 			"settings":
 			{
-				"buffer_size": 17329,
+				"buffer_size": 105784,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "cod_shop.sma",
+			"settings":
+			{
+				"buffer_size": 15834,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -218,6 +224,37 @@
 	],
 	"file_history":
 	[
+		"/D/Dawid/Workplace/AMXX/include/cod.inc",
+		"/D/Dawid/Workplace/New Mods/CoDMod/include/cod.inc",
+		"/D/Downloads/GoogleChrome/cod_shop.sma",
+		"/D/Dawid/Workplace/AMXX/scripting/supervip.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/motd.txt",
+		"/D/Dawid/Workplace/AMXX/scripting/csstatsx_sql.sma",
+		"/D/Dawid/Workplace/Mods/SourceMod/shopsms_service_admin.sp",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170417.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-3/mine_health.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/zp_lasermine_28.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/mine_health.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/name_change.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170414.log",
+		"/D/Downloads/GoogleChrome/shopsms.sp",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sklep_sms.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/admins_service.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/rank_system.txt",
+		"/D/Dawid/Workplace/AMXX/scripting/ozone_banconfig.sma",
+		"/D/Dawid/Workplace/AMXX/scripting/parachute.sma",
+		"/D/Dawid/Workplace/AMXX/scripting/c4.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/amxx.cfg",
+		"/D/Dawid/Workplace/AMXX/scripting/sillyc4.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170414.log",
+		"/D/Downloads/GoogleChrome/roulette.inc",
+		"/D/Dawid/Workplace/New Mods/CoDMod/casino/blackjack/scripting/blackjack.sma",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_casino.sma",
+		"/D/Downloads/GoogleChrome/roulette.sma",
+		"/D/Downloads/GoogleChrome/QTM_CodModa (1).sma",
+		"/D/Downloads/GoogleChrome/QTM_CodModa.sma",
+		"/D/Dawid/Workplace/AMXX/scripting/ozone_security.sma",
 		"/D/Dawid/Workplace/New Mods/CoDMod/cod_mod.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.179/QTM_CodMod.sma",
 		"/D/Dawid/Workplace/New Mods/CoDMod/cod_accounts.sma",
@@ -225,7 +262,6 @@
 		"/D/Dawid/Workplace/AMXX/scripting/spect_switch.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 2.ini",
 		"/D/Dawid/Workplace/AMXX/scripting/tbm.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins.ini",
 		"/D/Downloads/GoogleChrome/block_spawn_for_reconnect.sma",
 		"/D/Dawid/Workplace/AMXX/scripting/przelej.sma",
 		"/D/Dawid/Workplace/AMXX/scripting/block_team_flash.sma",
@@ -233,11 +269,9 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 5.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 4.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 3.ini",
-		"/D/Dawid/Workplace/AMXX/scripting/csstatsx_sql.sma",
 		"/D/Dawid/Workplace/AMXX/scripting/stats_system.sma",
 		"/D/Dawid/Workplace/New Mods/CoDMod/cod_stats.sma",
 		"/D/Dawid/Workplace/New Mods/CoDMod/cod_clans_system.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/zp_lasermine_28.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/mapcycle_male.txt",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170331.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/errors_20170331.log",
@@ -250,7 +284,6 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/servers.ini",
 		"/D/Dawid/Workplace/New Mods/CoDMod/cod_icons.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins-cod.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/name_change.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/users.ini",
 		"/D/Dawid/Workplace/New Mods/CoDMod/cod.inc",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/index.html",
@@ -294,7 +327,6 @@
 		"/D/Dawid/Workplace/AMXX/scripting/inf_smierc.sma",
 		"/D/Downloads/GoogleChrome/dead_name_change (1).sma",
 		"/D/Downloads/GoogleChrome/RegisterSystem (1).sma",
-		"/D/Dawid/Workplace/AMXX/scripting/ozone_banconfig.sma",
 		"/D/Downloads/GoogleChrome/VtcApi.inc",
 		"/D/Downloads/GoogleChrome/amx_gag (3).sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170412 3.log",
@@ -306,7 +338,6 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/server 4.cfg",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/pomoc.txt",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/Read if you Want ...txt",
-		"/D/Dawid/Workplace/AMXX/scripting/c4.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/advertisements.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170412.log",
 		"/D/Dawid/Workplace/AMXX/scripting/statsx.sma",
@@ -320,32 +351,7 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 7.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 6.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412171.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/stats.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170412 2.log",
-		"/D/Downloads/GoogleChrome/inf_smierc (1).sma",
-		"/D/Dawid/Workplace/AMXX/scripting/statsx_old.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/core.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names.log",
-		"/D/Dawid/Workplace/AMXX/scripting/ozone_security.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/knife_models.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/game.cfg",
-		"/D/Downloads/GoogleChrome/spam_block (1).sma",
-		"/D/Downloads/GoogleChrome/spam_block.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412030.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412029.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412028.log",
-		"/C/Program Files (x86)/Bloody6/Bloody6/Execute.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/ZawolajAdmina.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/admins_service.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/ozone_security.txt",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sklep_sms 2.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412027.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L0412026.log",
-		"/D/Downloads/GoogleChrome/vip2.sp",
-		"/D/Downloads/GoogleChrome/Vip.sp",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/errors_20170412.log",
-		"/D/Downloads/GoogleChrome/shopsms.sp",
-		"/D/Downloads/GoogleChrome/kontakt.sma"
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/stats.ini"
 	],
 	"find":
 	{
@@ -376,6 +382,60 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"armor",
+			"_cod_add_user_armor",
+			"get_user_footsteps",
+			"_cod_add_user_multijump",
+			"use_rocket",
+			"cod_get_user_item",
+			"item_upgrade",
+			"execute_fo",
+			"item_upgrade",
+			"item_value",
+			"ITEM_DAMAGE_VICTIM",
+			"ITEM_VALUE",
+			"MINE",
+			"ITEM_DAMAGE_ATTACKER",
+			"= get_func_id(\"cod_item_damage_attacker\", plugin);",
+			"ITEM_DAMAGE_ATTACKER",
+			"cod_get_user_item",
+			"CreateOneForward",
+			"executeforward",
+			"cod_get_user_item",
+			"_cod_add_user_gravity",
+			"_cod_get_user_footsteps",
+			"_cod_set_user_footsteps",
+			"reset_attributes",
+			"inflict",
+			"DAMAGE_POST",
+			"cvarC",
+			"cvar_pancerz",
+			"LoadModel",
+			"LoadModel//",
+			"Stats_SaveHit",
+			"EventHook_Damage",
+			"g_LBEO",
+			"takedamage",
+			"CreateLaserDamage",
+			"EXPLOSE_THINK",
+			"RemoveEntity",
+			"ShopThrowError",
+			"g_iUserParachute",
+			"g_iModelIndex",
+			"PARACHUTE_MODEL",
+			"sound_radar",
+			"karma",
+			"set_user_karma",
+			"use_skill",
+			"use_item",
+			"check_promotion",
+			"set_cvars",
+			"RENDER_VALUE",
+			"get_class_info(codPlayer[target][PLAYER_CLASS], CLASS_NAME, className, charsmax(className))",
+			"check_promotion",
+			"hudinfo",
+			"check_promotion",
+			"promotion",
 			"check_promotion",
 			"set_new_cla",
 			"promotion",
@@ -449,61 +509,7 @@
 			"user_info",
 			"save_stats",
 			"format_top15",
-			"cmdTop15",
-			"Time",
-			"SaveMedals",
-			"MsgIntermission",
-			"intermission",
-			"SaveStats",
-			"Spawn",
-			"SaveStats",
-			"Spawn",
-			"SaveStats",
-			"Time",
-			"codForwards",
-			"emit_sound",
-			"g_iMsgId_NVGToggle",
-			"Message_NVGToggle",
-			"client_impulse_flashlight",
-			"EmitSound",
-			"cmd_start",
-			"cod_cmd_start",
-			"CMD_START",
-			"cmd_start",
-			"armor",
-			"vest",
-			"menu_create",
-			"levelLimit",
-			"assign_points",
-			"save_data",
-			"check_level",
-			"menu_create",
-			"pointsDistribution",
-			"PLAYER_POINTS_SPEED",
-			"assign_points",
-			"commandPoints",
-			"hudinfo",
-			"player_rese",
-			"check_level",
-			"PLAYER_SPEED",
-			"speed",
-			"show_item_description",
-			"ITEM_GIVE",
-			"set_item",
-			"display_classes_description",
-			"brak",
-			"cod_round_end",
-			"remove_ent",
-			"remove_ents",
-			"applications_menu",
-			"applications_menu_handle",
-			"applications_confirm_menu",
-			"accept_application",
-			"application_menu",
-			"256",
-			"remove_ents",
-			"codForwards[NEW_ROUND]",
-			"cod_new_round"
+			"cmdTop15"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -511,6 +517,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"c",
 			"\\t",
 			"false);",
 			", ",
@@ -580,7 +587,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -589,15 +596,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 325,
+						"buffer_size": 168,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								325,
-								325
+								168,
+								168
 							]
 						],
 						"settings":
@@ -631,46 +638,36 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
 								"bh_c_define_close",
 								"bh_c_define_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
 								"bh_double_quote",
 								"bh_double_quote_center",
 								"bh_double_quote_open",
 								"bh_double_quote_close",
 								"bh_double_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
 								"bh_round_close",
 								"bh_round_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
@@ -681,11 +678,21 @@
 								"bh_angle_open",
 								"bh_angle_close",
 								"bh_angle_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content"
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
 							"git_gutter_enabled": true,
@@ -697,24 +704,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "include/cod.inc",
+					"file": "/D/Dawid/Workplace/AMXX/include/cod.inc",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 14626,
+						"buffer_size": 16662,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								520,
-								520
+								6458,
+								6458
 							]
 						],
 						"settings":
@@ -735,27 +742,12 @@
 							{
 								"close":
 								{
-									"1":
-									[
-										519,
-										520
-									]
 								},
 								"icon":
 								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/round_bracket.png",
-										"brackethighlighter.default"
-									]
 								},
 								"open":
 								{
-									"1":
-									[
-										514,
-										515
-									]
 								},
 								"unmatched":
 								{
@@ -763,21 +755,26 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
 								"bh_c_define_close",
 								"bh_c_define_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
@@ -788,16 +785,6 @@
 								"bh_unmatched_open",
 								"bh_unmatched_close",
 								"bh_unmatched_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
@@ -808,16 +795,21 @@
 								"bh_angle_open",
 								"bh_angle_close",
 								"bh_angle_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content"
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content"
 							],
 							"git_gutter_enabled": true,
 							"git_savvy.file_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod\\cod.inc",
@@ -825,28 +817,28 @@
 							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.x": -0.0,
+						"translation.y": 2801.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "/D/Dawid/Workplace/AMXX/scripting/ozone_security.sma",
+					"file": "cod_mod.sma",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 17329,
+						"buffer_size": 105784,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4583,
-								4583
+								16461,
+								16480
 							]
 						],
 						"settings":
@@ -869,15 +861,15 @@
 								{
 									"1":
 									[
-										4913,
-										4914
+										16480,
+										16481
 									]
 								},
 								"icon":
 								{
 									"1":
 									[
-										"Packages/BracketHighlighter/icons/curly_bracket.png",
+										"Packages/BracketHighlighter/icons/double_quote.png",
 										"brackethighlighter.default"
 									]
 								},
@@ -885,8 +877,8 @@
 								{
 									"1":
 									[
-										4561,
-										4562
+										16460,
+										16461
 									]
 								},
 								"unmatched":
@@ -895,74 +887,195 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
 								"bh_c_define_close",
 								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
 								"bh_regex",
 								"bh_regex_center",
 								"bh_regex_open",
 								"bh_regex_close",
 								"bh_regex_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content"
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content"
 							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
 							"git_gutter_enabled": true,
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\AMXX\\scripting\\ozone_security.sma",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\AMXX",
+							"git_savvy.file_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod\\cod_mod.sma",
+							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod",
 							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1831.0,
+						"translation.y": 3917.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "cod_shop.sma",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15834,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7561,
+								7561
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".#",
+									"selector": "text.html"
+								}
+							],
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+								},
+								"icon":
+								{
+								},
+								"open":
+								{
+								},
+								"unmatched":
+								{
+									"1":
+									[
+										9638,
+										9639
+									]
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content"
+							],
+							"git_gutter_enabled": true,
+							"git_savvy.file_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod\\cod_shop.sma",
+							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod",
+							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1715.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -1027,7 +1140,7 @@
 	"project": "codmod.sublime-project",
 	"replace":
 	{
-		"height": 44.0
+		"height": 114.0
 	},
 	"save_all_on_build": true,
 	"select_file":
