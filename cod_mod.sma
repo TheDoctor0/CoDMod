@@ -89,9 +89,9 @@ enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, 
 enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL,
 	PLAYER_INT, PLAYER_STAM, PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTR_HEAL, PLAYER_EXTR_INT, PLAYER_EXTR_STAM, 
 	PLAYER_EXTR_STR, PLAYER_EXTR_COND, PLAYER_EXTR_WPNS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_MAX_HP, PLAYER_SPEED, PLAYER_WEAPON, PLAYER_STATUS,
-	PLAYER_GRAVITY, PLAYER_DMG_REDUCE, PLAYER_ROCKETS, PLAYER_LAST_ROCKET, PLAYER_MINES, PLAYER_LAST_MINE, PLAYER_DYNAMITE, PLAYER_DYNAMITES, 
-	PLAYER_LAST_DYNAMITE, PLAYER_MEDKITS, PLAYER_LAST_MEDKIT, PLAYER_TELEPORTS, PLAYER_LAST_TELEPORT, PLAYER_JUMPS, PLAYER_LEFT_JUMPS, PLAYER_KS, 
-	PLAYER_TIME_KS, PLAYER_HUD, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, PLAYER_NAME[MAX_NAME] };
+	PLAYER_GRAVITY, PLAYER_ROCKETS, PLAYER_LAST_ROCKET, PLAYER_MINES, PLAYER_LAST_MINE, PLAYER_DYNAMITE, PLAYER_DYNAMITES, PLAYER_LAST_DYNAMITE, 
+	PLAYER_MEDKITS, PLAYER_LAST_MEDKIT, PLAYER_TELEPORTS, PLAYER_LAST_TELEPORT, PLAYER_JUMPS, PLAYER_LEFT_JUMPS, PLAYER_KS, PLAYER_TIME_KS, 
+	PLAYER_HUD, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, PLAYER_NAME[MAX_NAME] };
 
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 	
@@ -513,15 +513,13 @@ public select_fraction_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new menuData[128], itemData[MAX_NAME], codClass[classInfo], classId, itemAccess, menuCallback;
+	new menuData[128], menuClassName[64], menuClassId[5], itemData[MAX_NAME], classId = codPlayer[id][PLAYER_CLASS], codClass[classInfo], itemAccess, menuCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, menuCallback);
 	
 	menu_destroy(menu);
 	
-	new menuClassId[5], menu = menu_create("\yWybierz \rKlase\w:", "select_class_handle");
-	
-	classId = codPlayer[id][PLAYER_CLASS];
+	new menu = menu_create("\yWybierz \rKlase\w:", "select_class_handle");
 
 	for(new i = 1; i < ArraySize(codClasses); i++)
 	{
@@ -530,8 +528,12 @@ public select_fraction_handle(id, menu, item)
 		if(equal(itemData, codClass[CLASS_FRACTION]))
 		{
 			load_class(id, i);
+
+			formatex(menuClassName, charsmax(menuClassName), codClass[CLASS_NAME]);
+
+			if(codPlayer[id][PLAYER_PROMOTION] > PROMOTION_NONE) format(menuClassName, charsmax(menuClassName), "%s %s", codPromotions[codPlayer[id][PLAYER_PROMOTION]], menuClassName);
 			
-			formatex(menuData, charsmax(menuData), "%s \yPoziom: %i \d(%s)", codClass[CLASS_NAME], codPlayer[id][PLAYER_LEVEL], get_weapons(codClass[CLASS_WEAPONS]));
+			formatex(menuData, charsmax(menuData), "%s \yPoziom: %i \d(%s)", menuClassName, codPlayer[id][PLAYER_LEVEL], get_weapons(codClass[CLASS_WEAPONS]));
 			
 			num_to_str(i, menuClassId, charsmax(menuClassId));
 
@@ -558,15 +560,17 @@ public select_class(id)
 		
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new menuData[128], menuClassId[5], codClass[classInfo], classId, menu = menu_create("\yWybierz \rKlase\w:", "select_class_handle");
-	
-	classId = codPlayer[id][PLAYER_CLASS];
+	new menuData[128], menuClassName[64], menuClassId[5], codClass[classInfo], classId = codPlayer[id][PLAYER_CLASS], menu = menu_create("\yWybierz \rKlase\w:", "select_class_handle");
 
 	for(new i = 1; i < ArraySize(codClasses); i++)
 	{
 		ArrayGetArray(codClasses, i, codClass);
 
 		load_class(id, i);
+
+		formatex(menuClassName, charsmax(menuClassName), codClass[CLASS_NAME]);
+
+		if(codPlayer[id][PLAYER_PROMOTION] > PROMOTION_NONE) format(menuClassName, charsmax(menuClassName), "%s %s", codPromotions[codPlayer[id][PLAYER_PROMOTION]], menuClassName);
 
 		formatex(menuData, charsmax(menuData), "%s \yPoziom: %i \d(%s)", codClass[CLASS_NAME], codPlayer[id][PLAYER_LEVEL], get_weapons(codClass[CLASS_WEAPONS]));
 
@@ -846,26 +850,26 @@ public assign_points(id, sound)
 	
 	new menu = menu_create(menuData, "assign_points_handler");
 	
-	if(codPlayer[id][PLAYER_POINTS_SPEED] == -1) format(menuData, charsmax(menuData), "Ile dodawac: \rWszystko \y(Ile punktow dodac do statow)");
-	else format(menuData, charsmax(menuData), "Ile dodawac: \r%d \y(Ile punktow dodac do statow)", pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]]);
+	if(codPlayer[id][PLAYER_POINTS_SPEED] == -1) format(menuData, charsmax(menuData), "Ile dodawac: \rWszystko \y(Ile punktow dodac do statystyk)");
+	else format(menuData, charsmax(menuData), "Ile dodawac: \r%d \y(Ile punktow dodac do statystyk)", pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]]);
 
 	menu_additem(menu, menuData);
 	
 	menu_addblank(menu, 0);
 
-	format(menuData, charsmax(menuData), "Zdrowie: \r%i \y(Zwieksza ilosc zycia)", get_health(id, 0, 1, 1, 0));
+	format(menuData, charsmax(menuData), "Zdrowie: \r%i \y(Zwieksza o %i liczbe punktow zycia)", get_health(id, 1, 1, 1, 0), get_health(id, 1, 1, 1, 0));
 	menu_additem(menu, menuData);
 	
-	format(menuData, charsmax(menuData), "Inteligencja: \r%i \y(Zwieksza sile itemow i umiejetnosci klasy)", get_intelligence(id, 0, 1, 1));
+	format(menuData, charsmax(menuData), "Inteligencja: \r%i \y(Zwieksza o %0.1f%s sile itemow i umiejetnosci klas)",  get_intelligence(id, 1, 1, 1), get_intelligence(id, 1, 1, 1) / 2.0, "%");
 	menu_additem(menu, menuData);
 
-	format(menuData, charsmax(menuData), "Sila: \r%i \y(Zwieksza zadawane obrazenia)", get_strength(id, 0, 1, 1));
+	format(menuData, charsmax(menuData), "Sila: \r%i \y(Zwieksza o %0.1f zadawane obrazenia)", get_strength(id, 1, 1, 1), get_strength(id, 1, 1, 1) / 10.0);
 	menu_additem(menu, menuData);
 	
-	format(menuData, charsmax(menuData), "Wytrzymalosc: \r%i \y(Zmniejsza otrzymywane obrazenia)", get_stamina(id, 0, 1, 1));
+	format(menuData, charsmax(menuData), "Wytrzymalosc: \r%i \y(Zmniejsza o %0.1f%s otrzymywane obrazenia)", get_stamina(id, 1, 1, 1), get_stamina(id, 1, 1, 1) / 4.0, "%");
 	menu_additem(menu, menuData);
 	
-	format(menuData, charsmax(menuData), "Kondycja: \r%i \y(Zwieksza predkosc poruszania)", get_condition(id, 0, 1, 1));
+	format(menuData, charsmax(menuData), "Kondycja: \r%i \y(Zwieksza o %0.1f%s predkosc poruszania)", get_condition(id, 1, 1, 1), get_condition(id, 1, 1, 1) * 0.85 / 250.0 * 100.0, "%");
 	menu_additem(menu, menuData);
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
@@ -1480,7 +1484,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 
 	if(codPlayer[victim][PLAYER_CLASS])
 	{
-		damage = damage * (1.0 - Float:codPlayer[victim][PLAYER_DMG_REDUCE]);
+		damage -= damage * (get_stamina(victim, 1, 1, 1) / 4.0);
 			
 		function = get_class_info(codPlayer[victim][PLAYER_CLASS], CLASS_DAMAGE_VICTIM);
 			
@@ -1497,9 +1501,11 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 
 	if(codPlayer[attacker][PLAYER_CLASS])
 	{
+		damage += get_strength(attacker, 1, 1, 1) / 10.0;
+
 		function = get_class_info(codPlayer[attacker][PLAYER_CLASS], CLASS_DAMAGE_ATTACKER);
 			
-		if(function != -1)
+		if(function != -1 && !get_bit(victim, itemResistance))
 		{
 			callfunc_begin_i(function, get_class_info(codPlayer[attacker][PLAYER_CLASS], CLASS_PLUGIN));
 			callfunc_push_int(victim);
@@ -1525,7 +1531,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 		}
 	}
 		
-	if(codPlayer[attacker][PLAYER_ITEM])
+	if(codPlayer[attacker][PLAYER_ITEM] && !get_bit(victim, itemResistance))
 	{
 		function = get_class_info(codPlayer[attacker][PLAYER_ITEM], ITEM_DAMAGE_ATTACKER);
 			
@@ -2172,9 +2178,7 @@ public set_attributes(id)
 
 	codPlayer[id][PLAYER_MAX_HP] = _:(get_health(id, 1, 1, 1, 1));
 
-	codPlayer[id][PLAYER_DMG_REDUCE] = _:(0.7 * (1.0 - floatpower(1.1, -0.112311341 * get_stamina(id, 1, 1, 1))));
-
-	codPlayer[id][PLAYER_SPEED] = _:(get_condition(id, 1, 1, 1) * 1.0);
+	codPlayer[id][PLAYER_SPEED] = _:(get_condition(id, 1, 1, 1) * 0.85);
 	
 	set_user_health(id, codPlayer[id][PLAYER_MAX_HP]);
 	
@@ -2898,7 +2902,7 @@ public _cod_get_user_medkits(id)
 public _cod_get_user_teleports(id)
 	return codPlayer[id][PLAYER_TELEPORTS];
 	
-public _cod_get_user_multijump(id)
+public _cod_get_user_multijumps(id)
 	return codPlayer[id][PLAYER_JUMPS];
 	
 public _cod_get_user_gravity(id)
@@ -2922,7 +2926,7 @@ public _cod_set_user_medkits(id, value)
 public _cod_set_user_teleports(id, value)
 	codPlayer[id][PLAYER_TELEPORTS] = codPlayer[id][PLAYER_TELEPORTS] == -1 ? -1 : value;
 
-public _cod_set_user_multijump(id, value)
+public _cod_set_user_multijumps(id, value)
 	codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS] = max(0, value);
 	
 public _cod_set_user_gravity(id, value)
@@ -3127,7 +3131,7 @@ public _cod_register_class(plugin, params)
 
 	codClass[CLASS_PLUGIN] = plugin;
 	
-	codClass[CLASS_ENABLED] = CreateOneForward(plugin, "cod_class_enabled", FP_CELL);
+	codClass[CLASS_ENABLED] = CreateOneForward(plugin, "cod_class_enabled", FP_CELL, FP_CELL);
 	codClass[CLASS_DISABLED] = CreateOneForward(plugin, "cod_class_disabled", FP_CELL);
 	codClass[CLASS_SPAWNED] = CreateOneForward(plugin, "cod_class_spawned",FP_CELL);
 	codClass[CLASS_KILLED] = CreateOneForward(plugin, "cod_class_killed", FP_CELL);

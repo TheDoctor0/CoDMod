@@ -1,7 +1,7 @@
 #include <amxmodx>
 #include <cod>
 
-new class;
+new class, classPromotion;
 
 new const nazwa[] = "Test";
 new const opis[] = "Natychmiastowe zabicie z noza(PPM)";
@@ -20,11 +20,20 @@ public plugin_init()
 	cod_register_class(nazwa, opis, frakcja, bronie, zdrowie, inteligencja, sila, wytrzymalosc, kondycja);
 }
 
-public cod_class_enabled(id)
+public cod_class_enabled(id, promotion)
+{
 	set_bit(id, class);
+
+	classPromotion = promotion;
+
+	if(classPromotion == PROMOTION_THIRD) cod_set_user_multijumps(id, 2);
+}
 	
-public cod_class_disabled(id)
+public cod_class_disabled(id, promotion)
 	rem_bit(id, class);
+
+public cod_class_spawned(id)
+	if(classPromotion == PROMOTION_THIRD) cod_set_user_multijumps(id, 2);
 
 public cod_item_damage_attacker(attacker, victim, Float:damage, damageBits)
 	if(get_user_weapon(attacker) == CSW_KNIFE && damageBits & DMG_BULLET && damage > 20 && get_bit(attacker, class))

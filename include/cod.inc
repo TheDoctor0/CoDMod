@@ -393,13 +393,13 @@ Rejestruje nowa klase oraz zwraca jej numer
 ------------------------------*/
 
 
-native cod_get_level_xp(poziom);
+native cod_get_level_xp(level);
 /*------------------------------
 Zwraca ilosc potrzebnego doswiadczenia do przejscia danego poziomu
 ------------------------------*/
 
 
-native cod_set_item_durability(id, wytrzymalosc);
+native cod_set_item_durability(id, durability);
 /*------------------------------
 Ustawia wytrzymalosc itemu gracza
 ------------------------------*/
@@ -451,12 +451,12 @@ native cod_get_user_honor(id);
 Zwraca honor gracza
 ------------------------------*/
 
-native cod_set_user_honor(id, wartosc);
+native cod_set_user_honor(id, value);
 /*------------------------------
 Ustawia honor gracza.
 ------------------------------*/
 
-native cod_add_user_honor(id, wartosc);
+native cod_add_user_honor(id, value);
 /*------------------------------
 Dodaje honor graczowi.
 ------------------------------*/
@@ -487,13 +487,13 @@ Forward wysylany do wszystkich pluginow w momencie zmiany itemu
 ------------------------------*/
 
 
-forward cod_class_changed(id, klasa);
+forward cod_class_changed(id, class);
 /*------------------------------
 Forward wysylany do wszystkich pluginow w momencie zmiany klasy
 ------------------------------*/
 
 
-forward cod_item_enabled(id, wartosc, item);
+forward cod_item_enabled(id, value, item);
 /*------------------------------
 Forward wysylany do pluginu z ktorego zarejestrowany jest item w momencie aktywacji
 ------------------------------*/
@@ -511,13 +511,13 @@ Forward wysylany do pluginu z ktorego zarejestrowany jest item w momencie uzycia
 ------------------------------*/
 
 
-forward cod_class_enabled(id, klasa);
+forward cod_class_enabled(id, class, promotion);
 /*------------------------------
 Forward wysylany do pluginu z ktorego zarejestrowana jest kasa w momencie aktywacji
 ------------------------------*/
 
 
-forward cod_class_disabled(id, klasa);
+forward cod_class_disabled(id, class, promotion);
 /*------------------------------
 Forward wysylany do pluginu z ktorego zarejestrowana jest kasa w momencie dezaktywacji
 ------------------------------*/
