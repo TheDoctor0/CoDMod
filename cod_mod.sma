@@ -175,6 +175,7 @@ public plugin_init()
 	RegisterHam(Ham_Touch, "weapon_shield", "touch_weapon");
 	RegisterHam(Ham_Touch, "weaponbox", "touch_weapon");
 	RegisterHam(Ham_CS_Player_ResetMaxSpeed, "player", "player_reset_max_speed", 1);
+	RegisterHam(Ham_Spawn, "func_buyzone", "block_buyzone");
 
 	new const weapons[][] = { "weapon_p228", "weapon_scout", "weapon_hegrenade", "weapon_xm1014", "weapon_c4", "weapon_mac10", 
 		"weapon_aug", "weapon_smokegrenade", "weapon_elite", "weapon_fiveseven", "weapon_ump45", "weapon_sg550", "weapon_galil", 
@@ -1634,6 +1635,9 @@ public player_reset_max_speed(id)
 
 	return HAM_IGNORED;
 }
+
+public block_buyzone()
+    return HAM_SUPERCEDE;
 
 public weapon_deploy_post(ent)
 {
