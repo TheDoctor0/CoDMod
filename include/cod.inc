@@ -47,485 +47,685 @@ new const codSounds[sounds][] =
 	"CoDMod/box.wav"
 };
 
+/*------------------------------
+Returns if player is logged in his account.
+Account menu is diplayed if not logged in.
+------------------------------*/
 native cod_check_account(id);
-/*------------------------------
-Sprawdza, czy gracz zalogowal sie na konto.
-Wyświetla menu logowania na konto, jeśli nie jest zalogowany.
-------------------------------*/
 
+/*------------------------------
+Returns if player has a VIP.
+------------------------------*/
+native cod_get_user_vip(id);
+
+/*------------------------------
+Returns player's honor amount.
+------------------------------*/
+native cod_get_user_honor(id);
+
+/*------------------------------
+Sets player's honor amount.
+------------------------------*/
+native cod_set_user_honor(id, value);
+
+/*------------------------------
+Adds value to player's honor amount.
+------------------------------*/
+native cod_add_user_honor(id, value);
+
+/*------------------------------
+Returns clan.
+------------------------------*/
+native cod_get_user_clan(id);
+
+/*------------------------------
+Returns clan's name.
+------------------------------*/
+native cod_get_clan_name(clan, dataReturn[], dataLength);
+
+/*------------------------------
+Spawns an icon above box.
+------------------------------*/
+native cod_spawn_box_icon(ent);
+
+/*------------------------------
+Removes entity of box and icon.
+------------------------------*/
+native cod_remove_box_icon(ent);
+
+/*------------------------------
+Returns player's exp.
+------------------------------*/
 native cod_get_user_exp(id);
-/*------------------------------
-Zwraca doswiadczenie gracza.
-------------------------------*/
 
-native cod_set_user_exp(id, wartosc);
 /*------------------------------
-Ustawia doswiadczenie gracza.
+Sets player's gained exp.
+To remove exp use negative value.
 ------------------------------*/
+native cod_set_user_exp(id, value);
 
+/*------------------------------
+Returns exp multiplied by player's exp bonus.
+------------------------------*/
+native cod_get_user_bonus_exp(id, value);
+
+/*------------------------------
+Return exp needed for level.
+------------------------------*/
+native cod_get_level_xp(level);
+
+/*------------------------------
+Returns player's level.
+------------------------------*/
 native cod_get_user_level(id);
-/*------------------------------
-Zwraca poziom gracza.
-------------------------------*/
 
+/*------------------------------
+Returns player's highest level.
+------------------------------*/
 native cod_get_user_highest_level(id);
-/*------------------------------
-Zwraca najwyzszy poziom gracza.
-------------------------------*/
 
+/*------------------------------
+Return player's class.
+------------------------------*/
 native cod_get_user_class(id);
-/*------------------------------
-Zwraca klase gracza.
-------------------------------*/
 
+/*------------------------------
+Set player's class.
+When force = 1 the change is immediate.
+------------------------------*/
 native cod_set_user_class(id, class, force = 0);
-/*------------------------------
-Ustawia klase gracza, jezeli force = 1 zmienia ja natychmiastowo.
-------------------------------*/
 
+/*------------------------------
+Return class using class name.
+------------------------------*/
 native cod_get_classid(szClass[]);
-/*------------------------------
-Zwraca klase o podanej nazwie.
-------------------------------*/
 
+/*------------------------------
+Returns class name.
+------------------------------*/
 native cod_get_class_name(class, dataReturn[], dataLength);
-/*------------------------------
-Zwraca nazwe klasy.
-------------------------------*/
 
+/*------------------------------
+Returns class description.
+------------------------------*/
 native cod_get_class_desc(class, dataReturn[], dataLength);
-/*------------------------------
-Zwraca opis klasy.
-------------------------------*/
 
+/*------------------------------
+Returns class health bonus.
+------------------------------*/
 native cod_get_class_health(class);
-/*------------------------------
-Zwraca bazowe zycie klasy.
-------------------------------*/
 
+/*------------------------------
+Returns class intelligence bonus.
+------------------------------*/
+native cod_get_class_intelligence(class);
+
+/*------------------------------
+Returns class stamina bonus.
+------------------------------*/
+native cod_get_class_stamina(class);
+
+/*------------------------------
+Returns class strength bonus.
+------------------------------*/
+native cod_get_class_strength(class);
+
+/*------------------------------
+Returns class condition bonus.
+------------------------------*/
+native cod_get_class_condition(class);
+
+/*------------------------------
+Return classes number.
+------------------------------*/
 native cod_get_classes_num();
-/*------------------------------
-Zwraca ilosc klas.
-------------------------------*/
 
+/*------------------------------
+Returns item and assigns value of item to variable.
+------------------------------*/
 native cod_get_user_item(id, &value = 0);
-/*------------------------------
-Zwraca item gracza oraz przypisuje zmiennej value wartosc itemu.
-------------------------------*/
 
+/*------------------------------
+Sets player's item. 
+If item = -1 an item will be random.
+If value = -1 item value will be random.
+------------------------------*/
 native cod_set_user_item(id, item = -1, value = -1);
-/*------------------------------
-Ustawia item gracza. 
-Jezeli item = -1 item bedzie losowy.
-Jezeli value = -1 wartosc itemu bedzie losowa.
-------------------------------*/
 
+/*------------------------------
+Upgrades player's item
+If check = 1 returns if item is upgradable.
+------------------------------*/
 native cod_upgrade_user_item(id, check = 0);
-/*------------------------------
-Ulepsza item gracza
-Parametr check pozwala na sprawdzenie,
-czy dany przedmiot da sie ulepszych
-------------------------------*/
 
+/*------------------------------
+Returns item id using item name.
+------------------------------*/
 native cod_get_itemid(szItem[]);
-/*------------------------------
-Zwraca item o podanej nazwie.
-------------------------------*/
 
-native cod_get_item_name(item, dataReturn[], dataLength);
 /*------------------------------
 Zwraca nazwe itemu.
 ------------------------------*/
+native cod_get_item_name(item, dataReturn[], dataLength);
 
+/*------------------------------
+Returns item description.
+------------------------------*/
 native cod_get_item_desc(item, dataReturn[], dataLength);
-/*------------------------------
-Zwraca opis itemu.
-------------------------------*/
 
+/*------------------------------
+Returns items number.
+------------------------------*/
 native cod_get_items_num();
+
 /*------------------------------
-Zwraca liczbe itemow.
+Retuns player's item durability.
 ------------------------------*/
-
-native cod_get_user_rockets(id);
-/*------------------------------
-Zwraca liczbe rakiet gracza
-------------------------------*/
-
-native cod_set_user_rockets(id, value);
-/*------------------------------
-Ustawia liczbe rakiet gracza
-------------------------------*/
-
-native cod_add_user_rockets(id, value);
-/*------------------------------
-Dodaje graczowi liczbe rakiet
-------------------------------*/
-
-native cod_get_user_mines(id);
-/*------------------------------
-Zwraca liczbe min gracza
-------------------------------*/
-
-native cod_set_user_mines(id, value);
-/*------------------------------
-Ustawia liczbe min gracza
-------------------------------*/
-
-native cod_add_user_mines(id, value);
-/*------------------------------
-Dodaje graczowi liczbe min
-------------------------------*/
-
-native cod_get_user_medkits(id);
-/*------------------------------
-Zwraca liczbe apteczek gracza
-------------------------------*/
-
-native cod_set_user_medkits(id, value);
-/*------------------------------
-Ustawia liczbe apteczek gracza
-------------------------------*/
-
-native cod_add_user_medkits(id, value);
-/*------------------------------
-Dodaje graczowi liczbe apteczek
-------------------------------*/
-
-native cod_get_user_dynamites(id);
-/*------------------------------
-Zwraca liczbe dynamitow gracza
-------------------------------*/
-
-native cod_set_user_dynamites(id, value);
-/*------------------------------
-Ustawia liczbe dynamitow gracza
-------------------------------*/
-
-native cod_add_user_dynamites(id, value);
-/*------------------------------
-Dodaje graczowi liczbe dynamitow
-------------------------------*/
-
-native cod_get_user_multijumps(id);
-/*------------------------------
-Zwraca liczbe skokow gracza
-------------------------------*/
-
-native cod_set_user_multijumps(id, value);
-/*------------------------------
-Ustawia liczbe skoskow gracza
-------------------------------*/
-
-native cod_add_user_multijumps(id, value);
-/*------------------------------
-Dodaje graczowi liczbe skoskow
-------------------------------*/
-
-native cod_get_user_armor(id);
-/*------------------------------
-Zwraca punkty kamizelki gracza
-------------------------------*/
-
-native cod_set_user_armor(id, value);
-/*------------------------------
-Ustawia punkty kamizelki gracza
-------------------------------*/
-
-native cod_add_user_armor(id, value);
-/*------------------------------
-Dodaje graczowi punkty kamizelki
-------------------------------*/
-
-native cod_get_user_bunnyhop(id);
-/*------------------------------
-Zwraca czy gracz ma bunnyhop
-------------------------------*/
-
-native cod_set_user_bunnyhop(id, value);
-/*------------------------------
-Ustawia graczowi wartosc logiczna bunnyhop
-------------------------------*/
-
-native cod_get_user_footsteps(id);
-/*------------------------------
-Zwraca czy gracz ma ciche chodzenie
-------------------------------*/
-
-native cod_set_user_footsteps(id, value);
-/*------------------------------
-Ustawia graczowi wartosc logiczna cichego chodzenia
-------------------------------*/
-
-native cod_get_user_vip(id);
-/*------------------------------
-Sprawdza, czy gracz ma vipa
-------------------------------*/
-
-native cod_get_user_health(id, class_health = 1, stats_health = 1, bonus_health = 1);
-/*------------------------------
-Zwraca punkty statystyki zdrowie
-------------------------------*/
-
-native cod_get_user_max_health(id);
-/*------------------------------
-Zwraca maksymalne punkty zycia gracza
-------------------------------*/
-
-native cod_set_user_bonus_health(id, value);
-/*------------------------------
-Ustawia dodatkowe punkty statystyki zdrowie
-------------------------------*/
-
-native cod_get_user_bonus_health(id);
-/*------------------------------
-Zwraca dodatkowe punkty statystyki zdrowie
-------------------------------*/
-
-native cod_get_user_intelligence(id, class_intelligence = 1, stats_intelligence = 1, bonus_intelligence = 1);
-/*------------------------------
-Zwraca punkty statystyki inteligencja
-------------------------------*/
-
-native cod_set_user_bonus_intelligence(id, value);
-/*------------------------------
-Ustawia dodatkowe punkty statystyki inteligencja
-------------------------------*/
-
-native cod_get_user_bonus_intelligence(id);
-/*------------------------------
-Zwraca dodatkowe punkty statystyki inteligencja
-------------------------------*/
-
-native cod_get_user_stamina(id, class_stamina = 1, stats_stamina = 1, bonus_stamina = 1);
-/*------------------------------
-Zwraca punkty statystyki wytrzymalosc
-------------------------------*/
-
-native cod_set_user_bonus_stamina(id, value);
-/*------------------------------
-Ustawia dodatkowe punkty statystyki wytrzymalosc
-------------------------------*/
-
-native cod_get_user_bonus_stamina(id);
-/*------------------------------
-Zwraca dodatkowe punkty statystyki wytrzymalosc
-------------------------------*/
-
-native cod_get_user_strength(id, class_strength = 1, stats_strength = 1, bonus_strength = 1);
-/*------------------------------
-Zwraca punkty statystyki sila
-------------------------------*/
-
-native cod_set_user_bonus_strength(id, value);
-/*------------------------------
-Ustawia dodatkowe punkty statystyki sila
-------------------------------*/
-
-native cod_get_user_bonus_strength(id);
-/*------------------------------
-Zwraca dodatkowe punkty statystyki sila
-------------------------------*/
-
-native cod_get_user_condition(id, class_condition = 1, stats_condition = 1, bonus_condition = 1);
-/*------------------------------
-Zwraca punkty statystyki kondycja
-------------------------------*/
-
-native cod_set_user_bonus_condition(id, value);
-/*------------------------------
-Ustawia dodatkowe punkty statystyki kondycja
-------------------------------*/
-
-native cod_get_user_bonus_condition(id);
-/*------------------------------
-Ustawia dodatkowe punkty statystyki kondycja
-------------------------------*/
-
-native cod_inflict_damage(attacker, victim, Float:damage, Float:factor = 0.5, flags = 0);
-/*------------------------------
-Zadaje obrazenia z uwzglednieniem inteligencji
-------------------------------*/
-
-native cod_give_weapon(id, weapon);
-/*------------------------------
-Daje okreslona bron oraz pozwala na jej posiadanie
-------------------------------*/
-
-native cod_take_weapon(id, weapon);
-/*------------------------------
-Zabiera okreslona bron oraz zabrania jej posiadania
-------------------------------*/
-
-native cod_set_user_resistance(id, wartosc);
-/*------------------------------
-Ustawia graczowi odpornosc na miny, rakiety, dynamit
-------------------------------*/
-
-native cod_get_user_resistance(id);
-/*------------------------------
-Sprawdza odpornosc gracza na miny, rakiety, dynamit
-------------------------------*/
-
-native cod_get_user_gravity(id)
-/*------------------------------
-Zwraca wartosc grawitacji gracza
-------------------------------*/
-
-native cod_set_user_gravity(id, value)
-/*------------------------------
-Ustawia podana wartosc grawitacji
-------------------------------*/
-
-native cod_add_user_gravity(id, value)
-/*------------------------------
-Dodaje podana wartosc grawitacji
-------------------------------*/
-
-native cod_register_item(const nazwa[], const opis[]);
-/*------------------------------
-Rejestruje nowy item oraz zwraca jego numer
-------------------------------*/
-
-native cod_register_class(const nazwa[], const opis[], const frakcja[], bronie, punkty_zdrowia, punkty_inteligencji, punkty_sily, punkty_wytrzymalosci, punkty_kondycji);
-/*------------------------------
-Rejestruje nowa klase oraz zwraca jej numer
-------------------------------*/
-
-
-native cod_get_level_xp(level);
-/*------------------------------
-Zwraca ilosc potrzebnego doswiadczenia do przejscia danego poziomu
-------------------------------*/
-
-
-native cod_set_item_durability(id, durability);
-/*------------------------------
-Ustawia wytrzymalosc itemu gracza
-------------------------------*/
-
-
 native cod_get_item_durability(id);
+
 /*------------------------------
-Pobiera wytrzymalosc itemu gracza
+Set's player's item durability.
 ------------------------------*/
+native cod_set_item_durability(id, durability);
 
-
+/*------------------------------
+Return max item durability.
+------------------------------*/
 native cod_max_item_durability();
-/*------------------------------
-Zwraca maksymalna wytrzymalosc itemu
-------------------------------*/
 
-native cod_show_hud(id, const text[], type=0, red=255, green=255, blue=255, Float:x=-1.0, Float:y=0.35, effects=0, Float:fxtime=6.0, Float:holdtime=12.0, Float:fadeintime=0.1, Float:fadeouttime=0.2)
 /*------------------------------
-Wyświetla hud o podanych parametrach
+Return player's maximum health points
 ------------------------------*/
+native cod_get_user_max_health(id);
 
-native cod_get_user_bonus_exp(id, value);
 /*------------------------------
-Zwraca exp powiekszony bonus dla danego gracza
+Sets player's health point.
+If maximum = 1 player's max health limit is applied.
 ------------------------------*/
+native cod_set_user_health(id, value, maximum = 1);
 
+/*------------------------------
+Adds value to player's health point.
+If maximum = 1 player's max health limit is applied.
+------------------------------*/
+native cod_add_user_health(id, value, maximum = 1);
+
+/*------------------------------
+Returns health statistic points.
+If class_health = 1 adds class health points.
+If stats_health = 1 adds stats health points.
+If bonus_health = 1 adds extra health points.
+If base_health = 1 adds base 100HP.
+------------------------------*/
+native cod_get_user_health(id, class_health = 1, stats_health = 1, bonus_health = 1, base_health = 0);
+
+/*------------------------------
+Returns intelligence statistic points.
+If class_intelligence = 1 adds class intelligence points.
+If stats_intelligence = 1 adds stats intelligence points.
+If bonus_intelligence = 1 adds extra intelligence points.
+------------------------------*/
+native cod_get_user_intelligence(id, class_intelligence = 1, stats_intelligence = 1, bonus_intelligence = 1);
+
+/*------------------------------
+Returns stamina statistic points.
+If class_stamina = 1 adds class stamina points.
+If stats_stamina = 1 adds stats stamina points.
+If bonus_stamina = 1 adds extra stamina points.
+------------------------------*/
+native cod_get_user_stamina(id, class_stamina = 1, stats_stamina = 1, bonus_stamina = 1);
+
+/*------------------------------
+Returns strength statistic points.
+If class_strength = 1 adds class strength points.
+If stats_strength = 1 adds stats strength points.
+If bonus_strength = 1 adds extra strength points.
+------------------------------*/
+native cod_get_user_strength(id, class_strength = 1, stats_strength = 1, bonus_strength = 1);
+
+/*------------------------------
+Returns condition statistic points.
+If class_condition = 1 adds class condition points.
+If stats_condition = 1 adds stats condition points.
+If bonus_condition = 1 adds extra condition points.
+------------------------------*/
+native cod_get_user_condition(id, class_condition = 1, stats_condition = 1, bonus_condition = 1);
+
+/*------------------------------
+Returns player's extra health points.
+------------------------------*/
+native cod_get_user_bonus_health(id);
+
+/*------------------------------
+Returns player's extra intelligence points.
+------------------------------*/
+native cod_get_user_bonus_intelligence(id);
+
+/*------------------------------
+Returns player's extra stamina points.
+------------------------------*/
+native cod_get_user_bonus_stamina(id);
+
+/*------------------------------
+Returns player's extra strength points.
+------------------------------*/
+native cod_get_user_bonus_strength(id);
+
+/*------------------------------
+Returns player's extra condition points.
+------------------------------*/
+native cod_get_user_bonus_condition(id);
+
+/*------------------------------
+Sets player's extra health points.
+------------------------------*/
+native cod_set_user_bonus_health(id, value);
+
+/*------------------------------
+Sets player's extra intelligence points.
+------------------------------*/
+native cod_set_user_bonus_intelligence(id, value);
+
+/*------------------------------
+Sets player's extra stamina points.
+------------------------------*/
+native cod_set_user_bonus_stamina(id, value);
+
+/*------------------------------
+Sets player's extra strength points.
+------------------------------*/
+native cod_set_user_bonus_strength(id, value);
+
+/*------------------------------
+Sets player's extra condition points.
+------------------------------*/
+native cod_set_user_bonus_condition(id, value);
+
+/*------------------------------
+Returns player's rockets amount.
+------------------------------*/
+native cod_get_user_rockets(id);
+
+/*------------------------------
+Returns player's mines amount.
+------------------------------*/
+native cod_get_user_mines(id);
+
+/*------------------------------
+Returns player's medkits amount.
+------------------------------*/
+native cod_get_user_medkits(id);
+
+/*------------------------------
+Returns player's dynamites amount.
+------------------------------*/
+native cod_get_user_dynamites(id);
+
+/*------------------------------
+Returns player's teleports amount.
+------------------------------*/
+native cod_get_user_teleports(id);
+
+/*------------------------------
+Returns player's multijumps amount.
+------------------------------*/
+native cod_get_user_multijumps(id);
+
+/*------------------------------
+Returns player's gravity amount.
+------------------------------*/
+native cod_get_user_gravity(id);
+
+/*------------------------------
+Returns player's armor amount.
+------------------------------*/
+native cod_get_user_armor(id);
+
+/*------------------------------
+Sets player's rockets amount.
+------------------------------*/
+native cod_set_user_rockets(id, value);
+
+/*------------------------------
+Sets player's mines amount.
+------------------------------*/
+native cod_set_user_mines(id, value);
+
+/*------------------------------
+Sets player's medkits amount.
+------------------------------*/
+native cod_set_user_medkits(id, value);
+
+/*------------------------------
+Sets player's dynamites amount.
+------------------------------*/
+native cod_set_user_dynamites(id, value);
+
+/*------------------------------
+Sets player's teleports amount.
+------------------------------*/
+native cod_set_user_teleports(id, value);
+
+/*------------------------------
+Sets player's multijumps amount.
+------------------------------*/
+native cod_set_user_multijumps(id, value);
+
+/*------------------------------
+Sets player's gravity amount.
+------------------------------*/
+native cod_set_user_gravity(id, value);
+
+/*------------------------------
+Sets player's armor amount.
+------------------------------*/
+native cod_set_user_armor(id, value);
+
+/*------------------------------
+Adds value to player's rockets amount.
+------------------------------*/
+native cod_add_user_rockets(id, value);
+
+/*------------------------------
+Adds value to player's mines amount.
+------------------------------*/
+native cod_add_user_mines(id, value);
+
+/*------------------------------
+Adds value to player's medkits amount.
+------------------------------*/
+native cod_add_user_medkits(id, value);
+
+/*------------------------------
+Adds value to player's dynamites amount.
+------------------------------*/
+native cod_add_user_dynamites(id, value);
+
+/*------------------------------
+Adds value to player's teleports amount.
+------------------------------*/
+native cod_add_user_teleports(id, value);
+
+/*------------------------------
+Adds value to player's multijumps amount.
+------------------------------*/
+native cod_add_user_multijumps(id, value);
+
+/*------------------------------
+Adds value to player's gravity amount.
+------------------------------*/
+native cod_add_user_gravity(id, value);
+
+/*------------------------------
+Adds value to player's armor amount.
+------------------------------*/
+native cod_add_user_armor(id, value);
+
+/*------------------------------
+Returns if player have resistance for powers.
+------------------------------*/
+native cod_get_user_resistance(id);
+
+/*------------------------------
+Returns if player have bunnyhop.
+------------------------------*/
+native cod_get_user_bunnyhop(id);
+
+/*------------------------------
+Returns if player have silent walk.
+------------------------------*/
+native cod_get_user_footsteps(id);
+
+/*------------------------------
+Set's player's resistance for powers.
+------------------------------*/
+native cod_set_user_resistance(id, value);
+
+/*------------------------------
+Set's player's bunnyhop.
+------------------------------*/
+native cod_set_user_bunnyhop(id, value);
+
+/*------------------------------
+Set's player's footsteps.
+------------------------------*/
+native cod_set_user_footsteps(id, value);
+
+/*------------------------------
+Gives player a weapon and allows player to own it
+------------------------------*/
+native cod_give_weapon(id, weapon);
+
+/*------------------------------
+Removes player a weapon and disallows player to own it
+------------------------------*/
+native cod_take_weapon(id, weapon);
+
+/*------------------------------
+Returns player's render amount.
+------------------------------*/
+native cod_get_user_render(id);
+
+/*------------------------------
+Sets player's render.
+Type can be RENDER_CLASS - for class, RENDER_ITEM - for item, RENDER_ADDITIONAL - others.
+Value is number from -255 to 255 (negative numbers substract it from player's current render value, positive and 0 sets it to this value).
+Status is player state for render. It can be a bitsum of RENDER_ALWAYS, RENDER_STAND, RENDER_MOVE, RENDER_DUCK, RENDER_SHIFT.
+Weapon is weapon id (CSW_), 0 for all weapons.
+Timer sets render value for certain amount of time - it ignores type, status and weapon.
+------------------------------*/
+native cod_set_user_render(id, type, value, status, weapon, Float:timer);
+
+/*------------------------------
+Set's player's render glow.
+Usage is the same as in set_user_rendering native.
+Timer sets glow for certain amount of time.
+------------------------------*/
+native cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:timer);
+
+/*------------------------------
+Diplays text in HUD/DHUD.
+Type can be TYPE_HUD or TYPE_DHUD.
+HUD/DHUD params usage is the same as in set_hudmessage/set_dhudmessage.
+------------------------------*/
+native cod_show_hud(id, type=0, red=255, green=255, blue=255, Float:x=-1.0, Float:y=0.35, effects=0, Float:fxtime=6.0, Float:holdtime=12.0, Float:fadeintime=0.1, Float:fadeouttime=0.2, const text[], any:...)
+
+/*------------------------------
+Displays screen fade.
+Duration and holdtime are time seconds.
+------------------------------*/
 native cod_display_fade(id, duration, holdtime, fadetype, red, green, blue, alpha);
-/*------------------------------
-Wyświetla fade o podanych parametrach
-------------------------------*/
 
-native cod_check_register_system(id);
 /*------------------------------
-Sprawdza, czy gracz wpisal juz haslo i ewentualnie wymusza jego wpisanie
+Displays bartimer.
+Duration is time in seconds.
+Start is value from 0-100 and specifies from what percent of bar it starts.
 ------------------------------*/
+native cod_make_bartimer(id, duration, start = 0);
 
-native cod_get_user_clan(id);
 /*------------------------------
-Zwraca klan gracza
+Shakes player's screen.
+Amplitude is power of shakes.
+Duration is time in seconds.
+Frequency is noise frequency.
 ------------------------------*/
+native cod_screen_shake(id, amplitude, duration, frequency);
 
-native cod_get_clan_name(clan, dataReturn[], dataLength);
 /*------------------------------
-Zwraca nazwe klanu
+Makes an explosion around ent.
+Distance specifies beam distance.
+Explosion is explosion effect.
+Damage_distance is distance from ent where players will be hurt.
+Damage specifies damage dealt to players in damage_distance.
+Factor is intelligence multiplier for damage.
 ------------------------------*/
+native cod_make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0.0, Float:damage = 0.0, Float:factor = 0.5)
 
-native cod_get_user_honor(id);
 /*------------------------------
-Zwraca honor gracza
+Inflicts damage with intelligence factor.
+Factor is intelligence multiplier for damage.
 ------------------------------*/
+native cod_inflict_damage(attacker, victim, Float:damage, Float:factor = 0.5, flags = 0);
 
-native cod_set_user_honor(id, value);
 /*------------------------------
-Ustawia honor gracza.
+Kills a player imitating kill by another player.
 ------------------------------*/
-
-native cod_add_user_honor(id, value);
-/*------------------------------
-Dodaje honor graczowi.
-------------------------------*/
-
 native cod_kill_player(attacker, victim, damageBits);
+
 /*------------------------------
-Zabija podanego gracza.
+Register a new item and return its id.
 ------------------------------*/
+native cod_register_item(const itemName[], const itemDesc[]);
 
-native cod_spawn_box_icon(ent);
 /*------------------------------
-Wyswietla ikone nad paczka.
+Register a new class and return its id.
 ------------------------------*/
+native cod_register_class(const className[], const classDesc[], const classFraction[], weapons, health, intelligence, strength, stamina, condition);
 
-native cod_remove_box_icon(ent);
 /*------------------------------
-Usuwa ent paczki i jej ikony.
+Multiforward executed when player's class is changed.
 ------------------------------*/
-
-forward cod_item_get(id, item);
-/*------------------------------
-Forward wysylany do wszystkich pluginow w momencie znalezienia itemu
-------------------------------*/
-
-forward cod_item_changed(id, item);
-/*------------------------------
-Forward wysylany do wszystkich pluginow w momencie zmiany itemu
-------------------------------*/
-
-
 forward cod_class_changed(id, class);
+
 /*------------------------------
-Forward wysylany do wszystkich pluginow w momencie zmiany klasy
+Multiforward executed when player's item is changed.
 ------------------------------*/
+forward cod_item_changed(id, item);
 
-
-forward cod_item_enabled(id, value, item);
 /*------------------------------
-Forward wysylany do pluginu z ktorego zarejestrowany jest item w momencie aktywacji
+Multiforward executed when player's render is changed.
 ------------------------------*/
+forward cod_render_changed(id);
 
+/*------------------------------
+Multiforward executed when player's gravity is changed.
+------------------------------*/
+forward cod_gravity_changed(id);
 
+/*------------------------------
+Multiforward executed on damage event before armor reduce.
+------------------------------*/
+forward cod_damage_pre(attacker, victim, Float:damage, damageBits);
+
+/*------------------------------
+Multiforward executed on damage event after armor reduce.
+------------------------------*/
+forward cod_damage_post(attacker, victim, Float:damage, damageBits);
+
+/*------------------------------
+Multiforward executed on weapon deploy event.
+------------------------------*/
+forward cod_weapon_deploy(id, weapon, ent);
+
+/*------------------------------
+Multiforward executed on death event.
+------------------------------*/
+forward cod_killed(killer, victim, weaponId, hitPlace);
+
+/*------------------------------
+Multiforward executed on spawn event.
+------------------------------*/
+forward cod_spawned(id);
+
+/*------------------------------
+Multiforward executed on cmd start event.
+------------------------------*/
+forward cod_cmd_start(id, button, oldButton);
+
+/*------------------------------
+Multiforward executed on new round event.
+------------------------------*/
+forward cod_new_round();
+
+/*------------------------------
+Multiforward executed on round start event.
+------------------------------*/
+forward cod_start_round();
+
+/*------------------------------
+Multiforward executed on round end event.
+------------------------------*/
+forward cod_end_round();
+
+/*------------------------------
+Item forward executed on item give.
+------------------------------*/
+forward cod_item_enabled(id, value);
+
+/*------------------------------
+Item forward executed on item remove.
+------------------------------*/
 forward cod_item_disabled(id, item);
+
 /*------------------------------
-Forward wysylany do pluginu z ktorego zarejestrowany jest item w momencie dezaktywacji
+Item forward executed on spawn event.
 ------------------------------*/
+forward cod_item_spawned(id);
 
-
-forward cod_item_used(id);
 /*------------------------------
-Forward wysylany do pluginu z ktorego zarejestrowany jest item w momencie uzycia itemu
+Item forward executed on death event.
 ------------------------------*/
+forward cod_item_killed(id);
 
+/*------------------------------
+Item forward executed on skill use.
+------------------------------*/
+forward cod_item_skill_used(id);
 
+/*------------------------------
+Item forward executed on item upgrade.
+------------------------------*/
+forward cod_item_upgrade(id);
+
+/*------------------------------
+Item function for getting value of item.
+------------------------------*/
+forward cod_item_value(id, value);
+
+/*------------------------------
+Item function for attacker damage change.
+------------------------------*/
+forward cod_item_damage_attacker(victim, attacker, Float:damage, damageBits);
+
+/*------------------------------
+Item function for victim damage change.
+------------------------------*/
+forward cod_item_damage_victim(victim, attacker, Float:damage, damageBits);
+
+/*------------------------------
+Class forward executed on class set.
+------------------------------*/
 forward cod_class_enabled(id, class, promotion);
+
 /*------------------------------
-Forward wysylany do pluginu z ktorego zarejestrowana jest kasa w momencie aktywacji
+Class forward executed on class remove.
 ------------------------------*/
-
-
 forward cod_class_disabled(id, class, promotion);
-/*------------------------------
-Forward wysylany do pluginu z ktorego zarejestrowana jest kasa w momencie dezaktywacji
-------------------------------*/
 
-forward cod_class_skill_used(id);
 /*------------------------------
-Forward wysylany do pluginu z ktorego zarejestrowana jest kasa w momencie uzycia umiejetnosci klasy
+Class forward executed on spawn event.
 ------------------------------*/
+forward cod_class_spawned(id);
+
+/*------------------------------
+Class forward executed on death event.
+------------------------------*/
+forward cod_class_killed(id);
+
+/*------------------------------
+Class forward executed on skill use.
+------------------------------*/
+forward cod_class_skill_used(id);
+
+/*------------------------------
+Class function for attacker damage change.
+------------------------------*/
+forward cod_class_damage_attacker(victim, attacker, Float:damage, damageBits);
+
+/*------------------------------
+Class function for victim damage change.
+------------------------------*/
+forward cod_class_damage_victim(victim, attacker, Float:damage, damageBits);
 
 stock cmd_execute(id, const text[], any:...) 
 {

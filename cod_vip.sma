@@ -215,8 +215,8 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 	set_user_health(killer, min(get_user_health(killer) + (hs ? 15 : 10), cod_get_user_health(killer, 1, 1, 1)));
 	cs_set_user_money(killer, cs_get_user_money(killer) + (hs ? 1000 : 500));
 	
-	if(hs) cod_show_hud(killer, "HeadShot! +15HP", TYPE_DHUD, 38, 218, 116, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0);
-	else cod_show_hud(killer, "Zabiles! +10HP", TYPE_DHUD, 255, 212, 0, 0.50, 0.31, 0, 0.0, 1.0, 0.0, 0.0);
+	if(hs) cod_show_hud(killer, TYPE_DHUD, 38, 218, 116, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0, "HeadShot! +15HP");
+	else cod_show_hud(killer, TYPE_DHUD, 255, 212, 0, 0.50, 0.31, 0, 0.0, 1.0, 0.0, 0.0, "Zabiles! +10HP");
 
 	return PLUGIN_CONTINUE;
 }

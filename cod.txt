@@ -1,8 +1,6 @@
 Do zrobienia:
-- Rozbudowanie sklepu
-- Aktualizacja .inc
 - Kasyno
-- Awanse klas
+- Klasy i itemy
 - Statystyki WWW
 
 Kasyno:

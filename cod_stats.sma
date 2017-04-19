@@ -621,14 +621,12 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 			if(pev(i, pev_iuser2) == lastT || pev(i, pev_iuser2) == lastCT || i == lastT || i == lastCT) client_cmd(i, "spk %s", codSounds[SOUND_FORCE]);
 		}
 
-		new lastTName[32], lastCTName[32], hudData[64];
+		new lastTName[32], lastCTName[32];
 
 		get_user_name(lastT, lastTName, charsmax(lastTName));
 		get_user_name(lastCT, lastCTName, charsmax(lastCTName));
 
-		formatex(hudData, charsmax(hudData), "%s vs. %s", lastTName, lastCTName);
-
-		cod_show_hud(0, hudData, TYPE_DHUD, 255, 128, 0, -1.0, 0.30, 0, 5.0, 5.0, 0.5, 0.15);
+		cod_show_hud(0, TYPE_DHUD, 255, 128, 0, -1.0, 0.30, 0, 5.0, 5.0, 0.5, 0.15, "%s vs. %s", lastTName, lastCTName);
 	}
 	if(tCount == 1 && ctCount > 1 && !showedOneAndOnly)
 	{
@@ -643,11 +641,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 			if(pev(i, pev_iuser2) == lastT || i == lastT) client_cmd(i, "spk %s", codSounds[SOUND_ONE]);
 		}
 
-		new hudData[16];
-
-		formatex(hudData, charsmax(hudData), "%i vs %i", tCount, ctCount);
-
-		cod_show_hud(0, hudData, TYPE_DHUD, 255, 128, 0, -1.0, 0.30, 0, 5.0, 5.0, 0.5, 0.15);
+		cod_show_hud(0, TYPE_DHUD, 255, 128, 0, -1.0, 0.30, 0, 5.0, 5.0, 0.5, 0.15, "%i vs %i", tCount, ctCount);
 	}
 	if(tCount > 1 && ctCount == 1 && !showedOneAndOnly)
 	{
@@ -662,11 +656,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 			if(pev(i, pev_iuser2) == lastCT || i == lastCT) client_cmd(i, "spk %s", codSounds[SOUND_ONE]);
 		}
 
-		new hudData[16];
-
-		formatex(hudData, charsmax(hudData), "%i vs %i", ctCount, tCount);
-
-		cod_show_hud(0, hudData, TYPE_DHUD, 255, 128, 0, -1.0, 0.30, 0, 5.0, 5.0, 0.5, 0.15);
+		cod_show_hud(0, TYPE_DHUD, 255, 128, 0, -1.0, 0.30, 0, 5.0, 5.0, 0.5, 0.15, "%i vs %i", ctCount, tCount);
 	}
 }
 

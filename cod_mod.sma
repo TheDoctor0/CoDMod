@@ -76,7 +76,7 @@ enum _:itemInfo { ITEM_NAME[MAX_NAME], ITEM_DESC[MAX_DESC], ITEM_PLUGIN, ITEM_GI
 	ITEM_KILLED, ITEM_SKILL_USED, ITEM_UPGRADE, ITEM_VALUE, ITEM_DAMAGE_ATTACKER, ITEM_DAMAGE_VICTIM };
 
 enum _:classInfo { CLASS_NAME[MAX_NAME], CLASS_DESC[MAX_DESC], CLASS_FRACTION[MAX_NAME], CLASS_HEAL, 
-	CLASS_INT, CLASS_STR, CLASS_COND, CLASS_STAM,CLASS_WEAPONS, CLASS_PLUGIN, CLASS_ENABLED, CLASS_DISABLED, 
+	CLASS_INT, CLASS_STR, CLASS_COND, CLASS_STAM, CLASS_WEAPONS, CLASS_PLUGIN, CLASS_ENABLED, CLASS_DISABLED, 
 	CLASS_SPAWNED, CLASS_KILLED, CLASS_SKILL_USED, CLASS_DAMAGE_VICTIM, CLASS_DAMAGE_ATTACKER };
 
 enum _:playerClassInfo { PCLASS_LEVEL, PCLASS_EXP, PCLASS_HEAL, PCLASS_INT, PCLASS_STAM, PCLASS_STR, PCLASS_COND, PCLASS_POINTS };
@@ -105,7 +105,7 @@ new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpWinRound, cvarExpPlant, cv
 
 new Array:codItems, Array:codClasses, Array:codFractions, Array:codPlayerClasses[MAX_PLAYERS + 1], Array:codPlayerRender[MAX_PLAYERS + 1], codForwards[forwards];
 
-new Handle:sql, bool:freezeTime, hudInfo, hudSync, hudVault, playersNum, itemResistance, bunnyHop, dataLoaded, resetStats, userConnected, renderTimer, lastInfo;
+new Handle:sql, bool:freezeTime, hudInfo, hudSync, hudVault, maxPlayers, playersNum, itemResistance, bunnyHop, dataLoaded, resetStats, userConnected, renderTimer, lastInfo;
 
 public plugin_init() 
 {
@@ -200,12 +200,14 @@ public plugin_init()
 	hudSync = CreateHudSyncObj();
 	hudInfo = CreateHudSyncObj();
 
+	maxPlayers = get_maxplayers();
+
 	hudVault = nvault_open("cod_hud");
 	
 	if(hudVault == INVALID_HANDLE) set_fail_state("[COD] Nie mozna otworzyc pliku cod_hud.vault");
 	
 	codForwards[CLASS_CHANGED] = CreateMultiForward("cod_class_changed", ET_CONTINUE, FP_CELL, FP_CELL);
-	codForwards[ITEM_CHANGED] = CreateMultiForward("cod_item_changed", ET_CONTINUE, FP_CELL, FP_CELL, FP_CELL);
+	codForwards[ITEM_CHANGED] = CreateMultiForward("cod_item_changed", ET_CONTINUE, FP_CELL, FP_CELL);
 	codForwards[RENDER_CHANGED] = CreateMultiForward("cod_render_changed", ET_IGNORE, FP_CELL);
 	codForwards[GRAVITY_CHANGED] = CreateMultiForward("cod_gravity_changed", ET_IGNORE, FP_CELL);
 	codForwards[DAMAGE_PRE] = CreateMultiForward ("cod_damage_pre", ET_IGNORE, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL);
@@ -224,13 +226,12 @@ public plugin_natives()
 	register_native("cod_get_user_exp", "_cod_get_user_exp", 1);
 	register_native("cod_set_user_exp", "_cod_set_user_exp", 1);
 	register_native("cod_get_user_bonus_exp", "_cod_get_user_bonus_exp", 1);
-	
+	register_native("cod_get_level_xp", "_cod_get_level_xp", 1);
 	register_native("cod_get_user_level", "_cod_get_user_level", 1);
 	register_native("cod_get_user_highest_level", "_cod_get_user_highest_level", 1);
 	
 	register_native("cod_get_user_class", "_cod_get_user_class", 1);
 	register_native("cod_set_user_class", "_cod_set_user_class", 1);
-	
 	register_native("cod_get_classid", "_cod_get_classid", 1);
 	register_native("cod_get_class_name", "_cod_get_class_name", 1);
 	register_native("cod_get_class_desc", "_cod_get_class_desc", 1);
@@ -243,8 +244,7 @@ public plugin_natives()
 	
 	register_native("cod_get_user_item", "_cod_get_user_item", 1);
 	register_native("cod_set_user_item", "_cod_set_user_item", 1);
-	register_native("cod_upgrade_user_item", "_cod_upgrade_user_item", 1);
-	
+	register_native("cod_upgrade_user_item", "_cod_upgrade_user_item", 1)
 	register_native("cod_get_itemid", "_cod_get_itemid", 1);
 	register_native("cod_get_item_name", "_cod_get_item_name", 1);
 	register_native("cod_get_item_desc", "_cod_get_item_desc", 1);
@@ -253,6 +253,16 @@ public plugin_natives()
 	register_native("cod_get_item_durability", "_cod_get_item_durability", 1);
 	register_native("cod_set_item_durability", "_cod_set_item_durability", 1);
 	register_native("cod_max_item_durability", "_cod_max_item_durability", 1);
+
+	register_native("cod_get_user_max_health", "_cod_get_user_max_health", 1);
+	register_native("cod_set_user_health", "_cod_set_user_health", 1);
+	register_native("cod_add_user_health", "_cod_add_user_health", 1);
+
+	register_native("cod_get_user_health", "_cod_get_user_health", 1);
+	register_native("cod_get_user_intelligence", "_cod_get_user_intelligence", 1);
+	register_native("cod_get_user_stamina", "_cod_get_user_stamina", 1);
+	register_native("cod_get_user_strength", "_cod_get_user_strength", 1);
+	register_native("cod_get_user_condition", "_cod_get_user_condition", 1);
 
 	register_native("cod_get_user_bonus_health", "_cod_get_user_bonus_health", 1);
 	register_native("cod_get_user_bonus_intelligence", "_cod_get_user_bonus_intelligence", 1);
@@ -265,16 +275,6 @@ public plugin_natives()
 	register_native("cod_set_user_bonus_stamina", "_cod_set_user_bonus_stamina", 1);
 	register_native("cod_set_user_bonus_strength", "_cod_set_user_bonus_strength", 1);
 	register_native("cod_set_user_bonus_condition", "_cod_set_user_bonus_condition", 1);
-	
-	register_native("cod_get_user_health", "_cod_get_user_health", 1);
-	register_native("cod_get_user_intelligence", "_cod_get_user_intelligence", 1);
-	register_native("cod_get_user_stamina", "_cod_get_user_stamina", 1);
-	register_native("cod_get_user_strength", "_cod_get_user_strength", 1);
-	register_native("cod_get_user_condition", "_cod_get_user_condition", 1);
-	
-	register_native("cod_get_user_max_health", "_cod_get_user_max_health", 1);
-	register_native("cod_set_user_health", "_cod_set_user_health", 1);
-	register_native("cod_add_user_health", "_cod_add_user_health", 1);
 	
 	register_native("cod_get_user_rockets", "_cod_get_user_rockets", 1);
 	register_native("cod_get_user_mines", "_cod_get_user_mines", 1);
@@ -319,11 +319,10 @@ public plugin_natives()
 	register_native("cod_set_user_glow", "_cod_set_user_glow", 1);
 	
 	register_native("cod_show_hud", "_cod_show_hud", 1);
+	register_native("cod_make_bartimer", "_cod_make_bartimer", 1);
 	register_native("cod_display_fade", "_cod_display_fade", 1);
 	register_native("cod_screen_shake", "_cod_screen_shake", 1);
 	register_native("cod_make_explosion", "_cod_make_explosion", 1);
-	register_native("cod_make_bartimer", "_cod_make_bartimer", 1);
-	
 	register_native("cod_inflict_damage", "_cod_inflict_damage", 1);
 	register_native("cod_kill_player", "_cod_kill_player", 1);
 	
@@ -1106,18 +1105,7 @@ public touch_rocket(ent)
 {
 	if(!is_valid_ent(ent)) return;
 
-	make_explosion(ent);
-
-	new entList[33], id = entity_get_edict(ent, EV_ENT_owner), foundPlayers = find_sphere_class(ent, "player", 190.0, entList, MAX_PLAYERS), player;
-
-	for(new i = 0; i < foundPlayers; i++)
-	{
-		player = entList[i];
-
-		if(!is_user_alive(player) || get_user_team(id) == get_user_team(player)) continue;
-
-		_cod_inflict_damage(id, player, 65.0, 0.5, DMG_HEGRENADE);
-	}
+	make_explosion(ent, 0, 1, 190.0, 65.0, 0.5);
 	
 	remove_entity(ent);
 }
@@ -1189,18 +1177,7 @@ public touch_mine(ent, victim)
 	
 	if(get_user_team(victim) != get_user_team(id)) return;
 
-	make_explosion(ent);
-	
-	new entList[33], foundPlayers = find_sphere_class(ent, "player", 90.0, entList, MAX_PLAYERS), player;
-
-	for(new i = 0; i < foundPlayers; i++)
-	{
-		player = entList[i];
-
-		if(!is_user_alive(player) || get_user_team(id) == get_user_team(player)) continue;
-
-		_cod_inflict_damage(id, player, 75.0, 0.5, DMG_HEGRENADE);
-	}
+	make_explosion(ent, 0, 1, 90.0, 75.0, 0.5);
 	
 	remove_entity(ent);
 }
@@ -1211,18 +1188,7 @@ public use_dynamite(id)
 
 	if(is_valid_ent(codPlayer[id][PLAYER_DYNAMITE]))
 	{
-		make_explosion(codPlayer[id][PLAYER_DYNAMITE], 250);
-		
-		new entList[33], foundPlayers = find_sphere_class(codPlayer[id][PLAYER_DYNAMITE], "player", 250.0, entList, MAX_PLAYERS), player;
-
-		for(new i = 0; i < foundPlayers; i++)
-		{
-			player = entList[i];
-
-			if(!is_user_alive(player) || get_user_team(id) == get_user_team(player)) continue;
-
-			_cod_inflict_damage(id, player, 70.0, 0.5, DMG_HEGRENADE);
-		}
+		make_explosion(codPlayer[id][PLAYER_DYNAMITE], 250, 1, 250.0, 70.0, 0.5);
 		
 		remove_entity(codPlayer[id][PLAYER_DYNAMITE]);
 		
@@ -2094,7 +2060,7 @@ stock set_item(id, item = 0, value = 0)
 	
 	codPlayer[id][PLAYER_ITEM] = item;
 
-	execute_forward_ignore_two_params(codForwards[ITEM_CHANGED], id, codPlayer[id][PLAYER_ITEM]);	
+	ExecuteForward(codForwards[ITEM_CHANGED], ret, id, codPlayer[id][PLAYER_ITEM]);	
 
 	if(codPlayer[id][PLAYER_ITEM])
 	{
@@ -2664,6 +2630,9 @@ public _cod_set_user_exp(id, value)
 public _cod_get_user_bonus_exp(id, value)
 	return get_exp_bonus(id, value);
 
+public _cod_get_level_exp(level)
+	return get_level_exp(level);
+
 public _cod_get_user_level(id)
 	return codPlayer[id][PLAYER_LEVEL];
 	
@@ -2863,8 +2832,8 @@ public _cod_set_user_bonus_strength(id, value)
 public _cod_set_user_bonus_condition(id, value)
 	codPlayer[id][PLAYER_EXTR_COND] = max(0, value);
 
-public _cod_get_user_health(id, stats_health, class_health, bonus_health)
-	return get_health(id, stats_health, class_health, bonus_health, 0);
+public _cod_get_user_health(id, stats_health, class_health, bonus_health, base_health)
+	return get_health(id, stats_health, class_health, bonus_health, base_health);
 
 public _cod_get_user_intelligence(id, stats_intelligence, class_intelligence, bonus_intelligence)
 	return get_intelligence(id, stats_intelligence, class_intelligence, bonus_intelligence);
@@ -2881,11 +2850,11 @@ public _cod_get_user_condition(id, stats_condition, class_condition, bonus_condi
 public _cod_get_user_max_health(id)
 	return get_health(id, 1, 1, 1, 1);
 
-public _cod_set_user_health(id, value)
-	set_user_health(id, min(value, get_health(id, 1, 1, 1, 1)));
+public _cod_set_user_health(id, value, maximum)
+	set_user_health(id, maximum ? min(value, get_health(id, 1, 1, 1, 1)) : value);
 
-public _cod_add_user_health(id, value)
-	set_user_health(id, min(get_user_health(id) + value, get_health(id, 1, 1, 1, 1)));
+public _cod_add_user_health(id, value, maximum)
+	set_user_health(id, maximum ? min(get_user_health(id) + value, get_health(id, 1, 1, 1, 1)) : get_user_health(id) + value);
 
 public _cod_get_user_rockets(id)
 	return codPlayer[id][PLAYER_ROCKETS];
@@ -3058,17 +3027,24 @@ public _cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:tim
 public _cod_display_fade(id, duration, holdtime, fadetype, red, green, blue, alpha)
 	display_fade(id, duration * (1<<12), holdtime * (1<<12), fadetype, red, green, blue, alpha);
 
-public _cod_show_hud(id, const text[], type, red, green, blue, Float:x, Float:y, effects, Float:fxtime, Float:holdtime, Float:fadeintime, Float:fadeouttime)
-	show_hud(id, text, type, red, green, blue, Float:x, Float:y, effects, Float:fxtime, Float:holdtime, Float:fadeintime, Float:fadeouttime)
+public _cod_show_hud(id, type, red, green, blue, Float:x, Float:y, effects, Float:fxtime, Float:holdtime, Float:fadeintime, Float:fadeouttime, const text[], any:...)
+{
+	static hudText[192];
+
+	if(numargs() == 13) copy(hudText, charsmax(hudText), text);
+	else vformat(hudText, charsmax(hudText), text, 14);
+
+	show_hud(id, hudText, type, red, green, blue, Float:x, Float:y, effects, Float:fxtime, Float:holdtime, Float:fadeintime, Float:fadeouttime);
+}
 	
 public _cod_screen_shake(id, amplitude, duration, frequency)
 	screen_shake(id, amplitude, duration, frequency);
 	
-public _cod_make_explosion(ent, distance)
+public _cod_make_explosion(ent, distance, explosion, Float:damage_distance, Float:damage, Float:factor)
 	make_explosion(ent, distance);
 	
-public _cod_make_bartimer(id, duration)
-	make_bar_timer(id, duration);
+public _cod_make_bartimer(id, duration, start)
+	make_bar_timer(id, duration, start);
 
 public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
 	if(!get_bit(victim, itemResistance) || ((get_bit(victim, itemResistance) && !(flags & DMG_CODSKILL)))) ExecuteHam(Ham_TakeDamage, victim, attacker, attacker, damage + get_intelligence(attacker, 1, 1, 1) * factor, DMG_CODSKILL | flags);
@@ -3132,7 +3108,7 @@ public _cod_register_class(plugin, params)
 	codClass[CLASS_PLUGIN] = plugin;
 	
 	codClass[CLASS_ENABLED] = CreateOneForward(plugin, "cod_class_enabled", FP_CELL, FP_CELL);
-	codClass[CLASS_DISABLED] = CreateOneForward(plugin, "cod_class_disabled", FP_CELL);
+	codClass[CLASS_DISABLED] = CreateOneForward(plugin, "cod_class_disabled", FP_CELL, FP_CELL);
 	codClass[CLASS_SPAWNED] = CreateOneForward(plugin, "cod_class_spawned",FP_CELL);
 	codClass[CLASS_KILLED] = CreateOneForward(plugin, "cod_class_killed", FP_CELL);
 	codClass[CLASS_SKILL_USED] = CreateOneForward(plugin, "cod_class_skill_used", FP_CELL);
@@ -3320,7 +3296,7 @@ stock remove_render_type(id, type)
 	}
 }
 
-stock make_explosion(ent, distance = 0, explosion = 1)
+stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0.0, Float:damage = 0.0, Float:factor = 0.5)
 {
 	new Float:tempOrigin[3], origin[3];
 	
@@ -3353,21 +3329,38 @@ stock make_explosion(ent, distance = 0, explosion = 1)
 		write_coord(origin[1] + distance);
 		write_coord(origin[2] + distance);
 		write_short(codSprite[SPRITE_WHITE]);
-		write_byte(0); 
-		write_byte(0); 
-		write_byte(10); 
-		write_byte(10); 
+		write_byte(0);
+		write_byte(0);
+		write_byte(10);
+		write_byte(10);
 		write_byte(255); 
 		write_byte(255); 
 		write_byte(100);
-		write_byte(100); 
-		write_byte(128); 
+		write_byte(100);
+		write_byte(128);
 		write_byte(0); 
 		message_end();
 	}
+
+	if(damage_distance > 0.0)
+	{
+		new entList[33], id, foundPlayers = find_sphere_class(ent, "player", damage_distance, entList, MAX_PLAYERS), player;
+
+		if(is_user_valid(ent)) id = ent;
+		else id = entity_get_edict(ent, EV_ENT_owner);
+
+		for(new i = 0; i < foundPlayers; i++)
+		{
+			player = entList[i];
+
+			if(!is_user_alive(player) || get_user_team(id) == get_user_team(player)) continue;
+
+			_cod_inflict_damage(id, player, damage, factor, DMG_HEGRENADE);
+		}
+	}
 }
 
-stock make_bar_timer(id, duration)
+stock make_bar_timer(id, duration, start = 0)
 {
 	if(!is_user_alive(id)) return;
 
@@ -3377,7 +3370,7 @@ stock make_bar_timer(id, duration)
 	
 	message_begin(id ? MSG_ONE : MSG_ALL, msgBartimer, {0, 0, 0}, id);
 	write_byte(duration); 
-	write_byte(0);
+	write_byte(start);
 	message_end();
 }
 

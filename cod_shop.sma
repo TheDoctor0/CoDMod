@@ -453,3 +453,6 @@ public buy_honor_handle(id)
 
 public cod_damage_post(attacker, victim, damage, damageBits)
 	if(get_bit(attacker, damageBonus)) cod_inflict_damage(attacker, victim, float(damageAmount), 0.0, DMG_BULLET);
+
+public cod_new_round()
+	for(new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, damageBonus);

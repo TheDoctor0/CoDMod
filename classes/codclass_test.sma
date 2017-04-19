@@ -1,23 +1,27 @@
 #include <amxmodx>
 #include <cod>
 
-new class, classPromotion;
+#define PLUGIN "CoD Class Test"
+#define VERSION "1.0"
+#define AUTHOR "O'Zone"
 
-new const nazwa[] = "Test";
-new const opis[] = "Natychmiastowe zabicie z noza(PPM)";
-new const frakcja[] = "Testy";
-new const bronie = 1<<CSW_DEAGLE;
-new const zdrowie = 40;
-new const inteligencja = 0;
-new const sila = 10;
-new const kondycja = 50;
-new const wytrzymalosc = 0;
+new const name[] = "Test";
+new const description[] = "Natychmiastowe zabicie z noza(PPM)";
+new const fraction[] = "Testy";
+new const weapons = 1<<CSW_DEAGLE;
+new const health = 40;
+new const intelligence = 0;
+new const strength = 10;
+new const stamina = 0;
+new const condition = 50;
+
+new class, classPromotion;
 
 public plugin_init() 
 {
-	register_plugin(nazwa, "1.0", "O'Zone");
+	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	cod_register_class(nazwa, opis, frakcja, bronie, zdrowie, inteligencja, sila, wytrzymalosc, kondycja);
+	cod_register_class(name, description, fraction, weapons, health, intelligence, strength, stamina, condition);
 }
 
 public cod_class_enabled(id, promotion)
