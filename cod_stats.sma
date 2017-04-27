@@ -25,7 +25,7 @@ new const commandTopStats[][] = { "say /stop15", "say_team /stop15", "say /topst
 new const commandMedals[][] = { "say /medal", "say_team /medal", "say /medale", "say_team /medale", "say /medals", "say_team /medals", "medale" };
 new const commandTopMedals[][] = { "say /mtop15", "say_team /mtop15", "say /topmedals", "say_team /topmedals", "say /topmedale", "say_team /topmedale", "topmedale" };
 
-new playerName[MAX_PLAYERS + 1][64], playerStats[MAX_PLAYERS + 1][statsInfo], Handle:sql, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo, maxPlayers;
+new playerName[MAX_PLAYERS + 1][64], playerStats[MAX_PLAYERS + 1][statsInfo], Handle:sql, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo;
 
 new cvarGoldReward, cvarSilverReward, cvarBronzeReward;
 
@@ -58,8 +58,6 @@ public plugin_init()
 	register_message(get_user_msgid("SayText"), "say_text");
 
 	register_message(SVC_INTERMISSION, "message_intermission");
-	
-	maxPlayers = get_maxplayers();
 }
 
 public plugin_cfg()

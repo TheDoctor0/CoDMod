@@ -7,7 +7,7 @@
 #define set_bit(%2,%1) (%1 |= (1<<(%2&31)))
 #define rem_bit(%2,%1) (%1 &= ~(1 <<(%2&31)))
 
-#define is_user_valid(%1) (1 <= %1 <= maxPlayers)
+#define is_user_valid(%1) (1 <= %1 <= MAX_PLAYERS)
 
 #define COD_CONTINUE 0
 #define COD_STOP 4
@@ -112,7 +112,7 @@ native cod_get_user_bonus_exp(id, value);
 /*------------------------------
 Return exp needed for level.
 ------------------------------*/
-native cod_get_level_xp(level);
+native cod_get_level_exp(level);
 
 /*------------------------------
 Returns player's level.

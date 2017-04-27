@@ -8,7 +8,7 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new Array:listVIPs, maxPlayers, vip;
+new Array:listVIPs, vip;
 
 new const commandVIP[][] = { "say /vip", "say_team /vip", "say /vip", "say_team /vip", "vip" };
 new const commandVIPs[][] = { "say /vips", "say_team /vips", "say /vipy", "say_team /vipy", "vipy" };
@@ -31,8 +31,6 @@ public plugin_init()
 	register_message(get_user_msgid("ScoreAttrib"), "vip_status");
 	
 	listVIPs = ArrayCreate(64, 32);
-	
-	maxPlayers = get_maxplayers();
 }
 
 public plugin_natives()

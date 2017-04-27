@@ -105,7 +105,7 @@ new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpWinRound, cvarExpPlant, cv
 
 new Array:codItems, Array:codClasses, Array:codFractions, Array:codPlayerClasses[MAX_PLAYERS + 1], Array:codPlayerRender[MAX_PLAYERS + 1], codForwards[forwards];
 
-new Handle:sql, bool:freezeTime, hudInfo, hudSync, hudVault, maxPlayers, playersNum, itemResistance, bunnyHop, dataLoaded, resetStats, userConnected, renderTimer, lastInfo;
+new Handle:sql, bool:freezeTime, hudInfo, hudSync, hudSync2, hudVault, playersNum, itemResistance, bunnyHop, dataLoaded, resetStats, userConnected, renderTimer, lastInfo;
 
 public plugin_init() 
 {
@@ -199,9 +199,8 @@ public plugin_init()
 	register_message(SVC_INTERMISSION, "message_intermission");
 	
 	hudSync = CreateHudSyncObj();
+	hudSync2 = CreateHudSyncObj();
 	hudInfo = CreateHudSyncObj();
-
-	maxPlayers = get_maxplayers();
 
 	hudVault = nvault_open("cod_hud");
 	
@@ -227,7 +226,7 @@ public plugin_natives()
 	register_native("cod_get_user_exp", "_cod_get_user_exp", 1);
 	register_native("cod_set_user_exp", "_cod_set_user_exp", 1);
 	register_native("cod_get_user_bonus_exp", "_cod_get_user_bonus_exp", 1);
-	register_native("cod_get_level_xp", "_cod_get_level_xp", 1);
+	register_native("cod_get_level_exp", "_cod_get_level_exp", 1);
 	register_native("cod_get_user_level", "_cod_get_user_level", 1);
 	register_native("cod_get_user_highest_level", "_cod_get_user_highest_level", 1);
 	
@@ -3389,8 +3388,12 @@ stock show_hud(id, const text[], type=0, red=255, green=255, blue=255, Float:x=-
 	}
 	else
 	{
+		static counter;
+
+		if(++counter > 1) counter = 0;
+
 		set_hudmessage(red, green, blue, x, y, effects, fxtime, holdtime, fadeintime, fadeouttime);
-		ShowSyncHudMsg(id, hudSync, text);
+		ShowSyncHudMsg(id, counter ? hudSync2 : hudSync, text);
 	}
 }
 
