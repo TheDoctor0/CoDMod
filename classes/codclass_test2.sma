@@ -6,9 +6,9 @@
 #define AUTHOR "O'Zone"
 
 new const name[] = "Test2";
-new const description[] = "Natychmiastowe zabicie z noza(PPM)";
+new const description[] = "3 bronie i porobione";
 new const fraction[] = "Testy";
-new const weapons = 1<<CSW_DEAGLE;
+new const weapons = (1<<CSW_AWP)|(1<<CSW_AK47)|(1<<CSW_M4A1);
 new const health = 40;
 new const intelligence = 0;
 new const strength = 10;
