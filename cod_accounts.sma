@@ -17,7 +17,7 @@
 #define VGUI_JOIN_TEAM_NUM 2
 
 new playerName[33][64], playerSafeName[33][64], playerPassword[33][33], playerTempPassword[33][33], 
-	playerFails[33], playerStatus[33], Handle:sql, dataLoaded, autoLogin, maxPlayers, hudSync;
+	playerFails[33], playerStatus[33], Handle:sql, dataLoaded, autoLogin;
 
 enum _:status { NOT_REGISTERED, NOT_LOGGED, LOGGED, GUEST };
 
@@ -50,9 +50,6 @@ public plugin_init()
 	register_message(get_user_msgid("VGUIMenu"), "message_vgui_menu");
 
 	register_forward(FM_PlayerPreThink, "player_prethink");
-	
-	hudSync = CreateHudSyncObj();
-	maxPlayers = get_maxplayers();
 }
 
 public plugin_natives()
@@ -248,17 +245,15 @@ public account_menu_handle(id, menu, item)
 		{
 			cod_print_chat(id, "Wprowadz swoje^x04 haslo^x01, aby sie^x04 zalogowac.");
 
-			set_hudmessage(255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-			ShowSyncHudMsg(id, hudSync, "Wprowadz swoje haslo.");
+			cod_show_hud(id, TYPE_HUD, 255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Wprowadz swoje haslo.");
 
 			client_cmd(id, "messagemode WPROWADZ_SWOJE_HASLO");
 		}
 		case 1: 
 		{
 			cod_print_chat(id, "Rozpoczales proces^x04 rejestracji^x01. Wprowadz wybrane^x04 haslo^x01.");
-	
-			set_hudmessage(255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-			ShowSyncHudMsg(id, hudSync, "Wprowadz wybrane haslo.");
+
+			cod_show_hud(id, TYPE_HUD, 255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Wprowadz wybrane haslo.");
 	
 			client_cmd(id, "messagemode WPROWADZ_WYBRANE_HASLO");
 
@@ -267,9 +262,8 @@ public account_menu_handle(id, menu, item)
 		case 2:
 		{
 			cod_print_chat(id, "Wprowadz swoje^x04 aktualne haslo^x01 w celu potwierdzenia tozsamosci.");
-			
-			set_hudmessage(255, 128, 0, 0.22, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-			ShowSyncHudMsg(id, hudSync, "Wprowadz swoje aktualne haslo.");
+
+			cod_show_hud(id, TYPE_HUD, 255, 128, 0, 0.22, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Wprowadz swoje aktualne haslo.");
 			
 			client_cmd(id, "messagemode WPROWADZ_AKTUALNE_HASLO");
 		}
@@ -277,17 +271,15 @@ public account_menu_handle(id, menu, item)
 		{
 			cod_print_chat(id, "Wprowadz swoje^x04 aktualne haslo^x01 w celu potwierdzenia tozsamosci.");
 			
-			set_hudmessage(255, 128, 0, 0.22, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-			ShowSyncHudMsg(id, hudSync, "Wprowadz swoje aktualne haslo.");
+			cod_show_hud(id, TYPE_HUD, 255, 128, 0, 0.22, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Wprowadz swoje aktualne haslo.");
 			
 			client_cmd(id, "messagemode WPROWADZ_SWOJE_AKTUALNE_HASLO");
 		}
 		case 4: 
 		{
 			cod_print_chat(id, "Zalogowales sie jako^x04 Gosc^x01. By zabezpieczyc swoj nick^x04 zarejestruj sie^x01.");
-			
-			set_hudmessage(0, 255, 0, -1.0, 0.9, 0, 0.0, 3.5, 0.0, 0.0);
-			ShowSyncHudMsg(id, hudSync, "Zostales pomyslnie zalogowany jako Gosc.");
+
+			cod_show_hud(id, TYPE_HUD, 0, 255, 0, -1.0, 0.9, 0, 0.0, 3.5, 0.0, 0.0, "Zostales pomyslnie zalogowany jako Gosc.");
 			
 			remove_task(id + TASK_PASSWORD);
 			
@@ -317,9 +309,8 @@ public login_account(id)
 		if(++playerFails[id] >= 3) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
 		
 		cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01. (Bledne haslo^x04 %i/3^x01)", playerFails[id]);
-		
-		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		ShowSyncHudMsg(id, hudSync, "Podane haslo jest nieprawidlowe.");
+
+		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Podane haslo jest nieprawidlowe.");
 		
 		account_menu(id, 1);
 		
@@ -335,9 +326,8 @@ public login_account(id)
 	remove_task(id + TASK_PASSWORD);
 	
 	cod_print_chat(id, "Zostales pomyslnie^x04 zalogowany^x01. Zyczymy milej gry.");
-	
-	set_hudmessage(0, 255, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-	ShowSyncHudMsg(id, hudSync, "Zostales pomyslnie zalogowany.");
+
+	cod_show_hud(id, TYPE_HUD, 0, 255, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Zostales pomyslnie zalogowany.");
 	
 	engclient_cmd(id, "chooseteam");
 	
@@ -357,8 +347,7 @@ public register_step_one(id)
 	{
 		cod_print_chat(id, "Haslo musi miec co najmniej^x04 5 znakow^x01.");
 
-		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		ShowSyncHudMsg(id, hudSync, "Haslo musi miec co najmniej 5 znakow.");
+		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Haslo musi miec co najmniej 5 znakow.");
 		
 		account_menu(id, 1);
 		
@@ -370,9 +359,8 @@ public register_step_one(id)
 	copy(playerTempPassword[id], charsmax(playerTempPassword), password);
 	
 	cod_print_chat(id, "Teraz powtorz wybrane^x04 haslo^x01.");
-	
-	set_hudmessage(255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-	ShowSyncHudMsg(id, hudSync, "Powtorz wybrane haslo.");
+
+	cod_show_hud(id, TYPE_HUD, 255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Powtorz wybrane haslo.");
 	
 	client_cmd(id, "messagemode POWTORZ_WYBRANE_HASLO");
 	
@@ -391,9 +379,8 @@ public register_step_two(id)
 	if(!equal(password, playerTempPassword[id]))
 	{
 		cod_print_chat(id, "Podane hasla^x04 roznia sie^x01 od siebie.");
-		
-		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		ShowSyncHudMsg(id, hudSync, "Podane hasla roznia sie od siebie.");
+
+		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Podane hasla roznia sie od siebie.");
 		
 		account_menu(id, 1);
 		
@@ -447,9 +434,8 @@ public register_confirmation_handle(id, menu, item)
 			account_query(id, INSERT);
 
 			client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
-	
-			set_hudmessage(0, 255, 0, -1.0, 0.9, 0, 0.0, 3.5, 0.0, 0.0);
-			ShowSyncHudMsg(id, hudSync, "Zostales pomyslnie zarejestrowany i zalogowany.");
+
+			cod_show_hud(id, TYPE_HUD, 0, 255, 0, -1.0, 0.9, 0, 0.0, 3.5, 0.0, 0.0, "Zostales pomyslnie zarejestrowany i zalogowany.");
 	
 			cod_print_chat(id, "Twoj nick zostal pomyslnie^x04 zarejestrowany^x01.");
 			cod_print_chat(id, "Wpisz w konsoli komende^x04 setinfo ^"%s^" ^"%s^"^x01, aby twoje haslo bylo ladowane automatycznie.", SETINFO, playerPassword[id]);
@@ -464,9 +450,8 @@ public register_confirmation_handle(id, menu, item)
 			cod_print_chat(id, "Rozpoczales proces^x04 rejestracji^x01. Wprowadz wybrane^x04 haslo^x01.");
 
 			client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-	
-			set_hudmessage(255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-			ShowSyncHudMsg(id, hudSync, "Wprowadz wybrane haslo.");
+
+			cod_show_hud(id, TYPE_HUD, 255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Wprowadz wybrane haslo.");
 	
 			client_cmd(id, "messagemode WPROWADZ_WYBRANE_HASLO");
 		}
@@ -490,9 +475,8 @@ public change_step_one(id)
 		if(++playerFails[id] >= 3) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
 		
 		cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01. (Bledne haslo^x04 %i/3^x01)", playerFails[id]);
-		
-		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		ShowSyncHudMsg(id, hudSync, "Podane haslo jest nieprawidlowe.");
+
+		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Podane haslo jest nieprawidlowe.");
 		
 		account_menu(id, 1);
 		
@@ -503,8 +487,7 @@ public change_step_one(id)
 	
 	cod_print_chat(id, "Wprowadz swoje^x04 nowe haslo^x01.");
 
-	set_hudmessage(255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-	ShowSyncHudMsg(id, hudSync, "Wprowadz swoje nowe haslo.");
+	cod_show_hud(id, TYPE_HUD, 255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Wprowadz swoje nowe haslo.");
 
 	client_cmd(id, "messagemode WPROWADZ_NOWE_HASLO");
 	
@@ -524,8 +507,7 @@ public change_step_two(id)
 	{
 		cod_print_chat(id, "Nowe haslo jest^x04 takie samo^x01 jak aktualne.");
 
-		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		ShowSyncHudMsg(id, hudSync, "Nowe haslo jest takie samo jak aktualne.");
+		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Nowe haslo jest takie samo jak aktualne.");
 		
 		account_menu(id, 1);
 		
@@ -536,8 +518,7 @@ public change_step_two(id)
 	{
 		cod_print_chat(id, "Nowe haslo musi miec co najmniej^x04 5 znakow^x01.");
 
-		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		ShowSyncHudMsg(id, hudSync, "Nowe haslo musi miec co najmniej 5 znakow.");
+		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Nowe haslo musi miec co najmniej 5 znakow.");
 		
 		account_menu(id, 1);
 		
@@ -549,9 +530,8 @@ public change_step_two(id)
 	copy(playerTempPassword[id], charsmax(playerTempPassword), password);
 	
 	cod_print_chat(id, "Powtorz swoje nowe^x04 haslo^x01.");
-	
-	set_hudmessage(255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-	ShowSyncHudMsg(id, hudSync, "Powtorz swoje nowe haslo.");
+
+	cod_show_hud(id, TYPE_HUD, 255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Powtorz swoje nowe haslo.");
 	
 	client_cmd(id, "messagemode POWTORZ_NOWE_HASLO");
 	
@@ -570,9 +550,8 @@ public change_step_three(id)
 	if(!equal(password, playerTempPassword[id]))
 	{
 		cod_print_chat(id, "Podane hasla^x04 roznia sie^x01 od siebie.");
-		
-		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		ShowSyncHudMsg(id, hudSync, "Podane hasla roznia sie od siebie.");
+
+		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Podane hasla roznia sie od siebie.");
 		
 		account_menu(id, 1);
 		
@@ -584,9 +563,8 @@ public change_step_three(id)
 	copy(playerPassword[id], charsmax(playerPassword[]), password);
 
 	account_query(id, UPDATE);
-	
-	set_hudmessage(0, 255, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-	ShowSyncHudMsg(id, hudSync, "Twoje haslo zostalo pomyslnie zmienione.");
+
+	cod_show_hud(id, TYPE_HUD, 0, 255, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Twoje haslo zostalo pomyslnie zmienione.");
 	
 	cod_print_chat(id, "Twoje haslo zostalo pomyslnie^x04 zmienione^x01.");
 	cod_print_chat(id, "Wpisz w konsoli komende^x04 setinfo ^"%s^" ^"%s^"^x01, aby twoje haslo bylo ladowane automatycznie.", SETINFO, playerPassword[id]);
@@ -611,9 +589,8 @@ public delete_account(id)
 		if(++playerFails[id] >= 3) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
 		
 		cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01. (Bledne haslo^x04 %i/3^x01)", playerFails[id]);
-		
-		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		ShowSyncHudMsg(id, hudSync, "Podane haslo jest nieprawidlowe.");
+
+		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Podane haslo jest nieprawidlowe.");
 		
 		account_menu(id, 1);
 		
