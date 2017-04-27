@@ -8,8 +8,8 @@
 
 new const commandShopMenu[][] = { "say /shop", "say_team /shop", "say /sklep", "say_team /sklep", "sklep" };
 
-enum _:shopInfo { EXCHANGE, REPAIR, BUY, UPGRADE, SMALL_BANDAGE, BIG_BANDAGE, JUMP, BUNNY_HOP, SILENT, 
-	ROCKET, MINE, DYNAMITE, FIRST_AID_KIT, DAMAGE, ARMOR, SMALL_EXP, MEDIUM_EXP, BIG_EXP, RANDOM_EXP };
+enum _:shopInfo { EXCHANGE, REPAIR, BUY, UPGRADE, SMALL_BANDAGE, BIG_BANDAGE, ROCKET, MINE, DYNAMITE, 
+	FIRST_AID_KIT, JUMP, BUNNY_HOP, SILENT, ARMOR, DAMAGE, SMALL_EXP, MEDIUM_EXP, BIG_EXP, RANDOM_EXP };
 
 new cvarCostRepair, cvarCostItem, cvarCostUpgrade, cvarCostSmallBandage, cvarCostBigBandage, cvarCostRocket, cvarCostMine, cvarCostDynamite, cvarCostFirstAidKit, 
 	cvarCostJump, cvarCostBunnyHop, cvarCostSilent, cvarCostArmor, cvarCostDamage, cvarCostSmallExp, cvarCostMediumExp, cvarCostBigExp, cvarCostRandomExp, cvarExchangeRatio, 
@@ -103,81 +103,80 @@ public shop_menu(id)
 	
 	new menuData[128], menuPrice[10], menu = menu_create("\ySklep \rCoD Mod", "shop_menu_handle");
 
-	formatex(menuData, charsmax(menuData), "Kantor Walutowy \r[\yWymiana Kasy na Honor\r] \wKoszt:\r %i$/1 Honor", exchangeRatio);
+	formatex(menuData, charsmax(menuData), "Kantor Walutowy \r[\yWymiana Kasy na Honor\r] \wKoszt:\r %i$/1H", exchangeRatio);
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "Napraw Przedmiot \r[\y+%i Wytrzymalosci\r] \wKoszt:\r %i Honoru", durabilityAmount, costRepair);
+	formatex(menuData, charsmax(menuData), "Napraw Przedmiot \r[\y+%i Wytrzymalosci\r] \wKoszt:\r %iH", durabilityAmount, costRepair);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costRepair);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Kup Przedmiot \r[\yLosowy Przedmiot\r] \wKoszt:\r %i Honoru", costItem);
+	formatex(menuData, charsmax(menuData), "Kup Przedmiot \r[\yLosowy Przedmiot\r] \wKoszt:\r %iH", costItem);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costItem);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Ulepsz Przedmiot \r[\yWzmocnienie Przedmiotu\r] \wKoszt:\r %i Honoru", costUpgrade);
+	formatex(menuData, charsmax(menuData), "Ulepsz Przedmiot \r[\yWzmocnienie Przedmiotu\r] \wKoszt:\r %iH", costUpgrade);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costUpgrade);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Maly Bandaz \r[\y+%i HP\r] \wKoszt:\r %i Honoru", smallBandageHP, costSmallBandage);
+	formatex(menuData, charsmax(menuData), "Maly Bandaz \r[\y+%i HP\r] \wKoszt:\r %iH", smallBandageHP, costSmallBandage);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costSmallBandage);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Duzy Bandaz \r[\y+%i HP\r] \wKoszt:\r %i Honoru", bigBandageHP, costBigBandage);
+	formatex(menuData, charsmax(menuData), "Duzy Bandaz \r[\y+%i HP\r] \wKoszt:\r %iH", bigBandageHP, costBigBandage);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costBigBandage);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Dodatkowa Rakieta \r[\y+1 Rakieta\r] \wKoszt:\r %i Honoru", costRocket);
+	formatex(menuData, charsmax(menuData), "Dodatkowa Rakieta \r[\y+1 Rakieta\r] \wKoszt:\r %iH", costRocket);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costRocket);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Dodatkowa Mina \r[\y+1 Mina\r] \wKoszt:\r %i Honoru", costMine);
+	formatex(menuData, charsmax(menuData), "Dodatkowa Mina \r[\y+1 Mina\r] \wKoszt:\r %iH", costMine);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costMine);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Dodatkowy Dynamit \r[\y+1 Dynamit\r] \wKoszt:\r %i Honoru", costDynamite);
+	formatex(menuData, charsmax(menuData), "Dodatkowy Dynamit \r[\y+1 Dynamit\r] \wKoszt:\r %iH", costDynamite);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costDynamite);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Dodatkowa Apteczka \r[\y+1 Apteczka\r] \wKoszt:\r %i Honoru", costFirstAidKit);
+	formatex(menuData, charsmax(menuData), "Dodatkowa Apteczka \r[\y+1 Apteczka\r] \wKoszt:\r %iH", costFirstAidKit);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costFirstAidKit);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Dodatkowy Skok \r[\y+1 Skok w Powietrzu\r] \wKoszt:\r %i Honoru", costJump);
+	formatex(menuData, charsmax(menuData), "Dodatkowy Skok \r[\y+1 Skok w Powietrzu\r] \wKoszt:\r %iH", costJump);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costJump);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Bunny Hop \r[\yAutomatyczny BunnyHop\r] \wKoszt:\r %i Honoru", costBunnyHop);
+	formatex(menuData, charsmax(menuData), "Bunny Hop \r[\yAutomatyczny BunnyHop\r] \wKoszt:\r %iH", costBunnyHop);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costBunnyHop);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Ciche Chodzenie \r[\yBrak Dzwiekow Poruszania\r] \wKoszt:\r %i Honoru", costSilent);
+	formatex(menuData, charsmax(menuData), "Ciche Chodzenie \r[\yBrak Dzwiekow Poruszania\r] \wKoszt:\r %iH", costSilent);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costSilent);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Dodatkowy Pancerz \r[\y+%i Kamizelki\r] \wKoszt:\r %i Honoru", armorAmount, costArmor);
+	formatex(menuData, charsmax(menuData), "Dodatkowy Pancerz \r[\y+%i Kamizelki\r] \wKoszt:\r %iH", armorAmount, costArmor);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costArmor);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Wieksze Obrazenia \r[\y+%i DMG\r] \wKoszt:\r %i Honoru", damageAmount, costDamage);
+	formatex(menuData, charsmax(menuData), "Wieksze Obrazenia \r[\y+%i DMG\r] \wKoszt:\r %iH", damageAmount, costDamage);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costDamage);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Male Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %i Honoru", smallExp, costSmallExp);
+	formatex(menuData, charsmax(menuData), "Male Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", smallExp, costSmallExp);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costSmallExp);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Srednie Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %i Honoru", mediumExp, costMediumExp);
+	formatex(menuData, charsmax(menuData), "Srednie Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", mediumExp, costMediumExp);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costMediumExp);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Duze Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %i Honoru", bigExp, costBigExp);
+	formatex(menuData, charsmax(menuData), "Duze Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", bigExp, costBigExp);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costBigExp);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Losowe Doswiadczenie \r[\yLosowo od %i do %i Expa\r] \wKoszt:\r %i Honoru", minRandomExp, maxRandomExp, costRandomExp);
+	formatex(menuData, charsmax(menuData), "Losowe Doswiadczenie \r[\yLosowo od %i do %i Expa\r] \wKoszt:\r %iH", minRandomExp, maxRandomExp, costRandomExp);
 	formatex(menuPrice, charsmax(menuPrice), "%i", costRandomExp);
 	menu_additem(menu, menuData, menuPrice);
-
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
