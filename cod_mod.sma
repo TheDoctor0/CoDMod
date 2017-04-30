@@ -720,7 +720,7 @@ public classes_description_handle(id, menu, item)
 
 public display_item_description(id)
 {
-	show_item_description(id, codPlayer[id][PLAYER_ITEM]);
+	show_item_description(id, codPlayer[id][PLAYER_ITEM], 0);
 
 	return PLUGIN_HANDLED;
 }
@@ -766,14 +766,14 @@ public display_items_description_handle(id, menu, item)
 
 	menu_destroy(menu);
 	
-	show_item_description(id, item + 1);
+	show_item_description(id, item + 1, 1);
 
 	display_items_description(id, item / 7, 1);
 	
 	return PLUGIN_HANDLED;
 }
 	
-public show_item_description(id, item)
+public show_item_description(id, item, info)
 {
 	new itemDescription[MAX_DESC], itemName[MAX_NAME];
 
@@ -781,7 +781,22 @@ public show_item_description(id, item)
 	get_item_info(item, ITEM_NAME, itemName, charsmax(itemName));
 
 	cod_print_chat(id, "Przedmiot:^x03 %s^x01.", itemName);
-	cod_print_chat(id, "Opis:^x03 %s^x01.", itemDescription);
+
+	if(get_item_info(item, ITEM_VALUE) != -1)
+	{
+		if(codPlayer[id][PLAYER_ITEM] == item && !info)
+		{
+			new itemValue[16], itemTempValue;
+
+			cod_get_user_item(id, itemTempValue);
+
+			num_to_str(itemTempValue, itemValue, charsmax(itemValue));
+
+			cod_print_chat(id, "Opis:^x03 %s^x01.", itemDescription, itemValue);
+		}
+		else cod_print_chat(id, "Opis:^x03 %s^x01.", itemDescription, "x");
+	}
+	else cod_print_chat(id, "Opis:^x03 %s^x01.", itemDescription);
 
 	return PLUGIN_HANDLED;
 }
@@ -1453,7 +1468,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 		damage -= damage * (get_stamina(victim, 1, 1, 1) / 4.0);
 			
 		function = get_class_info(codPlayer[victim][PLAYER_CLASS], CLASS_DAMAGE_VICTIM);
-			
+		
 		if(function != -1)
 		{
 			callfunc_begin_i(function, get_class_info(codPlayer[victim][PLAYER_CLASS], CLASS_PLUGIN));
@@ -1462,6 +1477,13 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 			callfunc_push_floatrf(damage);
 			callfunc_push_int(damageBits);
 			callfunc_end();
+		}
+
+		if(damage == -1.0)
+		{
+			SetHamReturnFloat(0.0);
+
+			return HAM_SUPERCEDE;
 		}
 	}
 
@@ -1480,6 +1502,13 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 			callfunc_push_int(damageBits);
 			callfunc_end();
 		}
+
+		if(damage == -1.0)
+		{
+			SetHamReturnFloat(0.0);
+
+			return HAM_SUPERCEDE;
+		}
 	}
 
 	if(codPlayer[victim][PLAYER_ITEM])
@@ -1495,6 +1524,13 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 			callfunc_push_int(damageBits);
 			callfunc_end();
 		}
+
+		if(damage == -1.0)
+		{
+			SetHamReturnFloat(0.0);
+
+			return HAM_SUPERCEDE;
+		}
 	}
 		
 	if(codPlayer[attacker][PLAYER_ITEM] && !get_bit(victim, itemResistance))
@@ -1509,6 +1545,13 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 			callfunc_push_floatrf(damage);
 			callfunc_push_int(damageBits);
 			callfunc_end();
+		}
+
+		if(damage == -1.0)
+		{
+			SetHamReturnFloat(0.0);
+
+			return HAM_SUPERCEDE;
 		}
 	}
 
@@ -2704,7 +2747,7 @@ public _cod_get_classes_num()
 
 public _cod_get_user_item(id, &value)
 {
-	new function = get_class_info(codPlayer[id][PLAYER_ITEM], ITEM_VALUE);
+	new function = get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_VALUE);
 
 	if(function != -1)
 	{
@@ -2726,7 +2769,7 @@ public _cod_upgrade_user_item(id, check)
 
 	if(check) get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_UPGRADE) ? true : false;
 	
-	switch(random_num(1, 4))
+	switch(random_num(1, 5))
 	{
 		case 1, 2:
 		{
