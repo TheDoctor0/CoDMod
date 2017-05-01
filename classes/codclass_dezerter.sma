@@ -43,6 +43,9 @@ public cod_spawned(id)
 	if(random_num(1, 6) == 1) set_task(0.1, "teleport_to_enemy_spawn");
 }
 
+public cod_class_skill_used(id)
+	cod_use_user_rocket(id);
+
 public teleport_to_enemy_spawn(id)
 {
 	new origin[3], Float:originFloat[3], Float:angle[3];

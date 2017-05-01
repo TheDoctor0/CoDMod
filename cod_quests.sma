@@ -402,7 +402,7 @@ public give_reward(id)
 	
 	new reward = cod_get_user_bonus_exp(id, get_quest_info(playerData[PLAYER_ID][id], QUEST_REWARD));
 	
-	cod_set_user_exp(id, cod_get_user_exp(id) + reward);
+	cod_set_user_exp(id, reward);
 	
 	save_quest(id);
 

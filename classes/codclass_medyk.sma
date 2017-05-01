@@ -29,4 +29,4 @@ public cod_class_spawned(id)
 	cod_add_user_medkits(id, 2);
 
 public cod_class_skill_used(id)
-	cmd_execute(id, "+medkit");
+	cod_use_user_medkit(id);

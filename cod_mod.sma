@@ -8,6 +8,7 @@
 #include <xs>
 #include <csx>
 #include <sqlx>
+#include <stripweapons>
 #include <cod>
 
 #define PLUGIN "CoD Mod"
@@ -27,7 +28,8 @@
 #define	FL_WATERJUMP (1<<11)
 #define	FL_ONGROUND	(1<<9)
 
-new const maxAmmo[31] = { 0, 52, 0, 90, 1, 31, 1, 100, 90, 1, 120, 100, 100, 90, 90, 90, 100, 120, 30, 120, 200, 31, 90, 120, 90, 2, 35, 90, 90,0, 100 };
+new const maxAmmo[] = { 0, 52, 0, 90, 1, 31, 1, 100, 90, 1, 120, 100, 100, 90, 90, 90, 100, 120, 30, 120, 200, 31, 90, 120, 90, 2, 35, 90, 90,0, 100 };
+new const maxBpAmmo[] = { 0, 30, 90, 200, 90, 32, 100, 100, 35, 52, 120 };
 
 new const pointsDistribution[] = { 1, 3, 5, 10, 25, -1 };
 
@@ -191,6 +193,7 @@ public plugin_init()
 	register_forward(FM_EmitSound, "sound_emit");
 	
 	register_message(get_user_msgid("SayText"), "say_text");
+	register_message(get_user_msgid("AmmoX"), "message_ammo");
 	register_message(SVC_INTERMISSION, "message_intermission");
 	
 	hudSync = CreateHudSyncObj();
@@ -298,6 +301,12 @@ public plugin_natives()
 	register_native("cod_add_user_multijumps", "_cod_add_user_multijumps", 1);
 	register_native("cod_add_user_gravity", "_cod_add_user_gravity", 1);
 	register_native("cod_add_user_armor", "_cod_add_user_armor", 1);
+
+	register_native("cod_use_user_rocket", "_cod_use_user_rocket", 1);
+	register_native("cod_use_user_mine", "_cod_use_user_mine", 1);
+	register_native("cod_use_user_dynamite", "_cod_use_user_dynamite", 1);
+	register_native("cod_use_user_medkit", "_cod_use_user_medkit", 1);
+	register_native("cod_use_user_teleport", "_cod_use_user_teleport", 1);
 	
 	register_native("cod_get_user_resistance", "_cod_get_user_resistance", 1);
 	register_native("cod_get_user_bunnyhop", "_cod_get_user_bunnyhop", 1);
@@ -1245,7 +1254,7 @@ public touch_mine(ent, victim)
 
 	new id = entity_get_edict(ent, EV_ENT_owner);
 	
-	if(get_user_team(victim) != get_user_team(id)) return;
+	if(get_user_team(victim) == get_user_team(id)) return;
 
 	make_explosion(ent, 0, 1, 90.0, 75.0, 0.5);
 	
@@ -1380,17 +1389,15 @@ public think_medkit(ent)
 		
 		entity_get_vector(ent, EV_VEC_origin, origin);
 
-		new entList[33], foundPlayers = find_sphere_class(0, "player", 300.0, entList, MAX_PLAYERS, origin), player, playerHealth;
+		new entList[33], foundPlayers = find_sphere_class(0, "player", 300.0, entList, MAX_PLAYERS, origin), player;
 
 		for (new i = 0; i < foundPlayers; i++)
 		{
 			player = entList[i];
 
-			if (get_user_team(player) != get_user_team(player)) continue;
+			if(get_user_team(id) != get_user_team(player) || !is_user_alive(player)) continue;
 
-			playerHealth = min(get_user_health(player) + bonusHealth, get_health(player, 1, 1, 1, 1));
-			
-			if(is_user_alive(player)) entity_set_float(player, EV_FL_health, float(playerHealth));
+			_cod_add_user_health(player, bonusHealth, 1);
 		}
 
 		entity_set_edict(ent, EV_ENT_euser2, 0);
@@ -1464,7 +1471,7 @@ public use_teleport(id)
 	if(engfunc(EngFunc_PointContents, dest) == CONTENTS_SKY) return PLUGIN_HANDLED;
 
 	codPlayer[id][PLAYER_LAST_TELEPORT] = floatround(get_gametime());
-	codPlayer[id][PLAYER_TELEPORTS]--;
+	if(codPlayer[id][PLAYER_TELEPORTS] != -1) codPlayer[id][PLAYER_TELEPORTS]--;
 
 	new Float:normal[3];
 	get_tr2(0, TR_vecPlaneNormal, normal);
@@ -1543,8 +1550,8 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 		if(function != -1)
 		{
 			callfunc_begin_i(function, get_class_info(codPlayer[victim][PLAYER_CLASS], CLASS_PLUGIN));
-			callfunc_push_int(victim);
 			callfunc_push_int(attacker);
+			callfunc_push_int(victim);
 			callfunc_push_int(weapon);
 			callfunc_push_floatrf(damage);
 			callfunc_push_int(damageBits);
@@ -1563,8 +1570,8 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 		if(function != -1 && !codPlayer[victim][PLAYER_RESISTANCE])
 		{
 			callfunc_begin_i(function, get_class_info(codPlayer[attacker][PLAYER_CLASS], CLASS_PLUGIN));
-			callfunc_push_int(victim);
 			callfunc_push_int(attacker);
+			callfunc_push_int(victim);
 			callfunc_push_int(weapon);
 			callfunc_push_floatrf(damage);
 			callfunc_push_int(damageBits);
@@ -1581,8 +1588,8 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 		if(function != -1)
 		{
 			callfunc_begin_i(function, get_class_info(codPlayer[victim][PLAYER_ITEM], ITEM_PLUGIN));
-			callfunc_push_int(victim);
 			callfunc_push_int(attacker);
+			callfunc_push_int(victim);
 			callfunc_push_int(weapon);
 			callfunc_push_floatrf(damage);
 			callfunc_push_int(damageBits);
@@ -1599,8 +1606,8 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 		if(function != -1)
 		{
 			callfunc_begin_i(function, get_class_info(codPlayer[attacker][PLAYER_ITEM], ITEM_PLUGIN));
-			callfunc_push_int(victim);
 			callfunc_push_int(attacker);
+			callfunc_push_int(victim);
 			callfunc_push_int(weapon);
 			callfunc_push_floatrf(damage);
 			callfunc_push_int(damageBits);
@@ -1669,8 +1676,6 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 		
 		show_dhudmessage(killer, "+%i XP", exp);
 		
-		if(!codPlayer[killer][PLAYER_ITEM]) set_item(killer, -1, -1);
-		
 		codPlayer[killer][PLAYER_KS]++;
 		codPlayer[killer][PLAYER_TIME_KS] = killStreakTime;
 		
@@ -1679,6 +1684,8 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 		set_task(1.0, "end_kill_streak", killer + TASK_END_KILL_STREAK, _, _, "b");
 	}
 	
+	if(!codPlayer[killer][PLAYER_ITEM]) set_item(killer, -1, -1);
+
 	check_level(killer);
 
 	get_user_name(killer, playerName, charsmax(playerName));
@@ -2061,6 +2068,22 @@ public say_text(msgId, msgDest, msgEnt)
 	return PLUGIN_CONTINUE;
 }
 
+public message_ammo(msgId, msgDest, id)
+{
+	new weaponAmmo = get_msg_arg_int(1);
+
+	if(is_user_alive(id) && weaponAmmo && weaponAmmo <= 10)
+	{
+		new weaponMaxBpAmmo = maxBpAmmo[weaponAmmo];
+
+		if(get_msg_arg_int(2) < weaponMaxBpAmmo)
+		{
+			set_msg_arg_int(2, ARG_BYTE, weaponMaxBpAmmo);
+			set_pdata_int(id, 376 + weaponAmmo, weaponMaxBpAmmo, 5);
+		}
+	}
+}
+
 public message_intermission()
 	set_task(0.25, "save_players");
 
@@ -2366,6 +2389,9 @@ public set_attributes(id)
 	model_change(id);
 
 	player_reset_max_speed(id);
+
+	StripWeapons(id, Primary);
+	StripWeapons(id, Secondary);
 	
 	new playerWeapons[32], weaponName[22], weaponTypes, weaponType = get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_WEAPONS);
 	
@@ -2693,10 +2719,6 @@ public load_data_handle(failState, Handle:query, error[], errorNum, playerId[], 
 			codClass[PCLASS_STAM] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stamina"));
 			codClass[PCLASS_STR] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "strength"));
 			codClass[PCLASS_COND] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "condition"));
-
-			//TESTY
-			if(codClass[PCLASS_LEVEL] < 49) codClass[PCLASS_LEVEL] = 49;
-			if(codClass[PCLASS_EXP] < get_level_exp(49 - 1)) codClass[PCLASS_EXP] = get_level_exp(49 - 1);
 			
 			ArraySetArray(codPlayerClasses[id], classId, codClass);
 		}
@@ -2842,16 +2864,15 @@ public load_class(id, class)
 		
 		get_class_info(class, CLASS_NAME, className, charsmax(className));
 		
-		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`) VALUES ('%s', '%s')", codPlayer[id][PLAYER_NAME], className);
+		//TESTY
+		//formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`) VALUES ('%s', '%s')", codPlayer[id][PLAYER_NAME], className);
+		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`, `level`, `exp`) VALUES ('%s', '%s', '%i', '%i')", codPlayer[id][PLAYER_NAME], className, 49, get_level_exp(49 - 1));
 		SQL_ThreadQuery(sql, "ignore_handle", tempData);
 	}
 
 	//TESTY
-	if(codPlayer[id][PLAYER_LEVEL] < 49)
-	{
-		codPlayer[id][PLAYER_LEVEL] = codClass[PCLASS_LEVEL] = 49;
-		codPlayer[id][PLAYER_EXP] = codClass[PCLASS_EXP] = get_level_exp(codPlayer[id][PLAYER_LEVEL] - 1);
-	}
+	if(codClass[PCLASS_LEVEL] < 49) codPlayer[id][PLAYER_LEVEL] = codClass[PCLASS_LEVEL] = 49;
+	if(codClass[PCLASS_EXP] < get_level_exp(49 - 1)) codPlayer[id][PLAYER_EXP] = codClass[PCLASS_EXP] = get_level_exp(49 - 1);
 
 	check_promotion(id);
 	
@@ -3050,7 +3071,7 @@ public _cod_get_item_durability(id)
 	return codPlayer[id][PLAYER_ITEM_DURA];
 	
 public _cod_set_item_durability(id, value)
-	codPlayer[id][PLAYER_ITEM_DURA] = min(value, maxDurability);
+	codPlayer[id][PLAYER_ITEM_DURA] = min(max(0, value), maxDurability);
 
 public _cod_max_item_durability(id)
 	return maxDurability;
@@ -3188,6 +3209,21 @@ public _cod_add_user_gravity(id, value)
 
 public _cod_add_user_armor(id, value)
 	cs_set_user_armor(id, cs_get_user_armor(id) + value, CS_ARMOR_KEVLAR);
+
+public _cod_use_user_rocket(id)
+	use_rocket(id);
+
+public _cod_use_user_mine(id)
+	use_mine(id);
+
+public _cod_use_user_dynamite(id)
+	use_dynamite(id);
+
+public _cod_use_user_medkit(id)
+	use_medkit(id);
+
+public _cod_use_user_teleport(id)
+	use_teleport(id);
 
 public _cod_get_user_resistance(id)
 	return codPlayer[id][PLAYER_RESISTANCE];
@@ -3342,8 +3378,6 @@ public _cod_kill_player(killer, victim, flags)
 {
 	if(is_user_alive(victim))
 	{
-		log_to_file("cod_mod.log", "cod_kill_player");
-
 		cs_set_user_armor(victim, 0, CS_ARMOR_NONE);
 		
 		_cod_inflict_damage(killer, victim, float(get_user_health(victim) + 1), 0.0, flags);

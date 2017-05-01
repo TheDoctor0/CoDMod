@@ -19,7 +19,7 @@ new costRepair, costItem, costUpgrade, costSmallBandage, costBigBandage, costRoc
 	costJump, costBunnyHop, costSilent, costArmor, costDamage, costSmallExp, costMediumExp, costBigExp, costRandomExp, exchangeRatio, 
 	durabilityAmount, smallBandageHP, bigBandageHP, armorAmount, damageAmount, smallExp, mediumExp, bigExp, minRandomExp, maxRandomExp;
 
-new silentWalk, bunnyHop, damageBonus;
+new damageBonus;
 
 public plugin_init() 
 {
@@ -227,14 +227,14 @@ public shop_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == SILENT && (get_bit(id, silentWalk) || cod_get_user_footsteps(id)))
+	if(item == SILENT && cod_get_user_footsteps(id))
 	{
 		cod_print_chat(id, "Masz juz ^x03 Ciche Chodzenie^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == BUNNY_HOP && (get_bit(id, bunnyHop) || cod_get_user_bunnyhop(id)))
+	if(item == BUNNY_HOP && cod_get_user_bunnyhop(id))
 	{
 		cod_print_chat(id, "Masz juz ^x03 Bunny Hop^x01!");
 
@@ -361,16 +361,12 @@ public shop_menu_handle(id, menu, item)
 			cod_print_chat(id, "Kupiles^x03 BunnyHop^x01!");
 			
 			cod_set_user_bunnyhop(id, ADDITIONAL, 1);
-
-			set_bit(id, bunnyHop);
 		}
 		case SILENT:
 		{
 			cod_print_chat(id, "Kupiles^x03 Ciche Chodzenie^x01!");
 			
 			cod_set_user_footsteps(id, ADDITIONAL, 1);
-
-			set_bit(id, silentWalk);
 		}
 		case ARMOR:
 		{

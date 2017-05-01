@@ -512,6 +512,8 @@ public cod_spawned(id)
 {
 	if(!get_bit(id, visitInfo)) set_task(5.0, "check_time", id + TASK_TIME);
 
+	for(new i = 1; i <= MAX_PLAYERS; i++) playerDamage[id][i] = 0;
+
 	save_stats(id);
 }
 

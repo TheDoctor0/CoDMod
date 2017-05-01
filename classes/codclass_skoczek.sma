@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 new const name[] = "Skoczek";
-new const description[] = "Ma BunnyHop i dwa dodatkowe skoki.";
+new const description[] = "Ma BunnyHop i dodatkowy skok.";
 new const fraction[] = "";
 new const weapons = (1<<CSW_UMP45)|(1<<CSW_FIVESEVEN);
 new const health = 10;
@@ -25,11 +25,11 @@ public plugin_init()
 public cod_class_enabled(id, promotion)
 {
 	cod_set_user_bunnyhop(id, CLASS, 1);
-	cod_set_user_multijumps(id, 2);
+	cod_set_user_multijumps(id, 1);
 }
 
 public cod_class_disabled(id, promotion)
 	cod_set_user_bunnyhop(id, CLASS, 0);
 
 public cod_class_spawned(id)
-	cod_add_user_multijumps(id, 2);
+	cod_add_user_multijumps(id, 1);

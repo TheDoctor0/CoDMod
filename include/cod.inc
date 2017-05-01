@@ -468,6 +468,31 @@ Adds value to player's armor amount.
 native cod_add_user_armor(id, value);
 
 /*------------------------------
+Use player's rocket.
+------------------------------*/
+native cod_use_user_rocket(id);
+
+/*------------------------------
+Use player's rocket.
+------------------------------*/
+native cod_use_user_mine(id);
+
+/*------------------------------
+Use player's dynamite.
+------------------------------*/
+native cod_use_user_dynamite(id);
+
+/*------------------------------
+Use player's medkit.
+------------------------------*/
+native cod_use_user_medkit(id);
+
+/*------------------------------
+Use player's teleport.
+------------------------------*/
+native cod_use_user_teleport(id);
+
+/*------------------------------
 Returns if player have resistance for powers.
 ------------------------------*/
 native cod_get_user_resistance(id);

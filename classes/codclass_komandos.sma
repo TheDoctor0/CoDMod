@@ -36,8 +36,6 @@ public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damage
 		damage = COD_BLOCK;
 
 		cod_kill_player(attacker, victim, damageBits);
-
-		log_to_file("cod_mod.log", "Komandos PPM");
 	}
 
 	if(weapon == CSW_DEAGLE && damageBits & DMG_BULLET && random_num(1, 10) == 1)

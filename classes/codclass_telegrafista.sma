@@ -54,19 +54,19 @@ public radar_stop(id)
 {
 	id -= TASK_STOP;
 
-	rem_bit(id, used);
+	set_bit(id, used);
 }
 
 public radar_scan(id)
 {
 	id -= TASK_RADAR;
 
-	if(!is_user_alive(id) || !get_bit(id, used))
+	if(!is_user_alive(id) || get_bit(id, used))
 	{
 		remove_task(id + TASK_RADAR);
 
 		return;
-	}   
+	}
 
 	static playerOrigin[3], msgHostageAdd, msgHostageDel;
 

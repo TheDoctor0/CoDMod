@@ -32,4 +32,4 @@ public cod_class_spawned(id)
 	cod_set_user_teleports(id, -1);
 
 public cod_class_skill_used(id)
-	cmd_execute(id, "+teleport");
+	cod_use_user_teleport(id);
