@@ -56,7 +56,7 @@ public market_menu(id)
 	
 	menu_display(id, menu);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public market_menu_handle(id, menu, item)
@@ -175,7 +175,7 @@ public set_item_price(id)
 	
 	cod_set_user_item(id);
 	
-	cod_print_chat(0, "^x03%s^x01 wystawil^x03 %s^x01 na rynek za^x03 %i%s^x01 Honoru.", playerName[id], marketItem[NAME], marketItem[PRICE]);
+	cod_print_chat(0, "^x03%s^x01 wystawil^x03 %s^x01 na rynek za^x03 %i^x01 Honoru.", playerName[id], marketItem[NAME], marketItem[PRICE]);
 	
 	return PLUGIN_HANDLED;
 }

@@ -169,7 +169,7 @@ public cod_spawned(id)
 	}
 }
 
-public cod_damage_post(attacker, victim, Float:damage, damageBits)
+public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
 {
 	if(!get_bit(attacker, vip)) return PLUGIN_CONTINUE;
 
@@ -210,7 +210,8 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 	new bool:hs = hitPlace == HIT_HEAD;
 
-	set_user_health(killer, min(get_user_health(killer) + (hs ? 15 : 10), cod_get_user_health(killer, 1, 1, 1)));
+	cod_add_user_health(killer, hs ? 15 : 10);
+
 	cs_set_user_money(killer, cs_get_user_money(killer) + (hs ? 1000 : 500));
 	
 	if(hs) cod_show_hud(killer, TYPE_DHUD, 38, 218, 116, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0, "HeadShot! +15HP");

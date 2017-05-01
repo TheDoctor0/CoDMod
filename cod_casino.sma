@@ -7,8 +7,7 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new const commandCasino[][] = { "say /kasyno", "say_team /kasyno", "say /casino", "say_team /casino", 
-	"say /ruletka", "say_team /ruletka", "say /roulette", "say_team /roulette", "kasyno" };
+new const commandCasino[][] = { "say /kasyno", "say_team /kasyno", "say /casino", "say_team /casino", "kasyno" };
 new const commandDice[][] = { "say /kostka", "say_team /kostka", "say /dice", "say_team /dice", "kostka" };
 new const commandRoulette[][] = { "say /ruletka", "say_team /ruletka", "say /roulette", "say_team /roulette", "ruletka" };
 new const commandBlackjack[][] = { "say /blackjack", "say_team /blackjack", "blackjack" };
@@ -34,7 +33,7 @@ public plugin_init()
 	for(new i; i < sizeof commandMachine; i++) register_clcmd(commandMachine[i], "machine_menu");
 	for(new i; i < sizeof commandCoinFlip; i++) register_clcmd(commandCoinFlip[i], "coinflip_menu");
 
-	register_clcmd("KOSTKA_ZMIEN_STAWKE", "dice_change_bid");
+	register_clcmd("ZMIEN_STAWKE", "change_bid");
 }
 
 public client_putinserver(id)
@@ -52,16 +51,16 @@ public casino_menu(id, sound)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	if(sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new menu = menu_create("\yGry w \rKasynie\w:", "casino_menu_handle");
 	
 	menu_additem(menu, "\wKostka \y(/kostka)");
 	menu_additem(menu, "\wRuletka \y(/ruletka)");
-	menu_additem(menu, "\wBlackjack \y(/blackjack)");
-	menu_additem(menu, "\wPoker \y(/poker)");
-	menu_additem(menu, "\wAutomat \y(/automat)");
-	menu_additem(menu, "\wRzut Moneta \y(/moneta)");
+	//menu_additem(menu, "\wBlackjack \y(/blackjack)");
+	//menu_additem(menu, "\wPoker \y(/poker)");
+	//menu_additem(menu, "\wAutomat \y(/automat)");
+	//menu_additem(menu, "\wRzut Moneta \y(/moneta)");
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
@@ -89,8 +88,8 @@ public casino_menu_handle(id, menu, item)
     
 	switch(item)
 	{ 
-		case 0: dice_menu(id);
-		case 1: roulette_menu(id);
+		case 0: dice_menu(id, 0);
+		case 1: roulette_menu(id, 0);
 		case 2: blackjack_menu(id);
 		case 3: poker_menu(id);
 		case 4: machine_menu(id);
@@ -102,42 +101,54 @@ public casino_menu_handle(id, menu, item)
 	return PLUGIN_CONTINUE;
 }
 
-stock dice_menu(id, number = 0)
+public dice_menu(id, number)
 {
 	if(!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	playerData[id][GAME_TYPE] = DICE;
 
-	new menuData[64], menu;
+	new menuData[128], menu;
 
 	if(number > 0)
 	{
-		new bool:win;
+		new bool:win, amount = playerData[id][GAME_BID];
 
-		if(playerDice[id][DICE_TYPE] == DICE_NORMAL) if(playerDice[id][DICE_NUMBER] == number) win = true;
-		else if(playerDice[id][DICE_NUMBER] <= 3 && playerDice[id][DICE_NUMBER] == DICE_LOW || playerDice[id][DICE_NUMBER] > 3 && playerDice[id][DICE_NUMBER] == DICE_HIGH) win = true;
+		if(playerDice[id][DICE_TYPE] == DICE_NORMAL && playerDice[id][DICE_NUMBER] == number)
+		{
+			amount = playerData[id][GAME_BID] * 5;
 
-		cod_set_user_honor(id, win ? (cod_get_user_honor(id) + playerDice[id][DICE_TYPE] == DICE_NORMAL ? playerData[id][GAME_BID]*5 : playerData[id][GAME_BID]) : (cod_get_user_honor(id) - playerData[id][GAME_BID]));
+			win = true;
+		}
+		else if(playerDice[id][DICE_TYPE] == DICE_LOWHIGH && (playerDice[id][DICE_NUMBER] == DICE_LOW && number <= 3) || (playerDice[id][DICE_NUMBER] == DICE_HIGH && number > 3))
+		{
+			amount = floatround(playerData[id][GAME_BID] * 1.8);
 
-		formatex(menuData, charsmax(menuData), "\yGra w \rKostke\w:^n\wWylosowano \y%s \w- \r%s %i Honoru!\w", number, win ? "Wygrales" : "Przegrales", 
-			win ? (playerDice[id][DICE_TYPE] == DICE_NORMAL ? playerData[id][GAME_BID]*6 : playerData[id][GAME_BID]*2) : playerData[id][GAME_BID]);
+			win = true;
+		}
+
+		cod_set_user_honor(id, win ? (cod_get_user_honor(id) + amount) : (cod_get_user_honor(id) - amount));
+
+		win ? client_cmd(id, "spk %s", codSounds[SOUND_APPLAUSE]) : client_cmd(id, "spk %s", codSounds[SOUND_LAUGH]);
+
+		formatex(menuData, charsmax(menuData), "\yGra w \rKostke\w:^n\wWylosowano \y%i \w- \r%s %i Honoru!\w", number, win ? "Wygrales" : "Przegrales", amount);
 
 		menu = menu_create(menuData, "dice_menu_handle");
 	}
 	else menu = menu_create("\yGra w \rKostke\w:", "dice_menu_handle");
 
-	menu_additem(menu, "\wGraj");
+	menu_additem(menu, "\wGraj^n");
 	
 	formatex(menuData, charsmax(menuData), "\wTyp \yGry \r[%s]", playerDice[id][DICE_TYPE] == DICE_NORMAL ? "LICZBA" : "LOW/HIGH");
 	menu_additem(menu, menuData);
 
-	new numStr[2];
-	num_to_str(playerDice[id][DICE_NUMBER], numStr, charsmax(numStr));
+	new diceNumber[2];
 
-	formatex(menuData, charsmax(menuData), "\wTwoj \yTyp \r[%s]", playerDice[id][DICE_TYPE] == DICE_NORMAL ? numStr : (playerDice[id][DICE_NUMBER] == DICE_LOW ? "LOW" : "HIGH"));
+	num_to_str(playerDice[id][DICE_NUMBER], diceNumber, charsmax(diceNumber));
+
+	formatex(menuData, charsmax(menuData), "\wTwoj \yTyp \r[%s]", playerDice[id][DICE_TYPE] == DICE_NORMAL ? diceNumber : (playerDice[id][DICE_NUMBER] == DICE_LOW ? "LOW" : "HIGH"));
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "\wTwoja \yStawka \r[%s]", playerData[id][GAME_BID]);
+	formatex(menuData, charsmax(menuData), "\wTwoja \yStawka \r[%i]", playerData[id][GAME_BID]);
 	menu_additem(menu, menuData);
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
@@ -162,7 +173,7 @@ public dice_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if(item) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
 	menu_destroy(menu);
     
@@ -187,11 +198,15 @@ public dice_menu_handle(id, menu, item)
 
 			if(playerDice[id][DICE_TYPE] == DICE_NORMAL) playerDice[id][DICE_NUMBER] = 1;
 			else playerDice[id][DICE_NUMBER] = DICE_LOW;
+
+			dice_menu(id, 0);
 		}
 		case 2:
 		{
 			if(playerDice[id][DICE_TYPE] == DICE_NORMAL && ++playerDice[id][DICE_NUMBER] > 6) playerDice[id][DICE_NUMBER] = 1;
 			else if(playerDice[id][DICE_TYPE] == DICE_LOWHIGH) playerDice[id][DICE_NUMBER] = playerDice[id][DICE_NUMBER] == DICE_LOW ? DICE_HIGH : DICE_LOW;
+
+			dice_menu(id, 0);
 		}
 		case 3:
 		{
@@ -206,38 +221,47 @@ public dice_menu_handle(id, menu, item)
 	return PLUGIN_HANDLED;
 }
 
-stock roulette_menu(id, number = -1)
+public roulette_menu(id, number)
 {
 	if(!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	playerData[id][GAME_TYPE] = ROULETTE;
 
-	new menuData[64], menu;
+	new menuData[128], menu;
 
-	if(number >= 0)
+	if(--number >= 0)
 	{
-		new bool:win, amount;
+		new bool:win, amount = playerData[id][GAME_BID];
 
-		if(playerRoulette[id] == ROULETTE_GREEN && number == 0) win = true;
-		else if(playerRoulette[id] == ROULETTE_BLACK && number <= 7) win = true;
-		else if(playerRoulette[id] == ROULETTE_RED && number > 7) win = true;
+		if(playerRoulette[id] == ROULETTE_GREEN && number == 0)
+		{
+			amount = playerData[id][GAME_BID] * 14;
 
-		amount = win ? (playerRoulette[id] == ROULETTE_GREEN ? playerData[id][GAME_BID]*14 : playerData[id][GAME_BID]*2) : playerData[id][GAME_BID];
+			win = true;
+		}
+		else if((playerRoulette[id] == ROULETTE_BLACK && number <= 7 && number > 0) || (playerRoulette[id] == ROULETTE_RED && number > 7))
+		{
+			amount = playerData[id][GAME_BID] * 2;
+
+			win = true;
+		}
 
 		cod_set_user_honor(id, win ? (cod_get_user_honor(id) + amount) : (cod_get_user_honor(id) - amount));
 
-		formatex(menuData, charsmax(menuData), "\yGra w \rRuletke\w:^n\wWylosowano \y%s (%s) \w- \r%s %i Honoru!\w", number, number == 0 ? "Zielone" : (number <= 7 ? "Czerwone" : "Czarne"), win ? "Wygrales" : "Przegrales", amount);
+		win ? client_cmd(id, "spk %s", codSounds[SOUND_APPLAUSE]) : client_cmd(id, "spk %s", codSounds[SOUND_LAUGH]);
+
+		formatex(menuData, charsmax(menuData), "\yGra w \rRuletke\w:^n\wWylosowano \y%i (%s) \w- \r%s %i Honoru!\w", number, number == 0 ? "Zielone" : (number > 7 ? "Czerwone" : "Czarne"), win ? "Wygrales" : "Przegrales", amount);
 
 		menu = menu_create(menuData, "roulette_menu_handle");
 	}
 	else menu = menu_create("\yGra w \rRuletke\w:", "roulette_menu_handle");
 
-	menu_additem(menu, "\wGraj");
+	menu_additem(menu, "\wGraj^n");
 
 	formatex(menuData, charsmax(menuData), "\wTwoj \yTyp \r[%s]", playerRoulette[id] == ROULETTE_GREEN ? "ZIELONE" : (playerRoulette[id] == ROULETTE_BLACK ? "CZARNE" : "CZERWONE"));
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "\wTwoja \yStawka \r[%s]", playerData[id][GAME_BID]);
+	formatex(menuData, charsmax(menuData), "\wTwoja \yStawka \r[%i]", playerData[id][GAME_BID]);
 	menu_additem(menu, menuData);
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
@@ -262,7 +286,7 @@ public roulette_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if(item) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
 	menu_destroy(menu);
     
@@ -277,11 +301,16 @@ public roulette_menu_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 
-			roulette_menu(id, random_num(0, 14));
+			roulette_menu(id, random_num(0, 14) + 1);
 
 			return PLUGIN_HANDLED;
 		}
-		case 1: if(++playerRoulette[id] > ROULETTE_GREEN) playerRoulette[id] = ROULETTE_BLACK;
+		case 1: 
+		{
+			if(++playerRoulette[id] > ROULETTE_GREEN) playerRoulette[id] = ROULETTE_BLACK;
+
+			roulette_menu(id, 0);
+		}
 		case 2:
 		{
 			cod_print_chat(id, "Wpisz nowa^x04 stawke^x01.");
@@ -323,7 +352,7 @@ public change_bid(id)
 	
 	new bidData[16], bid;
 	
-	read_args(bidData, charsmax(bid));
+	read_args(bidData, charsmax(bidData));
 	remove_quotes(bidData);
 
 	bid = str_to_num(bidData);
@@ -346,8 +375,8 @@ public change_bid(id)
 
 	switch(playerData[id][GAME_TYPE])
 	{ 
-		case DICE: dice_menu(id);
-		case ROULETTE: roulette_menu(id);
+		case DICE: dice_menu(id, 0);
+		case ROULETTE: roulette_menu(id, 0);
 		case BLACKJACK: blackjack_menu(id);
 		case POKER: poker_menu(id);
 		case MACHINE: machine_menu(id);

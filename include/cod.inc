@@ -11,6 +11,7 @@
 
 #define COD_CONTINUE 0
 #define COD_STOP 4
+#define COD_BLOCK -1.0
 
 #define DMG_CODSKILL (1<<31)
 #define DMG_HEGRENADE (1<<24)
@@ -24,11 +25,12 @@
 
 enum _:promotions { PROMOTION_NONE, PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION_THIRD };
 
-enum _:renderType { RENDER_CLASS, RENDER_ITEM, RENDER_ADDITIONAL };
+enum _:types { NONE = -1, CLASS, ITEM, ADDITIONAL, ALL };
 
 enum _:hud { TYPE_HUD, TYPE_DHUD };
 
-enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_BOX };
+enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_DEPLOY, 
+	SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_BOX, SOUND_APPLAUSE, SOUND_LAUGH };
 
 new const codSounds[sounds][] =
 {
@@ -39,12 +41,15 @@ new const codSounds[sounds][] =
 	"CoDMod/levelup.wav",
 	"CoDMod/levelup2.wav",
 	"CoDMod/levelup3.wav",
+	"CoDMod/deploy.wav",
 	"CoDMod/one.wav",
 	"CoDMod/last.wav",
 	"CoDMod/force.wav",
 	"CoDMod/humiliation.wav",
 	"CoDMod/bomb.wav",
-	"CoDMod/box.wav"
+	"CoDMod/box.wav",
+	"CoDMod/applause.wav",
+	"CoDMod/laugh.wav"
 };
 
 /*------------------------------
@@ -190,7 +195,7 @@ Sets player's item.
 If item = -1 an item will be random.
 If value = -1 item value will be random.
 ------------------------------*/
-native cod_set_user_item(id, item = -1, value = -1);
+native cod_set_user_item(id, item = 0, value = 0);
 
 /*------------------------------
 Upgrades player's item
@@ -252,12 +257,13 @@ native cod_add_user_health(id, value, maximum = 1);
 
 /*------------------------------
 Returns health statistic points.
+If current_health = 1 returns current health points.
 If class_health = 1 adds class health points.
 If stats_health = 1 adds stats health points.
 If bonus_health = 1 adds extra health points.
 If base_health = 1 adds base 100HP.
 ------------------------------*/
-native cod_get_user_health(id, class_health = 1, stats_health = 1, bonus_health = 1, base_health = 0);
+native cod_get_user_health(id, currect_health = 0, class_health = 1, stats_health = 1, bonus_health = 1, base_health = 0);
 
 /*------------------------------
 Returns intelligence statistic points.
@@ -468,13 +474,21 @@ native cod_get_user_resistance(id);
 
 /*------------------------------
 Returns if player have bunnyhop.
+Type can be NONE - all, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 ------------------------------*/
-native cod_get_user_bunnyhop(id);
+native cod_get_user_bunnyhop(id, type = NONE);
 
 /*------------------------------
 Returns if player have silent walk.
+Type can be NONE - all, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 ------------------------------*/
-native cod_get_user_footsteps(id);
+native cod_get_user_footsteps(id, type = NONE);
+
+/*------------------------------
+Returns if player have model of the opponent.
+Type can be NONE - all, CLASS - for class, ITEM - for item, ADDITIONAL - others.
+------------------------------*/
+native cod_get_user_model(id, type = NONE);
 
 /*------------------------------
 Set's player's resistance for powers.
@@ -483,13 +497,21 @@ native cod_set_user_resistance(id, value);
 
 /*------------------------------
 Set's player's bunnyhop.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - others.
 ------------------------------*/
-native cod_set_user_bunnyhop(id, value);
+native cod_set_user_bunnyhop(id, type, value);
 
 /*------------------------------
-Set's player's footsteps.
+Set's player's silent walk.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - others.
 ------------------------------*/
-native cod_set_user_footsteps(id, value);
+native cod_set_user_footsteps(id, type, value);
+
+/*------------------------------
+Set's player's model of the opponent.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - others.
+------------------------------*/
+native cod_set_user_model(id, type, value);
 
 /*------------------------------
 Gives player a weapon and allows player to own it
@@ -508,7 +530,7 @@ native cod_get_user_render(id);
 
 /*------------------------------
 Sets player's render.
-Type can be RENDER_CLASS - for class, RENDER_ITEM - for item, RENDER_ADDITIONAL - others.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - others.
 Value is number from -255 to 255 (negative numbers substract it from player's current render value, positive and 0 sets it to this value).
 Status is player state for render. It can be a bitsum of RENDER_ALWAYS, RENDER_STAND, RENDER_MOVE, RENDER_DUCK, RENDER_SHIFT.
 Weapon is weapon id (CSW_), 0 for all weapons.
@@ -528,7 +550,7 @@ Diplays text in HUD/DHUD.
 Type can be TYPE_HUD or TYPE_DHUD.
 HUD/DHUD params usage is the same as in set_hudmessage/set_dhudmessage.
 ------------------------------*/
-native cod_show_hud(id, type=0, red=255, green=255, blue=255, Float:x=-1.0, Float:y=0.35, effects=0, Float:fxtime=6.0, Float:holdtime=12.0, Float:fadeintime=0.1, Float:fadeouttime=0.2, const text[], any:...)
+native cod_show_hud(id, type=0, red=255, green=255, blue=255, Float:x=-1.0, Float:y=0.35, effects=0, Float:fxtime=6.0, Float:holdtime=12.0, Float:fadeintime=0.1, Float:fadeouttime=0.2, const text[], any:...);
 
 /*------------------------------
 Displays screen fade.
@@ -605,12 +627,12 @@ forward cod_gravity_changed(id);
 /*------------------------------
 Multiforward executed on damage event before armor reduce.
 ------------------------------*/
-forward cod_damage_pre(attacker, victim, Float:damage, damageBits);
+forward cod_damage_pre(attacker, victim, weapon, Float:damage, damageBits);
 
 /*------------------------------
 Multiforward executed on damage event after armor reduce.
 ------------------------------*/
-forward cod_damage_post(attacker, victim, Float:damage, damageBits);
+forward cod_damage_post(attacker, victim, weapon, Float:damage, damageBits);
 
 /*------------------------------
 Multiforward executed on weapon deploy event.
@@ -620,7 +642,7 @@ forward cod_weapon_deploy(id, weapon, ent);
 /*------------------------------
 Multiforward executed on death event.
 ------------------------------*/
-forward cod_killed(killer, victim, weaponId, hitPlace);
+forward cod_killed(killer, victim, weapon, hitPlace);
 
 /*------------------------------
 Multiforward executed on spawn event.
@@ -655,7 +677,7 @@ forward cod_item_enabled(id, value);
 /*------------------------------
 Item forward executed on item remove.
 ------------------------------*/
-forward cod_item_disabled(id, item);
+forward cod_item_disabled(id);
 
 /*------------------------------
 Item forward executed on spawn event.
@@ -680,27 +702,27 @@ forward cod_item_upgrade(id);
 /*------------------------------
 Item function for getting value of item.
 ------------------------------*/
-forward cod_item_value(id, value);
+forward cod_item_value(id);
 
 /*------------------------------
 Item function for attacker damage change.
 ------------------------------*/
-forward cod_item_damage_attacker(victim, attacker, Float:damage, damageBits);
+forward cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits);
 
 /*------------------------------
 Item function for victim damage change.
 ------------------------------*/
-forward cod_item_damage_victim(victim, attacker, Float:damage, damageBits);
+forward cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits);
 
 /*------------------------------
 Class forward executed on class set.
 ------------------------------*/
-forward cod_class_enabled(id, class, promotion);
+forward cod_class_enabled(id, promotion);
 
 /*------------------------------
 Class forward executed on class remove.
 ------------------------------*/
-forward cod_class_disabled(id, class, promotion);
+forward cod_class_disabled(id, promotion);
 
 /*------------------------------
 Class forward executed on spawn event.
@@ -720,12 +742,12 @@ forward cod_class_skill_used(id);
 /*------------------------------
 Class function for attacker damage change.
 ------------------------------*/
-forward cod_class_damage_attacker(victim, attacker, Float:damage, damageBits);
+forward cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits);
 
 /*------------------------------
 Class function for victim damage change.
 ------------------------------*/
-forward cod_class_damage_victim(victim, attacker, Float:damage, damageBits);
+forward cod_class_damage_victim(attacker, victim, weapon, &Float:damage, damageBits);
 
 stock cmd_execute(id, const text[], any:...) 
 {

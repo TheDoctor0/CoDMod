@@ -220,7 +220,7 @@ public shop_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	if((item == SMALL_BANDAGE || item == BIG_BANDAGE) && get_user_health(id) == cod_get_user_max_health(id))
+	if((item == SMALL_BANDAGE || item == BIG_BANDAGE) && cod_get_user_health(id, 1) == cod_get_user_max_health(id))
 	{
 		cod_print_chat(id, "Jestes juz w pelni^x03 uzdrowiony^x01!");
 
@@ -314,13 +314,25 @@ public shop_menu_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 		}
-		case MINE:
+		case SMALL_BANDAGE:
+		{
+			cod_set_user_health(id, cod_get_user_health(id, 1) + smallBandageHP);
+			
+			cod_print_chat(id, "Kupiles^x03 Maly Bandarz^x01!");
+		}
+		case BIG_BANDAGE:
+		{
+			cod_set_user_health(id, cod_get_user_health(id, 1) + bigBandageHP);
+			
+			cod_print_chat(id, "Kupiles^x03 Duzy Bandarz^x01!");
+		}
+		case ROCKET:
 		{
 			cod_print_chat(id, "Kupiles^x03 Dodatkowa Rakiete^x01!");
 			
 			cod_add_user_mines(id, 1);
 		}
-		case ROCKET:
+		case MINE:
 		{
 			cod_print_chat(id, "Kupiles^x03 Dodatkowa Mine^x01!");
 			
@@ -348,7 +360,7 @@ public shop_menu_handle(id, menu, item)
 		{
 			cod_print_chat(id, "Kupiles^x03 BunnyHop^x01!");
 			
-			cod_set_user_bunnyhop(id, 1);
+			cod_set_user_bunnyhop(id, ADDITIONAL, 1);
 
 			set_bit(id, bunnyHop);
 		}
@@ -356,7 +368,7 @@ public shop_menu_handle(id, menu, item)
 		{
 			cod_print_chat(id, "Kupiles^x03 Ciche Chodzenie^x01!");
 			
-			cod_set_user_footsteps(id, 1);
+			cod_set_user_footsteps(id, ADDITIONAL, 1);
 
 			set_bit(id, silentWalk);
 		}
@@ -378,7 +390,7 @@ public shop_menu_handle(id, menu, item)
 
 			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", smallExp);
 			
-			cod_set_user_exp(id, cod_get_user_exp(id) + smallExp);
+			cod_set_user_exp(id, smallExp);
 		}
 		case MEDIUM_EXP:
 		{
@@ -386,7 +398,7 @@ public shop_menu_handle(id, menu, item)
 
 			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", mediumExp);
 			
-			cod_set_user_exp(id, cod_get_user_exp(id) + mediumExp);
+			cod_set_user_exp(id, mediumExp);
 		}
 		case BIG_EXP:
 		{
@@ -394,7 +406,7 @@ public shop_menu_handle(id, menu, item)
 
 			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", bigExp);
 			
-			cod_set_user_exp(id, cod_get_user_exp(id) + bigExp);
+			cod_set_user_exp(id, bigExp);
 		}
 		case RANDOM_EXP:
 		{
@@ -404,7 +416,7 @@ public shop_menu_handle(id, menu, item)
 
 			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", randomExp);
 			
-			cod_set_user_exp(id, cod_get_user_exp(id) + randomExp);
+			cod_set_user_exp(id, randomExp);
 		}
 	}
 
@@ -450,8 +462,8 @@ public buy_honor_handle(id)
 	return PLUGIN_HANDLED;
 }
 
-public cod_damage_post(attacker, victim, Float:damage, damageBits)
-	if(get_bit(attacker, damageBonus)) cod_inflict_damage(attacker, victim, float(damageAmount), 0.0, DMG_BULLET);
+public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
+	if(get_bit(attacker, damageBonus)) cod_inflict_damage(attacker, victim, float(damageAmount), 0.0, damageBits);
 
 public cod_new_round()
 	for(new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, damageBonus);

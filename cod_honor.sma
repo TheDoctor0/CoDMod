@@ -228,6 +228,9 @@ public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], d
 		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_honor` (`name`) VALUES ('%s')", playerName[id]);
 		
 		SQL_ThreadQuery(sql, "ignore_handle", queryData);
+
+		//TESTY
+		playerHonor[id] = 10000;
 	}
 	
 	set_bit(id, dataLoaded);

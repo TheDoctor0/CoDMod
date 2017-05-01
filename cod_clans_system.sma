@@ -12,10 +12,10 @@ enum _:statusInfo { STATUS_NONE, STATUS_MEMBER, STATUS_DEPUTY, STATUS_LEADER };
 
 new const commandClan[][] = { "say /clan", "say_team /clan", "say /codClans", "say_team /codClans", "say /klany", "say_team /klany", "say /klan", "say_team /klan", "klan" };
 
-new cvarLevelCost, cvarNextLevelCost, cvarSkillCost, cvarNextSkillCost, cvarCreateLevel, cvarMembersStart, cvarLevelMax, 
+new cvarChatPrefix, cvarLevelCost, cvarNextLevelCost, cvarSkillCost, cvarNextSkillCost, cvarCreateLevel, cvarMembersStart, cvarLevelMax, 
 	cvarSkillMax, cvarMembersPerLevel, cvarHealthPerLevel, cvarGravityPerLevel, cvarDamagePerLevel, cvarWeaponDropPerLevel;
 
-new levelCost, nextLevelCost, skillCost, nextSkillCost, createLevel, membersStart, levelMax, 
+new chatPrefix, levelCost, nextLevelCost, skillCost, nextSkillCost, createLevel, membersStart, levelMax, 
 	skillMax, membersPerLevel, healthPerLevel, gravityPerLevel, damagePerLevel, weaponDropPerLevel;
 
 new playerName[MAX_PLAYERS + 1][64], chosenName[MAX_PLAYERS + 1][64], clan[MAX_PLAYERS + 1], chosenId[MAX_PLAYERS + 1], Handle:sql, Array:codClans;
@@ -30,6 +30,7 @@ public plugin_init()
 	register_clcmd("PODAJ_NOWA_NAZWE_KLANU", "change_name_handle");
 	register_clcmd("WPISZ_ILOSC_HONORU", "deposit_honor_handle");
 
+	cvarChatPrefix = register_cvar("cod_clans_chat_prefix", "0");
 	cvarLevelCost = register_cvar("cod_clans_level_cost", "1000");
 	cvarNextLevelCost = register_cvar("cod_clans_next_level_cost", "1000");
 	cvarSkillCost = register_cvar("cod_clans_skill_cost", "500");
@@ -57,6 +58,7 @@ public plugin_natives()
 
 public plugin_cfg()
 {
+	chatPrefix = get_pcvar_num(cvarChatPrefix);
 	levelCost = get_pcvar_num(cvarLevelCost);
 	nextLevelCost = get_pcvar_num(cvarNextLevelCost);
 	skillCost = get_pcvar_num(cvarSkillCost);
@@ -116,7 +118,7 @@ public cod_spawned(id)
 	return PLUGIN_CONTINUE;
 }
 
-public cod_damage_post(attacker, victim, Float:damage, damageBits)
+public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
 {
 	if(!clan[attacker]) return PLUGIN_CONTINUE;
 	
@@ -1199,7 +1201,7 @@ public applications_menu(id)
 	
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT a.name, (SELECT level FROM `cod_mod` WHERE name = a.name ORDER BY level DESC LIMIT 1) as level, (SELECT honor FROM `cod_honor` WHERE name = a.name) as level FROM `cod_clans_applications` a WHERE clan = '%i'", clan[id]);
+	formatex(queryData, charsmax(queryData), "SELECT a.name, (SELECT level FROM `cod_mod` WHERE name = a.name ORDER BY level DESC LIMIT 1) as level, (SELECT honor FROM `cod_honor` WHERE name = a.name) as honor FROM `cod_clans_applications` a WHERE clan = '%i'", clan[id]);
 
 	SQL_ThreadQuery(sql, "applications_menu_handle", queryData, tempId, sizeof(tempId));
 	
@@ -1390,7 +1392,7 @@ public depositors_list(id)
 	
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT name, honor FROM `cod_members` WHERE honor > 0 ORDER BY honor DESC");
+	formatex(queryData, charsmax(queryData), "SELECT name, honor FROM `cod_clans_members` WHERE honor > 0 ORDER BY honor DESC");
 
 	SQL_ThreadQuery(sql, "show_depositors_list", queryData, tempId, sizeof(tempId));
 	
@@ -1505,25 +1507,25 @@ public say_text(msgId, msgDest, msgEnt)
 {
 	new id = get_msg_arg_int(1);
 	
-	if(is_user_connected(id) && clan[id])
+	if(is_user_connected(id) && clan[id] && chatPrefix)
 	{
-		new tempMessage[192], message[192], chatPrefix[64];
+		new tempMessage[192], message[192], prefix[64];
 		
 		get_msg_arg_string(2, tempMessage, charsmax(tempMessage));
 
-		get_clan_info(clan[id], CLAN_NAME, chatPrefix, charsmax(chatPrefix));
+		get_clan_info(clan[id], CLAN_NAME, prefix, charsmax(prefix));
 
-		format(chatPrefix, charsmax(chatPrefix), "^x04[%s]", chatPrefix);
+		format(prefix, charsmax(prefix), "^x04[%s]", prefix);
 		
 		if(!equal(tempMessage, "#Cstrike_Chat_All"))
 		{
-			add(message, charsmax(message), chatPrefix);
+			add(message, charsmax(message), prefix);
 			add(message, charsmax(message), " ");
 			add(message, charsmax(message), tempMessage);
 		}
 		else
 		{
-			add(message, charsmax(message), chatPrefix);
+			add(message, charsmax(message), prefix);
 			add(message, charsmax(message), "^x03 %s1^x01 :  %s2");
 		}
 		
@@ -1714,8 +1716,6 @@ stock set_user_clan(id, playerClan = 0, owner = 0)
 		TrieSetCell(Trie:get_clan_info(clan[id], CLAN_STATUS), playerName[id], owner ? STATUS_LEADER : STATUS_MEMBER);
 		
 		save_member(id, owner ? STATUS_LEADER : STATUS_MEMBER, 1);
-
-		remove_applications(id);
 	}
 }
 
@@ -1893,26 +1893,21 @@ stock save_member(id, status = 0, change = 0, const name[] = "")
 
 	if(status)
 	{
-		if(change) formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '%i', flag = '%i' WHERE name = '%s'", change, status, safeName);
+		if(change) formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '%i', flag = '%i' WHERE name = '%s'", clan[id], status, safeName);
 		else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET flag = '%i' WHERE name = '%s'", status, safeName);
 	}
 	else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '0', flag = '0', honor = '0' WHERE name = '%s'", safeName);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
-	if(change)
-	{
-		formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_applications` WHERE name = '%s'", change, safeName);
-
-		SQL_ThreadQuery(sql, "ignore_handle", queryData);
-	}
+	if(change) remove_applications(id, safeName);
 }
 
 stock add_deposited_honor(id, honor)
 {
 	new queryData[128];
 
-	formatex(queryData, charsmax(queryData), "UPDATE `cod_clan_members` SET honor = honor + %d WHERE name = '%s'", honor, playerName[id]);
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET honor = honor + %d WHERE name = '%s'", honor, playerName[id]);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
@@ -1931,7 +1926,7 @@ stock add_application(id, clanId)
 	{
 		if(!is_user_connected(i) || is_user_bot(i) || is_user_hltv(i) || clan[i] != clanId || get_user_status(i) <= STATUS_MEMBER) continue;
 
-		client_print_color(i, id, "^x03%s^x01 zlozyl podanie do klanu!", userName);
+		cod_print_chat(i, "^x03%s^x01 zlozyl podanie do klanu!", userName);
 	}
 }
 
@@ -1974,7 +1969,7 @@ stock accept_application(id, const userName[])
 
 		set_user_clan(player, clan[id]);
 
-		client_print_color(player, player, "Zostales przyjety do klanu^x03 %s^x01!", clanName);
+		cod_print_chat(player, "Zostales przyjety do klanu^x03 %s^x01!", clanName);
 	}
 	else 
 	{
@@ -1997,7 +1992,7 @@ stock remove_application(id, const name[] = "")
 		get_clan_info(clan[id], CLAN_NAME, clanName, charsmax(clanName));
 		get_user_name(id, userName, charsmax(userName));
 
-		client_print_color(player, player, "^x03%s^x01 odrzucil twoje podanie do klanu^x03 %s^x01!", userName, clanName);
+		cod_print_chat(player, "^x03%s^x01 odrzucil twoje podanie do klanu^x03 %s^x01!", userName, clanName);
 	}
 
 	new queryData[128], safeName[64];
@@ -2132,8 +2127,23 @@ stock create_clan(id, const clanName[])
 	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
 	
 	SQL_Execute(query);
+
+	formatex(queryData, charsmax(queryData), "SELECT id FROM `cod_clans` WHERE name = '%s';", safeClanName);
 	
-	clan[id] = SQL_GetInsertId(query);
+	connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	
+	if(errorNum)
+	{
+		log_to_file("cod_mod.log", "Error: %s", error);
+		
+		return;
+	}
+
+	query = SQL_PrepareQuery(connectHandle, queryData);
+	
+	SQL_Execute(query);
+	
+	if(SQL_NumResults(query)) clan[id] = SQL_ReadResult(query, 0);
 
 	copy(codClan[CLAN_NAME], charsmax(codClan[CLAN_NAME]), clanName);
 	codClan[CLAN_STATUS] = _:TrieCreate();
@@ -2158,7 +2168,7 @@ stock remove_clan(id)
 		{
 			clan[player] = 0;
 		
-			cod_print_chat(player,  "Twoj klan zostal rozwiazany.");
+			cod_print_chat(player, "Twoj klan zostal rozwiazany.");
 		}
 	}
 

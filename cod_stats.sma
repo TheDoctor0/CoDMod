@@ -2,6 +2,8 @@
 #include <cod>
 #include <csx>
 #include <sqlx>
+#include <fun>
+#include <cstrike>
 #include <fakemeta>
 #include <unixtime>
 
@@ -11,8 +13,8 @@
 
 #define TASK_TIME 9054
 
-enum _:statsInfo { ADMIN, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE, SILVER, GOLD, MEDALS, BEST_STATS, 
-	BEST_KILLS, BEST_HS_KILLS, BEST_DEATHS, CURRENT_STATS, CURRENT_KILLS, CURRENT_HS_KILLS, CURRENT_DEATHS };
+enum _:statsInfo { ADMIN, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE, SILVER, GOLD, MEDALS, BEST_STATS, BEST_KILLS, 
+	BEST_HS_KILLS, BEST_DEATHS, CURRENT_STATS, CURRENT_KILLS, CURRENT_HS_KILLS, CURRENT_DEATHS, ROUND_KILLS, ROUND_HS_KILLS };
 
 enum _:winers { THIRD, SECOND, FIRST };
 
@@ -25,32 +27,29 @@ new const commandTopStats[][] = { "say /stop15", "say_team /stop15", "say /topst
 new const commandMedals[][] = { "say /medal", "say_team /medal", "say /medale", "say_team /medale", "say /medals", "say_team /medals", "medale" };
 new const commandTopMedals[][] = { "say /mtop15", "say_team /mtop15", "say /topmedals", "say_team /topmedals", "say /topmedale", "say_team /topmedale", "topmedale" };
 
-new playerName[MAX_PLAYERS + 1][64], playerStats[MAX_PLAYERS + 1][statsInfo], Handle:sql, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo;
+new playerName[MAX_PLAYERS + 1][64], playerStats[MAX_PLAYERS + 1][statsInfo], playerDamage[MAX_PLAYERS + 1][MAX_PLAYERS + 1],
+	Handle:sql, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo;
 
-new cvarGoldReward, cvarSilverReward, cvarBronzeReward;
+new cvarGoldMedalExp, cvarSilverMedalExp, cvarBronzeMedalExp, cvarAssistEnabled, cvarAssistDamage, cvarAssistExp;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
-	cvarGoldReward = register_cvar("cod_rewards_gold", "300");
-	cvarSilverReward = register_cvar("cod_rewards_silver", "200");
-	cvarBronzeReward = register_cvar("cod_rewards_bronze", "100");
+	cvarGoldMedalExp = register_cvar("cod_medal_gold_exp", "300");
+	cvarSilverMedalExp = register_cvar("cod_medal_silver_exp", "200");
+	cvarBronzeMedalExp = register_cvar("cod_medal_bronze_exp", "100");
+	cvarAssistEnabled = register_cvar("cod_assist_enabled", "15");
+	cvarAssistDamage = register_cvar("cod_assist_damage", "65");
+	cvarAssistExp = register_cvar("cod_assist_exp", "15");
 
 	for(new i; i < sizeof commandMenu; i++) register_clcmd(commandMenu[i], "stats_menu");
-		
 	for(new i; i < sizeof commandTime; i++) register_clcmd(commandTime[i], "command_time");
-
 	for(new i; i < sizeof commandAdminTime; i++) register_clcmd(commandAdminTime[i], "command_time_admin");
-
 	for(new i; i < sizeof commandTopTime; i++) register_clcmd(commandTopTime[i], "command_time_top");
-	
 	for(new i; i < sizeof commandBestStats; i++) register_clcmd(commandBestStats[i], "command_best_stats");
-		
 	for(new i; i < sizeof commandTopStats; i++) register_clcmd(commandTopStats[i], "command_top_stats");
-
 	for(new i; i < sizeof commandMedals; i++) register_clcmd(commandMedals[i], "command_medals");
-		
 	for(new i; i < sizeof commandTopMedals; i++) register_clcmd(commandTopMedals[i], "command_top_medals");
 
 	register_event("TextMsg", "hostages_rescued", "a", "2&#All_Hostages_R");
@@ -84,7 +83,7 @@ public client_putinserver(id)
 	rem_bit(id, dataLoaded);
 	rem_bit(id, visitInfo);
 
-	for(new i = 0; i <= CURRENT_DEATHS; i++) playerStats[id][i] = 0;
+	for(new i = 0; i <= ROUND_HS_KILLS; i++) playerStats[id][i] = 0;
 	
 	load_stats(id);
 }
@@ -535,7 +534,7 @@ public cod_new_round()
 
 	round++;
 
-	new bestId, bestFrags, tempFrags, bestDeaths, tempDeaths;
+	new bestId, bestRoundId, bestFrags, bestRoundFrags, bestRoundHS, tempFrags, bestDeaths, tempDeaths;
 
 	for(new id = 1; id <= MAX_PLAYERS; id++) 
 	{
@@ -550,6 +549,25 @@ public cod_new_round()
 			bestDeaths = tempDeaths;
 			bestId = id;
 		}
+
+		if(playerStats[id][ROUND_KILLS] > 0 && (playerStats[id][ROUND_KILLS] > bestRoundFrags || (playerStats[id][ROUND_KILLS] == bestRoundFrags && playerStats[id][ROUND_HS_KILLS] > bestRoundHS)))
+		{
+			bestRoundFrags = playerStats[id][ROUND_KILLS];
+			bestRoundHS = playerStats[id][ROUND_HS_KILLS];
+			bestRoundId = id;
+		}
+
+		playerStats[id][ROUND_KILLS] = 0;
+		playerStats[id][ROUND_HS_KILLS] = 0;
+	}
+
+	if(is_user_connected(bestRoundId)) 
+	{
+		new bestRoundName[64];
+
+		get_user_name(bestRoundId, bestRoundName, charsmax(bestRoundName));
+
+		cod_print_chat(0, "^x03%s^x01 byl najlepszym graczem rundy. Ustrzelil^x04 %i^x01 frag%s, w tym^x04 %i^x01 z HeadShotem.", bestRoundName, bestRoundFrags, bestRoundFrags > 1 ? "i" : "a", bestRoundHS);
 	}
 
 	if(is_user_connected(bestId)) 
@@ -562,20 +580,22 @@ public cod_new_round()
 	}
 }
 
+public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
+	playerDamage[attacker][victim] += floatround(damage);
+
 public cod_killed(killer, victim, weaponId, hitPlace)
 {
 	playerStats[victim][CURRENT_DEATHS]++;
 
 	playerStats[killer][CURRENT_KILLS]++;
+	playerStats[killer][ROUND_KILLS]++;
 	playerStats[killer][KILLS]++;
 		
-	if(hitPlace == HIT_HEAD) playerStats[killer][CURRENT_HS_KILLS]++;
-
-	new killerName[64];
-
-	get_user_name(killer, killerName, charsmax(killerName));
-
-	cod_print_chat(victim, "Zostales zabity przez^x03 %s^x01, ktoremu zostalo^x04 %i^x01 HP.", killerName, get_user_health(killer));
+	if(hitPlace == HIT_HEAD)
+	{
+		playerStats[killer][CURRENT_HS_KILLS]++;
+		playerStats[killer][ROUND_HS_KILLS]++;
+	}
 
 	if(weaponId == CSW_KNIFE)
 	{
@@ -584,6 +604,58 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 			if(!is_user_connected(i)) continue;
 
 			if(pev(i, pev_iuser2) == victim || i == victim) client_cmd(i, "spk %s", codSounds[SOUND_HUMILIATION]);
+		}
+	}
+
+	if(get_pcvar_num(cvarAssistEnabled))
+	{
+		new assist = 0, damage = 0;
+
+		for(new id = 1; id <= MAX_PLAYERS; id++)
+		{
+			if(!is_user_connected(id) || is_user_bot(id) || is_user_hltv(id) || id == killer) continue;
+
+			if(playerDamage[id][victim] > damage)
+			{
+				assist = id;
+				damage = playerDamage[id][victim];
+			}
+
+			playerDamage[id][victim] = 0;
+		}
+
+		if(assist > 0 && damage > get_pcvar_num(cvarAssistDamage))
+		{
+			set_user_frags(assist, get_user_frags(assist) + 1);
+
+			cs_set_user_deaths(assist, cs_get_user_deaths(assist));
+
+			new playerMoney = cs_get_user_money(assist) + 300;
+
+			if(playerMoney > 16000) playerMoney = 16000;
+
+			cs_set_user_money(assist, playerMoney);
+
+			if(is_user_alive(playerMoney))
+			{
+				static msgMoney;
+
+				if(!msgMoney) msgMoney = get_user_msgid("Money");
+
+				message_begin(MSG_ONE_UNRELIABLE, msgMoney, _, assist);
+				write_long(playerMoney);
+				write_byte(1);
+				message_end();
+			}
+			
+			new nameVictim[32], nameKiller[32], exp = cod_get_user_bonus_exp(assist, get_pcvar_num(cvarAssistExp));
+
+			cod_set_user_exp(assist, exp);
+
+			get_user_name(victim, nameVictim, charsmax(nameVictim));
+			get_user_name(killer, nameKiller, charsmax(nameKiller));
+			
+			cod_print_chat(assist, "Pomogles^x03 %s^x01 w zabiciu^x03 %s^x01. Dostajesz fraga i %i expa!", nameKiller, nameVictim, exp);
 		}
 	}
 
@@ -717,19 +789,19 @@ public message_intermission()
 		{
 			case THIRD:
 			{
-				exp = cod_get_user_bonus_exp(0, get_pcvar_num(cvarBronzeReward));
+				exp = get_pcvar_num(cvarBronzeMedalExp);
 
 				playerStats[winnersId[i]][BRONZE]++;
 			}
 			case SECOND: 
 			{
-				exp = cod_get_user_bonus_exp(0, get_pcvar_num(cvarSilverReward));
+				exp = get_pcvar_num(cvarSilverMedalExp);
 
 				playerStats[winnersId[i]][SILVER]++;
 			}
 			case FIRST:
 			{
-				exp = cod_get_user_bonus_exp(0, get_pcvar_num(cvarGoldReward));
+				exp = get_pcvar_num(cvarGoldMedalExp);
 
 				playerStats[winnersId[i]][GOLD]++;
 			}
@@ -737,7 +809,7 @@ public message_intermission()
 
 		save_stats(winnersId[i], 1);
 		
-		cod_set_user_exp(winnersId[i], cod_get_user_exp(winnersId[i]) + exp);
+		cod_set_user_exp(winnersId[i], exp);
 		
 		get_user_name(winnersId[i], playerName, charsmax(playerName));
 

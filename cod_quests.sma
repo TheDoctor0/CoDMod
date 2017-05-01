@@ -372,7 +372,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 public cod_item_changed(id, item)
 	if(playerData[PLAYER_TYPE][id] == TYPE_ITEM && item == playerData[PLAYER_ADDITIONAL][id]) add_progress(id);
 
-public cod_damage_post(attacker, victim, Float:damage, damageBits)
+public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
 	if(playerData[PLAYER_TYPE][attacker] == TYPE_DAMAGE) add_progress(attacker, floatround(damage));
 
 public log_event_quest()
@@ -428,7 +428,7 @@ public check_quest(id)
 	return PLUGIN_CONTINUE;
 }
 
-public cod_class_changed(id)
+public cod_class_changed(id, class)
 {
 	if(is_user_bot(id) || is_user_hltv(id)) return PLUGIN_HANDLED;
 	

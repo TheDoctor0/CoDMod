@@ -82,7 +82,7 @@ public touch_box(ent, id)
 {
 	if(!is_user_alive(id)) return PLUGIN_CONTINUE;
 
-	get_box(id);
+	cod_remove_box_icon(ent);
 
 	new origin[3];
 	
@@ -114,9 +114,9 @@ public touch_box(ent, id)
 	write_byte(10);
 	message_end();
 	
-	engfunc(EngFunc_EmitSound, id, CHAN_WEAPON, SOUND_BOX, 1.0, ATTN_NORM, 0, PITCH_NORM);
+	engfunc(EngFunc_EmitSound, id, CHAN_WEAPON, codSounds[SOUND_BOX], 1.0, ATTN_NORM, 0, PITCH_NORM);
 
-	cod_remove_box_icon(ent);
+	get_box(id);
 	
 	return PLUGIN_CONTINUE;
 }
@@ -158,7 +158,7 @@ public get_box(id)
 		{
 			new health = random_num(15, 75);
 			
-			set_user_health(id, get_user_health(id) + health);
+			cod_set_user_health(id, cod_get_user_health(id, 1) + health);
 			
 			cod_print_chat(id, "Dostales^x04 +%i HP^x01!", health);
 		}
@@ -166,7 +166,7 @@ public get_box(id)
 		{
 			new exp = random_num(25, 100);
 			
-			cod_set_user_exp(id, cod_get_user_exp(id) + exp);
+			cod_set_user_exp(id, exp);
 
 			cod_print_chat(id, "Dostales^x04 %i Expa^x01!", exp);
 		}
@@ -174,31 +174,31 @@ public get_box(id)
 		{
 			new honor = random_num(5, 25);
 			
-			cod_set_user_honor(id, cod_get_user_honor(id) + honor);
+			cod_add_user_honor(id, honor);
 
 			cod_print_chat(id, "Dostales^x04 %i Honoru^x01!", honor);
 		}
 		case 7:
 		{
-			cod_set_user_rockets(id, cod_get_user_rockets(id) + 1);
+			cod_add_user_rockets(id, 1);
 			
 			cod_print_chat(id, "Dostales^x04 Rakiete^x01!");
 		}
 		case 8:
 		{
-			cod_set_user_mines(id, cod_get_user_mines(id) + 1);
+			cod_add_user_mines(id, 1);
 			
 			cod_print_chat(id, "Dostales^x04 Mine^x01!");
 		}
 		case 9:
 		{
-			cod_set_user_medkits(id, cod_get_user_medkits(id) + 1);
+			cod_add_user_medkits(id, 1);
 			
 			cod_print_chat(id, "Dostales^x04 Apteczke^x01!");
 		}
 		case 10:
 		{
-			cod_set_user_dynamites(id, cod_get_user_dynamites(id) + 1);
+			cod_add_user_dynamites(id, 1);
 			
 			cod_print_chat(id, "Dostales^x04 Dynamit^x01!");
 		}
