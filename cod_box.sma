@@ -135,9 +135,11 @@ public get_box(id)
 		}
 		case 2:
 		{
-			new deaths = random_num(1, 3);
+			new deaths = random_num(1, 2), frags = deaths - cs_get_user_deaths(id);
+
+			if(frags > 0) set_user_frags(id, get_user_frags(id) + frags);
 			
-			cs_set_user_deaths(id, cs_get_user_deaths(id) - deaths);
+			cs_set_user_deaths(id, min(0, cs_get_user_deaths(id) - deaths));
 			
 			cod_print_chat(id, "Masz o^x04 %i zgon%s^x01 mniej!", deaths, deaths == 1 ? "" : "y");
 		}
@@ -164,7 +166,7 @@ public get_box(id)
 		}
 		case 5:
 		{
-			new exp = random_num(25, 100);
+			new exp = random_num(25, 75);
 			
 			cod_set_user_exp(id, exp);
 

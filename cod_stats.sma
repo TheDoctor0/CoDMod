@@ -36,10 +36,10 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
-	cvarGoldMedalExp = register_cvar("cod_medal_gold_exp", "300");
-	cvarSilverMedalExp = register_cvar("cod_medal_silver_exp", "200");
+	cvarGoldMedalExp = register_cvar("cod_medal_gold_exp", "500");
+	cvarSilverMedalExp = register_cvar("cod_medal_silver_exp", "300");
 	cvarBronzeMedalExp = register_cvar("cod_medal_bronze_exp", "100");
-	cvarAssistEnabled = register_cvar("cod_assist_enabled", "15");
+	cvarAssistEnabled = register_cvar("cod_assist_enabled", "1");
 	cvarAssistDamage = register_cvar("cod_assist_damage", "65");
 	cvarAssistExp = register_cvar("cod_assist_exp", "15");
 
@@ -657,7 +657,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 			get_user_name(victim, nameVictim, charsmax(nameVictim));
 			get_user_name(killer, nameKiller, charsmax(nameKiller));
 			
-			cod_print_chat(assist, "Pomogles^x03 %s^x01 w zabiciu^x03 %s^x01. Dostajesz fraga i %i expa!", nameKiller, nameVictim, exp);
+			cod_print_chat(assist, "Pomogles^x03 %s^x01 w zabiciu^x03 %s^x01. Dostajesz fraga i^x03 %i^x01 expa!", nameKiller, nameVictim, exp);
 		}
 	}
 

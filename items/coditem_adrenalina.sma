@@ -21,7 +21,7 @@ public cod_item_enabled(id, value)
 	itemValue[id] = value == -1 ? random_num(35, 65): value;
 
 public cod_item_upgrade(id)
-	itemValue[id] += random_num(-5, 10);
+	itemValue[id] = max(0, itemValue[id] + random_num(-5, 10));
 
 public cod_item_value(id)
 	return itemValue[id];

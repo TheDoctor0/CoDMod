@@ -60,7 +60,7 @@ public plugin_natives()
 public plugin_end()
 	SQL_FreeHandle(sql);
 
-public client_putinserver(id)
+public client_connect(id)
 {
 	playerHonor[id] = 0;
 	
@@ -197,8 +197,6 @@ public sql_init()
 
 public load_honor(id)
 {
-	if(!is_user_connected(id)) return;
-
 	new queryData[128], tempId[1];
 	
 	tempId[0] = id;
@@ -218,14 +216,13 @@ public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], d
 	
 	new id = tempId[0];
 	
-	if(!is_user_connected(id)) return;
-	
 	if(SQL_MoreResults(query)) playerHonor[id] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
 	else
 	{
 		new queryData[128];
 		
-		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_honor` (`name`) VALUES ('%s')", playerName[id]);
+		//formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_honor` (`name`) VALUES ('%s')", playerName[id]);
+		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_honor` (`name`, `honor`) VALUES ('%s', '10000')", playerName[id]);
 		
 		SQL_ThreadQuery(sql, "ignore_handle", queryData);
 

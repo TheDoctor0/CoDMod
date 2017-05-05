@@ -173,7 +173,7 @@ public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
 {
 	if(!get_bit(attacker, vip)) return PLUGIN_CONTINUE;
 
-	cod_inflict_damage(attacker, victim, damage * 0.1, 0.0, damageBits);
+	cod_inflict_damage(attacker, victim, damage * 0.05, 0.0, damageBits);
 
 	return PLUGIN_CONTINUE;
 }

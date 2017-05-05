@@ -89,6 +89,21 @@ Returns clan's name.
 native cod_get_clan_name(clan, dataReturn[], dataLength);
 
 /*------------------------------
+Returns player's quest id (-1 if none).
+------------------------------*/
+native cod_get_user_quest(id);
+
+/*------------------------------
+Returns player's quest progress.
+------------------------------*/
+native cod_get_user_quest_progress(id);
+
+/*------------------------------
+Returns player's quest need.
+------------------------------*/
+native cod_get_user_quest_need(id);
+
+/*------------------------------
 Spawns an icon above box.
 ------------------------------*/
 native cod_spawn_box_icon(ent);
@@ -561,14 +576,14 @@ Status is player state for render. It can be a bitsum of RENDER_ALWAYS, RENDER_S
 Weapon is weapon id (CSW_), 0 for all weapons.
 Timer sets render value for certain amount of time - it ignores type, status and weapon.
 ------------------------------*/
-native cod_set_user_render(id, type, value, status, weapon, Float:timer);
+native cod_set_user_render(id, type, value, status = RENDER_ALWAYS, weapon = 0, Float:timer = 0.0);
 
 /*------------------------------
 Set's player's render glow.
 Usage is the same as in set_user_rendering native.
 Timer sets glow for certain amount of time.
 ------------------------------*/
-native cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:timer);
+native cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:timer = 0.0);
 
 /*------------------------------
 Diplays text in HUD/DHUD.

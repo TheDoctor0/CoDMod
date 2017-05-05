@@ -2,7 +2,7 @@
 #include <sqlx>
 #include <cod>
 
-#define PLUGIN "CoD codClans System"
+#define PLUGIN "CoD Clans System"
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 

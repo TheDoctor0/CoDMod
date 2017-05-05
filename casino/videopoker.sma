@@ -79,7 +79,7 @@ public plugin_init() {
 	register_clcmd("say poker", "poker_start")
 	
 	register_cvar("amx_poker_enabled","1")
-	register_cvar("amx_poker_deadonly","1")
+	register_cvar("amx_poker_deadonly","0")
 	
 	register_menucmd(register_menuid("menubet"),1023,"set_bet")
 	register_menucmd(register_menuid("menudeal"),1023,"set_deal")

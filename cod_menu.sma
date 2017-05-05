@@ -43,7 +43,7 @@ public display_menu(id)
 	menu_additem(menu, "\wMenu \rKasyno \y(/kasyno)");
 	menu_additem(menu, "\wUstawienia \rIkon \y(/ikony)");
 	menu_additem(menu, "\wUstawienia \rHUD \y(/hud)");
-	menu_additem(menu, "\wNajlepsze \rStaty \y(/staty)");
+	menu_additem(menu, "\wTwoje \rStatystyki \y(/menustaty)");
 	menu_additem(menu, "\wTwoje \rKonto \y(/konto)");
 	menu_additem(menu, "\wWymien \rItem \y(/wymien)");
 	menu_additem(menu, "\wOddaj \rItem \y(/daj)");
@@ -91,7 +91,7 @@ public display_menu_handle(id, menu, item)
 		case 11: cmd_execute(id, "kasyno");
 		case 12: cmd_execute(id, "ikony");
 		case 13: cmd_execute(id, "hud");
-		case 14: cmd_execute(id, "staty");
+		case 14: cmd_execute(id, "menustaty");
 		case 15: cmd_execute(id, "konto");
 		case 16: cmd_execute(id, "wymien");
 		case 17: cmd_execute(id, "daj");

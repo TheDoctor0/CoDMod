@@ -306,7 +306,13 @@ public sub_slotsmenu(iPlayer, slotsmenu, item)
 		{
 			for(new slots=0; slots < SLOTS; ++slots)
 			{
-				g_iSlotsNumbers[iPlayer][slots] = random_num(SLOTS-SLOTS, SLOTS);
+				switch(random_num(1, 4))
+				{
+					case 1: g_iSlotsNumbers[iPlayer][slots] = 3;
+					case 2: g_iSlotsNumbers[iPlayer][slots] = 6;
+					case 3: g_iSlotsNumbers[iPlayer][slots] = 9;
+					case 4: g_iSlotsNumbers[iPlayer][slots] = 0;
+				}
 			}
 
 			if(g_bFreeTry[iPlayer] && g_nCvar(cvar_freetry))
@@ -613,7 +619,7 @@ public client_putinserver(iPlayer)
 
 	return PLUGIN_CONTINUE;
 }
-public client_disconnect(iPlayer)
+public client_disconnected(iPlayer)
 {
 	if(!is_user_connected(iPlayer))
 		return PLUGIN_HANDLED;

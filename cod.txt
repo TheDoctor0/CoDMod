@@ -9,3 +9,9 @@ Kasyno (TO DO):
 - Automat
 - Blackjack
 - Poker
+
+Premium:
+Elitarny snajper - 1/1 z awp, na kucaku mniejsza widoczność, 1/2 z noża (PPM), mniejsza grawitacja
+
+Super Premium:
+Myśliwy - 1/1 z scouta, na kucaku mniejsza widoczność, mniejsza grawitacja, posiada 1mine, 1/2 z noża (PPM)

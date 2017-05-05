@@ -263,7 +263,7 @@ public check_visible(ent, pSet)
 
 public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 {
-	if(!is_user_connected(host) || !is_user_alive(host) || !pev_valid(ent) || !pev_valid(pev(ent, pev_iuser1))) return FMRES_IGNORED;
+	if(!is_user_connected(host) || !pev_valid(ent) || !pev_valid(pev(ent, pev_iuser1))) return FMRES_IGNORED;
 	
 	static className[32];
 	pev(ent, pev_classname, className, charsmax(className));
@@ -272,7 +272,7 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 
 	set_es(es, ES_Effects, get_es(es, ES_Effects) | EF_NODRAW);
 
-	if(!roundStarted) return FMRES_IGNORED;
+	if(!roundStarted || !is_user_alive(host)) return FMRES_IGNORED;
 
 	if((equal(className, iconSprite[BOMBSITE_A]) || equal(className, iconSprite[BOMBSITE_B])) && (!get_bit(host, iconBombSites) || is_valid_ent(bombEntity[BOMB_PLANTED]))) return FMRES_IGNORED;
 
