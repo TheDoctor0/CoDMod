@@ -1,7 +1,5 @@
 #include <amxmodx>
 #include <cstrike>
-#include <fakemeta>
-#include <fun>
 #include <cod>
 
 #define PLUGIN "CoD VIP"
@@ -12,10 +10,6 @@ new Array:listVIPs, vip;
 
 new const commandVIP[][] = { "say /vip", "say_team /vip", "say /vip", "say_team /vip", "vip" };
 new const commandVIPs[][] = { "say /vips", "say_team /vips", "say /vipy", "say_team /vipy", "vipy" };
-
-new const modelM4A1[][] = { "models/CoDMod/p_goldm4a1.mdl", "models/CoDMod/v_goldm4a1.mdl" };
-new const modelAK47[][] = { "models/CoDMod/p_goldak47.mdl", "models/CoDMod/v_goldak47.mdl" };
-new const modelAWP[][] = { "models/CoDMod/p_goldawp.mdl", "models/CoDMod/v_goldawp.mdl" };
 
 forward amxbans_admin_connect(id);
 
@@ -37,16 +31,6 @@ public plugin_natives()
 {
 	register_native("cod_get_user_vip", "_cod_get_user_vip", 1);
 	register_native("cod_set_user_vip", "_cod_set_user_vip", 1);
-}
-
-public plugin_precache()
-{
-	for(new i = 0; i < sizeof modelM4A1; i++) 
-	{
-		precache_model(modelM4A1[i]);
-		precache_model(modelAK47[i]);
-		precache_model(modelAWP[i]);
-	}
 }
 
 public plugin_end()
@@ -174,32 +158,6 @@ public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
 	if(!get_bit(attacker, vip)) return PLUGIN_CONTINUE;
 
 	cod_inflict_damage(attacker, victim, damage * 0.05, 0.0, damageBits);
-
-	return PLUGIN_CONTINUE;
-}
-
-public cod_weapon_deploy(id, weapon, ent)
-{
-	if(!is_user_valid(id)) return PLUGIN_CONTINUE;
-
-	switch(weapon)
-	{
-		case CSW_M4A1:
-		{
-			set_pev(id, pev_weaponmodel2, modelM4A1[0]);
-			set_pev(id, pev_viewmodel2, modelM4A1[1]);
-		}
-		case CSW_AK47:
-		{
-			set_pev(id, pev_weaponmodel2, modelAK47[0]);
-			set_pev(id, pev_viewmodel2, modelAK47[1]);
-		}
-		case CSW_AWP:
-		{
-			set_pev(id, pev_weaponmodel2, modelAWP[0]);
-			set_pev(id, pev_viewmodel2, modelAWP[1]);
-		}
-	}
 
 	return PLUGIN_CONTINUE;
 }

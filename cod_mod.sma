@@ -3004,10 +3004,6 @@ public load_class(id, class)
 
 	if(!class) return;
 
-	//TESTY
-	if(codClass[PCLASS_LEVEL] < 49) codPlayer[id][PLAYER_LEVEL] = codClass[PCLASS_LEVEL] = 49;
-	if(codClass[PCLASS_EXP] < get_level_exp(49 - 1)) codPlayer[id][PLAYER_EXP] = codClass[PCLASS_EXP] = get_level_exp(49 - 1);
-
 	if(!codPlayer[id][PLAYER_LEVEL])
 	{
 		codPlayer[id][PLAYER_LEVEL] = codClass[PCLASS_LEVEL] = 1;
@@ -3023,6 +3019,10 @@ public load_class(id, class)
 		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`, `level`, `exp`) VALUES ('%s', '%s', '%i', '%i')", codPlayer[id][PLAYER_NAME], className, 49, get_level_exp(49 - 1));
 		SQL_ThreadQuery(sql, "ignore_handle", tempData);
 	}
+
+	//TESTY
+	if(codClass[PCLASS_LEVEL] < 49) codPlayer[id][PLAYER_LEVEL] = codClass[PCLASS_LEVEL] = 49;
+	if(codClass[PCLASS_EXP] < get_level_exp(49 - 1)) codPlayer[id][PLAYER_EXP] = codClass[PCLASS_EXP] = get_level_exp(49 - 1);
 	
 	codPlayer[id][PLAYER_POINTS] = (codPlayer[id][PLAYER_LEVEL] - 1) - codPlayer[id][PLAYER_INT] - codPlayer[id][PLAYER_HEAL] - codPlayer[id][PLAYER_STAM] - codPlayer[id][PLAYER_STR] - codPlayer[id][PLAYER_COND];
 } 

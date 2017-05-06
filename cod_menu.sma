@@ -41,6 +41,7 @@ public display_menu(id)
 	menu_additem(menu, "\wMenu \rKlan \y(/klan)");
 	menu_additem(menu, "\wMenu \rMisje \y(/misje)");
 	menu_additem(menu, "\wMenu \rKasyno \y(/kasyno)");
+	menu_additem(menu, "\wSkiny \rBroni \y(/skiny)");
 	menu_additem(menu, "\wUstawienia \rIkon \y(/ikony)");
 	menu_additem(menu, "\wUstawienia \rHUD \y(/hud)");
 	menu_additem(menu, "\wTwoje \rStatystyki \y(/menustaty)");
@@ -89,15 +90,16 @@ public display_menu_handle(id, menu, item)
 		case 9: cmd_execute(id, "klan");
 		case 10: cmd_execute(id, "misje");
 		case 11: cmd_execute(id, "kasyno");
-		case 12: cmd_execute(id, "ikony");
-		case 13: cmd_execute(id, "hud");
-		case 14: cmd_execute(id, "menustaty");
-		case 15: cmd_execute(id, "konto");
-		case 16: cmd_execute(id, "wymien");
-		case 17: cmd_execute(id, "daj");
-		case 18: cmd_execute(id, "wyrzuc");
-		case 19: cmd_execute(id, "punkty");
-		case 20: cmd_execute(id, "reset");
+		case 12: cmd_execute(id, "skiny");
+		case 13: cmd_execute(id, "ikony");
+		case 14: cmd_execute(id, "hud");
+		case 15: cmd_execute(id, "menustaty");
+		case 16: cmd_execute(id, "konto");
+		case 17: cmd_execute(id, "wymien");
+		case 18: cmd_execute(id, "daj");
+		case 19: cmd_execute(id, "wyrzuc");
+		case 20: cmd_execute(id, "punkty");
+		case 21: cmd_execute(id, "reset");
 	}
 	
 	menu_destroy(menu);
