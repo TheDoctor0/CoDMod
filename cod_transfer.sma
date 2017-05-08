@@ -17,9 +17,7 @@ public plugin_init()
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
 	for(new i; i < sizeof commandTransfer; i++) register_clcmd(commandTransfer[i], "transfer_menu");
-	
 	for(new i; i < sizeof commandHonor; i++) register_clcmd(commandHonor[i], "transfer_honor_menu");
-		
 	for(new i; i < sizeof commandCash; i++) register_clcmd(commandCash[i], "transfer_cash_menu");
 
 	register_clcmd("ILOSC_HONORU", "transfer_honor_handle");

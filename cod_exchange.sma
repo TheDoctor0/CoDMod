@@ -15,7 +15,6 @@ public plugin_init()
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
 	for(new i; i < sizeof commandExchange; i++) register_clcmd(commandExchange[i], "exchange_menu");
-		
 	for(new i; i < sizeof commandGive; i++) register_clcmd(commandGive[i], "give_item");
 
 	maxPlayers = get_maxplayers();

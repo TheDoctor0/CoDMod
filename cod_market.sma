@@ -22,11 +22,8 @@ public plugin_init()
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
 	for(new i; i < sizeof commandMarket; i++) register_clcmd(commandMarket[i], "market_menu");
-
 	for(new i; i < sizeof commandSell; i++) register_clcmd(commandSell[i], "sell_item");
-	
 	for(new i; i < sizeof commandBuy; i++) register_clcmd(commandBuy[i], "buy_item");
-	
 	for(new i; i < sizeof commandWithdraw; i++) register_clcmd(commandWithdraw[i], "withdraw_item");
 
 	register_concmd("CENA_PRZEDMIOTU", "set_item_price");

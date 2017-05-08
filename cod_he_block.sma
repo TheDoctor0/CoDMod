@@ -80,8 +80,4 @@ public block_he(weapon)
 }
 
 public unblock_he()
-{
 	block = false;
-
-	cod_print_chat(0, "Granaty zostaly odblokowane.");
-}

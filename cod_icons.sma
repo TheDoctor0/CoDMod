@@ -62,8 +62,6 @@ public plugin_init()
 		bombEntity[bsBombSiteB] = find_ent_by_class(bombEntity[bsBombSiteA], "info_bomb_target");
 	}
 
-	if(!is_valid_ent(bombEntity[bsBombSiteA])) set_fail_state("[CoD] Brak BSow na mapie. Wylaczam plugin.");
-
 	icons = nvault_open("cod_icons");
 	
 	if(icons == INVALID_HANDLE) set_fail_state("[COD] Nie mozna otworzyc pliku cod_icons.vault");

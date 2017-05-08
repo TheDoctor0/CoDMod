@@ -116,6 +116,14 @@
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
+		},
+		{
+			"file": "/D/Downloads/GoogleChrome/sklepsms_usluga_bf1_odznaki.sma",
+			"settings":
+			{
+				"buffer_size": 3292,
+				"line_ending": "Windows"
+			}
 		}
 	],
 	"build_system": "Packages/User/AMXX-Compiler.sublime-build",
@@ -226,6 +234,42 @@
 	"file_history":
 	[
 		"/D/Dawid/Workplace/AMXX/scripting/csstatsx_sql.sma",
+		"/D/Dawid/Workplace/AMXX/scripting/ozone_security.sma",
+		"/D/Downloads/GoogleChrome/darmowaodznaka.sma",
+		"/C/sternik/zadania-spring/src/main/java/pl/sternik/kk/zadania/spring/zad11/Connection.java",
+		"/C/sternik/zadania-spring/src/main/java/pl/sternik/kk/zadania/spring/zad11/DbBeanConfigurator.java",
+		"/C/sternik/zadania-spring/src/main/java/pl/sternik/kk/zadania/spring/zad11/RunIt.java",
+		"/C/sternik/zadania-spring/src/main/resources/database.properties",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/restart.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csstats.log",
+		"/D/Dawid/Workplace/New Mods/CoDMod/cod_he_block.sma",
+		"/D/Downloads/GoogleChrome/csgo_204 (1).sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 2.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/modules.ini",
+		"/D/Downloads/GoogleChrome/csgo_204_withcolorchat.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names 2.log",
+		"/D/Dawid/Workplace/AMXX/scripting/ozone_security_new.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/name_change.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170506.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170507.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/weaprest.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/config.ini",
+		"/D/Dawid/Workplace/MoreThanYou/standard.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/amxx.cfg",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170507 2.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins-jb.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/ZawolajAdmina.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sklep_sms.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/ozone_security.txt",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/BanConfig 2.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/banconfig.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170507.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/php.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/locale",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sources.list",
+		"/C/Users/Dawid/Desktop/jail_spear.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/amxx 3.cfg",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/amxx 2.cfg",
 		"/D/Dawid/Workplace/New Mods/CoDMod/cod_menu.sma",
@@ -234,19 +278,13 @@
 		"/D/Downloads/GoogleChrome/molotov_cocktail (1).sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/vip.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/molotov_cocktail.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/config.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/amxx.cfg",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/cod_mod.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170506.log",
 		"/D/Dawid/Workplace/New Mods/CoDMod/cod_mod.sma",
 		"/D/Dawid/Workplace/New Mods/CoDMod/cod_vip.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins-cod.ini",
 		"/C/Users/Dawid/Desktop/cod_skins.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170506.log",
 		"/D/Dawid/Workplace/New Mods/CoDMod/cod_knife.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 2.ini",
-		"/D/Dawid/Workplace/AMXX/scripting/ozone_security.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 3.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/server 2.cfg",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/server.cfg",
@@ -266,7 +304,6 @@
 		"/C/Users/Dawid/Desktop/pluginy TODO/ultimate_unprecacher/config/unprecacher.cfg",
 		"/D/Dawid/Workplace/AMXX/scripting/team_flash.sma",
 		"/D/Dawid/Workplace/AMXX/scripting/bs_limiter.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins-jb.ini",
 		"/D/Dawid/Workplace/AMXX/scripting/csgo_nades.sma",
 		"/D/Dawid/Workplace/AMXX/scripting/vip.sma",
 		"/D/Dawid/Workplace/AMXX/scripting/roundsound.sma",
@@ -284,7 +321,6 @@
 		"/D/Dawid/Workplace/AMXX/scripting/reset.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170504.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170505.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/restart.log",
 		"/D/Dawid/Workplace/AMXX/scripting/rank_system.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/umc.cfg",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/maps.ini",
@@ -324,35 +360,7 @@
 		"/C/Users/Dawid/Desktop/ankieta3.txt",
 		"/C/Users/Dawid/Desktop/ankieta2.txt",
 		"/D/Dawid/Workplace/AMXX/scripting/ozone_banconfig.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.371/ptb.cfg",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/tbm.cfg",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/cod_mod.cfg",
-		"/D/Dawid/Workplace/New Mods/CoDMod/cod_shop.sma",
-		"/D/Dawid/Workplace/AMXX/include/cod.inc",
-		"/D/Dawid/Workplace/New Mods/CoDMod/casino/slots_machine.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/motd.log",
-		"/D/Downloads/GoogleChrome/cod_top15.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.680/statsx_shell.sma",
-		"/D/Dawid/Workplace/New Mods/CoDMod/cod_he_block.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/statsx.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.996/zablokowanie_lpm_i_ppm.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.392/statsx_shell.cfg",
-		"/D/Dawid/Workplace/New Mods/CoDMod/casino/ARP_Casino.sma",
-		"/D/Dawid/Workplace/New Mods/CoDMod/casino/videopoker.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/game.cfg",
-		"/D/Dawid/Workplace/New Mods/CoDMod/casino/sf_bets.sma",
-		"/D/Downloads/GoogleChrome/csgo_204.sma",
-		"/D/Downloads/GoogleChrome/sklep (1).sma",
-		"/D/Dawid/Workplace/New Mods/Battlefield One/cstrike/addons/amxmodx/configs/bf1.cfg",
-		"/D/Dawid/Workplace/New Mods/Battlefield One/bf1_vip.sma",
-		"/D/Dawid/Workplace/New Mods/Battlefield One/bf1_knives.sma",
-		"/D/Dawid/Workplace/AMXX/include/colorchat.inc",
-		"/D/Dawid/Workplace/AMXX Old/include/colorchat.inc",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-3/names.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 6.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 7.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/menu_serwera 3.ini"
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.371/ptb.cfg"
 	],
 	"find":
 	{
@@ -386,6 +394,45 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"PlayerSpawn",
+			"bChange",
+			"Stats_SaveKill",
+			"DB_SavePlayerData",
+			"knife",
+			"spawn",
+			"log_t",
+			"DB_SavePlayerData",
+			"log_to",
+			"log_to_file",
+			"DB_SavePlayerData",
+			"myszeva",
+			"SQL_Handler",
+			"DB_LoadPlayerData",
+			"putins",
+			"SQL_Handler",
+			"csstats.log",
+			"DB_SavePlayerData",
+			"csxsql_initialized",
+			"is_ready",
+			"SQL_Handler",
+			"LOAD_NEW",
+			"DB_SavePlayerData",
+			"Stats_SaveKill",
+			"SQL_Handler",
+			"DB_LoadPlayerData",
+			"ROW_LASTJOIN",
+			"ROW_FIRSTJOIN",
+			"first_join",
+			"DB_SavePlayerData",
+			"DB_LoadPlayerData",
+			"SQL_LOAD",
+			"PLAYER_ID",
+			"reload",
+			"DB_SavePlayerData",
+			"CVAR_UPDATESTYLE",
+			"spawn",
+			"Event_CurWeapon",
+			"curl",
 			"event_new_round",
 			"BUY_MOLOTOV",
 			"check_map",
@@ -474,46 +521,7 @@
 			"register_bombsite",
 			"ENTITY_CLASS",
 			"szText",
-			"wybranoP",
-			"stronaP",
-			"dane",
-			"TASK_MENU1",
-			"pCvarArmor",
-			"show_",
-			"motd",
-			"knife",
-			"REG_INFO",
-			"od ",
-			"od^x03",
-			"render_change",
-			"render_count",
-			"render_change",
-			"_cod_get_user_render",
-			"armor",
-			"random",
-			"rank",
-			"show_top15",
-			"show_binds",
-			"commandTop",
-			"command_time_top",
-			"get_wstats_sql_thread",
-			"cmdKnifeTop15",
-			"codForwards[WEAPON_DEPLOY]",
-			"cod_weapon_deploy",
-			"hudinfo",
-			"STATSX_SHELL_DESIGN2_STYLE",
-			"Doladowanie_Konta",
-			"gResources",
-			"cmd_help",
-			"gCmdHelp",
-			"cmd_addbadge",
-			"Ham_CS_Player_ResetMaxSpeed",
-			"player_prethink",
-			"create ",
-			"insert ",
-			"colorchat",
-			"przepraszam",
-			"colorchat"
+			"wybranoP"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -601,7 +609,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 2,
 			"sheets":
 			[
 				{
@@ -719,7 +727,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
@@ -735,8 +743,8 @@
 						"selection":
 						[
 							[
-								9827,
-								9827
+								1864,
+								1864
 							]
 						],
 						"settings":
@@ -748,15 +756,15 @@
 								{
 									"1":
 									[
-										9827,
-										9828
+										2122,
+										2123
 									]
 								},
 								"icon":
 								{
 									"1":
 									[
-										"Packages/BracketHighlighter/icons/double_quote.png",
+										"Packages/BracketHighlighter/icons/curly_bracket.png",
 										"brackethighlighter.default"
 									]
 								},
@@ -764,8 +772,8 @@
 								{
 									"1":
 									[
-										9760,
-										9761
+										1606,
+										1607
 									]
 								},
 								"unmatched":
@@ -774,36 +782,46 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
@@ -814,29 +832,134 @@
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content"
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content"
 							],
 							"git_gutter_is_enabled": true,
 							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod",
 							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
+						"translation.x": -0.0,
+						"translation.y": 714.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/D/Downloads/GoogleChrome/sklepsms_usluga_bf1_odznaki.sma",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3292,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".#",
+									"selector": "text.html"
+								}
+							],
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+								},
+								"icon":
+								{
+								},
+								"open":
+								{
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content"
+							],
+							"git_savvy.file_path": "D:\\Downloads\\GoogleChrome\\sklepsms_usluga_bf1_odznaki.sma",
+							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
 						"translation.x": 0.0,
-						"translation.y": 5429.0,
+						"translation.y": 1134.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
