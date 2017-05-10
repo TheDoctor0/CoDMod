@@ -423,6 +423,8 @@ public buy_weapon_skin_handle(id, menu, item)
 
 public cod_weapon_deploy(id, weapon, ent)
 {
+	if(weapon == CSW_HEGRENADE || weapon == CSW_SMOKEGRENADE || weapon == CSW_FLASHBANG) return;
+
 	if(playerData[id][weapon] > -1)
 	{
 		static skin[skinsInfo];
