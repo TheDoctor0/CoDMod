@@ -78,9 +78,9 @@ public plugin_precache()
 	
 	if(error) set_fail_state("[CoD] Nie zaladowano wszystkich skinow. Sprawdz logi bledow!");
 	
-	if(!ArraySize(skins)) set_fail_state("[CoD] Nie zaladowano zadnego zestawu. Sprawdz plik konfiguracyjny cod_skins.ini!");
+	if(!ArraySize(skins)) set_fail_state("[CoD] Nie zaladowano zadnego skina. Sprawdz plik konfiguracyjny cod_skins.ini!");
 	
-	for(new i = 1; i <= MAX_PLAYERS; i++) playerSkins[i] = ArrayCreate(         );
+	for(new i = 1; i <= MAX_PLAYERS; i++) playerSkins[i] = ArrayCreate();
 }
 
 public plugin_cfg()
