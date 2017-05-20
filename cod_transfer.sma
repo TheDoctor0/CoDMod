@@ -12,7 +12,7 @@ new const commandCash[][] = { "say /przelewc", "say_team /przelewc", "say /przel
 
 new transferPlayer[MAX_PLAYERS + 1], maxPlayers;
 
-public plugin_init() 
+public plugin_init()
 {  
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
@@ -281,7 +281,7 @@ public transfer_cash_handle(id)
 		
 	if(!is_user_connected(transferPlayer[id]))
 	{
-		cod_print_chat(id, "Gracza, ktoremu chcesz przelac^x03 honor^x01 nie ma juz na serwerze!");
+		cod_print_chat(id, "Gracza, ktoremu chcesz przelac^x03 kase^x01 nie ma juz na serwerze!");
 
 		return PLUGIN_HANDLED;
 	}
@@ -302,7 +302,7 @@ public transfer_cash_handle(id)
 	
 	if(cs_get_user_money(id) < cashAmount) 
 	{ 
-		cod_print_chat(id, "Nie masz tyle^x03 honoru^x01!");
+		cod_print_chat(id, "Nie masz tyle^x03 kasy^x01!");
 
 		return PLUGIN_HANDLED;
 	} 
@@ -315,7 +315,7 @@ public transfer_cash_handle(id)
 	cs_set_user_money(transferPlayer[id], cs_get_user_money(transferPlayer[id]) + cashAmount);
 	cs_set_user_money(id, cs_get_user_money(id) - cashAmount);
 	
-	cod_print_chat(0, "^x03%s^x01 przelal^x04 %i honoru^x01 na konto^x03 %s^x01.", playerName, cashAmount, playerIdName);
+	cod_print_chat(0, "^x03%s^x01 przelal^x04 %i$^x01 na konto^x03 %s^x01.", playerName, cashAmount, playerIdName);
 	
 	return PLUGIN_HANDLED;
 }

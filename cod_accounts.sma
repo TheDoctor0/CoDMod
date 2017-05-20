@@ -757,7 +757,7 @@ public _cod_check_account(plugin_id, num_params)
 	
 	if(playerStatus[id] < LOGGED)
 	{
-		cod_print_chat(id, "Musisz sie^x04 zalogowac^x01, aby miec dostep do glownych funkcji!");
+		cod_print_chat(id, "Musisz sie^x03 zalogowac^x01, aby miec dostep do glownych funkcji!");
 		
 		account_menu(id, 1);
 		

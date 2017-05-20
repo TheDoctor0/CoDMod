@@ -34,11 +34,13 @@ new const commandQuest[][] = { "say /quest", "say_team /quest", "say /misja", "s
 new const commandProgress[][] = { "say /progress", "say_team /progress", "say /progres", "say_team /progres", "say /postep", "say_team /postep", "postep" };
 new const commandEnd[][] = { "say /koniec", "say_team /koniec", "say /zakoncz", "say_team /zakoncz", "zakoncz", "say_team /przerwij", "say /przerwij", "przerwij" };
 
-new playerClass[MAX_PLAYERS + 1][64], playerName[MAX_PLAYERS + 1][64], playerData[MAX_PLAYERS + 1][playerInfo], Array:codQuests, quests;
+new playerClass[MAX_PLAYERS + 1][64], playerName[MAX_PLAYERS + 1][64], playerData[MAX_PLAYERS + 1][playerInfo], Array:codQuests, cvarMinPlayers, minPlayers, quests;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
+
+	cvarMinPlayers = register_cvar("cod_quests_minplayers", "4");
 	
 	for(new i; i < sizeof commandQuest; i++) register_clcmd(commandQuest[i], "quest_menu");
 	for(new i; i < sizeof commandProgress; i++) register_clcmd(commandProgress[i], "check_quest");
@@ -95,6 +97,8 @@ public plugin_cfg()
 	}
 
 	fclose(file);
+
+	minPlayers = get_pcvar_num(cvarMinPlayers);
 }
 
 public plugin_end()
@@ -530,7 +534,7 @@ stock get_quest_info(quest, info)
 
 stock add_progress(id, amount = 1)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	if(!is_user_connected(id) || get_playersnum() < minPlayers) return PLUGIN_HANDLED;
 	
 	if(check_progress(id)) playerData[id][PLAYER_PROGRESS] += amount;
 	else give_reward(id);

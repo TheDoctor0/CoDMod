@@ -10,7 +10,7 @@ new const commandGive[][] = { "say /give", "say_team /give", "say /oddaj", "say_
 
 new maxPlayers, blockExchange, cooldown;
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	

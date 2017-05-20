@@ -301,13 +301,14 @@ public set_weapon_skin_handle(id, menu, item)
 
 	ArrayGetArray(skins, skinId, skin);
 
-	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_skins` WHERE name = '%s' AND weapon = '%s ACTIVE'", playerData[id][NAME], skin[WEAPON]);
+	if(!skinId && strlen(itemData) > 3) formatex(queryData, charsmax(queryData), "DELETE FROM `cod_skins` WHERE name = '%s' AND weapon = '%s ACTIVE'", playerData[id][NAME], itemData);
+	else formatex(queryData, charsmax(queryData), "DELETE FROM `cod_skins` WHERE name = '%s' AND weapon = '%s ACTIVE'", playerData[id][NAME], skin[WEAPON]);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
 	if(item)
 	{
-		formatex(queryData, charsmax(queryData), "INSERT INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES ('%s', '%s ACTIVE', '%s')", playerData[id][NAME], skin[WEAPON], skin[NAME]);
+		add_skin(id, skin[WEAPON], skin[NAME], 1);
 
 		set_skin(id, skin[WEAPON], skinId);
 
@@ -315,14 +316,10 @@ public set_weapon_skin_handle(id, menu, item)
 	}
 	else 
 	{
-		formatex(queryData, charsmax(queryData), "INSERT INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES ('%s', '%s ACTIVE', 'DEFAULT')", playerData[id][NAME], skin[WEAPON]);
-
 		set_skin(id, itemData, -1);
 
 		cod_print_chat(id, "Przywrociles domyslny skin broni^x03 %s^x01.", itemData);
 	}
-	
-	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 	
 	return PLUGIN_HANDLED;
 }
@@ -404,11 +401,7 @@ public buy_weapon_skin_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	new queryData[256];
-
-	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES ('%s', '%s', '%s')", playerData[id][NAME], skin[WEAPON], skin[NAME]);
-
-	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+	add_skin(id, skin[WEAPON], skin[NAME]);
 
 	ArrayPushCell(playerSkins[id], skinId);
 
@@ -419,7 +412,7 @@ public buy_weapon_skin_handle(id, menu, item)
 
 public cod_weapon_deploy(id, weapon, ent)
 {
-	if(weapon == CSW_HEGRENADE || weapon == CSW_SMOKEGRENADE || weapon == CSW_FLASHBANG) return;
+	if(weapon == CSW_HEGRENADE || weapon == CSW_SMOKEGRENADE || weapon == CSW_FLASHBANG || weapon == CSW_C4) return;
 
 	if(playerData[id][weapon] > -1)
 	{
@@ -477,17 +470,31 @@ public load_skins_handle(failState, Handle:query, error[], errorNum, playerId[],
 	set_bit(id, loaded);
 }
 
-stock set_skin(id, weapon[], skin)
+stock get_weapon_id(weapon[])
 {
-	if(skin == -1) return;
-
 	static weaponName[32];
 
 	formatex(weaponName, charsmax(weaponName), "weapon_%s", weapon);
 
 	strtolower(weaponName);
 
-	playerData[id][get_weaponid(weaponName)] = skin;
+	return get_weaponid(weaponName);
+}
+
+stock add_skin(id, weapon[], name[], active = 0)
+{
+	new queryData[192];
+
+	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES ('%s', '%s%s', '%s')", playerData[id][NAME], weapon, active ? " ACTIVE" : "", name);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+}
+
+stock set_skin(id, weapon[], skin)
+{
+	if(skin >= ArraySize(skins)) return;
+
+	playerData[id][get_weapon_id(weapon)] = skin;
 }
 
 stock get_skin_id(const name[], const weapon[])
