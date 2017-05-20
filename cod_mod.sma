@@ -1836,7 +1836,7 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 
 	ExecuteForward(codForwards[KILLED], ret, killer, victim, weaponId, hitPlace);
 	
-	return HAM_IGNORED;
+	return PLUGIN_CONTINUE;
 }
 
 public touch_weapon(weapon, id)

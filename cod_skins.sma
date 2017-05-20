@@ -297,13 +297,17 @@ public set_weapon_skin_handle(id, menu, item)
 
 	menu_destroy(menu);
 
+	new skin[skinsInfo], skinId = str_to_num(itemData);
+
+	ArrayGetArray(skins, skinId, skin);
+
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_skins` WHERE name = '%s' AND weapon = '%s ACTIVE'", playerData[id][NAME], skin[WEAPON]);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+
 	if(item)
 	{
-		new skin[skinsInfo], skinId = str_to_num(itemData);
-
-		ArrayGetArray(skins, skinId, skin);
-
-		formatex(queryData, charsmax(queryData), "UPDATE `cod_skins` SET skin = '%s' WHERE weapon = '%s ACTIVE' AND name = '%s'", skin[NAME], skin[WEAPON], playerData[id][NAME]);
+		formatex(queryData, charsmax(queryData), "INSERT INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES ('%s', '%s ACTIVE', '%s')", playerData[id][NAME], skin[WEAPON], skin[NAME]);
 
 		set_skin(id, skin[WEAPON], skinId);
 
@@ -311,7 +315,7 @@ public set_weapon_skin_handle(id, menu, item)
 	}
 	else 
 	{
-		formatex(queryData, charsmax(queryData), "UPDATE `cod_skins` SET skin = 'DEFAULT' WHERE weapon = '%s ACTIVE' AND name = '%s'", itemData, playerData[id][NAME]);
+		formatex(queryData, charsmax(queryData), "INSERT INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES ('%s', '%s ACTIVE', 'DEFAULT')", playerData[id][NAME], skin[WEAPON]);
 
 		set_skin(id, itemData, -1);
 
@@ -401,14 +405,6 @@ public buy_weapon_skin_handle(id, menu, item)
 	}
 
 	new queryData[256];
-
-	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_skins` WHERE name = '%s' AND weapon = '%s ACTIVE'", playerData[id][NAME], skin[WEAPON]);
-
-	SQL_ThreadQuery(sql, "ignore_handle", queryData);
-	
-	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES ('%s', '%s ACTIVE', 'DEFAULT')", playerData[id][NAME], skin[WEAPON]);
-
-	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
 	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES ('%s', '%s', '%s')", playerData[id][NAME], skin[WEAPON], skin[NAME]);
 
