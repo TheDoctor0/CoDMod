@@ -2225,7 +2225,7 @@ public show_info(id)
 		return PLUGIN_CONTINUE;
 	}
 	
-	static hudData[512], className[MAX_NAME], itemName[MAX_NAME], clanName[MAX_NAME], questProgress[MAX_NAME], Float:levelPercent, exp, target;
+	static hudData[512], className[MAX_NAME], itemName[MAX_NAME], clanName[MAX_NAME], missionProgress[MAX_NAME], Float:levelPercent, exp, target;
 	
 	target = id;
 	
@@ -2252,13 +2252,13 @@ public show_info(id)
 
 	format(clanName, charsmax(clanName), "^n[Klan : %s]", clanName);
 
-	if(cod_get_user_quest(id) > -1) formatex(questProgress, charsmax(questProgress), "^n[Misja : %i/%i (%0.1f%s)]", cod_get_user_quest_progress(id), cod_get_user_quest_need(id), float(cod_get_user_quest_progress(id))/float(cod_get_user_quest_need(id)) * 100.0, "%%");
+	if(cod_get_user_mission(id) > -1) formatex(missionProgress, charsmax(missionProgress), "^n[Misja : %i/%i (%0.1f%s)]", cod_get_user_mission_progress(id), cod_get_user_mission_need(id), float(cod_get_user_mission_progress(id))/float(cod_get_user_mission_need(id)) * 100.0, "%%");
 
 	exp = codPlayer[target][PLAYER_LEVEL] - 1 >= 0 ? get_level_exp(codPlayer[target][PLAYER_LEVEL] - 1) : 0;
 	levelPercent = codPlayer[target][PLAYER_LEVEL] < levelLimit ? (float((codPlayer[target][PLAYER_EXP] - exp)) / float((get_level_exp(codPlayer[target][PLAYER_LEVEL]) - exp))) * 100.0 : 0.0;
 	
 	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot : %s (%i/%i)]%s^n[Zycie : %i]^n[Honor : %i]", 
-	className, cod_get_user_clan(target) ? clanName : "", codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, codPlayer[target][PLAYER_ITEM_DURA], maxDurability, cod_get_user_quest(id) > -1 ? questProgress : "", get_user_health(id), cod_get_user_honor(target));
+	className, cod_get_user_clan(target) ? clanName : "", codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, codPlayer[target][PLAYER_ITEM_DURA], maxDurability, cod_get_user_mission(id) > -1 ? missionProgress : "", get_user_health(id), cod_get_user_honor(target));
 	
 	if(get_exp_bonus(target, 100) > 100) format(hudData, charsmax(hudData), "%s^n[Exp Bonus : %i%s]", hudData, get_exp_bonus(target, 100) - 100, "%%");
 

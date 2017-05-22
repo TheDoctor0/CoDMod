@@ -89,19 +89,19 @@ Returns clan's name.
 native cod_get_clan_name(clan, dataReturn[], dataLength);
 
 /*------------------------------
-Returns player's quest id (-1 if none).
+Returns player's mission id (-1 if none).
 ------------------------------*/
-native cod_get_user_quest(id);
+native cod_get_user_mission(id);
 
 /*------------------------------
-Returns player's quest progress.
+Returns player's mission progress.
 ------------------------------*/
-native cod_get_user_quest_progress(id);
+native cod_get_user_mission_progress(id);
 
 /*------------------------------
-Returns player's quest need.
+Returns player's mission need.
 ------------------------------*/
-native cod_get_user_quest_need(id);
+native cod_get_user_mission_need(id);
 
 /*------------------------------
 Spawns an icon above box.

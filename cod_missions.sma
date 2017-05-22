@@ -3,17 +3,17 @@
 #include <nvault>
 #include <cod>
 
-#define PLUGIN "CoD Quests"
+#define PLUGIN "CoD Missions"
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-enum _:questType { TYPE_NONE, TYPE_KILL, TYPE_HEADSHOT, TYPE_PLANT, TYPE_DEFUSE, TYPE_RESCUE, TYPE_DAMAGE, TYPE_CLASS, TYPE_ITEM };
+enum _:missionType { TYPE_NONE, TYPE_KILL, TYPE_HEADSHOT, TYPE_PLANT, TYPE_DEFUSE, TYPE_RESCUE, TYPE_DAMAGE, TYPE_CLASS, TYPE_ITEM };
 
 enum _:playerInfo { PLAYER_ID, PLAYER_TYPE, PLAYER_ADDITIONAL, PLAYER_PROGRESS, PLAYER_CHAPTER };
 
-enum _:questInfo { QUEST_CHAPTER, QUEST_AMOUNT, QUEST_TYPE, QUEST_REWARD };
+enum _:missionInfo { QUEST_CHAPTER, QUEST_AMOUNT, QUEST_TYPE, QUEST_REWARD };
 
-new questDescription[][] = 
+new missionDescription[][] = 
 {
 	"Brak misji %i",
 	"Musisz zabic jeszcze %i osob",
@@ -26,40 +26,40 @@ new questDescription[][] =
 	"Musisz znalezc item %s jeszcze %i razy"
 };
 
-new questChapter[][] = { {1, 100}, {101, 200}, {201, 300}, {301, 400}, {401, 501} };
+new missionChapter[][] = { {1, 100}, {101, 200}, {201, 300}, {301, 400}, {401, 501} };
 
-new questChapterName[][] = { "Nowy Poczatek", "Walka Na Froncie", "Za Linia Wroga", "Wszystko Albo Nic", "Legenda Zyje Wiecznie" };
+new missionChapterName[][] = { "Nowy Poczatek", "Walka Na Froncie", "Za Linia Wroga", "Wszystko Albo Nic", "Legenda Zyje Wiecznie" };
 
-new const commandQuest[][] = { "say /quest", "say_team /quest", "say /misja", "say_team /misja", "say /misje", "say_team /misje", "say /questy", "say_team /questy", "misje" };
+new const commandMission[][] = { "say /quest", "say_team /quest", "say /misja", "say_team /misja", "say /misje", "say_team /misje", "say /questy", "say_team /questy", "misje" };
 new const commandProgress[][] = { "say /progress", "say_team /progress", "say /progres", "say_team /progres", "say /postep", "say_team /postep", "postep" };
 new const commandEnd[][] = { "say /koniec", "say_team /koniec", "say /zakoncz", "say_team /zakoncz", "zakoncz", "say_team /przerwij", "say /przerwij", "przerwij" };
 
-new playerClass[MAX_PLAYERS + 1][64], playerName[MAX_PLAYERS + 1][64], playerData[MAX_PLAYERS + 1][playerInfo], Array:codQuests, cvarMinPlayers, minPlayers, quests;
+new playerClass[MAX_PLAYERS + 1][64], playerName[MAX_PLAYERS + 1][64], playerData[MAX_PLAYERS + 1][playerInfo], Array:codMissions, cvarMinPlayers, minPlayers, missions;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
-	cvarMinPlayers = register_cvar("cod_quests_minplayers", "4");
+	cvarMinPlayers = register_cvar("cod_missions_minplayers", "4");
 	
-	for(new i; i < sizeof commandQuest; i++) register_clcmd(commandQuest[i], "quest_menu");
-	for(new i; i < sizeof commandProgress; i++) register_clcmd(commandProgress[i], "check_quest");
-	for(new i; i < sizeof commandEnd; i++) register_clcmd(commandEnd[i], "reset_quest");
+	for(new i; i < sizeof commandMission; i++) register_clcmd(commandMission[i], "mission_menu");
+	for(new i; i < sizeof commandProgress; i++) register_clcmd(commandProgress[i], "check_mission");
+	for(new i; i < sizeof commandEnd; i++) register_clcmd(commandEnd[i], "reset_mission");
 	
-	register_logevent("log_event_quest", 3, "1=triggered");
+	register_logevent("log_event_mission", 3, "1=triggered");
 	
-	quests = nvault_open("cod_quests");
+	missions = nvault_open("cod_missions");
 	
-	if(quests == INVALID_HANDLE) set_fail_state("Nie mozna otworzyc pliku cod_quests.vault");
+	if(missions == INVALID_HANDLE) set_fail_state("Nie mozna otworzyc pliku cod_missions.vault");
 	
-	codQuests = ArrayCreate(questInfo);
+	codMissions = ArrayCreate(missionInfo);
 }
 
 public plugin_natives()
 {
-	register_native("cod_get_user_quest", "get_quest", 1);
-	register_native("cod_get_user_quest_progress", "get_progress", 1);
-	register_native("cod_get_user_quest_need", "get_progress_need", 1);
+	register_native("cod_get_user_mission", "get_mission", 1);
+	register_native("cod_get_user_mission_progress", "get_progress", 1);
+	register_native("cod_get_user_mission_need", "get_progress_need", 1);
 }
 
 public plugin_cfg() 
@@ -67,18 +67,18 @@ public plugin_cfg()
 	new filePath[64]; 
 	
 	get_localinfo("amxx_configsdir", filePath, charsmax(filePath));
-	format(filePath, charsmax(filePath), "%s/cod_quests.ini", filePath);
+	format(filePath, charsmax(filePath), "%s/cod_missions.ini", filePath);
 	
 	if(!file_exists(filePath))
 	{
 		new error[128];
 
-		formatex(error, charsmax(error), "[CoD] Nie mozna znalezc pliku cod_quests.ini w lokalizacji %s", filePath);
+		formatex(error, charsmax(error), "[CoD] Nie mozna znalezc pliku cod_missions.ini w lokalizacji %s", filePath);
 
 		set_fail_state(error);
 	}
 	
-	new lineData[128], questData[4][16], codQuest[questInfo], file = fopen(filePath, "r");
+	new lineData[128], missionData[4][16], codMission[missionInfo], file = fopen(filePath, "r");
 	
 	while(!feof(file)) 
 	{
@@ -86,14 +86,14 @@ public plugin_cfg()
 		
 		if(lineData[0] == ';' || lineData[0] == '^0') continue;
 
-		parse(lineData, questData[0], charsmax(questData[]), questData[1], charsmax(questData[]), questData[2], charsmax(questData[]), questData[3], charsmax(questData[]));
+		parse(lineData, missionData[0], charsmax(missionData[]), missionData[1], charsmax(missionData[]), missionData[2], charsmax(missionData[]), missionData[3], charsmax(missionData[]));
 
-		codQuest[QUEST_CHAPTER] = str_to_num(questData[0]);
-		codQuest[QUEST_AMOUNT] = str_to_num(questData[1]);
-		codQuest[QUEST_TYPE] = str_to_num(questData[2]);
-		codQuest[QUEST_REWARD] = str_to_num(questData[3]);
+		codMission[QUEST_CHAPTER] = str_to_num(missionData[0]);
+		codMission[QUEST_AMOUNT] = str_to_num(missionData[1]);
+		codMission[QUEST_TYPE] = str_to_num(missionData[2]);
+		codMission[QUEST_REWARD] = str_to_num(missionData[3]);
 
-		ArrayPushArray(codQuests, codQuest);
+		ArrayPushArray(codMissions, codMission);
 	}
 
 	fclose(file);
@@ -102,22 +102,22 @@ public plugin_cfg()
 }
 
 public plugin_end()
-	nvault_close(quests);
+	nvault_close(missions);
 	
 public client_connect(id)
 {
 	get_user_name(id, playerName[id], charsmax(playerName));
 	
-	reset_quest(id, 1);
+	reset_mission(id, 1);
 }
 
-public quest_menu(id)
+public mission_menu(id)
 {
 	if(!cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new menu = menu_create("\yMenu \rMisji\w:", "quest_menu_handle"), callback = menu_makecallback("quest_menu_callback");
+	new menu = menu_create("\yMenu \rMisji\w:", "mission_menu_handle"), callback = menu_makecallback("mission_menu_callback");
 	
 	menu_additem(menu, "Wybierz \yMisje", _, _, callback);
 	menu_additem(menu, "Przerwij \yMisje", _, _, callback);
@@ -133,7 +133,7 @@ public quest_menu(id)
 	return PLUGIN_HANDLED;
 }
 
-public quest_menu_handle(id, menu, item)
+public mission_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
     
@@ -151,14 +151,14 @@ public quest_menu_handle(id, menu, item)
 	switch(item)
 	{
 		case 0: select_chapter(id);
-		case 1: reset_quest(id, 0);
-		case 2: check_quest(id);
+		case 1: reset_mission(id, 0);
+		case 2: check_mission(id);
 	}
 	
 	return PLUGIN_HANDLED;
 }
 
-public quest_menu_callback(id, menu, item)
+public mission_menu_callback(id, menu, item)
 {
 	switch(item)
 	{
@@ -180,11 +180,11 @@ public select_chapter(id)
 		return PLUGIN_HANDLED;
 	} 
 
-	new menuData[128], menu = menu_create("\yWybierz \rRozdzial\w:", "select_quest"), callback = menu_makecallback("select_chapter_callback");
+	new menuData[128], menu = menu_create("\yWybierz \rRozdzial\w:", "select_mission"), callback = menu_makecallback("select_chapter_callback");
 
-	for(new i = 0; i < sizeof(questChapter); i++)
+	for(new i = 0; i < sizeof(missionChapter); i++)
 	{
-		formatex(menuData, charsmax(menuData), "Rozdzial \y%s \w(\r%i \wPoziom - \r%i \wPoziom)", questChapterName[i], questChapter[i][0], questChapter[i][1]);
+		formatex(menuData, charsmax(menuData), "Rozdzial \y%s \w(\r%i \wPoziom - \r%i \wPoziom)", missionChapterName[i], missionChapter[i][0], missionChapter[i][1]);
 
 		menu_additem(menu, menuData, _, _, callback);
 	}
@@ -198,12 +198,12 @@ public select_chapter(id)
 
 public select_chapter_callback(id, menu, item)
 {
-	if(cod_get_user_level(id) < questChapter[item][0]) return ITEM_DISABLED;
+	if(cod_get_user_level(id) < missionChapter[item][0]) return ITEM_DISABLED;
 
 	return ITEM_ENABLED;
 }
 
-public select_quest(id, menu, item)
+public select_mission(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
     
@@ -222,30 +222,30 @@ public select_quest(id, menu, item)
 	
 	menu_destroy(menu);
 	
-	new menuData[128], questId[6], codQuest[questInfo], menu = menu_create("\yWybierz \rMisje\w:", "select_quest_handle");
+	new menuData[128], missionId[6], codMission[missionInfo], menu = menu_create("\yWybierz \rMisje\w:", "select_mission_handle");
 	
-	for(new i = 0; i < ArraySize(codQuests); i++)
+	for(new i = 0; i < ArraySize(codMissions); i++)
 	{	
-		ArrayGetArray(codQuests, i, codQuest);
+		ArrayGetArray(codMissions, i, codMission);
 
-		if(playerData[id][PLAYER_CHAPTER] == codQuest[QUEST_CHAPTER])
+		if(playerData[id][PLAYER_CHAPTER] == codMission[QUEST_CHAPTER])
 		{		
-			switch(codQuest[QUEST_TYPE])
+			switch(codMission[QUEST_TYPE])
 			{
-				case TYPE_KILL: formatex(menuData, charsmax(menuData), "Zabij %i osob \y(Nagroda: %i Expa)", codQuest[QUEST_AMOUNT], codQuest[QUEST_REWARD]);
-				case TYPE_HEADSHOT: formatex(menuData, charsmax(menuData), "Zabij %i osob z HS \y(Nagroda: %i Expa)",  codQuest[QUEST_AMOUNT], codQuest[QUEST_REWARD]);
-				case TYPE_PLANT: formatex(menuData, charsmax(menuData), "Podloz %i bomb \y(Nagroda: %i Expa)",  codQuest[QUEST_AMOUNT], codQuest[QUEST_REWARD]);
-				case TYPE_RESCUE: formatex(menuData, charsmax(menuData), "Uratuj %i razy hosty \y(Nagroda: %i Expa)",  codQuest[QUEST_AMOUNT], codQuest[QUEST_REWARD]);
-				case TYPE_DEFUSE: formatex(menuData, charsmax(menuData), "Rozbroj %i bomb \y(Nagroda: %i Expa)",  codQuest[QUEST_AMOUNT], codQuest[QUEST_REWARD]);
-				case TYPE_DAMAGE: formatex(menuData, charsmax(menuData), "Zadaj %i obrazen \y(Nagroda: %i Expa)",  codQuest[QUEST_AMOUNT], codQuest[QUEST_REWARD]);
-				case TYPE_CLASS: formatex(menuData, charsmax(menuData), "Zabij %i razy wybrana klase \y(Nagroda: %i Expa)", codQuest[QUEST_AMOUNT], codQuest[QUEST_REWARD]);
-				case TYPE_ITEM: formatex(menuData, charsmax(menuData), "Znajdz %i razy wybrany item \y(Nagroda: %i Expa)", codQuest[QUEST_AMOUNT], codQuest[QUEST_REWARD]);
+				case TYPE_KILL: formatex(menuData, charsmax(menuData), "Zabij %i osob \y(Nagroda: %i Expa)", codMission[QUEST_AMOUNT], codMission[QUEST_REWARD]);
+				case TYPE_HEADSHOT: formatex(menuData, charsmax(menuData), "Zabij %i osob z HS \y(Nagroda: %i Expa)",  codMission[QUEST_AMOUNT], codMission[QUEST_REWARD]);
+				case TYPE_PLANT: formatex(menuData, charsmax(menuData), "Podloz %i bomb \y(Nagroda: %i Expa)",  codMission[QUEST_AMOUNT], codMission[QUEST_REWARD]);
+				case TYPE_RESCUE: formatex(menuData, charsmax(menuData), "Uratuj %i razy hosty \y(Nagroda: %i Expa)",  codMission[QUEST_AMOUNT], codMission[QUEST_REWARD]);
+				case TYPE_DEFUSE: formatex(menuData, charsmax(menuData), "Rozbroj %i bomb \y(Nagroda: %i Expa)",  codMission[QUEST_AMOUNT], codMission[QUEST_REWARD]);
+				case TYPE_DAMAGE: formatex(menuData, charsmax(menuData), "Zadaj %i obrazen \y(Nagroda: %i Expa)",  codMission[QUEST_AMOUNT], codMission[QUEST_REWARD]);
+				case TYPE_CLASS: formatex(menuData, charsmax(menuData), "Zabij %i razy wybrana klase \y(Nagroda: %i Expa)", codMission[QUEST_AMOUNT], codMission[QUEST_REWARD]);
+				case TYPE_ITEM: formatex(menuData, charsmax(menuData), "Znajdz %i razy wybrany item \y(Nagroda: %i Expa)", codMission[QUEST_AMOUNT], codMission[QUEST_REWARD]);
 				case TYPE_NONE: continue;
 			}
 
-			num_to_str(i, questId, charsmax(questId));
+			num_to_str(i, missionId, charsmax(missionId));
 			
-			menu_additem(menu, menuData, questId);
+			menu_additem(menu, menuData, missionId);
 		}
 	}
 
@@ -260,7 +260,7 @@ public select_quest(id, menu, item)
 	return PLUGIN_HANDLED;
 }
 
-public select_quest_handle(id, menu, item)
+public select_mission_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
     
@@ -275,14 +275,14 @@ public select_quest_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new questId[3], itemAccess, itemCallback;
+	new missionId[3], itemAccess, itemCallback;
 
-	menu_item_getinfo(menu, item, itemAccess, questId, charsmax(questId), _, _, itemCallback);
+	menu_item_getinfo(menu, item, itemAccess, missionId, charsmax(missionId), _, _, itemCallback);
 
-	reset_quest(id, 1);
+	reset_mission(id, 1);
 
-	playerData[id][PLAYER_ID] = str_to_num(questId);
-	playerData[id][PLAYER_TYPE] = get_quest_info(playerData[id][PLAYER_ID], QUEST_TYPE);
+	playerData[id][PLAYER_ID] = str_to_num(missionId);
+	playerData[id][PLAYER_TYPE] = get_mission_info(playerData[id][PLAYER_ID], QUEST_TYPE);
 	
 	switch(playerData[id][PLAYER_TYPE])
 	{
@@ -292,7 +292,7 @@ public select_quest_handle(id, menu, item)
 		{
 			cod_print_chat(id, "Rozpoczales wykonywac^x03 misje^x01. Powodzenia!");
 
-			save_quest(id);
+			save_mission(id);
 		}
 	}
 	
@@ -368,15 +368,15 @@ public select_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new questData[6], itemAccess, itemCallback;
+	new missionData[6], itemAccess, itemCallback;
 	
-	menu_item_getinfo(menu, item, itemAccess, questData, charsmax(questData), _, _, itemCallback);
+	menu_item_getinfo(menu, item, itemAccess, missionData, charsmax(missionData), _, _, itemCallback);
 	
-	playerData[id][PLAYER_ADDITIONAL] = str_to_num(questData);
+	playerData[id][PLAYER_ADDITIONAL] = str_to_num(missionData);
 	
 	cod_print_chat(id, "Rozpoczales wykonywac^x03 misje^x01. Powodzenia!");
 
-	save_quest(id);
+	save_mission(id);
 
 	menu_destroy(menu);
 	
@@ -399,7 +399,7 @@ public cod_item_changed(id, item)
 public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
 	if(playerData[attacker][PLAYER_TYPE] == TYPE_DAMAGE) add_progress(attacker, floatround(damage));
 
-public log_event_quest()
+public log_event_mission()
 {
 	new userLog[80], userAction[64], userName[32];
 	
@@ -424,20 +424,20 @@ public give_reward(id)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	new reward = cod_get_user_bonus_exp(id, get_quest_info(playerData[id][PLAYER_ID], QUEST_REWARD));
+	new reward = cod_get_user_bonus_exp(id, get_mission_info(playerData[id][PLAYER_ID], QUEST_REWARD));
 	
 	cod_set_user_exp(id, reward);
 	
-	save_quest(id);
+	save_mission(id);
 
-	reset_quest(id, 1);
+	reset_mission(id, 1);
 	
 	cod_print_chat(id, "Gratulacje! Ukonczyles swoja misje - otrzymujesz w nagrode^x03 %i^x01 doswiadczenia.", reward);
 	
 	return PLUGIN_HANDLED;
 }
 
-public check_quest(id)
+public check_mission(id)
 {
 	if(!playerData[id][PLAYER_TYPE]) cod_print_chat(id, "Nie wykonujesz zadnej misji.");
 	else
@@ -447,10 +447,10 @@ public check_quest(id)
 		if(playerData[id][PLAYER_TYPE] == TYPE_CLASS) cod_get_class_name(playerData[id][PLAYER_ADDITIONAL], additional, charsmax(additional));
 		else if(playerData[id][PLAYER_TYPE] == TYPE_ITEM) cod_get_item_name(playerData[id][PLAYER_ADDITIONAL], additional, charsmax(additional));
 
-		if(additional[0]) formatex(message, charsmax(message), questDescription[playerData[id][PLAYER_TYPE]], additional, (get_progress_need(id) - get_progress(id)));
-		else formatex(message, charsmax(message), questDescription[playerData[id][PLAYER_TYPE]], (get_progress_need(id) - get_progress(id)));
+		if(additional[0]) formatex(message, charsmax(message), missionDescription[playerData[id][PLAYER_TYPE]], additional, (get_progress_need(id) - get_progress(id)));
+		else formatex(message, charsmax(message), missionDescription[playerData[id][PLAYER_TYPE]], (get_progress_need(id) - get_progress(id)));
 
-		cod_print_chat(id, "Rozdzial:^x03 %s^x01. Postep:^x03 %i/%i^x01.", questChapterName[playerData[id][PLAYER_CHAPTER]], get_progress(id), get_progress_need(id));
+		cod_print_chat(id, "Rozdzial:^x03 %s^x01. Postep:^x03 %i/%i^x01.", missionChapterName[playerData[id][PLAYER_CHAPTER]], get_progress(id), get_progress_need(id));
 		cod_print_chat(id, "Misja:^x03 %s^x01.", message);
 	}
 	
@@ -461,18 +461,18 @@ public cod_class_changed(id, class)
 {
 	if(is_user_bot(id) || is_user_hltv(id)) return PLUGIN_HANDLED;
 	
-	save_quest(id);
+	save_mission(id);
 
 	cod_get_class_name(cod_get_user_class(id), playerClass[id], charsmax(playerClass[]));
 	
-	reset_quest(id, 1);
+	reset_mission(id, 1);
 
-	load_quest(id);
+	load_mission(id);
 	
 	return PLUGIN_HANDLED;
 }
 
-public save_quest(id) 
+public save_mission(id) 
 {
 	if(is_user_bot(id) || is_user_hltv(id) || !playerData[id][PLAYER_TYPE]) return PLUGIN_HANDLED;
 	
@@ -481,38 +481,38 @@ public save_quest(id)
 	formatex(vaultKey, charsmax(vaultKey), "%s-%s", playerName[id], playerClass[id]);
 	formatex(vaultData, charsmax(vaultData), "%i %i %i %i %i", playerData[id][PLAYER_ID], playerData[id][PLAYER_TYPE], playerData[id][PLAYER_ADDITIONAL], playerData[id][PLAYER_PROGRESS], playerData[id][PLAYER_CHAPTER]);
 
-	nvault_set(quests, vaultKey, vaultData);
+	nvault_set(missions, vaultKey, vaultData);
 	
 	return PLUGIN_HANDLED;
 }
 
-public load_quest(id) 
+public load_mission(id) 
 {
 	if(is_user_bot(id) || is_user_hltv(id)) return PLUGIN_HANDLED;
 	
-	new vaultKey[64], vaultData[64], questData[5][16], questParam[5];
+	new vaultKey[64], vaultData[64], missionData[5][16], missionParam[5];
 	
 	formatex(vaultKey, charsmax(vaultKey), "%s-%s", playerName[id], playerClass[id]);
 
-	if(nvault_get(quests, vaultKey, vaultData, charsmax(vaultData)))
+	if(nvault_get(missions, vaultKey, vaultData, charsmax(vaultData)))
 	{
-		parse(vaultData, questData[0], charsmax(questData[]), questData[1], charsmax(questData[]), questData[2], charsmax(questData[]), questData[3], charsmax(questData[]), questData[4], charsmax(questData[]));
+		parse(vaultData, missionData[0], charsmax(missionData[]), missionData[1], charsmax(missionData[]), missionData[2], charsmax(missionData[]), missionData[3], charsmax(missionData[]), missionData[4], charsmax(missionData[]));
 	
-		for(new i = 0; i < sizeof questParam; i++) questParam[i] = str_to_num(questData[i]);
+		for(new i = 0; i < sizeof missionParam; i++) missionParam[i] = str_to_num(missionData[i]);
 
-		if(!questParam[1]) return PLUGIN_HANDLED;
+		if(!missionParam[1]) return PLUGIN_HANDLED;
 
-		playerData[id][PLAYER_ID] = questParam[0];
-		playerData[id][PLAYER_TYPE] = questParam[1];
-		playerData[id][PLAYER_ADDITIONAL] = questParam[2];
-		playerData[id][PLAYER_PROGRESS] = questParam[3];
-		playerData[id][PLAYER_CHAPTER] = questParam[4];
+		playerData[id][PLAYER_ID] = missionParam[0];
+		playerData[id][PLAYER_TYPE] = missionParam[1];
+		playerData[id][PLAYER_ADDITIONAL] = missionParam[2];
+		playerData[id][PLAYER_PROGRESS] = missionParam[3];
+		playerData[id][PLAYER_CHAPTER] = missionParam[4];
 	}
 	
 	return PLUGIN_HANDLED;
 }
 
-public reset_quest(id, silent)
+public reset_mission(id, silent)
 {
 	playerData[id][PLAYER_TYPE] = TYPE_NONE;
 	playerData[id][PLAYER_ID] = -1;
@@ -523,35 +523,33 @@ public reset_quest(id, silent)
 	return PLUGIN_HANDLED;
 }
 
-stock get_quest_info(quest, info)
+stock get_mission_info(mission, info)
 {
-	new codQuest[questInfo];
+	new codMission[missionInfo];
 	
-	ArrayGetArray(codQuests, quest, codQuest);
+	ArrayGetArray(codMissions, mission, codMission);
 	
-	return codQuest[info];
+	return codMission[info];
 }
 
 stock add_progress(id, amount = 1)
 {
 	if(!is_user_connected(id) || get_playersnum() < minPlayers) return PLUGIN_HANDLED;
-	
-	if(check_progress(id)) playerData[id][PLAYER_PROGRESS] += amount;
-	else give_reward(id);
 
-	save_quest(id);
+	playerData[id][PLAYER_PROGRESS] += amount;
+	
+	if(get_progress(id) >= get_progress_need(id)) give_reward(id);
+
+	save_mission(id);
 	
 	return PLUGIN_HANDLED;
 }
 
-public get_quest(id)
+public get_mission(id)
 	return playerData[id][PLAYER_ID];
 
 public get_progress(id)
 	return playerData[id][PLAYER_PROGRESS] ? playerData[id][PLAYER_PROGRESS] : 0;
 
 public get_progress_need(id)
-	return playerData[id][PLAYER_TYPE] ? get_quest_info(playerData[id][PLAYER_ID], QUEST_AMOUNT) : 0;
-
-public check_progress(id)
-	return get_progress(id) >= get_progress_need(id) - 1 ? 0 : 1;
+	return playerData[id][PLAYER_TYPE] ? get_mission_info(playerData[id][PLAYER_ID], QUEST_AMOUNT) : 0;
