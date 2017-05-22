@@ -323,7 +323,7 @@ public buy_question_handle(id, menu, item)
 	cod_set_user_item(id, marketItem[ITEM], marketItem[VALUE]);
 	
 	cod_print_chat(id, "Przedmiot^x03 %s^x01 zostal pomyslnie zakupiony.", marketItem[NAME]);
-	cod_print_chat(marketItem[OWNER], "Twoj przedmiot^x03 %s zostal zakupiony przez^x03 %s^x01. Otrzymujesz^x03 %i^x01 Honoru.", marketItem[NAME], playerName[id]);
+	cod_print_chat(marketItem[OWNER], "Twoj przedmiot^x03 %s^x01 zostal zakupiony przez^x03 %s^x01.", marketItem[NAME], playerName[id]);
 	cod_print_chat(marketItem[OWNER], "Za sprzedaz otrzymujesz^x03 %i^x01 Honoru.", marketItem[PRICE])
 	
 	return PLUGIN_CONTINUE;

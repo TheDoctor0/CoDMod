@@ -94,11 +94,11 @@ public exchange_item(id, sound)
 
 	for(new player = 1; player <= maxPlayers; player++)
 	{
-		if(!is_user_connected(player) || id == player || !cod_get_user_class(player) || !cod_get_user_item(player)) continue;
+		if(!is_user_connected(player) || id == player || !cod_get_user_class(player) || !cod_get_user_item(player) || get_bit(player, blockExchange)) continue;
 		
-		cod_get_item_name(cod_get_user_item(id), itemName, charsmax(itemName));
+		cod_get_item_name(cod_get_user_item(player), itemName, charsmax(itemName));
 
-		get_user_name(id, playerName, charsmax(playerName));
+		get_user_name(player, playerName, charsmax(playerName));
 		
 		formatex(menuData, charsmax(menuData), "%s \y(%s)", playerName, itemName);
 
@@ -298,7 +298,7 @@ public give_item(id)
 	{
 		if(!is_user_connected(player) || player == id || !cod_get_user_class(player) || cod_get_user_item(player)) continue;
 		
-		get_user_name(id, playerName, charsmax(playerName));
+		get_user_name(player, playerName, charsmax(playerName));
 
 		num_to_str(player, playerId, charsmax(playerId));
 		
