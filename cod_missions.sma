@@ -7,12 +7,6 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-enum _:missionType { TYPE_NONE, TYPE_KILL, TYPE_HEADSHOT, TYPE_PLANT, TYPE_DEFUSE, TYPE_RESCUE, TYPE_DAMAGE, TYPE_CLASS, TYPE_ITEM };
-
-enum _:playerInfo { PLAYER_ID, PLAYER_TYPE, PLAYER_ADDITIONAL, PLAYER_PROGRESS, PLAYER_CHAPTER };
-
-enum _:missionInfo { QUEST_CHAPTER, QUEST_AMOUNT, QUEST_TYPE, QUEST_REWARD };
-
 new missionDescription[][] = 
 {
 	"Brak misji %i",
@@ -30,11 +24,15 @@ new missionChapter[][] = { {1, 100}, {101, 200}, {201, 300}, {301, 400}, {401, 5
 
 new missionChapterName[][] = { "Nowy Poczatek", "Walka Na Froncie", "Za Linia Wroga", "Wszystko Albo Nic", "Legenda Zyje Wiecznie" };
 
+enum _:missionType { TYPE_NONE, TYPE_KILL, TYPE_HEADSHOT, TYPE_PLANT, TYPE_DEFUSE, TYPE_RESCUE, TYPE_DAMAGE, TYPE_CLASS, TYPE_ITEM };
+enum _:playerInfo { PLAYER_ID, PLAYER_TYPE, PLAYER_ADDITIONAL, PLAYER_PROGRESS, PLAYER_CHAPTER };
+enum _:missionInfo { QUEST_CHAPTER, QUEST_AMOUNT, QUEST_TYPE, QUEST_REWARD };
+
 new const commandMission[][] = { "say /quest", "say_team /quest", "say /misja", "say_team /misja", "say /misje", "say_team /misje", "say /questy", "say_team /questy", "misje" };
 new const commandProgress[][] = { "say /progress", "say_team /progress", "say /progres", "say_team /progres", "say /postep", "say_team /postep", "postep" };
 new const commandEnd[][] = { "say /koniec", "say_team /koniec", "say /zakoncz", "say_team /zakoncz", "zakoncz", "say_team /przerwij", "say /przerwij", "przerwij" };
 
-new playerClass[MAX_PLAYERS + 1][64], playerName[MAX_PLAYERS + 1][64], playerData[MAX_PLAYERS + 1][playerInfo], Array:codMissions, cvarMinPlayers, minPlayers, missions;
+new playerClass[MAX_PLAYERS + 1][64], playerName[MAX_PLAYERS + 1][64], playerData[MAX_PLAYERS + 1][playerInfo], Array:codMissions, cvarMinPlayers, minPlayers, missions, loaded;
 
 public plugin_init() 
 {
@@ -103,12 +101,15 @@ public plugin_cfg()
 
 public plugin_end()
 	nvault_close(missions);
+
+public client_disconnected(id)
+	rem_bit(id, loaded);
 	
-public client_connect(id)
+public client_putinserver(id)
 {
 	get_user_name(id, playerName[id], charsmax(playerName));
 	
-	reset_mission(id, 1);
+	reset_mission(id, 1, 1);
 }
 
 public mission_menu(id)
@@ -151,7 +152,7 @@ public mission_menu_handle(id, menu, item)
 	switch(item)
 	{
 		case 0: select_chapter(id);
-		case 1: reset_mission(id, 0);
+		case 1: reset_mission(id, 0, 0);
 		case 2: check_mission(id);
 	}
 	
@@ -279,7 +280,7 @@ public select_mission_handle(id, menu, item)
 
 	menu_item_getinfo(menu, item, itemAccess, missionId, charsmax(missionId), _, _, itemCallback);
 
-	reset_mission(id, 1);
+	reset_mission(id, 1, 1);
 
 	playerData[id][PLAYER_ID] = str_to_num(missionId);
 	playerData[id][PLAYER_TYPE] = get_mission_info(playerData[id][PLAYER_ID], QUEST_TYPE);
@@ -427,10 +428,8 @@ public give_reward(id)
 	new reward = cod_get_user_bonus_exp(id, get_mission_info(playerData[id][PLAYER_ID], QUEST_REWARD));
 	
 	cod_set_user_exp(id, reward);
-	
-	save_mission(id);
 
-	reset_mission(id, 1);
+	reset_mission(id, 0, 1);
 	
 	cod_print_chat(id, "Gratulacje! Ukonczyles swoja misje - otrzymujesz w nagrode^x03 %i^x01 doswiadczenia.", reward);
 	
@@ -465,7 +464,7 @@ public cod_class_changed(id, class)
 
 	cod_get_class_name(cod_get_user_class(id), playerClass[id], charsmax(playerClass[]));
 	
-	reset_mission(id, 1);
+	reset_mission(id, 1, 1);
 
 	load_mission(id);
 	
@@ -474,7 +473,7 @@ public cod_class_changed(id, class)
 
 public save_mission(id) 
 {
-	if(is_user_bot(id) || is_user_hltv(id) || !playerData[id][PLAYER_TYPE]) return PLUGIN_HANDLED;
+	if(is_user_bot(id) || is_user_hltv(id) || !get_bit(id, loaded)) return PLUGIN_HANDLED;
 	
 	new vaultKey[64], vaultData[64];
 	
@@ -494,6 +493,8 @@ public load_mission(id)
 	
 	formatex(vaultKey, charsmax(vaultKey), "%s-%s", playerName[id], playerClass[id]);
 
+	set_bit(id, loaded);
+
 	if(nvault_get(missions, vaultKey, vaultData, charsmax(vaultData)))
 	{
 		parse(vaultData, missionData[0], charsmax(missionData[]), missionData[1], charsmax(missionData[]), missionData[2], charsmax(missionData[]), missionData[3], charsmax(missionData[]), missionData[4], charsmax(missionData[]));
@@ -512,15 +513,15 @@ public load_mission(id)
 	return PLUGIN_HANDLED;
 }
 
-public reset_mission(id, silent)
+public reset_mission(id, data, silent)
 {
 	playerData[id][PLAYER_TYPE] = TYPE_NONE;
 	playerData[id][PLAYER_ID] = -1;
 	playerData[id][PLAYER_PROGRESS] = 0;
 
-	if(!silent) cod_print_chat(id, "Zrezygnowales z wykonywania wybranej wczesniej^x03 misji^x01.");
+	if(!data) save_mission(id);
 
-	return PLUGIN_HANDLED;
+	if(!silent) cod_print_chat(id, "Zrezygnowales z wykonywania wybranej wczesniej^x03 misji^x01.");
 }
 
 stock get_mission_info(mission, info)
@@ -539,8 +540,7 @@ stock add_progress(id, amount = 1)
 	playerData[id][PLAYER_PROGRESS] += amount;
 	
 	if(get_progress(id) >= get_progress_need(id)) give_reward(id);
-
-	save_mission(id);
+	else save_mission(id);
 	
 	return PLUGIN_HANDLED;
 }

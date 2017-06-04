@@ -27,10 +27,10 @@ enum _:promotions { PROMOTION_NONE, PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION
 
 enum _:types { NONE = -1, CLASS, ITEM, ADDITIONAL, ALL };
 
-enum _:hud { TYPE_HUD, TYPE_DHUD };
-
 enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_DEPLOY, 
 	SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_BOX, SOUND_APPLAUSE, SOUND_LAUGH };
+
+enum _:hud { TYPE_HUD, TYPE_DHUD };
 
 new const codSounds[sounds][] =
 {
@@ -158,7 +158,7 @@ native cod_set_user_class(id, class, force = 0);
 /*------------------------------
 Return class using class name.
 ------------------------------*/
-native cod_get_classid(szClass[]);
+native cod_get_class_id(szClass[]);
 
 /*------------------------------
 Returns class name.
@@ -221,7 +221,7 @@ native cod_upgrade_user_item(id, check = 0);
 /*------------------------------
 Returns item id using item name.
 ------------------------------*/
-native cod_get_itemid(szItem[]);
+native cod_get_item_id(szItem[]);
 
 /*------------------------------
 Zwraca nazwe itemu.
@@ -395,7 +395,7 @@ native cod_get_user_multijumps(id);
 /*------------------------------
 Returns player's gravity amount.
 ------------------------------*/
-native cod_get_user_gravity(id);
+native Float:cod_get_user_gravity(id);
 
 /*------------------------------
 Returns player's armor amount.
@@ -434,8 +434,9 @@ native cod_set_user_multijumps(id, value);
 
 /*------------------------------
 Sets player's gravity amount.
+Type can be NONE - all, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 ------------------------------*/
-native cod_set_user_gravity(id, value);
+native cod_set_user_gravity(id, type, Float:value);
 
 /*------------------------------
 Sets player's armor amount.
@@ -474,8 +475,9 @@ native cod_add_user_multijumps(id, value);
 
 /*------------------------------
 Adds value to player's gravity amount.
+Type can be NONE - all, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 ------------------------------*/
-native cod_add_user_gravity(id, value);
+native cod_add_user_gravity(id, type, Float:value);
 
 /*------------------------------
 Adds value to player's armor amount.

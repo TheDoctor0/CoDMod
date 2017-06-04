@@ -92,10 +92,10 @@ enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, 
 
 enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL, PLAYER_INT, 
 	PLAYER_STAM, PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTR_HEAL, PLAYER_EXTR_INT, PLAYER_EXTR_STAM, PLAYER_EXTR_STR, PLAYER_EXTR_COND, 
-	PLAYER_EXTR_WPNS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_MAX_HP, PLAYER_SPEED, PLAYER_WEAPON, PLAYER_STATUS, PLAYER_GRAVITY, PLAYER_ROCKETS, PLAYER_LAST_ROCKET, 
-	PLAYER_MINES, PLAYER_LAST_MINE, PLAYER_DYNAMITE, PLAYER_DYNAMITES, PLAYER_LAST_DYNAMITE, PLAYER_MEDKITS, PLAYER_LAST_MEDKIT, PLAYER_TELEPORTS, PLAYER_LAST_TELEPORT, 
-	PLAYER_JUMPS, PLAYER_LEFT_JUMPS, PLAYER_KS, PLAYER_TIME_KS, PLAYER_RESISTANCE, PLAYER_HUD, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, 
-	PLAYER_HUD_POSY, PLAYER_BUNNYHOP[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_FOOTSTEPS[ALL + 1], PLAYER_NAME[MAX_NAME] };
+	PLAYER_EXTR_WPNS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_MAX_HP, PLAYER_SPEED, PLAYER_WEAPON, PLAYER_STATUS, PLAYER_ROCKETS, PLAYER_LAST_ROCKET, PLAYER_MINES, 
+	PLAYER_LAST_MINE, PLAYER_DYNAMITE, PLAYER_DYNAMITES, PLAYER_LAST_DYNAMITE, PLAYER_MEDKITS, PLAYER_LAST_MEDKIT, PLAYER_TELEPORTS, PLAYER_LAST_TELEPORT, 
+	PLAYER_JUMPS, PLAYER_LEFT_JUMPS, PLAYER_KS, PLAYER_TIME_KS, PLAYER_RESISTANCE, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, 
+	PLAYER_HUD_POSY, Float:PLAYER_GRAVITY[ALL + 1], PLAYER_BUNNYHOP[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_FOOTSTEPS[ALL + 1], PLAYER_NAME[MAX_NAME] };
 
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 	
@@ -235,7 +235,7 @@ public plugin_natives()
 	
 	register_native("cod_get_user_class", "_cod_get_user_class", 1);
 	register_native("cod_set_user_class", "_cod_set_user_class", 1);
-	register_native("cod_get_classid", "_cod_get_classid", 1);
+	register_native("cod_get_class_id", "_cod_get_class_id", 1);
 	register_native("cod_get_class_name", "_cod_get_class_name", 1);
 	register_native("cod_get_class_desc", "_cod_get_class_desc", 1);
 	register_native("cod_get_class_health", "_cod_get_class_health", 1);
@@ -248,7 +248,7 @@ public plugin_natives()
 	register_native("cod_get_user_item", "_cod_get_user_item", 1);
 	register_native("cod_set_user_item", "_cod_set_user_item", 1);
 	register_native("cod_upgrade_user_item", "_cod_upgrade_user_item", 1)
-	register_native("cod_get_itemid", "_cod_get_itemid", 1);
+	register_native("cod_get_item_id", "_cod_get_item_id", 1);
 	register_native("cod_get_item_name", "_cod_get_item_name", 1);
 	register_native("cod_get_item_desc", "_cod_get_item_desc", 1);
 	register_native("cod_get_items_num", "_cod_get_items_num", 1);
@@ -1061,9 +1061,6 @@ public change_hud(id, sound)
 
 	new menuData[128], menu = menu_create("\yKonfiguracja \rHUD\w", "change_hud_handle");
 	
-	format(menuData, charsmax(menuData), "\wSposob \yWyswietlania: \r%s", codPlayer[id][PLAYER_HUD] > TYPE_HUD ? "DHUD" : "HUD");
-	menu_additem(menu, menuData);
-	
 	format(menuData, charsmax(menuData), "\wKolor \yCzerwony: \r%i", codPlayer[id][PLAYER_HUD_RED]);
 	menu_additem(menu, menuData);
 	
@@ -1106,15 +1103,13 @@ public change_hud_handle(id, menu, item)
 	
 	switch(item)
 	{
-		case 0: if(++codPlayer[id][PLAYER_HUD] > TYPE_DHUD) codPlayer[id][PLAYER_HUD] = TYPE_HUD;
-		case 1: if((codPlayer[id][PLAYER_HUD_RED] += 15) > 255) codPlayer[id][PLAYER_HUD_RED] = 0;
-		case 2: if((codPlayer[id][PLAYER_HUD_GREEN] += 15) > 255) codPlayer[id][PLAYER_HUD_GREEN] = 0;
-		case 3: if((codPlayer[id][PLAYER_HUD_BLUE] += 15) > 255) codPlayer[id][PLAYER_HUD_BLUE] = 0;
-		case 4: if((codPlayer[id][PLAYER_HUD_POSX] += 3) > 100) codPlayer[id][PLAYER_HUD_POSX] = 0;
-		case 5: if((codPlayer[id][PLAYER_HUD_POSY] += 3) > 100) codPlayer[id][PLAYER_HUD_POSY] = 0;
-		case 6:
+		case 0: if((codPlayer[id][PLAYER_HUD_RED] += 15) > 255) codPlayer[id][PLAYER_HUD_RED] = 0;
+		case 1: if((codPlayer[id][PLAYER_HUD_GREEN] += 15) > 255) codPlayer[id][PLAYER_HUD_GREEN] = 0;
+		case 2: if((codPlayer[id][PLAYER_HUD_BLUE] += 15) > 255) codPlayer[id][PLAYER_HUD_BLUE] = 0;
+		case 3: if((codPlayer[id][PLAYER_HUD_POSX] += 3) > 100) codPlayer[id][PLAYER_HUD_POSX] = 0;
+		case 4: if((codPlayer[id][PLAYER_HUD_POSY] += 3) > 100) codPlayer[id][PLAYER_HUD_POSY] = 0;
+		case 5:
 		{
-			codPlayer[id][PLAYER_HUD] = TYPE_HUD;
 			codPlayer[id][PLAYER_HUD_RED] = 0;
 			codPlayer[id][PLAYER_HUD_GREEN] = 255;
 			codPlayer[id][PLAYER_HUD_BLUE] = 0;
@@ -2233,14 +2228,9 @@ public show_info(id)
 	{
 		target = pev(id, pev_iuser2);
 		
-		if(!codPlayer[target][PLAYER_HUD]) set_hudmessage(255, 255, 255, 0.7, 0.4, 0, 0.0, 0.3, 0.0, 0.0, 4);
-		else set_dhudmessage(255, 255, 255, 0.7, 0.4, 0, 0.0, 0.3, 0.0, 0.0);
+		set_hudmessage(255, 255, 255, 0.7, 0.4, 0, 0.0, 0.3, 0.0, 0.0, 4);
 	}
-	else
-	{
-		if (!codPlayer[target][PLAYER_HUD]) set_hudmessage(codPlayer[target][PLAYER_HUD_RED], codPlayer[target][PLAYER_HUD_GREEN], codPlayer[target][PLAYER_HUD_BLUE], float(codPlayer[target][PLAYER_HUD_POSX]) / 100.0, float(codPlayer[target][PLAYER_HUD_POSY]) / 100.0, 0, 0.0, 0.3, 0.0, 0.0, 4);
-		else set_dhudmessage(codPlayer[target][PLAYER_HUD_RED], codPlayer[target][PLAYER_HUD_GREEN], codPlayer[target][PLAYER_HUD_BLUE], float(codPlayer[target][PLAYER_HUD_POSX]) / 100.0, float(codPlayer[target][PLAYER_HUD_POSY]) / 100.0, 0, 0.0, 0.3, 0.0, 0.0);
-	}
+	else set_hudmessage(codPlayer[target][PLAYER_HUD_RED], codPlayer[target][PLAYER_HUD_GREEN], codPlayer[target][PLAYER_HUD_BLUE], float(codPlayer[target][PLAYER_HUD_POSX]) / 100.0, float(codPlayer[target][PLAYER_HUD_POSY]) / 100.0, 0, 0.0, 0.3, 0.0, 0.0, 4);
 	
 	if(!target) return PLUGIN_CONTINUE;
 	
@@ -2264,11 +2254,7 @@ public show_info(id)
 
 	if(codPlayer[target][PLAYER_KS]) format(hudData, charsmax(hudData), "%s^n[KillStreak : %i (%i s)]", hudData, codPlayer[target][PLAYER_KS], codPlayer[target][PLAYER_TIME_KS]);
 
-	switch(codPlayer[target][PLAYER_HUD])
-	{
-		case TYPE_HUD: ShowSyncHudMsg(id, hudInfo, hudData);
-		case TYPE_DHUD: show_dhudmessage(id, hudData);
-	}
+	ShowSyncHudMsg(id, hudInfo, hudData);
 	
 	return PLUGIN_CONTINUE;
 } 
@@ -2285,26 +2271,26 @@ public show_help(id)
 {
 	id -= TASK_SHOW_HELP;
 	
-	set_hudmessage(0, 255, 0, -1.0, 0.7, 0, 5.0, 5.0, 0.1, 0.5, 11);
+	set_dhudmessage(0, 255, 0, -1.0, 0.7, 0, 5.0, 5.0, 0.1, 0.5);
 	
 	switch(random_num(1, 16))
 	{
-		case 1: show_hudmessage(id, "Aby uzyc umiejetnosci klasy wcisnij klawisz E. Przedmiotow uzywa sie klawiszem F.");
-		case 2: show_hudmessage(id, "Chcialbys zalozyc klan lub do niego dolaczyc? Wpisz komende /klan.");
-		case 3: show_hudmessage(id, "Sposobem na zdobywanie wiekszej ilosci doswiadczenia sa /misje.");
-		case 4: show_hudmessage(id, "Wpisz komende /bind, aby sprawdzic bindy wszystkich umiejetnosci.");
-		case 5: show_hudmessage(id, "Sprzedaj niechciany przedmiot zamiast do wyrzucac. Zajrzyj na /rynek.");
-		case 6: show_hudmessage(id, "Mozesz dowolnie konfigurowac wyswietlanie HUD uzywajac komendy /hud.");
-		case 7: show_hudmessage(id, "Chcesz sprobowac swojego szczescia? Sprawdz /kasyno.");
-		case 8: show_hudmessage(id, "Zajrzyj do /sklep, aby kupic dodatki, exp, jak i wymienic kase na honor.");
-		case 9: show_hudmessage(id, "Aby wylaczyc/wlaczyc pokazujace sie znaczniki uzyj komendy /ikony.");
-		case 10: show_hudmessage(id, "Noze dodaja bonusy do statystyk, mozesz zmienic swoj wpisujac /noz.");
-		case 11: show_hudmessage(id, "Jesli chcesz przelac komus kase lub honor uzyj komendy /przelew.");
-		case 12: show_hudmessage(id, "Oddaj przedmiot komenda /daj lub uzyj /wymien do wymiany z innym graczem.");
-		case 13: show_hudmessage(id, "Aby zarzadzac swoim kontem - w tym zmienic haslo, wpisz komende /konto.");
-		case 14: show_hudmessage(id, "Glowne menu serwera znajdziesz pod komenda /menu lub klawiszem V.");
-		case 15: show_hudmessage(id, "Jesli chcesz kupic VIPa, klasy premium, exp lub honor zajrzyj do /sklepsms.");
-		case 16: show_hudmessage(id, "Jest wiele dodatkowych statystyk, ktore znajdziesz pod komenda /statymenu.");
+		case 1: show_dhudmessage(id, "Aby uzyc umiejetnosci klasy wcisnij klawisz E. Przedmiotow uzywa sie klawiszem F.");
+		case 2: show_dhudmessage(id, "Chcialbys zalozyc klan lub do niego dolaczyc? Wpisz komende /klan.");
+		case 3: show_dhudmessage(id, "Sposobem na zdobywanie wiekszej ilosci doswiadczenia sa /misje.");
+		case 4: show_dhudmessage(id, "Wpisz komende /bind, aby sprawdzic bindy wszystkich umiejetnosci.");
+		case 5: show_dhudmessage(id, "Sprzedaj niechciany przedmiot zamiast do wyrzucac. Zajrzyj na /rynek.");
+		case 6: show_dhudmessage(id, "Mozesz dowolnie konfigurowac wyswietlanie HUD uzywajac komendy /hud.");
+		case 7: show_dhudmessage(id, "Chcesz sprobowac swojego szczescia? Sprawdz /kasyno.");
+		case 8: show_dhudmessage(id, "Zajrzyj do /sklep, aby kupic dodatki, exp, jak i wymienic kase na honor.");
+		case 9: show_dhudmessage(id, "Aby wylaczyc/wlaczyc pokazujace sie znaczniki uzyj komendy /ikony.");
+		case 10: show_dhudmessage(id, "Noze dodaja bonusy do statystyk, mozesz zmienic swoj wpisujac /noz.");
+		case 11: show_dhudmessage(id, "Jesli chcesz przelac komus kase lub honor uzyj komendy /przelew.");
+		case 12: show_dhudmessage(id, "Oddaj przedmiot komenda /daj lub uzyj /wymien do wymiany z innym graczem.");
+		case 13: show_dhudmessage(id, "Aby zarzadzac swoim kontem - w tym zmienic haslo, wpisz komende /konto.");
+		case 14: show_dhudmessage(id, "Glowne menu serwera znajdziesz pod komenda /menu lub klawiszem V.");
+		case 15: show_dhudmessage(id, "Jesli chcesz kupic VIPa, klasy premium, exp lub honor zajrzyj do /sklepsms.");
+		case 16: show_dhudmessage(id, "Jest wiele dodatkowych statystyk, ktore znajdziesz pod komenda /statymenu.");
 	}
 }
 
@@ -2471,12 +2457,12 @@ public reset_attributes(id, type)
 {
 	if(task_exists(id + TASK_END_KILL_STREAK)) remove_task(id + TASK_END_KILL_STREAK);
 
-	codPlayer[id][PLAYER_GRAVITY] = _:1.0;
 	codPlayer[id][PLAYER_LAST_ROCKET] = _:0.0;
 	codPlayer[id][PLAYER_LAST_MINE] = _:0.0;
 	codPlayer[id][PLAYER_LAST_DYNAMITE] = _:0.0;
 	codPlayer[id][PLAYER_LAST_MEDKIT] = _:0.0;
 	codPlayer[id][PLAYER_LAST_TELEPORT] = _:0.0;
+	codPlayer[id][PLAYER_GRAVITY][type] = _:1.0;
 
 	codPlayer[id][PLAYER_ROCKETS] = 0;
 	codPlayer[id][PLAYER_MINES] = 0;
@@ -2506,9 +2492,9 @@ public reset_attributes(id, type)
 
 	remove_render_type(id, type);
 
-	set_user_rendering(id);
-
 	model_change(id);
+
+	calculate_gravity(id);
 
 	set_user_footsteps(id, codPlayer[id][PLAYER_FOOTSTEPS][ALL]);
 }
@@ -2528,8 +2514,6 @@ public set_attributes(id)
 	gravity_change(id);
 
 	remove_render_type(id, ADDITIONAL);
-
-	render_change(id);
 
 	model_change(id);
 
@@ -2558,11 +2542,22 @@ public gravity_change(id)
 {
 	if(!is_user_alive(id)) return PLUGIN_CONTINUE;
 	
-	set_user_gravity(id, Float:codPlayer[id][PLAYER_GRAVITY]);
+	set_user_gravity(id, Float:codPlayer[id][PLAYER_GRAVITY][ALL]);
 
 	execute_forward_ignore_one_param(codForwards[GRAVITY_CHANGED], id);
 	
 	return PLUGIN_CONTINUE;
+}
+
+public calculate_gravity(id)
+{
+	new Float:gravity = 1.0;
+
+	for(new i = CLASS; i <= ADDITIONAL; i++) if(codPlayer[id][PLAYER_GRAVITY][i] < gravity) gravity = codPlayer[id][PLAYER_GRAVITY][i];
+
+	codPlayer[id][PLAYER_GRAVITY][ALL] = _:gravity;
+
+	gravity_change(id);
 }
 
 public model_change(id)
@@ -2588,14 +2583,13 @@ public reset_player(id)
 	
 	remove_tasks(id);
 
-	remove_render_type(id, ITEM);
-	remove_render_type(id, CLASS);
-	remove_render_type(id, ADDITIONAL);
+	clear_render(id);
 
 	for(new i = PLAYER_CLASS; i <= PLAYER_RESISTANCE; i++) codPlayer[id][i] = 0;
 
 	for(new i = CLASS; i <= ALL; i++)
 	{
+		codPlayer[id][PLAYER_GRAVITY][i] = _:1.0;
 		codPlayer[id][PLAYER_FOOTSTEPS][i] = 0;
 		codPlayer[id][PLAYER_BUNNYHOP][i] = 0;
 		codPlayer[id][PLAYER_MODEL][i] = 0;
@@ -2609,7 +2603,6 @@ public reset_player(id)
 	codPlayer[id][PLAYER_LAST_MEDKIT] = _:0.0;
 	codPlayer[id][PLAYER_LAST_TELEPORT] = _:0.0;
 
-	codPlayer[id][PLAYER_HUD] = TYPE_HUD;
 	codPlayer[id][PLAYER_HUD_RED] = 0;
 	codPlayer[id][PLAYER_HUD_GREEN] = 255;
 	codPlayer[id][PLAYER_HUD_BLUE] = 0;
@@ -2950,7 +2943,7 @@ public save_hud(id)
 	new vaultKey[64], vaultData[64];
 	
 	formatex(vaultKey, charsmax(vaultKey), "%s-cod_hud", codPlayer[id][PLAYER_NAME]);
-	formatex(vaultData, charsmax(vaultData), "%d#%d#%d#%d#%d#%d", codPlayer[id][PLAYER_HUD], codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], codPlayer[id][PLAYER_HUD_POSX], codPlayer[id][PLAYER_HUD_POSY]);
+	formatex(vaultData, charsmax(vaultData), "%d#%d#%d#%d#%d", codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], codPlayer[id][PLAYER_HUD_POSX], codPlayer[id][PLAYER_HUD_POSY]);
 	
 	nvault_set(hudVault, vaultKey, vaultData);
 	
@@ -2967,16 +2960,15 @@ public load_hud(id)
 	{
 		replace_all(vaultData, charsmax(vaultData), "#", " ");
 	 
-		new hudData[6][6];
+		new hudData[5][5];
 	
-		parse(vaultData, hudData[0], charsmax(hudData), hudData[1], charsmax(hudData), hudData[2], charsmax(hudData), hudData[3], charsmax(hudData), hudData[4], charsmax(hudData), hudData[5], charsmax(hudData));
+		parse(vaultData, hudData[0], charsmax(hudData), hudData[1], charsmax(hudData), hudData[2], charsmax(hudData), hudData[3], charsmax(hudData), hudData[4], charsmax(hudData));
 	
-		codPlayer[id][PLAYER_HUD] = str_to_num(hudData[0]);
-		codPlayer[id][PLAYER_HUD_RED] = str_to_num(hudData[1]);
-		codPlayer[id][PLAYER_HUD_GREEN] = str_to_num(hudData[2]);
-		codPlayer[id][PLAYER_HUD_BLUE] = str_to_num(hudData[3]);
-		codPlayer[id][PLAYER_HUD_POSX] = str_to_num(hudData[4]);
-		codPlayer[id][PLAYER_HUD_POSY] = str_to_num(hudData[5]);
+		codPlayer[id][PLAYER_HUD_RED] = str_to_num(hudData[0]);
+		codPlayer[id][PLAYER_HUD_GREEN] = str_to_num(hudData[1]);
+		codPlayer[id][PLAYER_HUD_BLUE] = str_to_num(hudData[2]);
+		codPlayer[id][PLAYER_HUD_POSX] = str_to_num(hudData[3]);
+		codPlayer[id][PLAYER_HUD_POSY] = str_to_num(hudData[4]);
 	}
 
 	return PLUGIN_CONTINUE;
@@ -3081,7 +3073,7 @@ public _cod_set_user_class(id, class, force)
 	if(force) set_new_class(id);
 }
 
-public _cod_get_classid(className[])
+public _cod_get_class_id(className[])
 {
 	param_convert(1);
 	
@@ -3182,7 +3174,7 @@ public _cod_upgrade_user_item(id, check)
 	return true;
 }
 
-public _cod_get_itemid(itemName[])
+public _cod_get_item_id(itemName[])
 {
 	param_convert(1);
 	
@@ -3296,8 +3288,8 @@ public _cod_get_user_teleports(id)
 public _cod_get_user_multijumps(id)
 	return codPlayer[id][PLAYER_JUMPS];
 	
-public _cod_get_user_gravity(id)
-	return codPlayer[id][PLAYER_GRAVITY] * 800;
+public Float:_cod_get_user_gravity(id)
+	return Float:codPlayer[id][PLAYER_GRAVITY][ALL];
 
 public _cod_get_user_armor(id, value)
 	return cs_get_user_armor(id);
@@ -3320,11 +3312,11 @@ public _cod_set_user_teleports(id, value)
 public _cod_set_user_multijumps(id, value)
 	codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS] = max(0, value);
 	
-public _cod_set_user_gravity(id, value)
+public _cod_set_user_gravity(id, type, Float:value)
 {
-	codPlayer[id][PLAYER_GRAVITY] = _:floatmax(0.01, value/800.0);
+	codPlayer[id][PLAYER_GRAVITY][type] = _:floatmax(0.01, value);
 
-	gravity_change(id);
+	calculate_gravity(id);
 }
 
 public _cod_set_user_armor(id, value)
@@ -3348,11 +3340,11 @@ public _cod_add_user_teleports(id, value)
 public _cod_add_user_multijumps(id, value)
 	codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS] += max(0, value);
 	
-public _cod_add_user_gravity(id, value)
+public _cod_add_user_gravity(id, type, Float:value)
 {
-	codPlayer[id][PLAYER_GRAVITY] = _:floatmax(0.01, Float:codPlayer[id][PLAYER_GRAVITY] + value/800.0);
+	codPlayer[id][PLAYER_GRAVITY][type] = _:floatmax(0.01, Float:codPlayer[id][PLAYER_GRAVITY] + value);
 	
-	gravity_change(id);
+	calculate_gravity(id);
 }
 
 public _cod_add_user_armor(id, value)
@@ -3759,6 +3751,9 @@ stock get_item_info(item, info, dataReturn[] = "", dataLength = 0)
 	return codItem[info];
 }
 
+stock clear_render(id)
+	for(new i = CLASS; i <= ADDITIONAL; i++) remove_render_type(id, i);
+
 stock remove_render_type(id, type)
 {
 	static codRender[renderInfo];
@@ -3775,6 +3770,8 @@ stock remove_render_type(id, type)
 			ArraySetArray(codPlayerRender[id], i, codRender);
 		}
 	}
+
+	render_change(id);
 }
 
 stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0.0, Float:damage = 0.0, Float:factor = 0.5)

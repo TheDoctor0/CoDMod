@@ -15,7 +15,8 @@ new const commandPoker[][] = { "say /poker", "say_team /poker", "poker" };
 new const commandMachine[][] = { "say /automat", "say_team /automat", "say /machine", "say_team /machine", "automat" };
 new const commandCoinFlip[][] = { "say /automat", "say_team /automat", "say /machine", "say_team /machine", "automat" };
 
-enum _:gamesInfo { GAME_BID, GAME_TYPE, DICE, ROULETTE, BLACKJACK, POKER, MACHINE, COINFLIP };
+enum _:gamesInfo { GAME_BID, GAME_TYPE };
+enum _:gamesTypesInfo { DICE, ROULETTE, BLACKJACK, POKER, MACHINE, COINFLIP }
 enum _:diceInfo { DICE_NUMBER, DICE_TYPE, DICE_NORMAL, DICE_LOWHIGH, DICE_LOW, DICE_HIGH };
 enum _:rouletteInfo { ROULETTE_BLACK, ROULETTE_RED, ROULETTE_GREEN };
 
@@ -88,12 +89,12 @@ public casino_menu_handle(id, menu, item)
     
 	switch(item)
 	{ 
-		case 0: dice_menu(id, 0);
-		case 1: roulette_menu(id, 0);
-		case 2: blackjack_menu(id);
-		case 3: poker_menu(id);
-		case 4: machine_menu(id);
-		case 5: coinflip_menu(id);
+		case DICE: dice_menu(id, 0);
+		case ROULETTE: roulette_menu(id, 0);
+		case BLACKJACK: blackjack_menu(id);
+		case POKER: poker_menu(id);
+		case MACHINE: machine_menu(id);
+		case COINFLIP: coinflip_menu(id);
 	}
 	
 	menu_destroy(menu);
@@ -380,6 +381,7 @@ public change_bid(id)
 		case BLACKJACK: blackjack_menu(id);
 		case POKER: poker_menu(id);
 		case MACHINE: machine_menu(id);
+		case COINFLIP: coinflip_menu(id);
 	}
 	
 	return PLUGIN_HANDLED;

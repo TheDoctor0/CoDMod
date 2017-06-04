@@ -113,7 +113,7 @@ public cod_spawned(id)
 {
 	if(!clan[id]) return PLUGIN_CONTINUE;
 
-	cod_add_user_gravity(id, -gravityPerLevel * get_clan_info(clan[id], CLAN_GRAVITY));
+	cod_add_user_gravity(id, ADDITIONAL, -gravityPerLevel * get_clan_info(clan[id], CLAN_GRAVITY) / 800.0);
 	
 	return PLUGIN_CONTINUE;
 }

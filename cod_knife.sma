@@ -24,7 +24,7 @@ new const knifeModels[][][] =
 new const commandKnives[][] = { "say /noz", "say_team /noz", "say /noze", "say_team /noze", "say /knife", "say_team /knife", 
 "say /knifes", "say_team /knifes", "say /kosa", "say_team /kosa", "say /kosy", "say_team /kosy", "noze" };
 
-new playerName[MAX_PLAYERS + 1][64], playerKnife[MAX_PLAYERS + 1], knives;
+new playerName[MAX_PLAYERS + 1][32], playerKnife[MAX_PLAYERS + 1], knives;
 
 public plugin_init() 
 {

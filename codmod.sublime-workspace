@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"cod_item",
+				"cod_item_disabled  \tcod.inc - forward"
+			],
+			[
+				"MARKET",
+				"MARKET_OWNER  \tcsgo_jackpot.sma - enum"
+			],
+			[
 				"PLA",
 				"PLAYER_LEVEL  \tcod_mod.sma - enum"
 			],
@@ -103,7 +111,7 @@
 			"file": "cod.txt",
 			"settings":
 			{
-				"buffer_size": 335,
+				"buffer_size": 116,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -112,74 +120,8 @@
 			"file": "cod_mod.sma",
 			"settings":
 			{
-				"buffer_size": 125639,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/D/Dawid/Workplace/AMXX/scripting/csgo_jackpot_decompiled.sma",
-			"settings":
-			{
-				"buffer_size": 128704,
+				"buffer_size": 125093,
 				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "cod_accounts.sma",
-			"settings":
-			{
-				"buffer_size": 20617,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/D/Dawid/Workplace/AMXX/scripting/csgo_accounts.sma",
-			"settings":
-			{
-				"buffer_size": 20617,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/D/Dawid/Workplace/AMXX/scripting/csgo_jackpot.sma",
-			"settings":
-			{
-				"buffer_size": 16968,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/D/Dawid/Workplace/Mods/BattlefieldOne/bf1_mod.sma",
-			"settings":
-			{
-				"buffer_size": 120548,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "cod.inc",
-			"settings":
-			{
-				"buffer_size": 25602,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/cod_skins.ini",
-			"settings":
-			{
-				"buffer_size": 1699,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/D/Dawid/Workplace/AMXX/scripting/csgo_operacje.sma",
-			"settings":
-			{
-				"buffer_size": 11649,
 				"line_ending": "Windows"
 			}
 		}
@@ -291,134 +233,134 @@
 	],
 	"file_history":
 	[
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_transfer.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-transfer.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-exchange.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-buy.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-random.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-give.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170604.log",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_accounts.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/include/cod.inc",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170604.log",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_honor.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_stats.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_shop.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_missions.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_market.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_knife.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_icons.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_he_block.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_exchange.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_clans_system.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_casino.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_box.sma",
-		"/C/Users/Dawid/Desktop/unprecacher.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/unprecacher.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/vip_ffa.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_skins.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/skiny.txt",
-		"/D/Dawid/Workplace/AMXX/scripting/csgo_operacje.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo_operacje.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/ranks_system.sma",
-		"/C/Users/Dawid/Desktop/csgo_operacje.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo_operations.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170519.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo_operacje.ini",
-		"/C/Users/Dawid/Desktop/vip_ffa.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_quests.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins.ini",
-		"/D/Dawid/Workplace/Tools/Decompile/Lysis/CSGO_Jackpot.txt",
-		"/D/Dawid/Workplace/AMXX Old/sklepsms/sklepsms_usluga_jackpot.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo_jackpot.cfg",
-		"/D/Dawid/Workplace/AMXX Old/unprecacher.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/przelew.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/vip.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod.inc",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 2.ini",
-		"/D/Dawid/Workplace/AMXX/scripting/supervip_4fun.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/supervip.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/vip_4fun.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/ozone_security.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/unprecache_list.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/unprecacher.cfg",
-		"/D/Dawid/Workplace/Tools/Decompile/Lysis/opcodes.txt",
-		"/C/Users/Dawid/Desktop/csgo_jackpot.cfg",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/advertisements.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.998/csgo_rangs_nvault.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/menu_serwera.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.085/csgo_operacje.sma",
-		"/D/Dawid/Workplace/AdminPanel/views/error.html.twig",
-		"/D/Dawid/Workplace/AdminPanel/views/layout.html.twig",
-		"/C/Users/Dawid/Desktop/motd.txt",
-		"/D/Dawid/Workplace/AdminPanel/web/index.php",
-		"/D/Dawid/Workplace/AdminPanel/web/css/style.css",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/motd.txt",
-		"/D/Dawid/Workplace/AdminPanel/accounts.sql",
-		"/D/Dawid/Workplace/AdminPanel/chat_logger.sma",
-		"/D/Dawid/Workplace/Panel/views/layout.html.twig",
-		"/D/Dawid/Workplace/Panel/.htaccess",
-		"/D/Dawid/Workplace/Panel/web/index.php",
-		"/D/Dawid/Workplace/Panel/views/index_dynamic.html.twig",
-		"/D/Dawid/Workplace/Panel/views/index.html.twig",
-		"/D/Dawid/Workplace/Panel/src/App/Entity/AdminsRepositoryInterface.php",
-		"/D/Dawid/Workplace/Panel/src/App/Entity/AccountsRepositoryInterface.php",
-		"/D/Dawid/Workplace/Panel/src/App/Entity/ResponsibilitiesRepository.php",
-		"/D/Dawid/Workplace/Panel/src/App/Entity/AccountsRepository.php",
-		"/D/Dawid/Workplace/Panel/src/App/Entity/MotdRepository.php",
-		"/D/Dawid/Workplace/Panel/src/App/Entity/MotdRepositoryInterface.php",
-		"/D/Dawid/Workplace/Panel/src/App/Entity/AdminsRepository.php",
-		"/D/Dawid/Workplace/Panel/src/App/Entity/ServersRepository.php",
-		"/D/Dawid/Workplace/Panel/src/App/Entity/ChatRepositoryInterface.php",
-		"/D/Dawid/Workplace/Panel/src/App/Entity/ServersRepositoryInterface.php",
-		"/D/Dawid/Workplace/Panel/src/App/Entity/ChatRepository.php",
-		"/D/Dawid/Workplace/Mods/BattlefieldOne/bf1_mod.sma",
-		"/D/Dawid/Workplace/Mods/BattlefieldOne/battlefield_one.sma",
-		"/D/Dawid/Workplace/Mods/Battlefield One/bf1_mod.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/ozone_security.txt",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170519.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/knife_models.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/modules.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/rank_system.txt",
-		"/D/Dawid/Workplace/AMXX/scripting/csstatsx_sql.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csstats.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/zp_boss_system.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/knife_models.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/restart.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names 2.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/register_system.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170518 2.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 3.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins-zplague.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170517.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170518 2.log",
-		"/C/Users/Dawid/Desktop/csgo_operacje.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.200/csgo_rangs_nvault.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.084/csgo_rangs_nvault.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.840/csgo_rangs_nvault.sma",
-		"/C/Users/Dawid/Desktop/stattrak.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170518.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170518.log",
-		"/D/Dawid/Workplace/AMXX/scripting/arena.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.978/arena.sma",
-		"/D/Dawid/Workplace/Tools/Decompile/amxxdump/bin/sklep_sms.sma",
-		"/D/Downloads/GoogleChrome/skinsystem.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.459/stattrak.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.785/csgo_rangs_nvault.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.870/stattrak.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.216/csgomod.inc",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.264/csgo_operacje.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.536/stattrak.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.266/csgo_rangs_nvault.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.047/csgo_operacje.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.893/csgomod.inc",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.879/stattrak.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.764/stattrak.sma",
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_jackpot.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-sql-debug.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-error.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-transfer-debug.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/banconfig.log",
+		"/C/Users/Dawid/Desktop/playlist.html",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins-cod.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/cod_mod.log",
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_operations.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170603.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170603.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/version.txt",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/index.php",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/config.xml",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/init.php",
-		"/C/Program Files (x86)/Steam/steamapps/common/Half-Life/cstrike/config.cfg",
-		"/D/Downloads/GoogleChrome/darmowaodznaka (1).sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170514.log",
-		"/D/Dawid/Workplace/AMXX/scripting/zm_register_system.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/amxx.cfg",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/versions.txt",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo_operations.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-load-debug.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names 2.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/rangi.txt",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names.log",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_duch.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_msciciel_premium.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_betonowecialo.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_butyszturmowca.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_bezlikammo.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_bezglowie.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_apteczka.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_adrenalina.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_intelektozone.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/codperk_intelektozonea.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_czarodziej.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/codperk_czarodziej.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/codperk_ghost.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_mysliwy_superpremium.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/codperk_brzuchoreload.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/codperk_helmreload.sma",
+		"/D/Downloads/GoogleChrome/infinite_ammo_light.sma",
+		"/D/Downloads/GoogleChrome/Unlimited_Clip_Ammo (1).sma",
+		"/D/Downloads/GoogleChrome/Unlimited_Clip_Ammo (2).sma",
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_vip.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_vip.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod.txt",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_komandos.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_amadeusz.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170602.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170602 2.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/server 2.cfg",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/server.cfg",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/ozone_security.txt",
+		"/C/Users/Dawid/Desktop/files/init.js.pobrane",
+		"/C/Users/Dawid/Desktop/login.html",
+		"/C/Users/Dawid/Desktop/Authenty.html",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/operation-debug.log",
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_ranks.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/menu_serwera.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170531.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-sell.log",
+		"/D/Dawid/Workplace/AMXX/scripting/umc.sma",
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/sklepsms_usluga_jackpot.sma",
+		"/C/Users/Dawid/Desktop/zend/view/zend-skeleton-module/skeleton/index.phtml",
+		"/C/xampp/htdocs/composer.json",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170530.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/users.ini",
-		"/D/Downloads/GoogleChrome/blacklisted.cfg",
-		"/C/Program Files (x86)/Steam/userdata/111329/730/local/cfg/config.cfg",
-		"/C/Users/Dawid/Desktop/csgo_mod.sma",
-		"/D/Downloads/GoogleChrome/csgo_204_withcolorchat (1).sma",
-		"/D/Downloads/GoogleChrome/csgo_204 (2).sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo.cfg",
-		"/D/Dawid/Workplace/Tools/Decompile/AMXX UnCompress 1.1/csgo.memory",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170513.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170510.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/mutemenu.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170511.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgomod.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/skins.cfg",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170511 2.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/modele3.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/spect_switch.sma"
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170529.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/restart.log",
+		"/D/Downloads/GoogleChrome/pl_PL.mo",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/admins_service.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/stats_system.txt",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/knife_models.ini",
+		"/D/Dawid/Workplace/AMXX/scripting/knife_models.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-3/knife_models.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-3/L20170528.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-3/error_20170528.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-3/csgo-transfer.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-3/csgo-exchange.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/unprecacher.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/amxbans.txt",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sys_error.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/amxbans 2.txt",
+		"/D/Downloads/GoogleChrome/UTC--2017-05-28T16-57-33.920Z--f444cae12eddb42d82ef5e5e3a7085928d8c6c73",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-money.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo_skins.ini",
+		"/D/Dawid/Workplace/AMXX/scripting/ozone_security.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170528.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo.log",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_transfer.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170528.log",
+		"/C/Users/Dawid/Desktop/Ewidencja/main.c",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170524.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170523.log",
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_nades.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod.inc",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_mod.sma",
+		"/C/Users/Dawid/Desktop/grenade_pop.sma",
+		"/D/Dawid/Workplace/AMXX/scripting/csstatsx_sql.sma",
+		"/D/Downloads/GoogleChrome/shortnade.sma",
+		"/D/Downloads/GoogleChrome/zoomed_models_fix.sma",
+		"/D/Downloads/GoogleChrome/dhudmessage.inc",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170523.log",
+		"/D/Dawid/Workplace/Mods/Zombie Evolution/addons/amxmodx/scripting/Mileage_Primary_Thunderbolt.sma",
+		"/D/Downloads/GoogleChrome/custom_sniper_scopes.sma",
+		"/D/Dawid/Workplace/Mods/Zombie Evolution/addons/amxmodx/scripting/cso_magnumbolt_native.sma.bak",
+		"/D/Downloads/GoogleChrome/GrenadePop (2).sma",
+		"/D/Downloads/GoogleChrome/GrenadePop (1).sma",
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_accounts.sma",
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_runboost.sma"
 	],
 	"find":
 	{
@@ -429,6 +371,8 @@
 		"height": 158.0,
 		"where_history":
 		[
+			"D:\\Dawid\\Workplace\\Mods\\CoDMod",
+			"D:\\Dawid\\Workplace\\Mods\\CSGOJackpot",
 			"C:\\Users\\Dawid\\Desktop\\utf8convert",
 			"C:\\Users\\Dawid\\Desktop\\logs",
 			"D:\\Dawid\\Workplace\\New Mods\\CoDMod,D:\\Dawid\\Workplace\\AMXX\\scripting",
@@ -453,134 +397,134 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"honor",
-			"random",
-			"client_cmd",
-			"client_prin",
-			"cod_print_chat",
-			"menu_additem(menu, \"\\wKup \\ySkin\");",
-			"buy_weapon_skin",
-			"query",
-			"jackpotPrice",
-			"loaded",
-			"playerData",
-			"playerSkins",
-			"cod_mod",
-			"cod_skins",
-			"vip",
-			"is_user_vip",
-			"weapon_deploy_post",
-			"codForwards[WEAPON_DEPLOY]",
-			"wylosowal",
-			"intermi",
-			"SaveData2",
-			"motd",
-			"ignored",
-			"explode",
-			"knife",
-			"motd",
-			"_is_user_vip",
-			"PLAYER_ID",
-			"get_quest",
-			"g_hud",
-			"hud",
-			"codForwards[KILLED]",
-			"player_take_damage_post",
-			"takedamage",
-			"operationInfo",
-			"codQuests",
-			"quest",
-			"QUEST",
-			"iModel",
-			"LoadModel",
-			"ChangeSkins",
-			"is_user_vip",
-			"    ",
-			"FindPlayer",
-			"WYLACZ",
-			"is_user_vip",
-			"cmdExecute",
-			"RYNEK",
-			"g_vault2",
-			"ShowStatus",
-			"Menu(id)",
-			"Menu",
-			"getSer",
-			"ResponsibilitiesRepository",
-			"responsibilitiesRepository",
-			"db_responsibilities",
-			"g_hud",
-			"GetSkinName",
-			"pKnifeSkin",
-			"KnifeSkin",
-			"SelectSkin",
-			"SaveStats",
-			"g_SqlTuple",
-			"statt",
-			"remove_Task",
-			"hud",
-			"GetMoney",
-			"g_HUD",
-			"ShowHud",
-			"csgo_get_rank",
-			"szRank",
-			"hud",
-			"csgo_add_money",
-			"SetKnifeSkin",
-			"fmClientData",
-			"dajwszystko",
-			"SQL_FreeHandle",
-			"think_ShowHUD",
-			"ShowSkins",
-			"Say",
-			"DebugMode",
+			"VGUI_JOIN_TEAM_NUM",
+			"OFFSET_LINUX",
+			"m_iMenuCode",
 			"debug",
-			"FixPlayerPin",
-			"controller",
-			"CvarWeaponMenu",
-			"WPMENU1",
-			"Message",
-			"AUTHOR",
-			"deroid",
-			"FoundCasesChance",
-			"native",
-			"print_color",
-			"ColorChat",
-			"client_print_color",
-			"DefaultModels",
-			"CmdRanks",
-			"CheckCookies",
-			"insert",
-			"kk",
-			"bombEntity",
-			"iconBombSites",
-			"PlayerSpawn",
-			"bChange",
-			"Stats_SaveKill",
-			"DB_SavePlayerData",
-			"knife",
-			"spawn",
-			"log_t",
-			"DB_SavePlayerData",
-			"log_to",
+			"remove_active_skin",
+			"set_skin",
+			"exchange_skin_menu",
+			"has_skin",
+			"ma juz t",
+			"give_skin_menu",
+			"commandGive",
+			"show_hud",
+			"cod_get_user_mission_need",
+			"defaultSkins",
+			"cvarDefaultSkins",
+			"[256]",
+			"load_skins",
+			"reset_attributes",
+			"cod_add_user_gravity",
+			"user_gravi",
+			"set_user_gravi",
+			"model_change",
+			"remove_render_type",
+			"reset_player",
+			"gravity",
+			"ADDITIONAL",
+			"PLAYER_GRAVITY",
+			"calculate_gravity(id)",
+			"gravity_change",
+			"calculate_gravity",
+			"render_change",
+			"gravity_change",
+			"gravity",
+			"cod_get_user_gravity",
+			"_cod_get_user_gravity",
+			"PLAYER_GRAVITY",
+			"gravity_change",
+			"PLAYER_GRAVITY",
+			"player_reset_max_speed",
+			"PLAYER_FOOTSTEPS",
+			"ITEM_DROP",
+			"cod_get_classid",
+			"jumps",
+			"load_mission",
+			"reset_attributes",
+			"set_attributes",
+			"CLASS_DISABLED",
+			"remove_render_type",
+			"codPlayerRender[id]",
+			"_cod_set_user_render",
+			"gravity",
+			"cod_kill_player",
 			"log_to_file",
-			"DB_SavePlayerData",
-			"myszeva",
-			"SQL_Handler",
-			"DB_LoadPlayerData",
-			"putins",
-			"SQL_Handler",
-			"csstats.log",
-			"DB_SavePlayerData",
-			"csxsql_initialized",
-			"is_ready",
-			"SQL_Handler",
-			"LOAD_NEW",
+			"ACTIVE",
+			"nie masz",
+			"load_data",
+			"animation-delay",
+			"top",
+			"436px",
+			"height",
+			"Authenty_files",
+			"save_operation",
+			"svip",
+			"skinsDisabled",
+			"exchangeBlocked",
+			"Cre[A]tOr^^",
+			"')",
+			"skinsLoaded",
+			"PLAYER_ID",
+			"reset_operation",
+			"ShowVoteMenu",
+			"//",
+			"operationDescription",
+			"ChangeKnife",
+			"PLAYER_BANNED_BEFORE",
+			"has_skin",
+			"add_skin",
+			"playerData[id][NAME]",
+			"playerData",
+			"playerData[id][NAME",
+			"PojebusMaximus",
+			"has_skin",
+			"check_skin",
+			"')",
+			"wylosowa",
+			"_csgo_get_money",
+			"exchange_skin_menu",
+			"stats_system",
+			"add_money",
+			"ignore_handle",
+			"awp_shot",
+			"weapon_awp",
+			"awp_s",
+			"operation_menu",
+			"awp_shot",
+			"set_fov",
+			"PLAYER_HUD",
+			"load_data",
+			"hud",
+			"TYPE_HUD",
+			"TYPE_",
+			"PLAYER_HUD",
+			"hudinfo",
+			"Event_SetFOV",
+			"log_event_operation",
+			"SUBMODEL",
+			"g_old_weapon",
+			"ZOOM_DELAY",
+			"sfsniper_zoom",
+			"g_iLastSpectated",
+			"CVAR_UPDATESTYLE",
+			"DB_SaveAll",
 			"DB_SavePlayerData",
 			"Stats_SaveKill",
-			"SQL_Handler",
-			"DB_LoadPlayerData",
-			"ROW_LASTJOIN"
+			"DB_SavePlayerData",
+			"player_wstats",
+			"Stats_SaveKill",
+			"EventHook_Damage",
+			"knife",
+			"load_account",
+			"exec",
+			"csgo-",
+			"csgo.log",
+			"cs_get_weapon_id",
+			"weapon_deploy",
+			"ModelChangeSmoke",
+			"ModelChangeFlash",
+			"ModelChangeHE"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -588,6 +532,19 @@
 		"regex": false,
 		"replace_history":
 		[
+			"",
+			".wav\",",
+			"\t\"radio",
+			"\t\"player",
+			"\t\"plats",
+			"\t\"hostage",
+			"\t\"events",
+			"\t\"de_torn",
+			"\t\"ambience",
+			"\t\"items",
+			"\t\"weapons",
+			"models/csr/default",
+			"client_print_color(id, id, \"",
 			"\\t",
 			"account_menu(id);",
 			"client_print_color(id, id, \"^x04[ZM]^x01 ",
@@ -669,7 +626,7 @@
 	"groups":
 	[
 		{
-			"selected": 4,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -678,15 +635,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 335,
+						"buffer_size": 116,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								22,
-								22
+								13,
+								13
 							]
 						],
 						"settings":
@@ -695,10 +652,6 @@
 							[
 								{
 									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
 									"selector": "text.html"
 								},
 								{
@@ -724,129 +677,26 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
 								"bh_unmatched",
 								"bh_unmatched_center",
 								"bh_unmatched_open",
 								"bh_unmatched_close",
 								"bh_unmatched_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
 								"bh_regex",
 								"bh_regex_center",
 								"bh_regex_open",
 								"bh_regex_close",
 								"bh_regex_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
-							"git_gutter_enabled": true,
-							"git_gutter_is_enabled": true,
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\New Mods\\CoDMod\\cod.txt",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "cod_mod.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 125639,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								6460,
-								6767
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-									"1":
-									[
-										6393,
-										6394
-									]
-								}
-							},
-							"bracket_highlighter.regions":
-							[
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
@@ -857,36 +707,6 @@
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
 								"bh_angle",
 								"bh_angle_center",
 								"bh_angle_open",
@@ -897,11 +717,153 @@
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
+							"git_gutter_is_enabled": true,
+							"git_savvy.file_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod\\cod.txt",
+							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "cod_mod.sma",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 125093,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4164,
+								4171
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".#",
+									"selector": "text.html"
+								}
+							],
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										4285,
+										4286
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/curly_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										4117,
+										4118
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
 								"bh_unmatched",
 								"bh_unmatched_center",
 								"bh_unmatched_open",
 								"bh_unmatched_close",
-								"bh_unmatched_content"
+								"bh_unmatched_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
 							"git_gutter_is_enabled": true,
@@ -911,924 +873,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1407.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "/D/Dawid/Workplace/AMXX/scripting/csgo_jackpot_decompiled.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 128704,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								92703,
-								92706
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										92709,
-										92710
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/round_bracket.png",
-										"brackethighlighter.default"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										92706,
-										92707
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content"
-							],
-							"git_gutter_is_enabled": true,
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\AMXX\\scripting\\csgo_jackpot.sma",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\AMXX",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 64873.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "cod_accounts.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 20617,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								20617
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-									"1":
-									[
-										4872,
-										4873
-									]
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content"
-							],
-							"git_gutter_is_enabled": true,
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod\\cod_accounts.sma",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 907.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "/D/Dawid/Workplace/AMXX/scripting/csgo_accounts.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 20617,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								20617,
-								20617
-							]
-						],
-						"settings":
-						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										20616,
-										20617
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/curly_bracket.png",
-										"brackethighlighter.default"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										20295,
-										20296
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content"
-							],
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 10076.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "/D/Dawid/Workplace/AMXX/scripting/csgo_jackpot.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 16968,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3814,
-								3814
-							]
-						],
-						"settings":
-						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										3814,
-										3815
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/round_bracket.png",
-										"brackethighlighter.default"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										3813,
-										3814
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content"
-							],
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 6807.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "/D/Dawid/Workplace/Mods/BattlefieldOne/bf1_mod.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 120548,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								34534,
-								34540
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										34551,
-										34552
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/round_bracket.png",
-										"brackethighlighter.default"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										34533,
-										34534
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content"
-							],
-							"git_gutter_is_enabled": true,
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": -0.0,
-						"translation.y": 15537.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "cod.inc",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 25602,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								24934,
-								24934
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content"
-							],
-							"git_gutter_is_enabled": true,
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod\\cod.inc",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 11078.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/cod_skins.ini",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1699,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"bracket_highlighter.busy": false,
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "/D/Dawid/Workplace/AMXX/scripting/csgo_operacje.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 11649,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5065,
-								5065
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										5067,
-										5068
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/curly_bracket.png",
-										"brackethighlighter.default"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										4930,
-										4931
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content"
-							],
-							"git_gutter_is_enabled": true,
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\AMXX\\scripting\\csgo_operacje.sma",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\AMXX",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1576.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
 					"type": "text"
 				}
 			]
@@ -1871,7 +919,7 @@
 	},
 	"output.exec":
 	{
-		"height": 161.0
+		"height": 158.0
 	},
 	"output.find_results":
 	{

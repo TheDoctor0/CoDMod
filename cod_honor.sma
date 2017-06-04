@@ -60,7 +60,7 @@ public plugin_natives()
 public plugin_end()
 	SQL_FreeHandle(sql);
 
-public client_connect(id)
+public client_putinserver(id)
 {
 	playerHonor[id] = 0;
 	

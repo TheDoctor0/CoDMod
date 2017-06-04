@@ -9,11 +9,12 @@
 
 #define TASK_LOAD 3045
 
-enum _:skinsInfo { NAME[64], WEAPON[32], MODEL[64], PRICE };
+enum _:playerInfo { NAME[32], ACTIVE[CSW_P90 + 1] };
+enum _:skinsInfo { SKIN_NAME[64], SKIN_WEAPON[32], SKIN_MODEL[64], SKIN_PRICE };
 
 new const commandSkins[][] = { "skiny", "say /skins", "say_team /skins", "say /skin", "say_team /skin", "say /skiny", "say_team /skiny", "say /modele", "say_team /modele", "say /model", "say_team /model" };
 
-new playerData[MAX_PLAYERS + 1][CSW_P90 + 1], Array:playerSkins[MAX_PLAYERS + 1], Array:skins, Array:weapons, Handle:sql, loaded;
+new playerData[MAX_PLAYERS + 1][playerInfo], Array:playerSkins[MAX_PLAYERS + 1], Array:skins, Array:weapons, Handle:sql, loaded;
 
 public plugin_init() 
 {
@@ -44,12 +45,12 @@ public plugin_precache()
 		
 		if(lineData[0] == '[') 
 		{
-			parse(lineData, skin[WEAPON], charsmax(skin[WEAPON]));
+			parse(lineData, skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]));
 			
-			replace_all(skin[WEAPON], charsmax(skin[WEAPON]), "[", "");
-			replace_all(skin[WEAPON], charsmax(skin[WEAPON]), "]", "");
+			replace_all(skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]), "[", "");
+			replace_all(skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]), "]", "");
 
-			ArrayPushString(weapons, skin[WEAPON]);
+			ArrayPushString(weapons, skin[SKIN_WEAPON]);
 			
 			continue;
 		}
@@ -57,18 +58,18 @@ public plugin_precache()
 		{
 			parse(lineData, tempValue[0], charsmax(tempValue[]), tempValue[1], charsmax(tempValue[]), tempValue[2], charsmax(tempValue[]));
 
-			formatex(skin[NAME], charsmax(skin[NAME]), tempValue[0]);
-			formatex(skin[MODEL], charsmax(skin[MODEL]), tempValue[1]);
+			formatex(skin[SKIN_NAME], charsmax(skin[SKIN_NAME]), tempValue[0]);
+			formatex(skin[SKIN_MODEL], charsmax(skin[SKIN_MODEL]), tempValue[1]);
 
-			skin[PRICE] = str_to_num(tempValue[2]);
+			skin[SKIN_PRICE] = str_to_num(tempValue[2]);
 
-			if(!file_exists(skin[MODEL]))
+			if(!file_exists(skin[SKIN_MODEL]))
 			{
-				log_to_file("cod_mod.log", "[CoD] Plik %s nie istnieje!", skin[MODEL]);
+				log_to_file("cod_mod.log", "[CoD] Plik %s nie istnieje!", skin[SKIN_MODEL]);
 			
 				error = true;
 			}
-			else precache_model(skin[MODEL]);
+			else precache_model(skin[SKIN_MODEL]);
 
 			ArrayPushArray(skins, skin);
 		}
@@ -135,9 +136,9 @@ public client_putinserver(id)
 
 	if(is_user_hltv(id) || is_user_bot(id)) return;
 	
-	get_user_name(id, playerData[id][NAME], charsmax(playerData[]));
+	get_user_name(id, playerData[id][NAME], charsmax(playerData[][NAME]));
 	
-	mysql_escape_string(playerData[id][NAME], playerData[id][NAME], charsmax(playerData[]));
+	mysql_escape_string(playerData[id][NAME], playerData[id][NAME], charsmax(playerData[][NAME]));
 	
 	load_skins(id);
 }
@@ -251,11 +252,11 @@ public set_weapon_skin(id, weapon[])
 	{
 		ArrayGetArray(skins, ArrayGetCell(playerSkins[id], i), skin);
 
-		if(equal(weapon, skin[WEAPON]))
+		if(equal(weapon, skin[SKIN_WEAPON]))
 		{
 			num_to_str(ArrayGetCell(playerSkins[id], i), tempId, charsmax(tempId));
 
-			formatex(menuData, charsmax(menuData), skin[NAME]);
+			formatex(menuData, charsmax(menuData), skin[SKIN_NAME]);
 
 			menu_additem(menu, menuData, tempId);
 
@@ -302,17 +303,17 @@ public set_weapon_skin_handle(id, menu, item)
 	ArrayGetArray(skins, skinId, skin);
 
 	if(!skinId && strlen(itemData) > 3) formatex(queryData, charsmax(queryData), "DELETE FROM `cod_skins` WHERE name = '%s' AND weapon = '%s ACTIVE'", playerData[id][NAME], itemData);
-	else formatex(queryData, charsmax(queryData), "DELETE FROM `cod_skins` WHERE name = '%s' AND weapon = '%s ACTIVE'", playerData[id][NAME], skin[WEAPON]);
+	else formatex(queryData, charsmax(queryData), "DELETE FROM `cod_skins` WHERE name = '%s' AND weapon = '%s ACTIVE'", playerData[id][NAME], skin[SKIN_WEAPON]);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
 	if(item)
 	{
-		add_skin(id, skin[WEAPON], skin[NAME], 1);
+		add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME], 1);
 
-		set_skin(id, skin[WEAPON], skinId);
+		set_skin(id, skin[SKIN_WEAPON], skinId);
 
-		cod_print_chat(id, "Twoj nowy skin^x03 %s^x01 to^x03 %s^x01.", skin[WEAPON], skin[NAME]);
+		cod_print_chat(id, "Twoj nowy skin^x03 %s^x01 to^x03 %s^x01.", skin[SKIN_WEAPON], skin[SKIN_NAME]);
 	}
 	else 
 	{
@@ -332,11 +333,11 @@ public buy_weapon_skin(id, weapon[])
 	{
 		ArrayGetArray(skins, i, skin);
 
-		if(equal(weapon, skin[WEAPON]))
+		if(equal(weapon, skin[SKIN_WEAPON]))
 		{
 			num_to_str(i, tempId, charsmax(tempId));
 
-			formatex(menuData, charsmax(menuData), "\y%s \w- \r%i Honoru", skin[NAME], skin[PRICE])
+			formatex(menuData, charsmax(menuData), "\y%s \w- \r%i Honoru", skin[SKIN_NAME], skin[SKIN_PRICE])
 
 			menu_additem(menu, menuData, tempId);
 
@@ -394,18 +395,18 @@ public buy_weapon_skin_handle(id, menu, item)
 
 	ArrayGetArray(skins, skinId, skin);
 
-	if(cod_get_user_honor(id) < skin[PRICE])
+	if(cod_get_user_honor(id) < skin[SKIN_PRICE])
 	{
 		cod_print_chat(id, "Nie masz wystarczajacej ilosci^x03 honoru^x01.");
 
 		return PLUGIN_HANDLED;
 	}
 
-	add_skin(id, skin[WEAPON], skin[NAME]);
+	add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
 
 	ArrayPushCell(playerSkins[id], skinId);
 
-	cod_print_chat(id, "Pomyslnie zakupiles skin^x03 %s^x01 do broni^x03 %s^x01.", skin[NAME], skin[WEAPON]);
+	cod_print_chat(id, "Pomyslnie zakupiles skin^x03 %s^x01 do broni^x03 %s^x01.", skin[SKIN_NAME], skin[SKIN_WEAPON]);
 
 	return PLUGIN_HANDLED;
 }
@@ -420,7 +421,7 @@ public cod_weapon_deploy(id, weapon, ent)
 		
 		ArrayGetArray(skins, playerData[id][weapon], skin);
 		
-		set_pev(id, pev_viewmodel2, skin[MODEL]);
+		set_pev(id, pev_viewmodel2, skin[SKIN_MODEL]);
 	}
 }
 
@@ -448,18 +449,18 @@ public load_skins_handle(failState, Handle:query, error[], errorNum, playerId[],
 	
 	while(SQL_MoreResults(query))
 	{
-		SQL_ReadResult(query, SQL_FieldNameToNum(query, "skin"), skin[NAME], charsmax(skin[NAME]));
-		SQL_ReadResult(query, SQL_FieldNameToNum(query, "weapon"), skin[WEAPON], charsmax(skin[WEAPON]));
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "skin"), skin[SKIN_NAME], charsmax(skin[SKIN_NAME]));
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "weapon"), skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]));
 
-		if(contain(skin[WEAPON], "ACTIVE") != -1)
+		if(contain(skin[SKIN_WEAPON], "ACTIVE") != -1)
 		{
-			replace(skin[WEAPON], charsmax(skin[WEAPON]), " ACTIVE", "");
+			replace(skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]), " ACTIVE", "");
 
-			set_skin(id, skin[WEAPON], get_skin_id(skin[NAME], skin[WEAPON]));
+			set_skin(id, skin[SKIN_WEAPON], get_skin_id(skin[SKIN_NAME], skin[SKIN_WEAPON]));
 		}
 		else
 		{
-			new skinId = get_skin_id(skin[NAME], skin[WEAPON]);
+			new skinId = get_skin_id(skin[SKIN_NAME], skin[SKIN_WEAPON]);
 
 			if(skinId > -1) ArrayPushCell(playerSkins[id], skinId);
 		}
@@ -505,7 +506,7 @@ stock get_skin_id(const name[], const weapon[])
 	{
 		ArrayGetArray(skins, i, skin);
 
-		if(equal(name, skin[NAME]) && equal(weapon, skin[WEAPON])) return i;
+		if(equal(name, skin[SKIN_NAME]) && equal(weapon, skin[SKIN_WEAPON])) return i;
 	}
 
 	return -1;
@@ -517,7 +518,7 @@ stock get_skin_info(skinId, info, dataReturn[] = "", dataLength = 0)
 	
 	ArrayGetArray(skins, skinId, skin);
 	
-	if(info == NAME || info == WEAPON || info == MODEL)
+	if(info == SKIN_NAME || info == SKIN_WEAPON || info == SKIN_MODEL)
 	{
 		copy(dataReturn, dataLength, skin[info]);
 		

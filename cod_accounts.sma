@@ -12,12 +12,8 @@
 
 #define TASK_PASSWORD 1945
 
-#define m_iMenuCode 205
-#define OFFSET_LINUX 5
-#define VGUI_JOIN_TEAM_NUM 2
-
-new playerName[33][64], playerSafeName[33][64], playerPassword[33][33], playerTempPassword[33][33], 
-	playerFails[33], playerStatus[33], Handle:sql, dataLoaded, autoLogin;
+new playerName[MAX_PLAYERS + 1][64], playerSafeName[MAX_PLAYERS + 1][64], playerPassword[MAX_PLAYERS + 1][32], playerTempPassword[MAX_PLAYERS + 1][32], 
+	playerFails[MAX_PLAYERS + 1], playerStatus[MAX_PLAYERS + 1], Handle:sql, dataLoaded, autoLogin;
 
 enum _:status { NOT_REGISTERED, NOT_LOGGED, LOGGED, GUEST };
 
@@ -105,7 +101,7 @@ public message_show_menu(msgId, dest, id)
 
 	if(equal(menuData, Team_Select) && playerStatus[id] < LOGGED)
 	{
-		set_pdata_int(id, m_iMenuCode, 0, OFFSET_LINUX);
+		set_pdata_int(id, 205, 0, 5);
 
 		set_task(0.1, "account_menu", id);
 		
@@ -117,7 +113,7 @@ public message_show_menu(msgId, dest, id)
 
 public message_vgui_menu(msgId, dest, id)
 {
-	if(get_msg_arg_int(1) == VGUI_JOIN_TEAM_NUM && playerStatus[id] < LOGGED)
+	if(get_msg_arg_int(1) == 2 && playerStatus[id] < LOGGED)
 	{
 		set_task(0.1, "account_menu", id);
 
@@ -690,7 +686,7 @@ public load_account_handle(failState, Handle:query, error[], errorNum, tempId[],
 	{
 		SQL_ReadResult(query, SQL_FieldNameToNum(query, "pass"), playerPassword[id], charsmax(playerPassword[]));
 		
-		if(!equal(playerPassword[id], ""))
+		if(playerPassword[id][0])
 		{
 			new password[33], info[32];
 
