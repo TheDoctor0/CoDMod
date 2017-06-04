@@ -8,7 +8,7 @@
 new const name[] = "Apteczka";
 new const description[] = "Mozesz uleczyc sie calkowicie raz na runde";
 
-new used;
+new usedItem;
 
 public plugin_init()
 {
@@ -18,14 +18,14 @@ public plugin_init()
 }
 
 public cod_item_enabled(id, value)
-	rem_bit(id, used);
+	rem_bit(id, usedItem);
 
 public cod_item_spawned(id)
-	rem_bit(id, used);
+	rem_bit(id, usedItem);
 	
 public cod_item_skill_used(id)
 {
-	if(get_bit(id, used))
+	if(get_bit(id, usedItem))
 	{
 		cod_print_chat(id, "Apteczke mozesz uzyc tylko raz na runde.");
 
@@ -36,7 +36,7 @@ public cod_item_skill_used(id)
 
 	cod_set_user_health(id, cod_get_user_max_health(id));
 		
-	set_bit(id, used);
+	set_bit(id, usedItem);
 
 	return COD_CONTINUE;
 }
