@@ -108,20 +108,41 @@
 	"buffers":
 	[
 		{
-			"file": "cod.txt",
+			"file": "cod_accounts.sma",
 			"settings":
 			{
-				"buffer_size": 116,
+				"buffer_size": 20571,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "cod_mod.sma",
+			"contents": "Package Control Messages\n========================\n\nGutter Color\n------------\n\n  Thanks for installing GutterColor!\n  \n  Before you get started you'll need ImageMagick installed. You can get this from the website: http://www.imagemagick.org/\n  \n  You need to configure the convert_path before things start working. This can be done through Preferences/Package Settings/GutterColor/Settings - User\n",
 			"settings":
 			{
-				"buffer_size": 125093,
-				"encoding": "UTF-8",
+				"buffer_size": 396,
+				"line_ending": "Windows",
+				"name": "Package Control Messages",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"file": "/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/Gutter Color/GutterColor.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 1656,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "",
+			"file": "/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/GutterColor.sublime-settings",
+			"file_size": -1,
+			"file_write_time": -1,
+			"settings":
+			{
+				"buffer_size": 0,
 				"line_ending": "Windows"
 			}
 		}
@@ -158,9 +179,45 @@
 	"command_palette":
 	{
 		"height": 354.0,
-		"last_filter": "compare ",
+		"last_filter": "insta",
 		"selected_items":
 		[
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Disable Package"
+			],
+			[
+				"Package Control: in",
+				"Package Control: Install Package"
+			],
+			[
+				"git",
+				"git: commit"
+			],
+			[
+				"Package Control: i",
+				"Package Control: Install Package"
+			],
+			[
+				"GitSavvy",
+				"Preferences: GitSavvy Settings"
+			],
+			[
+				"Package Control: sa",
+				"Package Control: Satisfy Dependencies"
+			],
+			[
+				"Package Control: install",
+				"Package Control: Install Package"
+			],
 			[
 				"compare ",
 				"GitGutter: Compare Against Branch"
@@ -170,27 +227,11 @@
 				"GitGutter: Show Diff Popup"
 			],
 			[
-				"Package Control: ",
-				"Package Control: Disable Package"
-			],
-			[
 				"gutt",
 				"GutterColor: Fix Current Color Scheme"
 			],
 			[
-				"Package Control: i",
-				"Package Control: Install Package"
-			],
-			[
 				"install",
-				"Package Control: Install Package"
-			],
-			[
-				"git",
-				"Git: Commit"
-			],
-			[
-				"Package Control: in",
 				"Package Control: Install Package"
 			],
 			[
@@ -233,8 +274,26 @@
 	],
 	"file_history":
 	[
-		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_transfer.sma",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/Alignment/Default (Windows).sublime-keymap",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/Default (Windows).sublime-keymap",
+		"/C/Users/Dawid/Desktop/sub/Roaming/Sublime Text 3/Packages/amxmodx/Main.sublime-menu",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_clans_system.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_box.sma",
+		"/C/wamp64/www/sco/app/Authorizable.php",
+		"/C/Users/Dawid/Desktop/sub/Roaming/Sublime Text 3/Packages/amxmodx/amxx.sublime-settings",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/AMXX-Pawn.sublime-settings",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/AMXX-Console.sublime-settings",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/AMXX-Compiler.sublime-build",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/amxx.sublime-settings",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod.txt",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod.inc",
+		"/D/Dawid/Workplace/Mods/CoDMod/asd.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_mod.sma",
+		"/C/wamp64/www/sco/.git/description",
+		"/C/wamp64/www/sco/.git/config",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-transfer.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names.log",
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_transfer.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-exchange.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-buy.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-random.log",
@@ -252,9 +311,7 @@
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_icons.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_he_block.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_exchange.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_clans_system.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_casino.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_box.sma",
 		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_jackpot.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-sql-debug.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-error.log",
@@ -274,7 +331,6 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names 2.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/rangi.txt",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names.log",
 		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_duch.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_msciciel_premium.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_betonowecialo.sma",
@@ -296,7 +352,6 @@
 		"/D/Downloads/GoogleChrome/Unlimited_Clip_Ammo (2).sma",
 		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_vip.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_vip.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod.txt",
 		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_komandos.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_amadeusz.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170602.log",
@@ -346,25 +401,11 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170524.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170523.log",
 		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_nades.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod.inc",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_mod.sma",
-		"/C/Users/Dawid/Desktop/grenade_pop.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/csstatsx_sql.sma",
-		"/D/Downloads/GoogleChrome/shortnade.sma",
-		"/D/Downloads/GoogleChrome/zoomed_models_fix.sma",
-		"/D/Downloads/GoogleChrome/dhudmessage.inc",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170523.log",
-		"/D/Dawid/Workplace/Mods/Zombie Evolution/addons/amxmodx/scripting/Mileage_Primary_Thunderbolt.sma",
-		"/D/Downloads/GoogleChrome/custom_sniper_scopes.sma",
-		"/D/Dawid/Workplace/Mods/Zombie Evolution/addons/amxmodx/scripting/cso_magnumbolt_native.sma.bak",
-		"/D/Downloads/GoogleChrome/GrenadePop (2).sma",
-		"/D/Downloads/GoogleChrome/GrenadePop (1).sma",
-		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_accounts.sma",
-		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_runboost.sma"
+		"/C/Users/Dawid/Desktop/grenade_pop.sma"
 	],
 	"find":
 	{
-		"height": 70.0
+		"height": 28.0
 	},
 	"find_in_files":
 	{
@@ -626,39 +667,28 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 2,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "cod.txt",
+					"file": "cod_accounts.sma",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 116,
+						"buffer_size": 20571,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								13,
-								13
+								1046,
+								1046
 							]
 						],
 						"settings":
 						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
 							"bracket_highlighter.busy": false,
 							"bracket_highlighter.locations":
 							{
@@ -677,67 +707,141 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
 								"bh_angle",
 								"bh_angle_center",
 								"bh_angle_open",
 								"bh_angle_close",
 								"bh_angle_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
 								"bh_double_quote",
 								"bh_double_quote_center",
 								"bh_double_quote_open",
 								"bh_double_quote_close",
 								"bh_double_quote_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
-								"bh_square_content"
+								"bh_square_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content"
 							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
-							"git_gutter_is_enabled": true,
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod\\cod.txt",
+							"git_savvy.file_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod\\cod_accounts.sma",
 							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 204.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 396,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								77,
+								77
+							]
+						],
+						"settings":
+						{
+							"auto_indent": false,
+							"color_scheme": "Packages/User/Color Highlighter/themes/Material Monokai Soda.tmTheme",
+							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_width": 2,
+							"word_wrap": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/Gutter Color/GutterColor.sublime-settings",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1656,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".#",
+									"selector": "text.html"
+								}
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Material Monokai Soda.tmTheme",
+							"git_savvy.file_path": "C:\\Users\\Dawid\\AppData\\Roaming\\Sublime Text 3\\Packages\\Gutter Color\\GutterColor.sublime-settings",
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -747,20 +851,20 @@
 					"type": "text"
 				},
 				{
-					"buffer": 1,
-					"file": "cod_mod.sma",
+					"buffer": 3,
+					"file": "/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/GutterColor.sublime-settings",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 125093,
+						"buffer_size": 0,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4164,
-								4171
+								0,
+								0
 							]
 						],
 						"settings":
@@ -776,104 +880,12 @@
 									"selector": "text.html"
 								}
 							],
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										4285,
-										4286
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/curly_bracket.png",
-										"brackethighlighter.default"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										4117,
-										4118
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
-							"git_gutter_is_enabled": true,
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod\\cod_mod.sma",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
+							"color_scheme": "Packages/User/Color Highlighter/themes/Material Monokai Soda.tmTheme",
+							"git_savvy.file_path": "C:\\Users\\Dawid\\AppData\\Roaming\\Sublime Text 3\\Packages\\User\\GutterColor.sublime-settings",
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 907.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
@@ -884,7 +896,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 24.0
+		"height": 28.0
 	},
 	"input":
 	{
@@ -972,7 +984,7 @@
 	},
 	"select_symbol":
 	{
-		"height": 47.0,
+		"height": 354.0,
 		"last_filter": "",
 		"selected_items":
 		[

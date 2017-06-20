@@ -27,9 +27,9 @@ new const commandAccount[][] = { "say /haslo", "say_team /haslo", "say /password
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	for(new i; i < sizeof commandAccount; i++) register_clcmd(commandAccount[i], "account_menu");
-	
+
 	register_clcmd("WPROWADZ_SWOJE_HASLO", "login_account");
 	register_clcmd("WPROWADZ_WYBRANE_HASLO", "register_step_one");
 	register_clcmd("POWTORZ_WYBRANE_HASLO", "register_step_two");

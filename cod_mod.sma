@@ -1567,7 +1567,7 @@ public use_teleport(id)
 	pev(id, pev_v_angle, end);
 	engfunc(EngFunc_MakeVectors, end);
 	global_get(glb_v_forward, end);
-	xs_vec_mul_scalar(end, 5000.0, end);
+	xs_vec_mul_scalar(end, 2500.0, end);
 	xs_vec_add(start, end, end);
 
 	engfunc(EngFunc_TraceLine, start, end, 0, id, 0);
