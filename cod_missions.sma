@@ -24,21 +24,21 @@ new missionChapter[][] = { {1, 100}, {101, 200}, {201, 300}, {301, 400}, {401, 5
 
 new missionChapterName[][] = { "Nowy Poczatek", "Walka Na Froncie", "Za Linia Wroga", "Wszystko Albo Nic", "Legenda Zyje Wiecznie" };
 
-enum _:missionType { TYPE_NONE, TYPE_KILL, TYPE_HEADSHOT, TYPE_PLANT, TYPE_DEFUSE, TYPE_RESCUE, TYPE_DAMAGE, TYPE_CLASS, TYPE_ITEM };
-enum _:playerInfo { PLAYER_ID, PLAYER_TYPE, PLAYER_ADDITIONAL, PLAYER_PROGRESS, PLAYER_CHAPTER };
-enum _:missionInfo { QUEST_CHAPTER, QUEST_AMOUNT, QUEST_TYPE, QUEST_REWARD };
-
 new const commandMission[][] = { "say /quest", "say_team /quest", "say /misja", "say_team /misja", "say /misje", "say_team /misje", "say /questy", "say_team /questy", "misje" };
 new const commandProgress[][] = { "say /progress", "say_team /progress", "say /progres", "say_team /progres", "say /postep", "say_team /postep", "postep" };
 new const commandEnd[][] = { "say /koniec", "say_team /koniec", "say /zakoncz", "say_team /zakoncz", "zakoncz", "say_team /przerwij", "say /przerwij", "przerwij" };
 
-new playerClass[MAX_PLAYERS + 1][64], playerName[MAX_PLAYERS + 1][64], playerData[MAX_PLAYERS + 1][playerInfo], Array:codMissions, cvarMinPlayers, minPlayers, missions, loaded;
+enum _:missionType { TYPE_NONE, TYPE_KILL, TYPE_HEADSHOT, TYPE_PLANT, TYPE_DEFUSE, TYPE_RESCUE, TYPE_DAMAGE, TYPE_CLASS, TYPE_ITEM };
+enum _:playerInfo { PLAYER_ID, PLAYER_TYPE, PLAYER_ADDITIONAL, PLAYER_PROGRESS, PLAYER_CHAPTER };
+enum _:missionInfo { QUEST_CHAPTER, QUEST_AMOUNT, QUEST_TYPE, QUEST_REWARD };
+
+new playerClass[MAX_PLAYERS + 1][64], playerName[MAX_PLAYERS + 1][64], playerData[MAX_PLAYERS + 1][playerInfo], Array:codMissions, cvarMinPlayers, missions, loaded;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
-	cvarMinPlayers = register_cvar("cod_missions_minplayers", "4");
+	bind_pcvar_num(create_cvar("cod_missions_minplayers", "4"), cvarMinPlayers);
 	
 	for(new i; i < sizeof commandMission; i++) register_clcmd(commandMission[i], "mission_menu");
 	for(new i; i < sizeof commandProgress; i++) register_clcmd(commandProgress[i], "check_mission");
@@ -95,8 +95,6 @@ public plugin_cfg()
 	}
 
 	fclose(file);
-
-	minPlayers = get_pcvar_num(cvarMinPlayers);
 }
 
 public plugin_end()
@@ -535,7 +533,7 @@ stock get_mission_info(mission, info)
 
 stock add_progress(id, amount = 1)
 {
-	if(!is_user_connected(id) || get_playersnum() < minPlayers) return PLUGIN_HANDLED;
+	if(!is_user_connected(id) || get_playersnum() < cvarMinPlayers) return PLUGIN_HANDLED;
 
 	playerData[id][PLAYER_PROGRESS] += amount;
 	

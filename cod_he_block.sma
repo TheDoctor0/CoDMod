@@ -10,13 +10,13 @@
 #define TASK_BLOCK 7526
 #define TASK_INFO 8432
 
-new bool:block;
-
-new Float:roundStart;
+new Float:cvarBlockTime, Float:roundStart, bool:block;
 
 public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
+
+	bind_pcvar_float(create_cvar("cod_block_he_time", "10"), cvarBlockTime);
 
 	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_hegrenade", "block_he");
 }
@@ -28,7 +28,7 @@ public cod_start_round()
 {
 	remove_task(TASK_BLOCK);
 
-	set_task(10.0, "unblock_he", TASK_BLOCK);
+	set_task(cvarBlockTime, "unblock_he", TASK_BLOCK);
 
 	roundStart = get_gametime();
 }
@@ -51,7 +51,7 @@ public show_info(id)
 {
 	id -= TASK_INFO;
 
-	new Float:currentTime = (roundStart + 10.0) - get_gametime();
+	new Float:currentTime = (roundStart + cvarBlockTime) - get_gametime();
 
 	if(currentTime <= 0.0)
 	{

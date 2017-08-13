@@ -13,11 +13,6 @@
 
 #define TASK_TIME 9054
 
-enum _:statsInfo { ADMIN, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE, SILVER, GOLD, MEDALS, BEST_STATS, BEST_KILLS, 
-	BEST_HS_KILLS, BEST_DEATHS, CURRENT_STATS, CURRENT_KILLS, CURRENT_HS_KILLS, CURRENT_DEATHS, ROUND_KILLS, ROUND_HS_KILLS };
-
-enum _:winers { THIRD, SECOND, FIRST };
-
 new const commandMenu[][] = { "say /statsmenu", "say_team /statsmenu", "say /statymenu", "say_team /statymenu", "say /menustaty", "say_team /menustaty", "menustaty" };
 new const commandTime[][] = { "say /time", "say_team /time", "say /czas", "say_team /czas", "czas" };
 new const commandAdminTime[][] = { "say /timeadmin", "say_team /timeadmin", "say /tadmin", "say_team /tadmin", "say /czasadmin", "say_team /czasadmin", "say /cadmin", "say_team /cadmin", "say /adminczas", "say_team /adminczas", "czasadmin" };
@@ -27,6 +22,10 @@ new const commandTopStats[][] = { "say /stop15", "say_team /stop15", "say /topst
 new const commandMedals[][] = { "say /medal", "say_team /medal", "say /medale", "say_team /medale", "say /medals", "say_team /medals", "medale" };
 new const commandTopMedals[][] = { "say /mtop15", "say_team /mtop15", "say /topmedals", "say_team /topmedals", "say /topmedale", "say_team /topmedale", "topmedale" };
 
+enum _:statsInfo { ADMIN, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE, SILVER, GOLD, MEDALS, BEST_STATS, BEST_KILLS, 
+	BEST_HS_KILLS, BEST_DEATHS, CURRENT_STATS, CURRENT_KILLS, CURRENT_HS_KILLS, CURRENT_DEATHS, ROUND_KILLS, ROUND_HS_KILLS };
+enum _:winers { THIRD, SECOND, FIRST };
+
 new playerName[MAX_PLAYERS + 1][64], playerStats[MAX_PLAYERS + 1][statsInfo], playerDamage[MAX_PLAYERS + 1][MAX_PLAYERS + 1],
 	Handle:sql, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo;
 
@@ -35,6 +34,13 @@ new cvarGoldMedalExp, cvarSilverMedalExp, cvarBronzeMedalExp, cvarAssistEnabled,
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
+
+	bind_pcvar_num(create_cvar("cod_medal_gold_exp", "500"), cvarGoldMedalExp);
+	bind_pcvar_num(create_cvar("cod_medal_silver_exp", "300"), cvarSilverMedalExp);
+	bind_pcvar_num(create_cvar("cod_medal_bronze_exp", "100"), cvarBronzeMedalExp);
+	bind_pcvar_num(create_cvar("cod_assist_enabled", "1"), cvarAssistEnabled);
+	bind_pcvar_num(create_cvar("cod_assist_damage", "65"), cvarAssistDamage);
+	bind_pcvar_num(create_cvar("cod_assist_exp", "15"), cvarAssistExp);
 
 	cvarGoldMedalExp = register_cvar("cod_medal_gold_exp", "500");
 	cvarSilverMedalExp = register_cvar("cod_medal_silver_exp", "300");
@@ -609,7 +615,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 		}
 	}
 
-	if(get_pcvar_num(cvarAssistEnabled))
+	if(cvarAssistEnabled)
 	{
 		new assist = 0, damage = 0;
 
@@ -626,7 +632,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 			playerDamage[id][victim] = 0;
 		}
 
-		if(assist > 0 && damage > get_pcvar_num(cvarAssistDamage))
+		if(assist > 0 && damage > cvarAssistDamage)
 		{
 			set_user_frags(assist, get_user_frags(assist) + 1);
 
@@ -650,7 +656,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 				message_end();
 			}
 			
-			new nameVictim[32], nameKiller[32], exp = cod_get_user_bonus_exp(assist, get_pcvar_num(cvarAssistExp));
+			new nameVictim[32], nameKiller[32], exp = cod_get_user_bonus_exp(assist, cvarAssistExp);
 
 			cod_set_user_exp(assist, exp);
 
@@ -791,19 +797,19 @@ public message_intermission()
 		{
 			case THIRD:
 			{
-				exp = get_pcvar_num(cvarBronzeMedalExp);
+				exp = cvarBronzeMedalExp;
 
 				playerStats[winnersId[i]][BRONZE]++;
 			}
 			case SECOND: 
 			{
-				exp = get_pcvar_num(cvarSilverMedalExp);
+				exp = cvarSilverMedalExp;
 
 				playerStats[winnersId[i]][SILVER]++;
 			}
 			case FIRST:
 			{
-				exp = get_pcvar_num(cvarGoldMedalExp);
+				exp = cvarGoldMedalExp;
 
 				playerStats[winnersId[i]][GOLD]++;
 			}

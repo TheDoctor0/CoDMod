@@ -7,10 +7,6 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-enum _:knifeInfo { NAME, BONUS, MODEL };
-
-enum _:knivesTypes { DEFAULT, HEALTH, INTELLIGENCE, STAMINA, STRENGTH, CONDITION };
-
 new const knifeModels[][][] =
 {
 	{ "Standardowy", "(+2 Kazdej Statystyki)", "models/v_knife.mdl" },
@@ -23,6 +19,9 @@ new const knifeModels[][][] =
 
 new const commandKnives[][] = { "say /noz", "say_team /noz", "say /noze", "say_team /noze", "say /knife", "say_team /knife", 
 "say /knifes", "say_team /knifes", "say /kosa", "say_team /kosa", "say /kosy", "say_team /kosy", "noze" };
+
+enum _:knifeInfo { NAME, BONUS, MODEL };
+enum _:knifeTypes { DEFAULT, HEALTH, INTELLIGENCE, STAMINA, STRENGTH, CONDITION };
 
 new playerName[MAX_PLAYERS + 1][32], playerKnife[MAX_PLAYERS + 1], knives;
 
@@ -131,34 +130,34 @@ public set_bonus(id, oldKnife, newKnife)
 	{
 		case DEFAULT:
 		{
-			cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) - 2);
-			cod_set_user_bonus_intelligence(id, cod_get_user_bonus_intelligence(id) - 2);
-			cod_set_user_bonus_stamina(id, cod_get_user_bonus_stamina(id) - 2);
-			cod_set_user_bonus_strength(id, cod_get_user_bonus_strength(id) - 2);
-			cod_set_user_bonus_condition(id, cod_get_user_bonus_condition(id) - 2);
+			cod_set_user_bonus_health(id, -2);
+			cod_set_user_bonus_intelligence(id, -2);
+			cod_set_user_bonus_stamina(id, -2);
+			cod_set_user_bonus_strength(id, -2);
+			cod_set_user_bonus_condition(id, -2);
 		}
-		case HEALTH: cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) - 10);
-		case INTELLIGENCE: cod_set_user_bonus_intelligence(id, cod_get_user_bonus_intelligence(id) - 10);
-		case STAMINA: cod_set_user_bonus_stamina(id, cod_get_user_bonus_stamina(id) - 10);
-		case STRENGTH: cod_set_user_bonus_strength(id, cod_get_user_bonus_strength(id) - 10);
-		case CONDITION: cod_set_user_bonus_condition(id, cod_get_user_bonus_condition(id) - 10);
+		case HEALTH: cod_set_user_bonus_health(id, -10);
+		case INTELLIGENCE: cod_set_user_bonus_intelligence(id, -10);
+		case STAMINA: cod_set_user_bonus_stamina(id, -10);
+		case STRENGTH: cod_set_user_bonus_strength(id, -10);
+		case CONDITION: cod_set_user_bonus_condition(id, -10);
 	}
 
 	switch(newKnife)
 	{
 		case DEFAULT:
 		{
-			cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + 2);
-			cod_set_user_bonus_intelligence(id, cod_get_user_bonus_intelligence(id) + 2);
-			cod_set_user_bonus_stamina(id, cod_get_user_bonus_stamina(id) + 2);
-			cod_set_user_bonus_strength(id, cod_get_user_bonus_strength(id) + 2);
-			cod_set_user_bonus_condition(id, cod_get_user_bonus_condition(id) + 2);
+			cod_set_user_bonus_health(id, 2);
+			cod_set_user_bonus_intelligence(id, 2);
+			cod_set_user_bonus_stamina(id, 2);
+			cod_set_user_bonus_strength(id, 2);
+			cod_set_user_bonus_condition(id, 2);
 		}
-		case HEALTH: cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + 10);
-		case INTELLIGENCE: cod_set_user_bonus_intelligence(id, cod_get_user_bonus_intelligence(id) + 10);
-		case STAMINA: cod_set_user_bonus_stamina(id, cod_get_user_bonus_stamina(id) + 10);
-		case STRENGTH: cod_set_user_bonus_strength(id, cod_get_user_bonus_strength(id) + 10);
-		case CONDITION: cod_set_user_bonus_condition(id, cod_get_user_bonus_condition(id) + 10);
+		case HEALTH: cod_set_user_bonus_health(id, 10);
+		case INTELLIGENCE: cod_set_user_bonus_intelligence(id, 10);
+		case STAMINA: cod_set_user_bonus_stamina(id, 10);
+		case STRENGTH: cod_set_user_bonus_strength(id, 10);
+		case CONDITION: cod_set_user_bonus_condition(id, 10);
 	}
 
 	playerKnife[id] = newKnife;

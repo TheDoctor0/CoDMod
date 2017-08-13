@@ -12,21 +12,22 @@
 
 #define TASK_PASSWORD 1945
 
-new playerName[MAX_PLAYERS + 1][64], playerSafeName[MAX_PLAYERS + 1][64], playerPassword[MAX_PLAYERS + 1][32], playerTempPassword[MAX_PLAYERS + 1][32], 
-	playerFails[MAX_PLAYERS + 1], playerStatus[MAX_PLAYERS + 1], Handle:sql, dataLoaded, autoLogin;
+new const commandAccount[][] = { "say /haslo", "say_team /haslo", "say /password", "say_team /password", 
+	"say /konto", "say_team /konto", "say /account", "say_team /account", "konto" };
 
 enum _:status { NOT_REGISTERED, NOT_LOGGED, LOGGED, GUEST };
-
 enum _:queries { UPDATE, INSERT, DELETE };
 
 new const accountStatus[status][] = { "Niezarejestrowany", "Niezalogowany", "Zalogowany", "Gosc" };
 
-new const commandAccount[][] = { "say /haslo", "say_team /haslo", "say /password", "say_team /password", 
-	"say /konto", "say_team /konto", "say /account", "say_team /account", "konto" };
+new playerName[MAX_PLAYERS + 1][64], playerSafeName[MAX_PLAYERS + 1][64], playerPassword[MAX_PLAYERS + 1][32], playerTempPassword[MAX_PLAYERS + 1][32], 
+	playerFails[MAX_PLAYERS + 1], playerStatus[MAX_PLAYERS + 1], Handle:sql, dataLoaded, autoLogin, cvarAccountsEnabled;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
+
+	bind_pcvar_num(create_cvar("cod_accounts_enabled", "1"), cvarAccountsEnabled);
 
 	for(new i; i < sizeof commandAccount; i++) register_clcmd(commandAccount[i], "account_menu");
 
@@ -84,7 +85,7 @@ public message_team(id)
 {
 	if(is_user_connected(id) && !is_user_bot(id) && !is_user_hltv(id) && playerStatus[id] < LOGGED) 
 	{
-		account_menu(id, 1);
+		account_menu(id, true);
 
 		return PLUGIN_HANDLED;
 	}
@@ -147,7 +148,7 @@ public check_account(id)
 {
 	if(playerStatus[id] < LOGGED)
 	{
-		account_menu(id, 1);
+		account_menu(id, true);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -163,7 +164,7 @@ public kick_player(id)
 }
 public account_menu(id, sound)
 {
-	if(!is_user_connected(id) || !is_user_valid(id)) return PLUGIN_HANDLED;
+	if(!is_user_connected(id) || !is_user_valid(id) || !cvarAccountsEnabled) return PLUGIN_HANDLED;
 
 	if(!get_bit(id, dataLoaded))
 	{
@@ -308,7 +309,7 @@ public login_account(id)
 
 		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Podane haslo jest nieprawidlowe.");
 		
-		account_menu(id, 1);
+		account_menu(id, true);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -345,7 +346,7 @@ public register_step_one(id)
 
 		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Haslo musi miec co najmniej 5 znakow.");
 		
-		account_menu(id, 1);
+		account_menu(id, true);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -378,7 +379,7 @@ public register_step_two(id)
 
 		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Podane hasla roznia sie od siebie.");
 		
-		account_menu(id, 1);
+		account_menu(id, true);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -451,7 +452,7 @@ public register_confirmation_handle(id, menu, item)
 	
 			client_cmd(id, "messagemode WPROWADZ_WYBRANE_HASLO");
 		}
-		case 2: account_menu(id, 0);
+		case 2: account_menu(id, false);
 	}
 	
 	return PLUGIN_HANDLED;
@@ -474,7 +475,7 @@ public change_step_one(id)
 
 		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Podane haslo jest nieprawidlowe.");
 		
-		account_menu(id, 1);
+		account_menu(id, true);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -505,7 +506,7 @@ public change_step_two(id)
 
 		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Nowe haslo jest takie samo jak aktualne.");
 		
-		account_menu(id, 1);
+		account_menu(id, true);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -516,7 +517,7 @@ public change_step_two(id)
 
 		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Nowe haslo musi miec co najmniej 5 znakow.");
 		
-		account_menu(id, 1);
+		account_menu(id, true);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -549,7 +550,7 @@ public change_step_three(id)
 
 		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Podane hasla roznia sie od siebie.");
 		
-		account_menu(id, 1);
+		account_menu(id, true);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -588,7 +589,7 @@ public delete_account(id)
 
 		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Podane haslo jest nieprawidlowe.");
 		
-		account_menu(id, 1);
+		account_menu(id, true);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -742,23 +743,25 @@ public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSiz
 
 public _cod_check_account(plugin_id, num_params)
 {
+	if(!cvarAccountsEnabled) return true;
+
 	new id = get_param(1);
 	
 	if (!is_user_valid(id))
 	{
 		log_error(AMX_ERR_NATIVE, "[CoD] Invalid Player (%d)", id);
 		
-		return 0;
+		return false;
 	}
 	
 	if(playerStatus[id] < LOGGED)
 	{
 		cod_print_chat(id, "Musisz sie^x03 zalogowac^x01, aby miec dostep do glownych funkcji!");
 		
-		account_menu(id, 1);
+		account_menu(id, true);
 		
-		return 0;
+		return false;
 	}
 	
-	return 1;
+	return true;
 }

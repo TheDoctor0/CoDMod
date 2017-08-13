@@ -1,6 +1,4 @@
 #include <amxmodx>
-#include <sqlx>
-#include <fakemeta>
 #include <cod>
 
 #define PLUGIN "CoD Casino"
@@ -10,10 +8,6 @@
 new const commandCasino[][] = { "say /kasyno", "say_team /kasyno", "say /casino", "say_team /casino", "kasyno" };
 new const commandDice[][] = { "say /kostka", "say_team /kostka", "say /dice", "say_team /dice", "kostka" };
 new const commandRoulette[][] = { "say /ruletka", "say_team /ruletka", "say /roulette", "say_team /roulette", "ruletka" };
-new const commandBlackjack[][] = { "say /blackjack", "say_team /blackjack", "blackjack" };
-new const commandPoker[][] = { "say /poker", "say_team /poker", "poker" };
-new const commandMachine[][] = { "say /automat", "say_team /automat", "say /machine", "say_team /machine", "automat" };
-new const commandCoinFlip[][] = { "say /automat", "say_team /automat", "say /machine", "say_team /machine", "automat" };
 
 enum _:gamesInfo { GAME_BID, GAME_TYPE };
 enum _:gamesTypesInfo { DICE, ROULETTE, BLACKJACK, POKER, MACHINE, COINFLIP }
@@ -29,10 +23,6 @@ public plugin_init()
 	for(new i; i < sizeof commandCasino; i++) register_clcmd(commandCasino[i], "casino_menu");
 	for(new i; i < sizeof commandDice; i++) register_clcmd(commandDice[i], "dice_menu");
 	for(new i; i < sizeof commandRoulette; i++) register_clcmd(commandRoulette[i], "roulette_menu");
-	for(new i; i < sizeof commandBlackjack; i++) register_clcmd(commandBlackjack[i], "blackjack_menu");
-	for(new i; i < sizeof commandPoker; i++) register_clcmd(commandPoker[i], "poker_menu");
-	for(new i; i < sizeof commandMachine; i++) register_clcmd(commandMachine[i], "machine_menu");
-	for(new i; i < sizeof commandCoinFlip; i++) register_clcmd(commandCoinFlip[i], "coinflip_menu");
 
 	register_clcmd("ZMIEN_STAWKE", "change_bid");
 }
@@ -58,10 +48,6 @@ public casino_menu(id, sound)
 	
 	menu_additem(menu, "\wKostka \y(/kostka)");
 	menu_additem(menu, "\wRuletka \y(/ruletka)");
-	//menu_additem(menu, "\wBlackjack \y(/blackjack)");
-	//menu_additem(menu, "\wPoker \y(/poker)");
-	//menu_additem(menu, "\wAutomat \y(/automat)");
-	//menu_additem(menu, "\wRzut Moneta \y(/moneta)");
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
@@ -91,10 +77,6 @@ public casino_menu_handle(id, menu, item)
 	{ 
 		case DICE: dice_menu(id, 0);
 		case ROULETTE: roulette_menu(id, 0);
-		case BLACKJACK: blackjack_menu(id);
-		case POKER: poker_menu(id);
-		case MACHINE: machine_menu(id);
-		case COINFLIP: coinflip_menu(id);
 	}
 	
 	menu_destroy(menu);
@@ -325,26 +307,6 @@ public roulette_menu_handle(id, menu, item)
 	return PLUGIN_HANDLED;
 }
 
-public blackjack_menu(id)
-{
-	
-}
-
-public poker_menu(id)
-{
-
-}
-
-public machine_menu(id)
-{
-
-}
-
-public coinflip_menu(id)
-{
-
-}
-
 public change_bid(id)
 {
 	if(!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
@@ -378,10 +340,6 @@ public change_bid(id)
 	{ 
 		case DICE: dice_menu(id, 0);
 		case ROULETTE: roulette_menu(id, 0);
-		case BLACKJACK: blackjack_menu(id);
-		case POKER: poker_menu(id);
-		case MACHINE: machine_menu(id);
-		case COINFLIP: coinflip_menu(id);
 	}
 	
 	return PLUGIN_HANDLED;

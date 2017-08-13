@@ -108,41 +108,11 @@
 	"buffers":
 	[
 		{
-			"file": "cod_accounts.sma",
+			"file": "cod.txt",
 			"settings":
 			{
-				"buffer_size": 20571,
+				"buffer_size": 46,
 				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "Package Control Messages\n========================\n\nGutter Color\n------------\n\n  Thanks for installing GutterColor!\n  \n  Before you get started you'll need ImageMagick installed. You can get this from the website: http://www.imagemagick.org/\n  \n  You need to configure the convert_path before things start working. This can be done through Preferences/Package Settings/GutterColor/Settings - User\n",
-			"settings":
-			{
-				"buffer_size": 396,
-				"line_ending": "Windows",
-				"name": "Package Control Messages",
-				"read_only": true,
-				"scratch": true
-			}
-		},
-		{
-			"file": "/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/Gutter Color/GutterColor.sublime-settings",
-			"settings":
-			{
-				"buffer_size": 1656,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "",
-			"file": "/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/GutterColor.sublime-settings",
-			"file_size": -1,
-			"file_write_time": -1,
-			"settings":
-			{
-				"buffer_size": 0,
 				"line_ending": "Windows"
 			}
 		}
@@ -178,10 +148,62 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 354.0,
-		"last_filter": "insta",
+		"height": 318.0,
+		"last_filter": "git comm",
 		"selected_items":
 		[
+			[
+				"git comm",
+				"git: quick commit"
+			],
+			[
+				"git push",
+				"git: push"
+			],
+			[
+				"git: commit including unstaged files",
+				"git: commit including unstaged files"
+			],
+			[
+				"git a",
+				"git: add (edit)"
+			],
+			[
+				"git",
+				"git: commit"
+			],
+			[
+				"git add",
+				"git: add (edit)"
+			],
+			[
+				"git status",
+				"git: status"
+			],
+			[
+				"git ",
+				"git: log"
+			],
+			[
+				"git pu",
+				"git: push"
+			],
+			[
+				"git commit",
+				"git: commit"
+			],
+			[
+				"git ad",
+				"git: add (edit)"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
 			[
 				"insta",
 				"Package Control: Install Package"
@@ -197,10 +219,6 @@
 			[
 				"Package Control: in",
 				"Package Control: Install Package"
-			],
-			[
-				"git",
-				"git: commit"
 			],
 			[
 				"Package Control: i",
@@ -229,10 +247,6 @@
 			[
 				"gutt",
 				"GutterColor: Fix Current Color Scheme"
-			],
-			[
-				"install",
-				"Package Control: Install Package"
 			],
 			[
 				"sftp",
@@ -274,144 +288,145 @@
 	],
 	"file_history":
 	[
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/game.cfg",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.472/QTM_CodElite_questy_oddzialy.sma",
+		"/C/Windows/System32/drivers/etc/hosts",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/V.php",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_shop.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod.inc",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_mod.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod.txt",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_technik.sma",
+		"/D/Dawid/Workplace/AMXX/include/cod.inc",
+		"/D/Dawid/Workplace/Mods/CoDMod/include/cod.inc",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_ninja.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_adrenalina.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_intelektozone.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_duch.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_kucacz.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_bezglowie.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_betonowecialo.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_apteczka.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_vip.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_clans_system.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_box.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_komandos.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_saper.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_pulkownik.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_amadeusz.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_szturmowiec.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_wsparciechemiczne.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_chemik.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_mysliwy_superpremium.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_msciciel_premium.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_partyzant.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_danger.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_bomberman.sma",
+		"/C/wamp64/www/.htaccess",
+		"/C/wamp64/www/.gitignore",
+		"/C/wamp64/www/bootstrap/autoload.php",
+		"/C/wamp64/www/public/index.php",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/users.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/users 2.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170713.log",
+		"/D/Dawid/Workplace/AMXX/scripting/vip_svip.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/jail_extra_vip.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/zp_vip.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/weaprest.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins-zplague.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins-jb.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo_vip.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 2.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins.ini",
+		"/C/Users/Dawid/Desktop/🔍 Facebook Scanner.html",
+		"/D/Dawid/Workplace/AMXX/scripting/stats_system.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sql.cfg",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170708.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/amxx.cfg",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170705.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sql.inc.php",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/admin_sm_bg.php",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/admin_bg.tpl",
+		"/D/Dawid/Workplace/AMXX/scripting/ozone_banconfig.sma",
+		"/D/Downloads/LinkedIn/37.txt",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170708.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/get_data 2.php",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/index 2.php",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/cache.html",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/get_data.php",
+		"/C/Users/Dawid/Desktop/sklep_sms.cfg",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/databases 2.cfg",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/databases.cfg",
+		"/C/Users/Dawid/Desktop/sql.cfg",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sklep_sms.cfg",
+		"/D/Dawid/Workplace/AMXX/scripting/chat_logger.sma",
+		"/D/Dawid/Workplace/AMXX/scripting/screenshots_new.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/config.php",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/db.config.inc.php",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/index.php",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/server.cfg",
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_jackpot.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/stats.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/users 3.ini",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/users 4.ini",
+		"/C/Users/Dawid/Desktop/vue-paper-dashboard-master/index.html",
+		"/C/Users/Dawid/Desktop/vue-paper-dashboard-master/src/App.vue",
+		"/C/Users/Dawid/Desktop/vue-paper-dashboard-master/config/prod.env.js",
+		"/C/Users/Dawid/Desktop/vue-paper-dashboard-master/config/index.js",
+		"/C/Users/Dawid/Desktop/vue-paper-dashboard-master/src/routes/routes.js",
+		"/C/Users/Dawid/Desktop/vue-paper-dashboard-master/src/assets/sass/paper/mixins/_buttons.scss",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.157/csrevo_backweapons.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.921/csrevo_camera_new.sma",
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_vip.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names.log",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/unprecacher.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170621.log",
+		"/D/Downloads/GoogleChrome/pressToPickup.sma",
+		"/D/Downloads/GoogleChrome/csgo_podnoszeniebroni.sma",
+		"/C/Program Files (x86)/Jenkins/secrets/initialAdminPassword",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170620.log",
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_transfer.sma",
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_ranks.sma",
+		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_accounts.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_accounts.sma",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/Inc-Dec-Value/Default (Windows).sublime-keymap",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/Gutter Color/GutterColor.sublime-settings",
+		"/C/Users/Dawid/Desktop/material-dashboard-html-v1.1.1/examples/dashboard.html",
+		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/GutterColor.sublime-settings",
 		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/Alignment/Default (Windows).sublime-keymap",
 		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/Default (Windows).sublime-keymap",
 		"/C/Users/Dawid/Desktop/sub/Roaming/Sublime Text 3/Packages/amxmodx/Main.sublime-menu",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_clans_system.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_box.sma",
 		"/C/wamp64/www/sco/app/Authorizable.php",
 		"/C/Users/Dawid/Desktop/sub/Roaming/Sublime Text 3/Packages/amxmodx/amxx.sublime-settings",
 		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/AMXX-Pawn.sublime-settings",
 		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/AMXX-Console.sublime-settings",
 		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/AMXX-Compiler.sublime-build",
 		"/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/amxx.sublime-settings",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod.txt",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod.inc",
 		"/D/Dawid/Workplace/Mods/CoDMod/asd.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_mod.sma",
 		"/C/wamp64/www/sco/.git/description",
 		"/C/wamp64/www/sco/.git/config",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-transfer.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names.log",
-		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_transfer.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-exchange.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-buy.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-random.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-give.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170604.log",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_accounts.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/include/cod.inc",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170604.log",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_honor.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_stats.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_shop.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_missions.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_market.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_knife.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_icons.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_he_block.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_exchange.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_casino.sma",
-		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_jackpot.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-sql-debug.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-error.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-transfer-debug.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/banconfig.log",
-		"/C/Users/Dawid/Desktop/playlist.html",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins-cod.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/cod_mod.log",
-		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_operations.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170603.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170603.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/version.txt",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/index.php",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/versions.txt",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo_operations.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-load-debug.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/names 2.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/rangi.txt",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_duch.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_msciciel_premium.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_betonowecialo.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_butyszturmowca.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_bezlikammo.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_bezglowie.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_apteczka.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_adrenalina.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_intelektozone.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/codperk_intelektozonea.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_czarodziej.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/codperk_czarodziej.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/codperk_ghost.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_mysliwy_superpremium.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/codperk_brzuchoreload.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/codperk_helmreload.sma",
-		"/D/Downloads/GoogleChrome/infinite_ammo_light.sma",
-		"/D/Downloads/GoogleChrome/Unlimited_Clip_Ammo (1).sma",
-		"/D/Downloads/GoogleChrome/Unlimited_Clip_Ammo (2).sma",
-		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_vip.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_vip.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_komandos.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_amadeusz.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170602.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170602 2.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/server 2.cfg",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/server.cfg",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/ozone_security.txt",
-		"/C/Users/Dawid/Desktop/files/init.js.pobrane",
-		"/C/Users/Dawid/Desktop/login.html",
-		"/C/Users/Dawid/Desktop/Authenty.html",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/operation-debug.log",
-		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_ranks.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/menu_serwera.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170531.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-sell.log",
-		"/D/Dawid/Workplace/AMXX/scripting/umc.sma",
-		"/D/Dawid/Workplace/Mods/CSGOJackpot/sklepsms_usluga_jackpot.sma",
-		"/C/Users/Dawid/Desktop/zend/view/zend-skeleton-module/skeleton/index.phtml",
-		"/C/xampp/htdocs/composer.json",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170530.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/users.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170529.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/restart.log",
-		"/D/Downloads/GoogleChrome/pl_PL.mo",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/admins_service.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/stats_system.txt",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/knife_models.ini",
-		"/D/Dawid/Workplace/AMXX/scripting/knife_models.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-3/knife_models.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-3/L20170528.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-3/error_20170528.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-3/csgo-transfer.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-3/csgo-exchange.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/unprecacher.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/amxbans.txt",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sys_error.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/amxbans 2.txt",
-		"/D/Downloads/GoogleChrome/UTC--2017-05-28T16-57-33.920Z--f444cae12eddb42d82ef5e5e3a7085928d8c6c73",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo-money.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo_skins.ini",
-		"/D/Dawid/Workplace/AMXX/scripting/ozone_security.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170528.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo.log",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_transfer.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170528.log",
-		"/C/Users/Dawid/Desktop/Ewidencja/main.c",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170524.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170523.log",
-		"/D/Dawid/Workplace/Mods/CSGOJackpot/csgo_nades.sma",
-		"/C/Users/Dawid/Desktop/grenade_pop.sma"
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_market.sma"
 	],
 	"find":
 	{
-		"height": 28.0
+		"height": 70.0
 	},
 	"find_in_files":
 	{
 		"height": 158.0,
 		"where_history":
 		[
+			"D:\\Downloads\\LinkedIn",
 			"D:\\Dawid\\Workplace\\Mods\\CoDMod",
 			"D:\\Dawid\\Workplace\\Mods\\CSGOJackpot",
 			"C:\\Users\\Dawid\\Desktop\\utf8convert",
@@ -438,6 +453,63 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"SquadMenu",
+			"_cod_upgrade_user_item",
+			"reset_attributes",
+			"use_rocket",
+			"PLAYER_BUNNYHOP",
+			"SET_ATTRIBUTES",
+			"PLAYER_JUMPS",
+			"_cod_get_item_id",
+			"PLAYER_ROCKETS",
+			"codPlayer[id][PLAYER_TELEPORTS][ALL] == -1 ? -1 : (codPlayer[id][PLAYER_TELEPORTS][ALL] + codPlayer[id][PLAYER_TELEPORTS][i])",
+			"PLAYER_TELEPORTS",
+			"teleports",
+			"cod_get",
+			"cod_add",
+			"cod_set",
+			"gravity",
+			"arraypusharray",
+			"render_count",
+			"ADDITIONAL",
+			"render_count",
+			"armor",
+			"reset_att",
+			"ROUND",
+			"PLAYER_LAST_ROCKET",
+			"reset_att",
+			"reset_attributes",
+			"reset_Att",
+			"remove_attributes",
+			"set_item",
+			"drop_item",
+			"reset_attributes",
+			"PLAYER_MODEL",
+			"new j",
+			"player_resi",
+			"ADDITIONAL",
+			"none",
+			"use_skill",
+			"CLASS_SKILL_USED",
+			"use_",
+			"set_attributes",
+			"reset_attributes",
+			"gravity_change",
+			"calculate_gravity",
+			"Type can be",
+			"render_weapon",
+			"class_disa",
+			"cod_set_user_footsteps",
+			"jump",
+			"RENDER_MOVE",
+			"render_",
+			"handleSayText",
+			"HandleSayText",
+			"message",
+			"say_text",
+			"edjan1970@tlen.pl",
+			"vip",
+			"log_to_file(\"addons/amxmodx/logs/csgo/",
 			"VGUI_JOIN_TEAM_NUM",
 			"OFFSET_LINUX",
 			"m_iMenuCode",
@@ -508,64 +580,7 @@
 			"skinsLoaded",
 			"PLAYER_ID",
 			"reset_operation",
-			"ShowVoteMenu",
-			"//",
-			"operationDescription",
-			"ChangeKnife",
-			"PLAYER_BANNED_BEFORE",
-			"has_skin",
-			"add_skin",
-			"playerData[id][NAME]",
-			"playerData",
-			"playerData[id][NAME",
-			"PojebusMaximus",
-			"has_skin",
-			"check_skin",
-			"')",
-			"wylosowa",
-			"_csgo_get_money",
-			"exchange_skin_menu",
-			"stats_system",
-			"add_money",
-			"ignore_handle",
-			"awp_shot",
-			"weapon_awp",
-			"awp_s",
-			"operation_menu",
-			"awp_shot",
-			"set_fov",
-			"PLAYER_HUD",
-			"load_data",
-			"hud",
-			"TYPE_HUD",
-			"TYPE_",
-			"PLAYER_HUD",
-			"hudinfo",
-			"Event_SetFOV",
-			"log_event_operation",
-			"SUBMODEL",
-			"g_old_weapon",
-			"ZOOM_DELAY",
-			"sfsniper_zoom",
-			"g_iLastSpectated",
-			"CVAR_UPDATESTYLE",
-			"DB_SaveAll",
-			"DB_SavePlayerData",
-			"Stats_SaveKill",
-			"DB_SavePlayerData",
-			"player_wstats",
-			"Stats_SaveKill",
-			"EventHook_Damage",
-			"knife",
-			"load_account",
-			"exec",
-			"csgo-",
-			"csgo.log",
-			"cs_get_weapon_id",
-			"weapon_deploy",
-			"ModelChangeSmoke",
-			"ModelChangeFlash",
-			"ModelChangeHE"
+			"ShowVoteMenu"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -573,6 +588,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"log_to_file(\"csgo-",
 			"",
 			".wav\",",
 			"\t\"radio",
@@ -667,161 +683,24 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "cod_accounts.sma",
+					"file": "cod.txt",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 20571,
+						"buffer_size": 46,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1046,
-								1046
-							]
-						],
-						"settings":
-						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content"
-							],
-							"git_savvy.file_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod\\cod_accounts.sma",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 204.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 396,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								77,
-								77
-							]
-						],
-						"settings":
-						{
-							"auto_indent": false,
-							"color_scheme": "Packages/User/Color Highlighter/themes/Material Monokai Soda.tmTheme",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"tab_width": 2,
-							"word_wrap": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/Gutter Color/GutterColor.sublime-settings",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1656,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
+								13,
+								13
 							]
 						],
 						"settings":
@@ -837,58 +716,15 @@
 									"selector": "text.html"
 								}
 							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Material Monokai Soda.tmTheme",
-							"git_savvy.file_path": "C:\\Users\\Dawid\\AppData\\Roaming\\Sublime Text 3\\Packages\\Gutter Color\\GutterColor.sublime-settings",
-							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "/C/Users/Dawid/AppData/Roaming/Sublime Text 3/Packages/User/GutterColor.sublime-settings",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 0,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Material Monokai Soda.tmTheme",
-							"git_savvy.file_path": "C:\\Users\\Dawid\\AppData\\Roaming\\Sublime Text 3\\Packages\\User\\GutterColor.sublime-settings",
-							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -929,6 +765,10 @@
 	{
 		"height": 0.0
 	},
+	"output.GitSavvy":
+	{
+		"height": 138.0
+	},
 	"output.exec":
 	{
 		"height": 158.0
@@ -942,6 +782,10 @@
 		"height": 100.0
 	},
 	"output.sftp":
+	{
+		"height": 132.0
+	},
+	"output.show_commit_info":
 	{
 		"height": 132.0
 	},

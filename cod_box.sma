@@ -11,15 +11,15 @@
 
 new const boxClass[] = "cod_box", boxModel[] = "models/CoDMod/box.mdl";
 
-new spriteGreen, spriteAcid, cvarBoxChance;
+new cvarBoxChance, spriteGreen, spriteAcid;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
 	register_touch(boxClass, "player", "touch_box");
-	
-	cvarBoxChance = register_cvar("cod_box_chance", "6");
+
+	bind_pcvar_num(create_cvar("cod_box_chance", "6"), cvarBoxChance);
 }
 
 public plugin_precache()
@@ -31,7 +31,7 @@ public plugin_precache()
 }
 
 public cod_killed(killer, victim, weaponId, hitPlace)
-	if(random_num(1, get_pcvar_num(cvarBoxChance)) == 1) create_box(victim);
+	if(random_num(1, cvarBoxChance) == 1) create_box(victim);
 
 public cod_new_round()
 	set_task(0.1, "remove_ents");
@@ -182,25 +182,25 @@ public get_box(id)
 		}
 		case 7:
 		{
-			cod_add_user_rockets(id, 1);
+			cod_add_user_rockets(id, 1, ROUND);
 			
 			cod_print_chat(id, "Dostales^x04 Rakiete^x01!");
 		}
 		case 8:
 		{
-			cod_add_user_mines(id, 1);
+			cod_add_user_mines(id, 1, ROUND);
 			
 			cod_print_chat(id, "Dostales^x04 Mine^x01!");
 		}
 		case 9:
 		{
-			cod_add_user_medkits(id, 1);
+			cod_add_user_medkits(id, 1, ROUND);
 			
 			cod_print_chat(id, "Dostales^x04 Apteczke^x01!");
 		}
 		case 10:
 		{
-			cod_add_user_dynamites(id, 1);
+			cod_add_user_dynamites(id, 1, ROUND);
 			
 			cod_print_chat(id, "Dostales^x04 Dynamit^x01!");
 		}

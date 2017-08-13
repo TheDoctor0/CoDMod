@@ -8,12 +8,12 @@
 
 #define MAX_ITEMS 5
 
-enum _:itemInfo { ID, ITEM, VALUE, DURABILITY, OWNER, PRICE, NAME[32] };
-
 new const commandMarket[][] = { "say /market", "say_team /market", "say /rynek", "say_team /rynek", "rynek" };
 new const commandSell[][] = { "say /sell", "say_team /sell", "say /wystaw", "say_team /wystaw", "say /sprzedaj", "say_team /sprzedaj", "sprzedaj" };
 new const commandBuy[][] = { "say /buy", "say_team /buy", "say /kup", "say_team /kup", "kup" };
 new const commandWithdraw[][] = { "say /withdraw", "say_team /withdraw", "say /wycofaj", "say_team /wycofaj", "wycofaj" };
+
+enum _:itemInfo { ID, ITEM, VALUE, DURABILITY, OWNER, PRICE, NAME[32] };
 
 new playerName[MAX_PLAYERS + 1][32], Array:marketItems, items;
 

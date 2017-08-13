@@ -16,6 +16,9 @@
 
 #define UNITS_METER 39.37
 
+new const commandIcons[][] = { "say /ikona", "say_team /ikona", "say /ikony", "say_team /ikony", "say /icon", "say_team /icon", 
+"say /icons", "say_team /icons", "say /sprite", "say_team /sprite", "say /wkaznik", "say_team /wskaznik", "ikony" };
+
 enum _:iconInfo { BOMBSITE_A, BOMBSITE_B, BOMB_DROPPED, BOMB_PLANTED, BOMB_EXPLODE, BOX };
 
 new const iconSprite[iconInfo][] =
@@ -27,9 +30,6 @@ new const iconSprite[iconInfo][] =
 	"sprites/CoDMod/explode.spr",
 	"sprites/CoDMod/box.spr"
 };
-
-new const commandIcons[][] = { "say /ikona", "say_team /ikona", "say /ikony", "say_team /ikony", "say /icon", "say_team /icon", 
-"say /icons", "say_team /icons", "say /sprite", "say_team /sprite", "say /wkaznik", "say_team /wskaznik", "ikony" };
 
 new playerName[MAX_PLAYERS + 1][32], bombEntity[iconInfo], iconEntity[iconInfo], playerTeam[MAX_PLAYERS + 1], 
 	bool:roundStarted, iconBombSites, iconDropped, iconPlanted, iconBox, bombTimer, cvarC4, icons;

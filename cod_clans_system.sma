@@ -6,17 +6,13 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-enum _:clanInfo { CLAN_ID, CLAN_LEVEL, CLAN_HONOR, CLAN_HEALTH, CLAN_GRAVITY, CLAN_DAMAGE, CLAN_DROP, CLAN_KILLS, CLAN_MEMBERS, Trie:CLAN_STATUS, CLAN_NAME[64] };
+new const commandClan[][] = { "say /clan", "say_team /clan", "say /clans", "say_team /clans", "say /klany", "say_team /klany", "say /klan", "say_team /klan", "klan" };
 
+enum _:clanInfo { CLAN_ID, CLAN_LEVEL, CLAN_HONOR, CLAN_HEALTH, CLAN_GRAVITY, CLAN_DAMAGE, CLAN_DROP, CLAN_KILLS, CLAN_MEMBERS, Trie:CLAN_STATUS, CLAN_NAME[64] };
 enum _:statusInfo { STATUS_NONE, STATUS_MEMBER, STATUS_DEPUTY, STATUS_LEADER };
 
-new const commandClan[][] = { "say /clan", "say_team /clan", "say /codClans", "say_team /codClans", "say /klany", "say_team /klany", "say /klan", "say_team /klan", "klan" };
-
-new cvarChatPrefix, cvarLevelCost, cvarNextLevelCost, cvarSkillCost, cvarNextSkillCost, cvarCreateLevel, cvarMembersStart, cvarLevelMax, 
-	cvarSkillMax, cvarMembersPerLevel, cvarHealthPerLevel, cvarGravityPerLevel, cvarDamagePerLevel, cvarWeaponDropPerLevel;
-
-new chatPrefix, levelCost, nextLevelCost, skillCost, nextSkillCost, createLevel, membersStart, levelMax, 
-	skillMax, membersPerLevel, healthPerLevel, gravityPerLevel, damagePerLevel, weaponDropPerLevel;
+new cvarCreateLevel, cvarMembersStart, cvarLevelMax, cvarSkillMax, cvarChatPrefix, cvarLevelCost, cvarNextLevelCost, cvarSkillCost, 
+	cvarNextSkillCost, cvarMembersPerLevel, cvarHealthPerLevel, cvarGravityPerLevel, cvarDamagePerLevel, cvarWeaponDropPerLevel;
 
 new playerName[MAX_PLAYERS + 1][64], chosenName[MAX_PLAYERS + 1][64], clan[MAX_PLAYERS + 1], chosenId[MAX_PLAYERS + 1], Handle:sql, Array:codClans;
 
@@ -30,20 +26,20 @@ public plugin_init()
 	register_clcmd("PODAJ_NOWA_NAZWE_KLANU", "change_name_handle");
 	register_clcmd("WPISZ_ILOSC_HONORU", "deposit_honor_handle");
 
-	cvarChatPrefix = register_cvar("cod_clans_chat_prefix", "0");
-	cvarLevelCost = register_cvar("cod_clans_level_cost", "1000");
-	cvarNextLevelCost = register_cvar("cod_clans_next_level_cost", "1000");
-	cvarSkillCost = register_cvar("cod_clans_skill_cost", "500");
-	cvarNextSkillCost = register_cvar("cod_clans_next_skill_cost", "500");
-	cvarCreateLevel = register_cvar("cod_clans_create_level", "25");
-	cvarMembersStart = register_cvar("cod_clans_members_start", "3");
-	cvarLevelMax = register_cvar("cod_clans_level_max", "10");
-	cvarSkillMax = register_cvar("cod_clans_skill_max", "10");
-	cvarMembersPerLevel = register_cvar("cod_clans_members_per_level", "1");
-	cvarHealthPerLevel = register_cvar("cod_clans_health_per_level", "1");
-	cvarGravityPerLevel = register_cvar("cod_clans_gravity_per_level", "20");
-	cvarDamagePerLevel = register_cvar("cod_clans_damage_per_level", "1");
-	cvarWeaponDropPerLevel = register_cvar("cod_clans_weapondrop_per_level", "1");
+	bind_pcvar_num(create_cvar("cod_clans_create_level", "25"), cvarCreateLevel);
+	bind_pcvar_num(create_cvar("cod_clans_members_start", "3"), cvarMembersStart);
+	bind_pcvar_num(create_cvar("cod_clans_level_max", "10"), cvarLevelMax);
+	bind_pcvar_num(create_cvar("cod_clans_skill_max", "10"), cvarSkillMax);
+	bind_pcvar_num(create_cvar("cod_clans_chat_prefix", "0"), cvarChatPrefix);
+	bind_pcvar_num(create_cvar("cod_clans_level_cost", "1000"), cvarLevelCost);
+	bind_pcvar_num(create_cvar("cod_clans_next_level_cost", "1000"), cvarNextLevelCost);
+	bind_pcvar_num(create_cvar("cod_clans_skill_cost", "500"), cvarSkillCost);
+	bind_pcvar_num(create_cvar("cod_clans_next_skill_cost", "500"), cvarNextSkillCost);
+	bind_pcvar_num(create_cvar("cod_clans_members_per_level", "1"), cvarMembersPerLevel);
+	bind_pcvar_num(create_cvar("cod_clans_health_per_level", "1"), cvarHealthPerLevel);
+	bind_pcvar_num(create_cvar("cod_clans_gravity_per_level", "20"), cvarGravityPerLevel);
+	bind_pcvar_num(create_cvar("cod_clans_damage_per_level", "1"), cvarDamagePerLevel);
+	bind_pcvar_num(create_cvar("cod_clans_weapondrop_per_level", "1"), cvarWeaponDropPerLevel);
 	
 	register_message(get_user_msgid("SayText"), "say_text");
 	
@@ -58,21 +54,6 @@ public plugin_natives()
 
 public plugin_cfg()
 {
-	chatPrefix = get_pcvar_num(cvarChatPrefix);
-	levelCost = get_pcvar_num(cvarLevelCost);
-	nextLevelCost = get_pcvar_num(cvarNextLevelCost);
-	skillCost = get_pcvar_num(cvarSkillCost);
-	nextSkillCost = get_pcvar_num(cvarNextSkillCost);
-	createLevel = get_pcvar_num(cvarCreateLevel);
-	membersStart = get_pcvar_num(cvarMembersStart);
-	levelMax = get_pcvar_num(cvarLevelMax);
-	skillMax = get_pcvar_num(cvarSkillMax);
-	membersPerLevel = get_pcvar_num(cvarMembersPerLevel);
-	healthPerLevel = get_pcvar_num(cvarHealthPerLevel);
-	gravityPerLevel = get_pcvar_num(cvarGravityPerLevel);
-	damagePerLevel = get_pcvar_num(cvarDamagePerLevel);
-	weaponDropPerLevel = get_pcvar_num(cvarWeaponDropPerLevel);
-
 	new codClan[clanInfo];
 	
 	codClan[CLAN_NAME] = "Brak";
@@ -103,17 +84,13 @@ public client_putinserver(id)
 }
 
 public client_disconnected(id)
-{
-	playerName[id] = "";
-
 	clan[id] = 0;
-}
 
 public cod_spawned(id)
 {
 	if(!clan[id]) return PLUGIN_CONTINUE;
 
-	cod_add_user_gravity(id, ADDITIONAL, -gravityPerLevel * get_clan_info(clan[id], CLAN_GRAVITY) / 800.0);
+	cod_add_user_gravity(id, -cvarGravityPerLevel * get_clan_info(clan[id], CLAN_GRAVITY) / 800.0, ROUND);
 	
 	return PLUGIN_CONTINUE;
 }
@@ -122,9 +99,9 @@ public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
 {
 	if(!clan[attacker]) return PLUGIN_CONTINUE;
 	
-	cod_inflict_damage(attacker, victim, damage * damagePerLevel * get_clan_info(clan[attacker], CLAN_DAMAGE) / 100.0, 0.0, damageBits);
+	cod_inflict_damage(attacker, victim, damage * cvarGravityPerLevel * get_clan_info(clan[attacker], CLAN_DAMAGE) / 100.0, 0.0, damageBits);
 	
-	if(get_clan_info(clan[attacker], CLAN_DROP) && random_num(1, (skillMax * 1.6 - (get_clan_info(clan[attacker], CLAN_DROP) * weaponDropPerLevel)) == 1)) engclient_cmd(victim, "drop");
+	if(get_clan_info(clan[attacker], CLAN_DROP) && random_num(1, (cvarSkillMax * 1.6 - (get_clan_info(clan[attacker], CLAN_DROP) * cvarWeaponDropPerLevel)) == 1)) engclient_cmd(victim, "drop");
 	
 	return PLUGIN_CONTINUE;
 }
@@ -150,7 +127,7 @@ public show_clan_menu(id, sound)
 	{
 		ArrayGetArray(codClans, get_clan_id(clan[id]), codClan);
 		
-		formatex(menuData, charsmax(menuData), "\yMenu \rKlanu^n\wAktualny Klan:\y %s^n\wStan: \y%i/%i %s \w| \y%i Honoru\w", codClan[CLAN_NAME], codClan[CLAN_MEMBERS], codClan[CLAN_LEVEL] * membersPerLevel + membersStart, codClan[CLAN_MEMBERS] > 1 ? "Czlonkow" : "Czlonek", codClan[CLAN_HONOR]);
+		formatex(menuData, charsmax(menuData), "\yMenu \rKlanu^n\wAktualny Klan:\y %s^n\wStan: \y%i/%i %s \w| \y%i Honoru\w", codClan[CLAN_NAME], codClan[CLAN_MEMBERS], codClan[CLAN_LEVEL] * cvarMembersPerLevel + cvarMembersStart, codClan[CLAN_MEMBERS] > 1 ? "Czlonkow" : "Czlonek", codClan[CLAN_HONOR]);
 		
 		menu = menu_create(menuData, "show_clan_menu_handle");
 
@@ -164,7 +141,7 @@ public show_clan_menu(id, sound)
 	{
 		menu = menu_create("\yMenu \rKlanu^n\wAktualny Klan:\y Brak", "show_clan_menu_handle");
 
-		formatex(menuData, charsmax(menuData), "\wStworz \yKlan \r(Wymagany %i Poziom)", createLevel);
+		formatex(menuData, charsmax(menuData), "\wStworz \yKlan \r(Wymagany %i Poziom)", cvarCreateLevel);
 
 		menu_additem(menu, menuData, "0", _, callback);
 
@@ -188,7 +165,7 @@ public show_clan_menu_callback(id, menu, item)
 
 	switch(str_to_num(itemData))
 	{
-		case 0: return cod_get_user_highest_level(id) >= createLevel ? ITEM_ENABLED : ITEM_DISABLED;
+		case 0: return cod_get_user_highest_level(id) >= cvarCreateLevel ? ITEM_ENABLED : ITEM_DISABLED;
 		case 1: return get_user_status(id) > STATUS_MEMBER ? ITEM_ENABLED : ITEM_DISABLED;
 		case 2, 3, 4: return clan[id] ? ITEM_ENABLED : ITEM_DISABLED;
 		case 6: return clan[id] ? ITEM_DISABLED : ITEM_ENABLED;
@@ -227,9 +204,9 @@ public show_clan_menu_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 			
-			if(cod_get_user_highest_level(id) < createLevel)
+			if(cod_get_user_highest_level(id) < cvarCreateLevel)
 			{
-				cod_print_chat(id, "Nie masz wystarczajacego poziomu by stworzyc klan (Wymagany^x03 %i^x01)!", createLevel);
+				cod_print_chat(id, "Nie masz wystarczajacego poziomu by stworzyc klan (Wymagany^x03 %i^x01)!", cvarCreateLevel);
 
 				return PLUGIN_HANDLED;
 			}
@@ -271,9 +248,9 @@ public create_clan_handle(id)
 		
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 	
-	if(cod_get_user_level(id) < createLevel)
+	if(cod_get_user_level(id) < cvarCreateLevel)
 	{
-		cod_print_chat(id, "Nie masz wystarczajaco wysokiego poziomu (Wymagany: %i)!", createLevel);
+		cod_print_chat(id, "Nie masz wystarczajaco wysokiego poziomu (Wymagany: %i)!", cvarCreateLevel);
 
 		return PLUGIN_HANDLED;
 	}
@@ -459,8 +436,8 @@ public leader_menu_callback(id, menu, item)
 	switch(item)
 	{
 		case 1: get_user_status(id) == STATUS_LEADER ? ITEM_ENABLED : ITEM_DISABLED;
-		case 2: if(((get_clan_info(clan[id], CLAN_LEVEL) * membersPerLevel) + membersStart) <= get_clan_info(clan[id], CLAN_MEMBERS)) return ITEM_DISABLED;
-		case 4: if(((get_clan_info(clan[id], CLAN_LEVEL) * membersPerLevel) + membersStart) <= get_clan_info(clan[id], CLAN_MEMBERS) || !get_applications_count(clan[id])) return ITEM_DISABLED;
+		case 2: if(((get_clan_info(clan[id], CLAN_LEVEL) * cvarMembersPerLevel) + cvarMembersStart) <= get_clan_info(clan[id], CLAN_MEMBERS)) return ITEM_DISABLED;
+		case 4: if(((get_clan_info(clan[id], CLAN_LEVEL) * cvarMembersPerLevel) + cvarMembersStart) <= get_clan_info(clan[id], CLAN_MEMBERS) || !get_applications_count(clan[id])) return ITEM_DISABLED;
 	}
 
 	return ITEM_ENABLED;
@@ -557,19 +534,19 @@ public skills_menu(id)
 
 	new menu = menu_create(menuData, "skills_menu_handle");
 	
-	formatex(menuData, charsmax(menuData), "Poziom Klanu \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_LEVEL], levelMax, levelCost + nextLevelCost * codClan[CLAN_LEVEL]);
+	formatex(menuData, charsmax(menuData), "Poziom Klanu \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_LEVEL], cvarLevelMax, cvarLevelCost + cvarNextLevelCost * codClan[CLAN_LEVEL]);
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "Zycie \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_HEALTH], skillMax, skillCost + nextSkillCost * codClan[CLAN_HEALTH]);
+	formatex(menuData, charsmax(menuData), "Zycie \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_HEALTH], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_HEALTH]);
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "Grawitacja \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_GRAVITY], skillMax, skillCost + nextSkillCost * codClan[CLAN_GRAVITY]);
+	formatex(menuData, charsmax(menuData), "Grawitacja \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_GRAVITY], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_GRAVITY]);
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "Obrazenia \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_DAMAGE], skillMax, skillCost + nextSkillCost * codClan[CLAN_DAMAGE]);
+	formatex(menuData, charsmax(menuData), "Obrazenia \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_DAMAGE], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_DAMAGE]);
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "Obezwladnienie \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_DROP], skillMax, skillCost + nextSkillCost * codClan[CLAN_DROP]);
+	formatex(menuData, charsmax(menuData), "Obezwladnienie \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_DROP], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_DROP]);
 	menu_additem(menu, menuData);
 	
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
@@ -606,7 +583,7 @@ public skills_menu_handle(id, menu, item)
 	{
 		case 0:
 		{
-			if(codClan[CLAN_LEVEL] == levelMax)
+			if(codClan[CLAN_LEVEL] == cvarLevelMax)
 			{
 				cod_print_chat(id, "Twoj klan ma juz maksymalny Poziom.");
 
@@ -615,7 +592,7 @@ public skills_menu_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 			
-			new remainingHonor = codClan[CLAN_HONOR] - (levelCost + nextLevelCost * codClan[CLAN_LEVEL]);
+			new remainingHonor = codClan[CLAN_HONOR] - (cvarLevelCost + cvarNextLevelCost * codClan[CLAN_LEVEL]);
 			
 			if(remainingHonor < 0)
 			{
@@ -635,7 +612,7 @@ public skills_menu_handle(id, menu, item)
 		}
 		case 1:
 		{
-			if(codClan[CLAN_HEALTH] == skillMax)
+			if(codClan[CLAN_HEALTH] == cvarSkillMax)
 			{
 				cod_print_chat(id, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
 
@@ -644,7 +621,7 @@ public skills_menu_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 			
-			new remainingHonor = codClan[CLAN_HONOR] - (skillCost + nextSkillCost * codClan[CLAN_HEALTH]);
+			new remainingHonor = codClan[CLAN_HONOR] - (cvarSkillCost + cvarNextSkillCost * codClan[CLAN_HEALTH]);
 			
 			if(remainingHonor < 0)
 			{
@@ -660,13 +637,13 @@ public skills_menu_handle(id, menu, item)
 			codClan[CLAN_HEALTH]++;
 			codClan[CLAN_HONOR] = remainingHonor;
 
-			cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + get_clan_info(clan[id], CLAN_HEALTH) * healthPerLevel);
+			cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + get_clan_info(clan[id], CLAN_HEALTH) * cvarHealthPerLevel);
 			
 			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Predkosc^x01 na^x03 %i^x01 poziom!", codClan[CLAN_HEALTH]);
 		}
 		case 2:
 		{
-			if(codClan[CLAN_GRAVITY] == skillMax)
+			if(codClan[CLAN_GRAVITY] == cvarSkillMax)
 			{
 				cod_print_chat(id, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
 
@@ -675,7 +652,7 @@ public skills_menu_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 			
-			new remainingHonor = codClan[CLAN_HONOR] - (skillCost + nextSkillCost * codClan[CLAN_GRAVITY]);
+			new remainingHonor = codClan[CLAN_HONOR] - (cvarSkillCost + cvarNextSkillCost * codClan[CLAN_GRAVITY]);
 			
 			if(remainingHonor < 0)
 			{
@@ -695,7 +672,7 @@ public skills_menu_handle(id, menu, item)
 		}
 		case 3:
 		{
-			if(codClan[CLAN_DAMAGE] == skillMax)
+			if(codClan[CLAN_DAMAGE] == cvarSkillMax)
 			{
 				cod_print_chat(id, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
 
@@ -704,7 +681,7 @@ public skills_menu_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 			
-			new remainingHonor = codClan[CLAN_HONOR] - (skillCost + nextSkillCost * codClan[CLAN_DAMAGE]);
+			new remainingHonor = codClan[CLAN_HONOR] - (cvarSkillCost + cvarNextSkillCost * codClan[CLAN_DAMAGE]);
 			
 			if(remainingHonor < 0)
 			{
@@ -724,7 +701,7 @@ public skills_menu_handle(id, menu, item)
 		}
 		case 4:
 		{
-			if(codClan[CLAN_DROP] == skillMax)
+			if(codClan[CLAN_DROP] == cvarSkillMax)
 			{
 				cod_print_chat(id, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
 
@@ -733,7 +710,7 @@ public skills_menu_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 			
-			new remainingHonor = codClan[CLAN_HONOR] - (skillCost + nextSkillCost * codClan[CLAN_DROP]);
+			new remainingHonor = codClan[CLAN_HONOR] - (cvarSkillCost + cvarNextSkillCost * codClan[CLAN_DROP]);
 			
 			if(remainingHonor < 0)
 			{
@@ -765,7 +742,7 @@ public skills_menu_handle(id, menu, item)
 	{
 		if(!is_user_connected(id) || player == id || clan[player] != clan[id]) continue;
 
-		cod_set_user_bonus_health(player, cod_get_user_bonus_health(player) + get_clan_info(clan[player], CLAN_HEALTH) * healthPerLevel);
+		cod_set_user_bonus_health(player, cod_get_user_bonus_health(player) + get_clan_info(clan[player], CLAN_HEALTH) * cvarHealthPerLevel);
 
 		cod_print_chat(player, "^x03 %s^x01 ulepszyl klan na^x03 %i Poziom^x01!", name, codClan[upgradedSkill]);
 	}
@@ -902,7 +879,7 @@ public invite_confirm_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 	
-	if(((get_clan_info(clan[player], CLAN_LEVEL) * membersPerLevel) + membersStart) <= get_clan_info(clan[player], CLAN_MEMBERS))
+	if(((get_clan_info(clan[player], CLAN_LEVEL) * cvarMembersPerLevel) + cvarMembersStart) <= get_clan_info(clan[player], CLAN_MEMBERS))
 	{
 		cod_print_chat(id, "Niestety, w tym klanie nie ma juz wolnego miejsca.");
 
@@ -1323,7 +1300,7 @@ public applications_confirm_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 
-			if(((get_clan_info(clan[id], CLAN_LEVEL) * membersPerLevel) + membersStart) <= get_clan_info(clan[id], CLAN_MEMBERS))
+			if(((get_clan_info(clan[id], CLAN_LEVEL) * cvarMembersPerLevel) + cvarMembersStart) <= get_clan_info(clan[id], CLAN_MEMBERS))
 			{
 				cod_print_chat(id, "Klan osiagnal maksymalna na ten moment liczbe czlonkow!");
 
@@ -1505,9 +1482,11 @@ public show_clans_top15(failState, Handle:query, error[], errorNum, tempId[], da
 
 public say_text(msgId, msgDest, msgEnt)
 {
+	if(!cvarChatPrefix) return PLUGIN_CONTINUE;
+
 	new id = get_msg_arg_int(1);
 	
-	if(is_user_connected(id) && clan[id] && chatPrefix)
+	if(is_user_connected(id) && clan[id])
 	{
 		new tempMessage[192], message[192], prefix[64];
 		
@@ -1860,7 +1839,7 @@ public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], da
 
 		new status = SQL_ReadResult(query, SQL_FieldNameToNum(query, "flag"));
 
-		cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + get_clan_info(clan[id], CLAN_HEALTH) * healthPerLevel);
+		cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + get_clan_info(clan[id], CLAN_HEALTH) * cvarHealthPerLevel);
 
 		TrieSetCell(Trie:get_clan_info(clan[id], CLAN_STATUS), playerName[id], status);
 	}

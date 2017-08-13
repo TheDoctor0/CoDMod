@@ -6,25 +6,23 @@
 #define PLUGIN	"CoD Honor System"
 #define AUTHOR	"O'Zone"
 #define VERSION	"1.0"
-	
-enum _:events { KILL, KILL_HS, WIN_ROUND, BOMB_DEFUSE, BOMB_PLANT, HOST_RESCUE, HOST_KILL };
 
-new cvarMinPlayers, cvarKill, cvarKillHS, cvarWinRound, cvarBombPlated, cvarBombDefused, cvarRescueHostage, cvarKillHostage;
+new cvarMinPlayers, cvarKill, cvarKillHS, cvarWinRound, cvarBombPlanted, cvarBombDefused, cvarRescueHostage, cvarKillHostage;
 
-new playerName[MAX_PLAYERS + 1][64], playerHonor[MAX_PLAYERS + 1], Handle:sql, honorEvent[events], minPlayers, dataLoaded;
+new playerName[MAX_PLAYERS + 1][64], playerHonor[MAX_PLAYERS + 1], Handle:sql, dataLoaded;
 
 public plugin_init()
 {	
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
-	cvarMinPlayers = register_cvar("cod_honor_minplayers", "4");
-	cvarKill = register_cvar("cod_honor_kill", "1");
-	cvarKillHS = register_cvar("cod_honor_killhs", "1");
-	cvarWinRound = register_cvar("cod_honor_winround", "1");
-	cvarBombPlated = register_cvar("cod_honor_bombplanted", "2");
-	cvarBombDefused = register_cvar("cod_honor_bombdefused", "2");
-	cvarRescueHostage = register_cvar("cod_honor_rescuehostage", "1");
-	cvarKillHostage = register_cvar("cod_honor_killhostage", "4");
+	bind_pcvar_num(create_cvar("cod_honor_minplayers", "4"), cvarMinPlayers);
+	bind_pcvar_num(create_cvar("cod_honor_kill", "1"), cvarKill);
+	bind_pcvar_num(create_cvar("cod_honor_killhs", "1"), cvarKillHS);
+	bind_pcvar_num(create_cvar("cod_honor_winround", "1"), cvarWinRound);
+	bind_pcvar_num(create_cvar("cod_honor_bombplanted", "2"), cvarBombPlanted);
+	bind_pcvar_num(create_cvar("cod_honor_bombdefused", "2"), cvarBombDefused);
+	bind_pcvar_num(create_cvar("cod_honor_rescuehostage", "1"), cvarRescueHostage);
+	bind_pcvar_num(create_cvar("cod_honor_killhostage", "4"), cvarKillHostage);
 	
 	register_event("SendAudio", "t_win_round" , "a", "2&%!MRAD_terwin");
 	register_event("SendAudio", "ct_win_round", "a", "2&%!MRAD_ct_win_round");
@@ -36,19 +34,7 @@ public plugin_init()
 }
 
 public plugin_cfg()
-{
-	minPlayers = get_pcvar_num(cvarMinPlayers);
-
-	honorEvent[KILL] = get_pcvar_num(cvarKill);
-	honorEvent[KILL_HS] = get_pcvar_num(cvarKillHS);
-	honorEvent[WIN_ROUND] = get_pcvar_num(cvarWinRound);
-	honorEvent[BOMB_PLANT] = get_pcvar_num(cvarBombPlated);
-	honorEvent[BOMB_DEFUSE] = get_pcvar_num(cvarBombDefused);
-	honorEvent[HOST_RESCUE] = get_pcvar_num(cvarRescueHostage);
-	honorEvent[HOST_KILL] = get_pcvar_num(cvarKillHostage);
-
 	sql_init();
-}
 
 public plugin_natives()
 {
@@ -80,11 +66,11 @@ public client_disconnected(id)
 
 public cod_killed(killer, victim, weaponId, hitPlace)
 {
-	if(get_playersnum() < minPlayers) return;
+	if(get_playersnum() < cvarMinPlayers) return;
 		
-	playerHonor[killer] += cod_get_user_vip(killer) ? honorEvent[KILL] * 2 : honorEvent[KILL];
+	playerHonor[killer] += cod_get_user_vip(killer) ? cvarKill * 2 : cvarKill;
 	
-	if(hitPlace == HIT_HEAD) playerHonor[killer] += cod_get_user_vip(killer) ? honorEvent[KILL_HS] * 2 : honorEvent[KILL_HS];
+	if(hitPlace == HIT_HEAD) playerHonor[killer] += cod_get_user_vip(killer) ? cvarKillHS * 2 : cvarKillHS;
 	
 	save_honor(killer);
 }
@@ -97,13 +83,13 @@ public ct_win_round()
 
 public round_winner(team)
 {
-	if(get_playersnum() < minPlayers) return;
+	if(get_playersnum() < cvarMinPlayers) return;
 
 	for(new id = 1; id < MAX_PLAYERS; id++) 
 	{
 		if(!cod_get_user_class(id) || get_user_team(id) != team) continue;
 
-		playerHonor[id] += cod_get_user_vip(id) ? honorEvent[WIN_ROUND] * 2 : honorEvent[WIN_ROUND];
+		playerHonor[id] += cod_get_user_vip(id) ? cvarWinRound * 2 : cvarWinRound;
 
 		save_honor(id);
 	}
@@ -111,44 +97,44 @@ public round_winner(team)
 
 public bomb_planted(id)
 {
-	if(get_playersnum() < minPlayers || !cod_get_user_class(id)) return;
+	if(get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) return;
 
-	playerHonor[id] += cod_get_user_vip(id) ? honorEvent[BOMB_PLANT] * 2 : honorEvent[BOMB_PLANT];
+	playerHonor[id] += cod_get_user_vip(id) ? cvarBombPlanted * 2 : cvarBombPlanted;
 
 	save_honor(id);
 }
 
 public bomb_defused(id)
 {
-	if(get_playersnum() < minPlayers || !cod_get_user_class(id)) return;
+	if(get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) return;
 
-	playerHonor[id] += cod_get_user_vip(id) ? honorEvent[BOMB_DEFUSE] * 2 : honorEvent[BOMB_DEFUSE];
+	playerHonor[id] += cod_get_user_vip(id) ? cvarBombDefused * 2 : cvarBombDefused;
 
 	save_honor(id);
 }
 
 public hostage_rescued()
 {
-	if(get_playersnum() < minPlayers) return;
+	if(get_playersnum() < cvarMinPlayers) return;
 
 	new id = get_loguser_index();
 
 	if(!cod_get_user_class(id)) return;
 	
-	playerHonor[id] += cod_get_user_vip(id) ? honorEvent[HOST_RESCUE] * 2 : honorEvent[HOST_RESCUE];
+	playerHonor[id] += cod_get_user_vip(id) ? cvarRescueHostage * 2 : cvarRescueHostage;
 
 	save_honor(id);
 }
 
 public hostage_killed() 
 {
-	if(get_playersnum() < minPlayers) return;
+	if(get_playersnum() < cvarMinPlayers) return;
 
 	new id = get_loguser_index();
 
 	if(!cod_get_user_class(id)) return;
 	
-	playerHonor[id] -= cod_get_user_vip(id) ? honorEvent[HOST_KILL] / 2 : honorEvent[HOST_KILL];
+	playerHonor[id] -= cod_get_user_vip(id) ? cvarKillHostage / 2 : cvarKillHostage;
 
 	save_honor(id);
 }

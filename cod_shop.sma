@@ -16,11 +16,6 @@ new cvarCostRepair, cvarCostItem, cvarCostUpgrade, cvarCostSmallExp, cvarCostMed
 	cvarCostJump, cvarCostBunnyHop, cvarCostSilent, cvarCostArmor, cvarCostDamage, cvarCostInvisible, cvarExchangeRatio, cvarDurabilityAmount, 
 	cvarSmallExp, cvarMediumExp, cvarBigExp, cvarMinRandomExp, cvarMaxRandomExp, cvarSmallBandageHP, cvarBigBandageHP, cvarArmorAmount, cvarDamageAmount;
 
-new costRepair, costItem, costUpgrade, costSmallExp, costMediumExp, costBigExp, costRandomExp, 
-	costSmallBandage, costBigBandage, costRocket, costMine, costDynamite, costFirstAidKit, costTeleport, costJump, 
-	costBunnyHop, costSilent, costArmor, costDamage, costInvisible, exchangeRatio, durabilityAmount, smallExp, 
-	mediumExp, bigExp, minRandomExp, maxRandomExp, smallBandageHP, bigBandageHP, armorAmount, damageAmount;
-
 new damageBonus;
 
 public plugin_init() 
@@ -30,75 +25,39 @@ public plugin_init()
 	for(new i; i < sizeof commandShopMenu; i++) register_clcmd(commandShopMenu[i], "shop_menu");
 
 	register_clcmd("KUPNO_HONORU", "buy_honor_handle");
-	
-	cvarCostRepair = register_cvar("cod_shop_repair_cost", "10");
-	cvarCostItem = register_cvar("cod_shop_item_cost", "15");
-	cvarCostUpgrade = register_cvar("cod_shop_upgrade_cost", "10");
-	cvarCostSmallExp = register_cvar("cod_shop_small_exp_cost", "6");
-	cvarCostMediumExp = register_cvar("cod_shop_medium_exp_cost", "14");
-	cvarCostBigExp = register_cvar("cod_shop_big_exp_cost", "25");
-	cvarCostRandomExp = register_cvar("cod_shop_random_exp_cost", "15");
-	cvarCostSmallBandage = register_cvar("cod_shop_small_bandage_cost", "6");
-	cvarCostBigBandage = register_cvar("cod_shop_big_bandage_cost", "15");
-	cvarCostRocket = register_cvar("cod_shop_rocket_cost", "15");
-	cvarCostMine = register_cvar("cod_shop_mine_cost", "15");
-	cvarCostDynamite = register_cvar("cod_shop_dynamite_cost", "15");
-	cvarCostFirstAidKit = register_cvar("cod_shop_firstaidkit_cost", "15");
-	cvarCostTeleport = register_cvar("cod_shop_teleport_cost", "15");
-	cvarCostJump = register_cvar("cod_shop_jump_cost", "20");
-	cvarCostBunnyHop = register_cvar("cod_shop_bunnyhop_cost", "25");
-	cvarCostSilent = register_cvar("cod_shop_silent_cost", "15");
-	cvarCostArmor = register_cvar("cod_shop_armor_cost", "20");
-	cvarCostDamage = register_cvar("cod_shop_damage_cost", "20");
-	cvarCostInvisible = register_cvar("cod_shop_invisible_cost", "40");
-	
-	cvarExchangeRatio = register_cvar("cod_shop_exchange_ratio", "1000");
-	cvarDurabilityAmount = register_cvar("cod_shop_durability_amount", "30");
-	cvarSmallExp = register_cvar("cod_shop_small_exp", "25");
-	cvarMediumExp = register_cvar("cod_shop_medium_exp", "75");
-	cvarBigExp = register_cvar("cod_shop_big_exp", "150");
-	cvarMinRandomExp = register_cvar("cod_shop_random_exp_min", "1");
-	cvarMaxRandomExp = register_cvar("cod_shop_random_exp_max", "200");
-	cvarSmallBandageHP = register_cvar("cod_shop_small_bandage_hp", "25");
-	cvarBigBandageHP = register_cvar("cod_shop_big_bandage_hp", "75");
-	cvarArmorAmount = register_cvar("cod_shop_armor_amount", "100");
-	cvarDamageAmount = register_cvar("cod_shop_damage_amount", "5");
-}
 
-public plugin_cfg()
-{
-	costRepair = get_pcvar_num(cvarCostRepair);
-	costItem = get_pcvar_num(cvarCostItem);
-	costUpgrade = get_pcvar_num(cvarCostUpgrade);
-	costSmallExp = get_pcvar_num(cvarCostSmallExp);
-	costMediumExp = get_pcvar_num(cvarCostMediumExp);
-	costBigExp = get_pcvar_num(cvarCostBigExp);
-	costRandomExp = get_pcvar_num(cvarCostRandomExp);
-	costSmallBandage = get_pcvar_num(cvarCostSmallBandage);
-	costBigBandage = get_pcvar_num(cvarCostBigBandage);
-	costRocket = get_pcvar_num(cvarCostRocket);
-	costMine = get_pcvar_num(cvarCostMine);
-	costDynamite = get_pcvar_num(cvarCostDynamite);
-	costFirstAidKit = get_pcvar_num(cvarCostFirstAidKit);
-	costTeleport = get_pcvar_num(cvarCostTeleport);
-	costJump = get_pcvar_num(cvarCostJump);
-	costBunnyHop = get_pcvar_num(cvarCostBunnyHop);
-	costSilent = get_pcvar_num(cvarCostSilent);
-	costArmor = get_pcvar_num(cvarCostArmor);
-	costDamage = get_pcvar_num(cvarCostDamage);
-	costInvisible = get_pcvar_num(cvarCostInvisible);
-	
-	exchangeRatio = get_pcvar_num(cvarExchangeRatio);
-	durabilityAmount = get_pcvar_num(cvarDurabilityAmount);
-	smallExp = get_pcvar_num(cvarSmallExp);
-	mediumExp = get_pcvar_num(cvarMediumExp);
-	bigExp = get_pcvar_num(cvarBigExp);
-	minRandomExp = get_pcvar_num(cvarMinRandomExp);
-	maxRandomExp = get_pcvar_num(cvarMaxRandomExp);
-	smallBandageHP = get_pcvar_num(cvarSmallBandageHP);
-	bigBandageHP = get_pcvar_num(cvarBigBandageHP);
-	armorAmount = get_pcvar_num(cvarArmorAmount);
-	damageAmount = get_pcvar_num(cvarDamageAmount);
+	bind_pcvar_num(create_cvar("cod_shop_repair_cost", "10"), cvarCostRepair);
+	bind_pcvar_num(create_cvar("cod_shop_item_cost", "15"), cvarCostItem);
+	bind_pcvar_num(create_cvar("cod_shop_upgrade_cost", "10"), cvarCostUpgrade);
+	bind_pcvar_num(create_cvar("cod_shop_small_exp_cost", "6"), cvarCostSmallExp);
+	bind_pcvar_num(create_cvar("cod_shop_medium_exp_cost", "14"), cvarCostMediumExp);
+	bind_pcvar_num(create_cvar("cod_shop_big_exp_cost", "25"), cvarCostBigExp);
+	bind_pcvar_num(create_cvar("cod_shop_random_exp_cost", "15"), cvarCostRandomExp);
+	bind_pcvar_num(create_cvar("cod_shop_small_bandage_cost", "6"), cvarCostSmallBandage);
+	bind_pcvar_num(create_cvar("cod_shop_big_bandage_cost", "15"), cvarCostBigBandage);
+	bind_pcvar_num(create_cvar("cod_shop_rocket_cost", "15"), cvarCostRocket);
+	bind_pcvar_num(create_cvar("cod_shop_mine_cost", "15"), cvarCostMine);
+	bind_pcvar_num(create_cvar("cod_shop_dynamite_cost", "15"), cvarCostDynamite);
+	bind_pcvar_num(create_cvar("cod_shop_firstaidkit_cost", "15"), cvarCostFirstAidKit);
+	bind_pcvar_num(create_cvar("cod_shop_dynamite_cost", "15"), cvarCostTeleport);
+	bind_pcvar_num(create_cvar("cod_shop_jump_cost", "20"), cvarCostJump);
+	bind_pcvar_num(create_cvar("cod_shop_bunnyhop_cost", "25"), cvarCostBunnyHop);
+	bind_pcvar_num(create_cvar("cod_shop_silent_cost", "15"), cvarCostSilent);
+	bind_pcvar_num(create_cvar("cod_shop_armor_cost", "20"), cvarCostArmor);
+	bind_pcvar_num(create_cvar("cod_shop_damage_cost", "20"), cvarCostDamage);
+	bind_pcvar_num(create_cvar("cod_shop_invisible_cost", "50"), cvarCostInvisible);
+
+	bind_pcvar_num(create_cvar("cod_shop_exchange_ratio", "1000"), cvarExchangeRatio);
+	bind_pcvar_num(create_cvar("cod_shop_durability_amount", "50"), cvarDurabilityAmount);
+	bind_pcvar_num(create_cvar("cod_shop_small_exp", "25"), cvarSmallExp);
+	bind_pcvar_num(create_cvar("cod_shop_medium_exp", "75"), cvarMediumExp);
+	bind_pcvar_num(create_cvar("cod_shop_big_exp", "150"), cvarBigExp);
+	bind_pcvar_num(create_cvar("cod_shop_random_exp_min", "1"), cvarMinRandomExp);
+	bind_pcvar_num(create_cvar("cod_shop_random_exp_max", "200"), cvarMaxRandomExp);
+	bind_pcvar_num(create_cvar("cod_shop_small_bandage_hp", "25"), cvarSmallBandageHP);
+	bind_pcvar_num(create_cvar("cod_shop_big_bandage_hp", "75"), cvarBigBandageHP);
+	bind_pcvar_num(create_cvar("cod_shop_armor_amount", "100"), cvarArmorAmount);
+	bind_pcvar_num(create_cvar("cod_shop_damage_amount", "5"), cvarDamageAmount);
 }
 	
 public shop_menu(id)
@@ -109,87 +68,87 @@ public shop_menu(id)
 	
 	new menuData[128], menuPrice[10], menu = menu_create("\ySklep \rCoD Mod", "shop_menu_handle");
 
-	formatex(menuData, charsmax(menuData), "Kantor Walutowy \r[\yWymiana Kasy na Honor\r] \wKoszt:\r %i$/1H", exchangeRatio);
+	formatex(menuData, charsmax(menuData), "Kantor Walutowy \r[\yWymiana Kasy na Honor\r] \wKoszt:\r %i$/1H", cvarExchangeRatio);
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "Napraw Przedmiot \r[\y+%i Wytrzymalosci\r] \wKoszt:\r %iH", durabilityAmount, costRepair);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costRepair);
+	formatex(menuData, charsmax(menuData), "Napraw Przedmiot \r[\y+%i Wytrzymalosci\r] \wKoszt:\r %iH", cvarDurabilityAmount, cvarCostRepair);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostRepair);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Kup Przedmiot \r[\yLosowy Przedmiot\r] \wKoszt:\r %iH", costItem);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costItem);
+	formatex(menuData, charsmax(menuData), "Kup Przedmiot \r[\yLosowy Przedmiot\r] \wKoszt:\r %iH", cvarCostItem);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostItem);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Ulepsz Przedmiot \r[\yWzmocnienie Przedmiotu\r] \wKoszt:\r %iH", costUpgrade);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costUpgrade);
+	formatex(menuData, charsmax(menuData), "Ulepsz Przedmiot \r[\yWzmocnienie Przedmiotu\r] \wKoszt:\r %iH", cvarCostUpgrade);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostUpgrade);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Male Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", smallExp, costSmallExp);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costSmallExp);
+	formatex(menuData, charsmax(menuData), "Male Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", cvarSmallExp, cvarCostSmallExp);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostSmallExp);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Srednie Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", mediumExp, costMediumExp);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costMediumExp);
+	formatex(menuData, charsmax(menuData), "Srednie Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", cvarMediumExp, cvarCostMediumExp);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostMediumExp);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Duze Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", bigExp, costBigExp);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costBigExp);
+	formatex(menuData, charsmax(menuData), "Duze Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", cvarBigExp, cvarCostBigExp);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostBigExp);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Losowe Doswiadczenie \r[\yLosowo od %i do %i Expa\r] \wKoszt:\r %iH", minRandomExp, maxRandomExp, costRandomExp);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costRandomExp);
+	formatex(menuData, charsmax(menuData), "Losowe Doswiadczenie \r[\yLosowo od %i do %i Expa\r] \wKoszt:\r %iH", cvarMinRandomExp, cvarMaxRandomExp, cvarCostRandomExp);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostRandomExp);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Maly Bandaz \r[\y+%i HP\r] \wKoszt:\r %iH", smallBandageHP, costSmallBandage);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costSmallBandage);
+	formatex(menuData, charsmax(menuData), "Maly Bandaz \r[\y+%i HP\r] \wKoszt:\r %iH", cvarSmallBandageHP, cvarCostSmallBandage);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostSmallBandage);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Duzy Bandaz \r[\y+%i HP\r] \wKoszt:\r %iH", bigBandageHP, costBigBandage);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costBigBandage);
+	formatex(menuData, charsmax(menuData), "Duzy Bandaz \r[\y+%i HP\r] \wKoszt:\r %iH", cvarBigBandageHP, cvarCostBigBandage);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostBigBandage);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Dodatkowa Rakieta \r[\y+1 Rakieta\r] \wKoszt:\r %iH", costRocket);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costRocket);
+	formatex(menuData, charsmax(menuData), "Dodatkowa Rakieta \r[\y+1 Rakieta\r] \wKoszt:\r %iH", cvarCostRocket);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostRocket);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Dodatkowa Mina \r[\y+1 Mina\r] \wKoszt:\r %iH", costMine);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costMine);
+	formatex(menuData, charsmax(menuData), "Dodatkowa Mina \r[\y+1 Mina\r] \wKoszt:\r %iH", cvarCostMine);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostMine);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Dodatkowy Dynamit \r[\y+1 Dynamit\r] \wKoszt:\r %iH", costDynamite);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costDynamite);
+	formatex(menuData, charsmax(menuData), "Dodatkowy Dynamit \r[\y+1 Dynamit\r] \wKoszt:\r %iH", cvarCostDynamite);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostDynamite);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Dodatkowa Apteczka \r[\y+1 Apteczka\r] \wKoszt:\r %iH", costFirstAidKit);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costFirstAidKit);
+	formatex(menuData, charsmax(menuData), "Dodatkowa Apteczka \r[\y+1 Apteczka\r] \wKoszt:\r %iH", cvarCostFirstAidKit);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostFirstAidKit);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Dodatkowy Teleport \r[\y+1 Teleport\r] \wKoszt:\r %iH", costTeleport);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costTeleport);
+	formatex(menuData, charsmax(menuData), "Dodatkowy Teleport \r[\y+1 Teleport\r] \wKoszt:\r %iH", cvarCostTeleport);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostTeleport);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Dodatkowy Skok \r[\y+1 Skok w Powietrzu\r] \wKoszt:\r %iH", costJump);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costJump);
+	formatex(menuData, charsmax(menuData), "Dodatkowy Skok \r[\y+1 Skok w Powietrzu\r] \wKoszt:\r %iH", cvarCostJump);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostJump);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Bunny Hop \r[\yAuto BunnyHop\r] \wKoszt:\r %iH", costBunnyHop);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costBunnyHop);
+	formatex(menuData, charsmax(menuData), "Bunny Hop \r[\yAuto BunnyHop\r] \wKoszt:\r %iH", cvarCostBunnyHop);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostBunnyHop);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Ciche Chodzenie \r[\yBrak Dzwieku Biegu\r] \wKoszt:\r %iH", costSilent);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costSilent);
+	formatex(menuData, charsmax(menuData), "Ciche Chodzenie \r[\yBrak Dzwieku Biegu\r] \wKoszt:\r %iH", cvarCostSilent);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostSilent);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Dodatkowy Pancerz \r[\y+%i Kamizelki\r] \wKoszt:\r %iH", armorAmount, costArmor);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costArmor);
+	formatex(menuData, charsmax(menuData), "Dodatkowy Pancerz \r[\y+%i Kamizelki\r] \wKoszt:\r %iH", cvarArmorAmount, cvarCostArmor);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostArmor);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Wieksze Obrazenia \r[\y+%i DMG\r] \wKoszt:\r %iH", damageAmount, costDamage);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costDamage);
+	formatex(menuData, charsmax(menuData), "Wieksze Obrazenia \r[\y+%i DMG\r] \wKoszt:\r %iH", cvarDamageAmount, cvarCostDamage);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostDamage);
 	menu_additem(menu, menuData, menuPrice);
 
-	formatex(menuData, charsmax(menuData), "Peleryna Niewidka \r[\yPelna Niewidzialnosc\r] \wKoszt:\r %iH", costInvisible);
-	formatex(menuPrice, charsmax(menuPrice), "%i", costInvisible);
+	formatex(menuData, charsmax(menuData), "Peleryna Niewidka \r[\yPelna Niewidzialnosc\r] \wKoszt:\r %iH", cvarCostInvisible);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostInvisible);
 	menu_additem(menu, menuData, menuPrice);
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
@@ -324,9 +283,11 @@ public shop_menu_handle(id, menu, item)
 	{
 		case REPAIR:
 		{
-			cod_print_chat(id, "Kupiles^x03 +%i^x01 wytrzymalosci przedmiotu!", durabilityAmount);
+			cod_print_chat(id, "Kupiles^x03 +%i^x01 wytrzymalosci przedmiotu!", cvarDurabilityAmount
+		);
 			
-			if(cod_get_item_durability(id) + durabilityAmount >= cod_max_item_durability())
+			if(cod_get_item_durability(id) + cvarDurabilityAmount
+	 >= cod_max_item_durability())
 			{
 				cod_set_item_durability(id, cod_max_item_durability());
 
@@ -334,7 +295,8 @@ public shop_menu_handle(id, menu, item)
 			}
 			else
 			{
-				cod_set_item_durability(id, cod_get_item_durability(id) + durabilityAmount);
+				cod_set_item_durability(id, cod_get_item_durability(id) + cvarDurabilityAmount
+			);
 
 				cod_print_chat(id, "Wytrzymalosc twojego przedmiotu wynosi^x03 %i^x01!", cod_get_item_durability(id));
 			}
@@ -360,29 +322,29 @@ public shop_menu_handle(id, menu, item)
 		{
 			cod_print_chat(id, "Kupiles^x03 Male Doswiadczenie^x01!");
 
-			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", smallExp);
+			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", cvarSmallExp);
 			
-			cod_set_user_exp(id, smallExp);
+			cod_set_user_exp(id, cvarSmallExp);
 		}
 		case MEDIUM_EXP:
 		{
 			cod_print_chat(id, "Kupiles^x03 Srednie Doswiadczenie^x01!");
 
-			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", mediumExp);
+			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", cvarMediumExp);
 			
-			cod_set_user_exp(id, mediumExp);
+			cod_set_user_exp(id, cvarMediumExp);
 		}
 		case BIG_EXP:
 		{
 			cod_print_chat(id, "Kupiles^x03 Duze Doswiadczenie^x01!");
 
-			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", bigExp);
+			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", cvarBigExp);
 			
-			cod_set_user_exp(id, bigExp);
+			cod_set_user_exp(id, cvarBigExp);
 		}
 		case RANDOM_EXP:
 		{
-			new randomExp = random_num(minRandomExp, maxRandomExp);
+			new randomExp = random_num(cvarMinRandomExp, cvarMaxRandomExp);
 
 			cod_print_chat(id, "Kupiles^x03 Losowe Doswiadczenie^x01!");
 
@@ -392,13 +354,13 @@ public shop_menu_handle(id, menu, item)
 		}
 		case SMALL_BANDAGE:
 		{
-			cod_set_user_health(id, cod_get_user_health(id, 1) + smallBandageHP);
+			cod_set_user_health(id, cod_get_user_health(id, 1) + cvarSmallBandageHP);
 			
 			cod_print_chat(id, "Kupiles^x03 Maly Bandarz^x01!");
 		}
 		case BIG_BANDAGE:
 		{
-			cod_set_user_health(id, cod_get_user_health(id, 1) + bigBandageHP);
+			cod_set_user_health(id, cod_get_user_health(id, 1) + cvarBigBandageHP);
 			
 			cod_print_chat(id, "Kupiles^x03 Duzy Bandarz^x01!");
 		}
@@ -442,19 +404,19 @@ public shop_menu_handle(id, menu, item)
 		{
 			cod_print_chat(id, "Kupiles^x03 BunnyHop^x01!");
 			
-			cod_set_user_bunnyhop(id, ADDITIONAL, 1);
+			cod_set_user_bunnyhop(id, 1, ROUND);
 		}
 		case SILENT:
 		{
 			cod_print_chat(id, "Kupiles^x03 Ciche Chodzenie^x01!");
 			
-			cod_set_user_footsteps(id, ADDITIONAL, 1);
+			cod_set_user_footsteps(id, 1, ROUND);
 		}
 		case ARMOR:
 		{
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Armor^x01!");
 			
-			cod_add_user_armor(id, armorAmount);
+			cod_add_user_armor(id, cvarArmorAmount);
 		}
 		case DAMAGE:
 		{
@@ -466,7 +428,7 @@ public shop_menu_handle(id, menu, item)
 		{
 			cod_print_chat(id, "Kupiles^x03 Peleryne Niewidke^x01!");
 
-			cod_set_user_render(id, ADDITIONAL, 0, RENDER_ALWAYS);
+			cod_set_user_render(id, 0, ROUND, RENDER_ALWAYS);
 		}
 	}
 
@@ -497,23 +459,23 @@ public buy_honor_handle(id)
 		return PLUGIN_HANDLED;
 	}
 	
-	if(cs_get_user_money(id) < honorAmount * exchangeRatio) 
+	if(cs_get_user_money(id) < honorAmount * cvarExchangeRatio) 
 	{ 
 		cod_print_chat(id, "Nie masz wystarczajaco^x03 kasy^x01, aby kupic tyle^x03 Honoru^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 	
-	cs_set_user_money(id, cs_get_user_money(id) - honorAmount * exchangeRatio);
+	cs_set_user_money(id, cs_get_user_money(id) - honorAmount * cvarExchangeRatio);
 	cod_add_user_honor(id, honorAmount);
 	
-	cod_print_chat(id, "Wymieniles^x03 %i$^x01 na ^x03%i Honoru^x01.", honorAmount * exchangeRatio, honorAmount);
+	cod_print_chat(id, "Wymieniles^x03 %i$^x01 na ^x03%i Honoru^x01.", honorAmount * cvarExchangeRatio, honorAmount);
 	
 	return PLUGIN_HANDLED;
 }
 
 public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
-	if(get_bit(attacker, damageBonus)) cod_inflict_damage(attacker, victim, float(damageAmount), 0.0, damageBits);
+	if(get_bit(attacker, damageBonus)) cod_inflict_damage(attacker, victim, float(cvarDamageAmount), 0.0, damageBits);
 
 public cod_new_round()
 	for(new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, damageBonus);

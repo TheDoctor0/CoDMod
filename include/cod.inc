@@ -23,13 +23,10 @@
 #define	RENDER_DUCK (1<<4)
 #define	RENDER_SHIFT (1<<5)
 
-enum _:promotions { PROMOTION_NONE, PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION_THIRD };
-
-enum _:types { NONE = -1, CLASS, ITEM, ADDITIONAL, ALL };
-
 enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_DEPLOY, 
 	SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_BOX, SOUND_APPLAUSE, SOUND_LAUGH };
-
+enum _:promotions { PROMOTION_NONE, PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION_THIRD };
+enum _:types { NONE = -1, CLASS, ITEM, ADDITIONAL, ROUND, USED, ALL };
 enum _:hud { TYPE_HUD, TYPE_DHUD };
 
 new const codSounds[sounds][] =
@@ -358,44 +355,76 @@ Sets player's extra strength points.
 native cod_set_user_bonus_strength(id, value);
 
 /*------------------------------
-Sets player's extra condition points.
+Adds value to player's extra condition points.
 ------------------------------*/
 native cod_set_user_bonus_condition(id, value);
 
 /*------------------------------
-Returns player's rockets amount.
+Adds value to player's extra health points.
 ------------------------------*/
-native cod_get_user_rockets(id);
+native cod_add_user_bonus_health(id, value);
+
+/*------------------------------
+Adds value to player's extra intelligence points.
+------------------------------*/
+native cod_add_user_bonus_intelligence(id, value);
+
+/*------------------------------
+Adds value to player's extra stamina points.
+------------------------------*/
+native cod_add_user_bonus_stamina(id, value);
+
+/*------------------------------
+Adds value to player's extra strength points.
+------------------------------*/
+native cod_add_user_bonus_strength(id, value);
+
+/*------------------------------
+Adds value to player's extra condition points.
+------------------------------*/
+native cod_add_user_bonus_condition(id, value);
+
+/*------------------------------
+Returns player's rockets amount.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+------------------------------*/
+native cod_get_user_rockets(id, type = ALL);
 
 /*------------------------------
 Returns player's mines amount.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_get_user_mines(id);
+native cod_get_user_mines(id, type = ALL);
 
 /*------------------------------
 Returns player's medkits amount.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_get_user_medkits(id);
+native cod_get_user_medkits(id, type = ALL);
 
 /*------------------------------
 Returns player's dynamites amount.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_get_user_dynamites(id);
+native cod_get_user_dynamites(id, type = ALL);
 
 /*------------------------------
 Returns player's teleports amount.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_get_user_teleports(id);
+native cod_get_user_teleports(id, type = ALL);
 
 /*------------------------------
 Returns player's multijumps amount.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_get_user_multijumps(id);
+native cod_get_user_multijumps(id, type = ALL);
 
 /*------------------------------
 Returns player's gravity amount.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native Float:cod_get_user_gravity(id);
+native Float:cod_get_user_gravity(id, type = ALL);
 
 /*------------------------------
 Returns player's armor amount.
@@ -404,39 +433,45 @@ native cod_get_user_armor(id);
 
 /*------------------------------
 Sets player's rockets amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_set_user_rockets(id, value);
+native cod_set_user_rockets(id, value, type = ROUND);
 
 /*------------------------------
 Sets player's mines amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_set_user_mines(id, value);
+native cod_set_user_mines(id, value, type = ROUND);
 
 /*------------------------------
 Sets player's medkits amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_set_user_medkits(id, value);
+native cod_set_user_medkits(id, value, type = ROUND);
 
 /*------------------------------
 Sets player's dynamites amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_set_user_dynamites(id, value);
+native cod_set_user_dynamites(id, value, type = ROUND);
 
 /*------------------------------
 Sets player's teleports amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_set_user_teleports(id, value);
+native cod_set_user_teleports(id, value, type = ROUND);
 
 /*------------------------------
 Sets player's multijumps amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_set_user_multijumps(id, value);
+native cod_set_user_multijumps(id, value, type = ROUND);
 
 /*------------------------------
 Sets player's gravity amount.
-Type can be NONE - all, CLASS - for class, ITEM - for item, ADDITIONAL - others.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_set_user_gravity(id, type, Float:value);
+native cod_set_user_gravity(id, Float:value, type = ROUND);
 
 /*------------------------------
 Sets player's armor amount.
@@ -445,39 +480,45 @@ native cod_set_user_armor(id, value);
 
 /*------------------------------
 Adds value to player's rockets amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_add_user_rockets(id, value);
+native cod_add_user_rockets(id, value, type = ROUND);
 
 /*------------------------------
 Adds value to player's mines amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_add_user_mines(id, value);
+native cod_add_user_mines(id, value, type = ROUND);
 
 /*------------------------------
 Adds value to player's medkits amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_add_user_medkits(id, value);
+native cod_add_user_medkits(id, value, type = ROUND);
 
 /*------------------------------
 Adds value to player's dynamites amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_add_user_dynamites(id, value);
+native cod_add_user_dynamites(id, value, type = ROUND);
 
 /*------------------------------
 Adds value to player's teleports amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_add_user_teleports(id, value);
+native cod_add_user_teleports(id, value, type = ROUND);
 
 /*------------------------------
 Adds value to player's multijumps amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_add_user_multijumps(id, value);
+native cod_add_user_multijumps(id, value, type = ROUND);
 
 /*------------------------------
 Adds value to player's gravity amount.
 Type can be NONE - all, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 ------------------------------*/
-native cod_add_user_gravity(id, type, Float:value);
+native cod_add_user_gravity(id, Float:value, type = ROUND);
 
 /*------------------------------
 Adds value to player's armor amount.
@@ -516,44 +557,44 @@ native cod_get_user_resistance(id);
 
 /*------------------------------
 Returns if player have bunnyhop.
-Type can be NONE - all, CLASS - for class, ITEM - for item, ADDITIONAL - others.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
 ------------------------------*/
-native cod_get_user_bunnyhop(id, type = NONE);
+native cod_get_user_bunnyhop(id, type = ALL);
 
 /*------------------------------
 Returns if player have silent walk.
-Type can be NONE - all, CLASS - for class, ITEM - for item, ADDITIONAL - others.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 ------------------------------*/
-native cod_get_user_footsteps(id, type = NONE);
+native cod_get_user_footsteps(id, type = ALL);
 
 /*------------------------------
 Returns if player have model of the opponent.
-Type can be NONE - all, CLASS - for class, ITEM - for item, ADDITIONAL - others.
+Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 ------------------------------*/
-native cod_get_user_model(id, type = NONE);
+native cod_get_user_model(id, type = ALL);
+
+/*------------------------------
+Set's player's bunnyhop.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+------------------------------*/
+native cod_set_user_bunnyhop(id, value, type = ROUND);
+
+/*------------------------------
+Set's player's silent walk.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+------------------------------*/
+native cod_set_user_footsteps(id, value, type = ROUND);
+
+/*------------------------------
+Set's player's model of the opponent.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+------------------------------*/
+native cod_set_user_model(id, value, type = ROUND);
 
 /*------------------------------
 Set's player's resistance for powers.
 ------------------------------*/
 native cod_set_user_resistance(id, value);
-
-/*------------------------------
-Set's player's bunnyhop.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - others.
-------------------------------*/
-native cod_set_user_bunnyhop(id, type, value);
-
-/*------------------------------
-Set's player's silent walk.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - others.
-------------------------------*/
-native cod_set_user_footsteps(id, type, value);
-
-/*------------------------------
-Set's player's model of the opponent.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - others.
-------------------------------*/
-native cod_set_user_model(id, type, value);
 
 /*------------------------------
 Gives player a weapon and allows player to own it
@@ -567,18 +608,20 @@ native cod_take_weapon(id, weapon);
 
 /*------------------------------
 Returns player's render amount.
+Type can be NONE - at this moment (with status and weapon rules applied), ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
-native cod_get_user_render(id);
+native cod_get_user_render(id, type = NONE);
 
 /*------------------------------
 Sets player's render.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - others.
-Value is number from -255 to 255 (negative numbers substract it from player's current render value, positive and 0 sets it to this value).
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+There can be only one render for CLASS, ITEM, ADDITIONAL, but multiple for ROUND - every set adds new render record.
+Value is number from -255 to 255, but for CLASS type must be 0 or more (negative numbers substract it from player's current render value, positive and 0 sets it to this value).
 Status is player state for render. It can be a bitsum of RENDER_ALWAYS, RENDER_STAND, RENDER_MOVE, RENDER_DUCK, RENDER_SHIFT.
 Weapon is weapon id (CSW_), 0 for all weapons.
 Timer sets render value for certain amount of time - it ignores type, status and weapon.
 ------------------------------*/
-native cod_set_user_render(id, type, value, status = RENDER_ALWAYS, weapon = 0, Float:timer = 0.0);
+native cod_set_user_render(id, value, type = ROUND, status = RENDER_ALWAYS, weapon = 0, Float:timer = 0.0);
 
 /*------------------------------
 Set's player's render glow.
