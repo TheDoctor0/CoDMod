@@ -6,13 +6,13 @@
 #define AUTHOR "O'Zone"
 
 new const name[] = "Bomberman";
-new const description[] = "Ma 2 dynamity, ktore moze podkladac i detonowac.";
+new const description[] = "Ma 2 dynamity, ktore moze podkladac i detonowac. Ma mniejsza grawitacje.";
 new const fraction[] = "";
 new const weapons = (1<<CSW_AUG)|(1<<CSW_USP);
 new const health = 10;
 new const intelligence = 0;
 new const strength = 10;
-new const stamina = 10;
+new const stamina = 20;
 new const condition = 0;
 
 public plugin_init() 
@@ -23,7 +23,11 @@ public plugin_init()
 }
 
 public cod_class_enabled(id, promotion)
+{
 	cod_set_user_dynamites(id, 2);
+
+	cod_set_user_gravity(id, CLASS, 0.5);
+}
 
 public cod_class_spawned(id)
 	cod_add_user_dynamites(id, 2);

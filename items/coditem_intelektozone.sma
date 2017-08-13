@@ -25,7 +25,7 @@ public cod_item_enabled(id, value)
 {
 	set_bit(id, hasItem);
 
-	itemValue[id] = value;
+	itemValue[id] = value == -1 ? random_num(4, 8): value;
 }
 
 public cod_item_disabled(id)

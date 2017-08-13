@@ -21,7 +21,7 @@ public plugin_init()
 
 public cod_item_enabled(id, value)
 {
-	cod_set_user_render(id, ITEM, 0, RENDER_ALWAYS);
+	cod_set_user_render(id, 0, ITEM, RENDER_ALWAYS);
 
 	cod_add_user_multijumps(id, 1);
 

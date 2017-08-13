@@ -1,18 +1,18 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Class Skrytobojca"
+#define PLUGIN "CoD Class Pulkownik"
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new const name[] = "Skrytobojca";
-new const description[] = "Po uzyciu mocy klasy jest niewidzialny przez 15s. Ma podwojny skok i 1/2 na zabicie z noza (PPM).";
+new const name[] = "Pulkownik";
+new const description[] = "Zadaje coraz wieksze obrazenia wraz ze spadkiem ilosci amunicji w magazynku M249. Mniejsza widocznosc z nozem.";
 new const fraction[] = "";
-new const weapons = (1<<CSW_DEAGLE)|(1<<CSW_UMP45);
-new const health = -10;
+new const weapons = (1<<CSW_M249)|(1<<CSW_GLOCK18);
+new const health = 20;
 new const intelligence = 0;
-new const strength = 10;
-new const stamina = 10;
+new const strength = 0;
+new const stamina = 0;
 new const condition = 20;
 
 public plugin_init() 
@@ -23,13 +23,7 @@ public plugin_init()
 }
 
 public cod_class_enabled(id, promotion)
-	cod_set_user_multijumps(id, 1);
-
-public cod_class_spawned(id)
-	cod_add_user_multijumps(id, 1);
-
-public cod_class_skill_used(id)
-	cod_set_user_render(id, 0, CLASS, RENDER_ALWAYS, 0, 15.0);
+	cod_set_user_render(id, CLASS, 60, RENDER_WEAPON, CSW_KNIFE);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
 {

@@ -9,10 +9,10 @@ new const name[] = "Mysliwy";
 new const description[] = "1/1 ze scouta, mala widocznosc na nozu, podwojny skok i 1 dynamit";
 new const fraction[] = "SuperPremium";
 new const weapons = (1<<CSW_DEAGLE)|(1<<CSW_SCOUT);
-new const health = 25;
+new const health = 30;
 new const intelligence = 0;
-new const strength = 0;
-new const stamina = 5;
+new const strength = 10;
+new const stamina = 0;
 new const condition = 20;
 
 public plugin_init() 
@@ -24,7 +24,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	cod_set_user_render(id, CLASS, 40, RENDER_ALWAYS, CSW_KNIFE);
+	cod_set_user_render(id, CLASS, 50, RENDER_ALWAYS, CSW_KNIFE);
 
 	cod_add_user_multijumps(id, 1);
 

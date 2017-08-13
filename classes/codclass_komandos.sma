@@ -7,7 +7,7 @@
 #define AUTHOR "O'Zone"
 
 new const name[] = "Komandos";
-new const description[] = "Natychmiastowe zabicie z noza(PPM), 1/10 z Deagle, podwojny skok";
+new const description[] = "Natychmiastowe zabicie z noza (PPM), 1/10 z Deagle, podwojny skok";
 new const fraction[] = "";
 new const weapons = 1<<CSW_DEAGLE;
 new const health = 40;

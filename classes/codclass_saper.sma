@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 new const name[] = "Saper";
-new const description[] = "Ma 2 miny.";
+new const description[] = "Ma 2 miny i nieco zmniejszona grawitacje. Jest mniej widoczny z P90.";
 new const fraction[] = "";
 new const weapons = (1<<CSW_P90)|(1<<CSW_FIVESEVEN);
 new const health = 10;
@@ -23,7 +23,13 @@ public plugin_init()
 }
 
 public cod_class_enabled(id, promotion)
+{
 	cod_set_user_mines(id, 2);
+
+	cod_set_user_render(id, CLASS, 140, RENDER_ALWAYS, CSW_P90);
+
+	cod_set_user_gravity(id, CLASS, -0.25);
+}
 	
 public cod_class_spawned(id)
 	cod_add_user_mines(id, 2);

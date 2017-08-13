@@ -6,13 +6,13 @@
 #define AUTHOR "O'Zone"
 
 new const name[] = "Msciciel";
-new const description[] = "1/1 z awp, 1/2 z noża (PPM), mniejsza widocznosc podczas kucania, zmniejszona grawitacja";
+new const description[] = "1/2 z awp, 1/2 z noża (PPM), mniejsza widocznosc podczas kucania, zmniejszona grawitacja";
 new const fraction[] = "Premium";
 new const weapons = (1<<CSW_USP)|(1<<CSW_AWP);
 new const health = 25;
 new const intelligence = 0;
 new const strength = 0;
-new const stamina = 5;
+new const stamina = 10;
 new const condition = 20;
 
 public plugin_init() 
@@ -24,14 +24,14 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	cod_add_user_gravity(id, CLASS, -0.25);
+	cod_add_user_gravity(id, CLASS, -0.45);
 
-	cod_set_user_render(id, CLASS, 150, RENDER_DUCK);
+	cod_set_user_render(id, CLASS, 120, RENDER_DUCK);
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
 {
-	if((weapon == CSW_SCOUT && damageBits & DMG_BULLET) || (weapon == CSW_KNIFE && random_num(1, 2) && !(pev(attacker, pev_button) & IN_ATTACK)))
+	if((weapon == CSW_AWP && damageBits & DMG_BULLET && random_num(1, 2)) || (weapon == CSW_KNIFE && random_num(1, 2) && !(pev(attacker, pev_button) & IN_ATTACK)))
 	{
 		damage = COD_BLOCK;
 

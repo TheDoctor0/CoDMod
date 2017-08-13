@@ -1,11 +1,11 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Item Czarodziej"
+#define PLUGIN "CoD Item Kucacz"
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new const name[] = "Czarodziej";
+new const name[] = "Kucacz";
 new const description[] = "Gdy kucasz jestes praktycznie niewidzialny";
 
 public plugin_init()
@@ -16,4 +16,4 @@ public plugin_init()
 }
 
 public cod_item_enabled(id, value)
-	cod_set_user_render(id, ITEM, 20, RENDER_DUCK);
+	cod_set_user_render(id, 20, ITEM, RENDER_DUCK);
