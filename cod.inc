@@ -14,8 +14,6 @@
 #define COD_BLOCK -1.0
 
 #define DMG_BULLET (1<<1)
-#define DMG_BURN (1<<3) 
-#define DMG_ACID (1<<20)
 #define DMG_HEGRENADE (1<<24)
 #define DMG_CODSKILL (1<<31)
 
@@ -28,7 +26,8 @@
 enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_DEPLOY, 
 	SOUND_THUNDER, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_BOX, SOUND_APPLAUSE, SOUND_LAUGH };
 enum _:promotions { PROMOTION_NONE, PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION_THIRD };
-enum _:types { NONE = -1, CLASS, ITEM, ADDITIONAL, ROUND, USED, ALL, FIRE, POISON };
+enum _:types { NONE = -1, CLASS, ITEM, ADDITIONAL, ROUND, USED, ALL };
+enum _:repeating { FIRE, POISON, HEAL };
 enum _:hud { TYPE_HUD, TYPE_DHUD };
 
 new const codSounds[sounds][] =
@@ -707,14 +706,14 @@ Factor is intelligence bonus for damage.
 native cod_make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0.0, Float:damage = 0.0, Float:factor = 0.5);
 
 /*------------------------------
-Makes repeating damage to player - poison and fire with custom effects are avaiable out of the box.
-Factor is intelligence bonus for damage.
+Makes repeating damage to player.
+Damage is damage amount.
 Time is interval between damage.
 Counter is how many times make damage.
-Flags is damage flag (DMG_BURN for fire, DMG_ACID for poison).
-Type can be FIRE or POISON if want to use custom effects.
+Flags is damage flag.
+Flags can also be FIRE, POISON or HEAL (healing player instead of huring) if want to use custom effects out of the box.
 ------------------------------*/
-native cod_repeating_damage(attacker, victim, Float:damage, Float:time, counter, flags, type = NONE);
+native cod_repeating_damage(attacker, victim, Float:damage, Float:time, counter, flags);
 
 /*------------------------------
 Inflicts damage with intelligence factor.

@@ -7,7 +7,7 @@
 #define AUTHOR "O'Zone"
 
 new const name[] = "Snajper";
-new const description[] = "Ma 130 procent obrazen z AWP (+inteligencja) i 1/2 szansy na zabicie z noza(PPM)";
+new const description[] = "Ma 130 procent obrazen z AWP (+int) i 1/2 szansy na zabicie z noza(PPM)";
 new const fraction[] = "";
 new const weapons = (1<<CSW_AWP)|(1<<CSW_DEAGLE);
 new const health = 10;
