@@ -12,7 +12,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.0"
+#define VERSION "1.0.2"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -85,8 +85,8 @@ enum _:playerClassInfo { PCLASS_LEVEL, PCLASS_EXP, PCLASS_HEAL, PCLASS_INT, PCLA
 
 enum _:renderInfo { RENDER_TYPE, RENDER_VALUE, RENDER_STATUS, RENDER_WEAPON };
 
-enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, DAMAGE_PRE, DAMAGE_POST, WEAPON_DEPLOY, KILLED, 
-	SPAWNED, CMD_START, NEW_ROUND, START_ROUND, END_ROUND, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH };
+enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, DAMAGE_PRE, DAMAGE_POST, WEAPON_DEPLOY, KILLED, SPAWNED, 
+	CMD_START, PRETHINK, NEW_ROUND, START_ROUND, END_ROUND, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH };
 
 enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL, PLAYER_INT, 
 	PLAYER_STAM, PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTR_HEAL, PLAYER_EXTR_INT, PLAYER_EXTR_STAM, PLAYER_EXTR_STR, PLAYER_EXTR_COND, PLAYER_EXTR_WPNS, 
@@ -189,6 +189,7 @@ public plugin_init()
 	
 	register_forward(FM_CmdStart, "cmd_start");
 	register_forward(FM_EmitSound, "sound_emit");
+	register_forward(FM_PlayerPreThink, "player_prethink");
 	
 	register_message(get_user_msgid("SayText"), "say_text");
 	register_message(get_user_msgid("AmmoX"), "message_ammo");
@@ -211,7 +212,8 @@ public plugin_init()
 	codForwards[WEAPON_DEPLOY] = CreateMultiForward("cod_weapon_deploy", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[KILLED] = CreateMultiForward("cod_killed", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[SPAWNED] = CreateMultiForward("cod_spawned", ET_IGNORE, FP_CELL);
-	codForwards[CMD_START] = CreateMultiForward("cod_cmd_start", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL);
+	codForwards[CMD_START] = CreateMultiForward("cod_cmd_start", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_CELL);
+	codForwards[PRETHINK] = CreateMultiForward("cod_player_prethink", ET_IGNORE, FP_CELL);
 	codForwards[NEW_ROUND] = CreateMultiForward("cod_new_round", ET_IGNORE);
 	codForwards[START_ROUND] = CreateMultiForward("cod_start_round", ET_IGNORE);
 	codForwards[END_ROUND] = CreateMultiForward("cod_end_round", ET_IGNORE);
@@ -2200,8 +2202,6 @@ public cmd_start(id, ucHandle)
 	button = get_uc(ucHandle, UC_Buttons);
 	oldButton = pev(id, pev_oldbuttons);
 	playerState = RENDER_ALWAYS;
-
-	ExecuteForward(codForwards[CMD_START], ret, id, button, oldButton);
 	
 	pev(id, pev_velocity, velocity);
 
@@ -2215,6 +2215,8 @@ public cmd_start(id, ucHandle)
 	if(button & IN_DUCK) playerState |= RENDER_DUCK;
 
 	if(pev(id, pev_gaitsequence) == 3) playerState |= RENDER_SHIFT;
+
+	ExecuteForward(codForwards[CMD_START], ret, id, button, oldButton, playerState);
 	
 	render_change(id, playerState);
 
@@ -2265,9 +2267,13 @@ public sound_emit(id, channel, sound[], Float:volume, Float:attn, flags, pitch)
 	return FMRES_IGNORED;
 }
 
-public client_PreThink(id)
+public player_prethink(id)
 {
-	if(!is_user_alive(id) || !codPlayer[id][PLAYER_BUNNYHOP][ALL]) return PLUGIN_CONTINUE;
+	if(!is_user_alive(id)) return FMRES_IGNORED;
+
+	execute_forward_ignore_one_param(codForwards[PRETHINK], id);
+
+	if(!codPlayer[id][PLAYER_BUNNYHOP][ALL]) return FMRES_IGNORED;
 
 	entity_set_float(id, EV_FL_fuser2, 0.0);
 
@@ -2288,7 +2294,7 @@ public client_PreThink(id)
 		entity_set_int(id, EV_INT_gaitsequence, 6);
 	}
 	
-	return PLUGIN_CONTINUE;
+	return FMRES_IGNORED;
 }
 
 public say_text(msgId, msgDest, msgEnt)

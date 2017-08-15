@@ -774,6 +774,9 @@ forward cod_damage_post(attacker, victim, weapon, Float:damage, damageBits);
 
 /*------------------------------
 Multiforward executed on weapon deploy event.
+Id is player id.
+Weapon is CSW_ format.
+Ent is weapon entity.
 ------------------------------*/
 forward cod_weapon_deploy(id, weapon, ent);
 
@@ -783,14 +786,24 @@ Multiforward executed on death event.
 forward cod_killed(killer, victim, weapon, hitPlace);
 
 /*------------------------------
-Multiforward executed on spawn event.
+Multiforward executed on player spawn event.
 ------------------------------*/
 forward cod_spawned(id);
 
 /*------------------------------
 Multiforward executed on cmd start event.
+Id is player id.
+Button is button pressed right now.
+Oldbutton is last pressed button.
+Player state have types RENDER_ALWAYS, RENDER_STAND, RENDER_MOVE, RENDER_DUCK, RENDER_SHIFT
+and can be used as additional information.
 ------------------------------*/
-forward cod_cmd_start(id, button, oldButton);
+forward cod_cmd_start(id, button, oldButton, playerState);
+
+/*------------------------------
+Multiforward executed on player prethink.
+------------------------------*/
+forward cod_player_prethink(id);
 
 /*------------------------------
 Multiforward executed on new round event.
