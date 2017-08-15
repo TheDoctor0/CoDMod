@@ -12,7 +12,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.61"
+#define VERSION "1.0.71"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -29,14 +29,6 @@
 #define TASK_BLOCK 11731
 #define TASK_BLOCK_INFO 12935
 
-#define	FL_WATERJUMP (1<<11)
-#define	FL_ONGROUND	(1<<9)
-
-new const maxAmmo[] = { 0, 52, 0, 90, 1, 31, 1, 100, 90, 1, 120, 100, 100, 90, 90, 90, 100, 120, 30, 120, 200, 31, 90, 120, 90, 2, 35, 90, 90,0, 100 };
-new const maxBpAmmo[] = { 0, 30, 90, 200, 90, 32, 100, 100, 35, 52, 120 };
-
-new const pointsDistribution[] = { 1, 3, 5, 10, 25, -1 };
-
 new const commandClass[][] = { "klasa", "say /klasa", "say_team /klasa", "say /class", "say_team /class", "say /k", "say_team /k", "say /c", "say_team /c" };
 new const commandClasses[][] = { "klasy", "say /klasy", "say_team /klasy", "say /classes", "say_team /classes", "say /ky", "say_team /ky", "say /cs", "say_team /cs" };
 new const commandItem[][] = { "item", "say /item", "say_team /item", "say /przedmiot", "say_team /przedmiot", "say /perk", "say_team /perk", "say /i", "say_team /i", "say /p", "say_team /p" };
@@ -48,6 +40,11 @@ new const commandHud[][] = { "hud", "say /hud", "say_team /hud", "say /zmienhud"
 new const commandBinds[][] = { "bindy", "say /bind", "say_team /bind", "say /bindy", "say_team /bindy", "say /binds", "say_team /binds" };
 new const commandTop[][] = { "top", "say /toplvl", "say_team /toplvl", "say /toplevel", "say_team /toplevel", "say /toppoziom", "say_team /toppoziom", "say /ltop15", "say_team /ltop15", "say /ptop15", "say_team /ptop15" };
 new const commandBlock[][] = { "fullupdate", "cl_autobuy", "cl_rebuy", "cl_setautobuy", "rebuy", "autobuy", "hegren", "sgren", "flash", "-rocket", "-mine", "-dynamite", "-medkit", "-teleport" };
+
+new const maxAmmo[] = { 0, 52, 0, 90, 1, 31, 1, 100, 90, 1, 120, 100, 100, 90, 90, 90, 100, 120, 30, 120, 200, 31, 90, 120, 90, 2, 35, 90, 90,0, 100 };
+new const maxBpAmmo[] = { 0, 30, 90, 200, 90, 32, 100, 100, 35, 52, 120 };
+
+new const pointsDistribution[] = { 1, 3, 5, 10, 25, -1 };
 
 enum _:models { MODEL_ROCKET, MODEL_MINE, MODEL_DYNAMITE, MODEL_MEDKIT };
 
@@ -89,8 +86,8 @@ enum _:playerClassInfo { PCLASS_LEVEL, PCLASS_EXP, PCLASS_HEAL, PCLASS_INT, PCLA
 
 enum _:renderInfo { RENDER_TYPE, RENDER_VALUE, RENDER_STATUS, RENDER_WEAPON };
 
-enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, DAMAGE_PRE, DAMAGE_POST, WEAPON_DEPLOY, KILLED, SPAWNED, 
-	CMD_START, PRETHINK, NEW_ROUND, START_ROUND, END_ROUND, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH };
+enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, SPEED_CHANGED, DAMAGE_PRE, DAMAGE_POST, WEAPON_DEPLOY, KILLED, 
+	SPAWNED, CMD_START, PRETHINK, NEW_ROUND, START_ROUND, END_ROUND, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH };
 
 enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL, PLAYER_INT, 
 	PLAYER_STAM, PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTR_HEAL, PLAYER_EXTR_INT, PLAYER_EXTR_STAM, PLAYER_EXTR_STR, PLAYER_EXTR_COND, PLAYER_EXTR_WPNS, 
@@ -207,8 +204,9 @@ public plugin_init()
 	
 	codForwards[CLASS_CHANGED] = CreateMultiForward("cod_class_changed", ET_IGNORE, FP_CELL, FP_CELL);
 	codForwards[ITEM_CHANGED] = CreateMultiForward("cod_item_changed", ET_IGNORE, FP_CELL, FP_CELL);
-	codForwards[RENDER_CHANGED] = CreateMultiForward("cod_render_changed", ET_IGNORE, FP_CELL);
-	codForwards[GRAVITY_CHANGED] = CreateMultiForward("cod_gravity_changed", ET_IGNORE, FP_CELL);
+	codForwards[RENDER_CHANGED] = CreateMultiForward("cod_render_changed", ET_IGNORE, FP_CELL, FP_CELL);
+	codForwards[GRAVITY_CHANGED] = CreateMultiForward("cod_gravity_changed", ET_IGNORE, FP_CELL, FP_FLOAT);
+	codForwards[SPEED_CHANGED] = CreateMultiForward("cod_speed_changed", ET_IGNORE, FP_CELL, FP_FLOAT);
 	codForwards[DAMAGE_PRE] = CreateMultiForward ("cod_damage_pre", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL);
 	codForwards[DAMAGE_POST] = CreateMultiForward ("cod_damage_post", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL);
 	codForwards[WEAPON_DEPLOY] = CreateMultiForward("cod_weapon_deploy", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL);
@@ -806,7 +804,7 @@ public classes_description_handle(id, menu, item)
 
 	menu_destroy(menu);
 
-	if(containi(itemData, "#") != -1)
+	if(containi(itemData, "#") != NONE)
 	{
 		log_amx(itemData);
 
@@ -1012,7 +1010,7 @@ public assign_points(id, sound)
 	
 	new menu = menu_create(menuData, "assign_points_handler");
 	
-	if(pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]] == -1) format(menuData, charsmax(menuData), "Ile dodawac: \rWszystko \y(Ile punktow dodac do statystyk)");
+	if(pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]] == FULL) format(menuData, charsmax(menuData), "Ile dodawac: \rWszystko \y(Ile punktow dodac do statystyk)");
 	else format(menuData, charsmax(menuData), "Ile dodawac: \r%d \y(Ile punktow dodac do statystyk)", pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]]);
 
 	menu_additem(menu, menuData);
@@ -1056,9 +1054,9 @@ public assign_points_handler(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	if(codPlayer[id][PLAYER_POINTS] < 1) return PLUGIN_CONTINUE;
+	if(!codPlayer[id][PLAYER_POINTS]) return PLUGIN_CONTINUE;
 
-	new pointsDistributionAmount = (pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]] == -1) ? codPlayer[id][PLAYER_POINTS] 
+	new pointsDistributionAmount = (pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]] == FULL) ? codPlayer[id][PLAYER_POINTS] 
 	: (pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]] > codPlayer[id][PLAYER_POINTS] ? codPlayer[id][PLAYER_POINTS] : pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]]);
 	
 	switch(item) 
@@ -1066,9 +1064,9 @@ public assign_points_handler(id, menu, item)
 		case 0: if(++codPlayer[id][PLAYER_POINTS_SPEED] >= sizeof(pointsDistribution)) codPlayer[id][PLAYER_POINTS_SPEED] = 0;     
 		case 1: 
 		{
-			if(codPlayer[id][PLAYER_HEAL] < cvarLevelLimit/5) 
+			if(codPlayer[id][PLAYER_HEAL] < cvarLevelLimit / 5) 
 			{
-				if(pointsDistributionAmount > cvarLevelLimit/5 - codPlayer[id][PLAYER_HEAL]) pointsDistributionAmount = cvarLevelLimit/5 - codPlayer[id][PLAYER_HEAL];
+				if(pointsDistributionAmount > cvarLevelLimit / 5 - codPlayer[id][PLAYER_HEAL]) pointsDistributionAmount = cvarLevelLimit / 5 - codPlayer[id][PLAYER_HEAL];
 
 				codPlayer[id][PLAYER_HEAL] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
@@ -1077,9 +1075,9 @@ public assign_points_handler(id, menu, item)
 		} 
 		case 2: 
 		{       
-			if(codPlayer[id][PLAYER_INT] < cvarLevelLimit/5) 
+			if(codPlayer[id][PLAYER_INT] < cvarLevelLimit / 5) 
 			{
-				if(pointsDistributionAmount > cvarLevelLimit/5 - codPlayer[id][PLAYER_INT]) pointsDistributionAmount = cvarLevelLimit/5 - codPlayer[id][PLAYER_INT];
+				if(pointsDistributionAmount > cvarLevelLimit / 5 - codPlayer[id][PLAYER_INT]) pointsDistributionAmount = cvarLevelLimit / 5 - codPlayer[id][PLAYER_INT];
 
 				codPlayer[id][PLAYER_INT] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
@@ -1089,9 +1087,9 @@ public assign_points_handler(id, menu, item)
 		}
 		case 3: 
 		{       
-			if(codPlayer[id][PLAYER_STR] < cvarLevelLimit/5) 
+			if(codPlayer[id][PLAYER_STR] < cvarLevelLimit / 5) 
 			{
-				if(pointsDistributionAmount > cvarLevelLimit/5 - codPlayer[id][PLAYER_STR]) pointsDistributionAmount = cvarLevelLimit/5 - codPlayer[id][PLAYER_STR];
+				if(pointsDistributionAmount > cvarLevelLimit / 5 - codPlayer[id][PLAYER_STR]) pointsDistributionAmount = cvarLevelLimit / 5 - codPlayer[id][PLAYER_STR];
 
 				codPlayer[id][PLAYER_STR] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
@@ -1100,9 +1098,9 @@ public assign_points_handler(id, menu, item)
 		}
 		case 4: 
 		{       
-			if(codPlayer[id][PLAYER_STAM] < cvarLevelLimit/5) 
+			if(codPlayer[id][PLAYER_STAM] < cvarLevelLimit / 5) 
 			{
-				if(pointsDistributionAmount > cvarLevelLimit/5 - codPlayer[id][PLAYER_STAM]) pointsDistributionAmount = cvarLevelLimit/5 - codPlayer[id][PLAYER_STAM];
+				if(pointsDistributionAmount > cvarLevelLimit / 5 - codPlayer[id][PLAYER_STAM]) pointsDistributionAmount = cvarLevelLimit / 5 - codPlayer[id][PLAYER_STAM];
 
 				codPlayer[id][PLAYER_STAM] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
@@ -1111,9 +1109,9 @@ public assign_points_handler(id, menu, item)
 		}
 		case 5: 
 		{       
-			if(codPlayer[id][PLAYER_COND] < cvarLevelLimit/5) 
+			if(codPlayer[id][PLAYER_COND] < cvarLevelLimit / 5) 
 			{
-				if(pointsDistributionAmount > cvarLevelLimit/5 - codPlayer[id][PLAYER_COND]) pointsDistributionAmount = cvarLevelLimit/5 - codPlayer[id][PLAYER_COND];
+				if(pointsDistributionAmount > cvarLevelLimit / 5 - codPlayer[id][PLAYER_COND]) pointsDistributionAmount = cvarLevelLimit / 5 - codPlayer[id][PLAYER_COND];
 
 				codPlayer[id][PLAYER_COND] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
@@ -1731,7 +1729,7 @@ public use_teleport(id)
 
 	codPlayer[id][PLAYER_LAST_TELEPORT] = floatround(get_gametime());
 
-	if(codPlayer[id][PLAYER_TELEPORTS][ALL] != -1)
+	if(codPlayer[id][PLAYER_TELEPORTS][ALL] != FULL)
 	{
 		codPlayer[id][PLAYER_TELEPORTS][ALL]--;
 		codPlayer[id][PLAYER_TELEPORTS][USED]++;
@@ -1850,7 +1848,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 		
 		function = get_class_info(codPlayer[victim][PLAYER_CLASS], CLASS_DAMAGE_VICTIM);
 		
-		if(function != -1)
+		if(function != NONE)
 		{
 			callfunc_begin_i(function, get_class_info(codPlayer[victim][PLAYER_CLASS], CLASS_PLUGIN));
 			callfunc_push_int(attacker);
@@ -1870,7 +1868,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 
 		function = get_class_info(codPlayer[attacker][PLAYER_CLASS], CLASS_DAMAGE_ATTACKER);
 			
-		if(function != -1)
+		if(function != NONE)
 		{
 			callfunc_begin_i(function, get_class_info(codPlayer[attacker][PLAYER_CLASS], CLASS_PLUGIN));
 			callfunc_push_int(attacker);
@@ -1888,7 +1886,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 	{
 		function = get_class_info(codPlayer[victim][PLAYER_ITEM], ITEM_DAMAGE_VICTIM);
 			
-		if(function != -1)
+		if(function != NONE)
 		{
 			callfunc_begin_i(function, get_class_info(codPlayer[victim][PLAYER_ITEM], ITEM_PLUGIN));
 			callfunc_push_int(attacker);
@@ -1906,7 +1904,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 	{
 		function = get_class_info(codPlayer[attacker][PLAYER_ITEM], ITEM_DAMAGE_ATTACKER);
 			
-		if(function != -1)
+		if(function != NONE)
 		{
 			callfunc_begin_i(function, get_class_info(codPlayer[attacker][PLAYER_ITEM], ITEM_PLUGIN));
 			callfunc_push_int(attacker);
@@ -1985,7 +1983,7 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 		set_task(1.0, "end_kill_streak", killer + TASK_END_KILL_STREAK, _, _, "b");
 	}
 	
-	if(!codPlayer[killer][PLAYER_ITEM]) set_item(killer, -1, -1);
+	if(!codPlayer[killer][PLAYER_ITEM]) set_item(killer, RANDOM, RANDOM);
 
 	check_level(killer);
 
@@ -2031,7 +2029,7 @@ public touch_weapon(weapon, id)
 	
 	pev(weapon, pev_model, modelName, charsmax(modelName));
 	
-	if(containi(modelName, "w_backpack") != -1) return HAM_IGNORED;
+	if(containi(modelName, "w_backpack") != NONE) return HAM_IGNORED;
 
 	new playerTeam = get_user_team(id);
 	
@@ -2053,6 +2051,10 @@ public player_reset_max_speed(id)
 	new Float:speed = get_user_maxspeed(id) + Float:codPlayer[id][PLAYER_SPEED];
 
 	set_user_maxspeed(id, speed);
+
+	static ret;
+	
+	ExecuteForward(codForwards[SPEED_CHANGED], ret, id, speed);
 
 	return HAM_IGNORED;
 }
@@ -2201,15 +2203,17 @@ public hostages_rescued()
 	check_level(id);
 }
 
-stock render_change(id, playerStatus = -1)
+stock render_change(id, playerStatus = NONE)
 {
 	if(!is_user_alive(id) || codPlayer[id][PLAYER_STATUS] == playerStatus || get_bit(id, renderTimer)) return;
 
-	if(playerStatus != -1) codPlayer[id][PLAYER_STATUS] = playerStatus;
+	if(playerStatus != NONE) codPlayer[id][PLAYER_STATUS] = playerStatus;
 
-	set_user_rendering(id, kRenderFxNone, 0, 0, 0, kRenderTransAlpha, render_count(id));
+	new renderAmount = render_count(id);
 
-	execute_forward_ignore_one_param(codForwards[RENDER_CHANGED], id);
+	set_user_rendering(id, kRenderFxNone, 0, 0, 0, kRenderTransAlpha, renderAmount);
+
+	execute_forward_ignore_two_params(codForwards[RENDER_CHANGED], id, renderAmount);
 }
 
 stock render_count(id, type = NONE)
@@ -2446,6 +2450,8 @@ public show_info(id)
 	}
 	
 	static hudData[512], className[MAX_NAME], itemName[MAX_NAME], clanName[MAX_NAME], missionProgress[MAX_NAME], Float:levelPercent, exp, target;
+
+	clanName = ""; missionProgress = "";
 	
 	target = id;
 	
@@ -2461,17 +2467,21 @@ public show_info(id)
 	
 	get_user_class_info(target, codPlayer[target][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 	get_item_info(codPlayer[target][PLAYER_ITEM], ITEM_NAME, itemName, charsmax(itemName));
-	cod_get_clan_name(cod_get_user_clan(target), clanName, charsmax(clanName));
 
-	format(clanName, charsmax(clanName), "^n[Klan : %s]", clanName);
+	if(cod_get_user_clan(target))
+	{
+		cod_get_clan_name(cod_get_user_clan(target), clanName, charsmax(clanName));
 
-	if(cod_get_user_mission(id) > -1) formatex(missionProgress, charsmax(missionProgress), "^n[Misja : %i/%i (%0.1f%s)]", cod_get_user_mission_progress(id), cod_get_user_mission_need(id), float(cod_get_user_mission_progress(id))/float(cod_get_user_mission_need(id)) * 100.0, "%%");
+		format(clanName, charsmax(clanName), "^n[Klan : %s]", clanName);
+	}
+
+	if(cod_get_user_mission(id) > NONE) formatex(missionProgress, charsmax(missionProgress), "^n[Misja : %i/%i (%0.1f%s)]", cod_get_user_mission_progress(id), cod_get_user_mission_need(id), float(cod_get_user_mission_progress(id)) / float(cod_get_user_mission_need(id)) * 100.0, "%%");
 
 	exp = codPlayer[target][PLAYER_LEVEL] - 1 >= 0 ? get_level_exp(codPlayer[target][PLAYER_LEVEL] - 1) : 0;
 	levelPercent = codPlayer[target][PLAYER_LEVEL] < cvarLevelLimit ? (float((codPlayer[target][PLAYER_EXP] - exp)) / float((get_level_exp(codPlayer[target][PLAYER_LEVEL]) - exp))) * 100.0 : 0.0;
 	
 	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot : %s (%i/%i)]%s^n[Zycie : %i]^n[Honor : %i]", 
-	className, cod_get_user_clan(target) ? clanName : "", codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, codPlayer[target][PLAYER_ITEM_DURA], cvarMaxDurability, cod_get_user_mission(id) > -1 ? missionProgress : "", get_user_health(id), cod_get_user_honor(target));
+	className, clanName, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, codPlayer[target][PLAYER_ITEM_DURA], cvarMaxDurability, missionProgress, get_user_health(id), cod_get_user_honor(target));
 	
 	if(get_exp_bonus(target, 100) > 100) format(hudData, charsmax(hudData), "%s^n[Exp Bonus : %i%s]", hudData, get_exp_bonus(target, 100) - 100, "%%");
 
@@ -2596,7 +2606,7 @@ stock set_item(id, item = 0, value = 0)
 {
 	if(!ArraySize(codItems) || !is_user_connected(id)) return PLUGIN_CONTINUE;
 	
-	item = (item == -1) ? random_num(1, ArraySize(codItems) - 1): item;
+	item = (item == RANDOM) ? random_num(1, ArraySize(codItems) - 1): item;
 
 	new ret;
 	
@@ -2604,7 +2614,7 @@ stock set_item(id, item = 0, value = 0)
 	
 	if(ret == COD_STOP)
 	{
-		set_item(id, -1, -1);
+		set_item(id, RANDOM, RANDOM);
 		
 		return PLUGIN_CONTINUE;
 	}
@@ -2626,7 +2636,7 @@ stock set_item(id, item = 0, value = 0)
 		get_item_info(item, ITEM_DESC, itemDescription, charsmax(itemDescription));
 		get_item_info(item, ITEM_NAME, itemName, charsmax(itemName));
 
-		if(itemTempValue != -1)
+		if(itemTempValue != NONE)
 		{
 			num_to_str(itemTempValue, itemValue, charsmax(itemValue));
 
@@ -2796,7 +2806,9 @@ public gravity_change(id)
 	
 	set_user_gravity(id, Float:codPlayer[id][PLAYER_GRAVITY][ALL]);
 
-	execute_forward_ignore_one_param(codForwards[GRAVITY_CHANGED], id);
+	static ret;
+	
+	ExecuteForward(codForwards[GRAVITY_CHANGED], ret, id, Float:codPlayer[id][PLAYER_GRAVITY][ALL]);
 	
 	return PLUGIN_CONTINUE;
 }
@@ -2908,7 +2920,7 @@ public remove_tasks(id)
 
 stock remove_ents(id = 0)
 {
-	new ent = find_ent_by_class(-1, "rocket");
+	new ent = find_ent_by_class(NONE, "rocket");
 	
 	while(ent > 0)
 	{
@@ -2917,7 +2929,7 @@ stock remove_ents(id = 0)
 		ent = find_ent_by_class(ent, "rocket");
 	}
 	
-	ent = find_ent_by_class(-1, "mine");
+	ent = find_ent_by_class(NONE, "mine");
 	
 	while(ent > 0)
 	{
@@ -2926,7 +2938,7 @@ stock remove_ents(id = 0)
 		ent = find_ent_by_class(ent, "mine");
 	}
 	
-	ent = find_ent_by_class(-1, "dynamite");
+	ent = find_ent_by_class(NONE, "dynamite");
 	
 	while(ent > 0)
 	{
@@ -2935,7 +2947,7 @@ stock remove_ents(id = 0)
 		ent = find_ent_by_class(ent, "dynamite");
 	}
 	
-	ent = find_ent_by_class(-1, "medkit");
+	ent = find_ent_by_class(NONE, "medkit");
 	
 	while(ent > 0)
 	{
@@ -3363,7 +3375,7 @@ public _cod_get_user_item(id, &value)
 
 public get_user_item_value(id)
 {
-	new value = -1;
+	new value = NONE;
 
 	if(get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_VALUE) > 0) ExecuteForward(get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_VALUE), value, id);
 
@@ -3591,7 +3603,7 @@ public _cod_set_user_medkits(id, value, type)
 
 public _cod_set_user_teleports(id, value, type)
 {
-	codPlayer[id][PLAYER_TELEPORTS][type] = codPlayer[id][PLAYER_TELEPORTS][type] == -1 ? -1 : value;
+	codPlayer[id][PLAYER_TELEPORTS][type] = codPlayer[id][PLAYER_TELEPORTS][type] == FULL ? FULL : value;
 
 	calculate_teleports_left(id);
 }
@@ -3652,7 +3664,7 @@ public _cod_add_user_medkits(id, value, type)
 
 public _cod_add_user_teleports(id, value, type)
 {
-	codPlayer[id][PLAYER_TELEPORTS][type] = codPlayer[id][PLAYER_TELEPORTS][type] == -1 ? -1 : max(0, codPlayer[id][PLAYER_TELEPORTS][type] + value);
+	codPlayer[id][PLAYER_TELEPORTS][type] = codPlayer[id][PLAYER_TELEPORTS][type] == FULL ? FULL : max(0, codPlayer[id][PLAYER_TELEPORTS][type] + value);
 
 	calculate_teleports_left(id);
 }
@@ -3836,8 +3848,8 @@ public _cod_show_hud(id, type, red, green, blue, Float:x, Float:y, effects, Floa
 public _cod_screen_shake(id, amplitude, duration, frequency)
 	screen_shake(id, amplitude, duration, frequency);
 	
-public _cod_make_explosion(ent, distance, explosion, Float:damage_distance, Float:damage, Float:factor)
-	make_explosion(ent, distance, explosion, damage_distance, damage, factor);
+public _cod_make_explosion(ent, distance, explosion, Float:damage_distance, Float:damage, Float:factor, suicide)
+	make_explosion(ent, distance, explosion, damage_distance, damage, factor, suicide);
 	
 public _cod_make_bartimer(id, duration, start)
 	make_bar_timer(id, duration, start);
@@ -3845,7 +3857,7 @@ public _cod_make_bartimer(id, duration, start)
 public _cod_drop_weapon(id)
 	engclient_cmd(id, "drop");
 
-public _cod_repeating_damage(attacker, victim, Float:damage, Float:time, counter, flags)
+public _cod_repeating_damage(attacker, victim, Float:damage, Float:time, counter, flags, instant)
 {
 	new data[5];
 
@@ -3857,9 +3869,9 @@ public _cod_repeating_damage(attacker, victim, Float:damage, Float:time, counter
 
 	if(task_exists(victim + attacker + TASK_DAMAGE)) remove_task(victim + attacker + TASK_DAMAGE);
 
-	set_task(time, "repeating_damage", victim + attacker + TASK_DAMAGE, data, sizeof(data), "a", counter - 1);
+	set_task(time, "repeating_damage", victim + attacker + TASK_DAMAGE, data, sizeof(data), counter ? "a" : "b", counter - instant);
 
-	repeating_damage(data);
+	if(instant) repeating_damage(data);
 }
 
 public repeating_damage(data[])
@@ -3871,7 +3883,7 @@ public repeating_damage(data[])
 		return;
 	}
 
-	data[COUNTER]--;
+	if(data[COUNTER]) data[COUNTER]--;
 
 	switch(data[FLAGS])
 	{
@@ -3881,7 +3893,7 @@ public repeating_damage(data[])
 
 			get_user_origin(data[VICTIM], origin);
 			
-			if(flags & FL_INWATER || !data[COUNTER])
+			if(flags & FL_INWATER || data[COUNTER] == 0)
 			{
 				message_begin(MSG_PVS, SVC_TEMPENTITY, origin);
 				write_byte(TE_SMOKE);
@@ -4192,16 +4204,16 @@ stock calculate_teleports_left(id)
 
 	for(new i = CLASS; i <= ROUND; i++)
 	{
-		if(codPlayer[id][PLAYER_TELEPORTS][i] == -1)
+		if(codPlayer[id][PLAYER_TELEPORTS][i] == FULL)
 		{
-			codPlayer[id][PLAYER_TELEPORTS][ALL] = -1;
+			codPlayer[id][PLAYER_TELEPORTS][ALL] = FULL;
 
 			break;
 		}
 		else codPlayer[id][PLAYER_TELEPORTS][ALL] += codPlayer[id][PLAYER_TELEPORTS][i];
 	}
 
-	codPlayer[id][PLAYER_TELEPORTS][ALL] = codPlayer[id][PLAYER_TELEPORTS][ALL] == -1 ? -1 : max(0, codPlayer[id][PLAYER_TELEPORTS][ALL] - codPlayer[id][PLAYER_TELEPORTS][USED]);
+	codPlayer[id][PLAYER_TELEPORTS][ALL] = codPlayer[id][PLAYER_TELEPORTS][ALL] == FULL ? FULL : max(0, codPlayer[id][PLAYER_TELEPORTS][ALL] - codPlayer[id][PLAYER_TELEPORTS][USED]);
 }
 
 stock execute_forward_ignore(forwardHandle)
@@ -4357,7 +4369,7 @@ stock remove_render_type(id, type)
 	render_change(id);
 }
 
-stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0.0, Float:damage = 0.0, Float:factor = 0.5, type = NONE)
+stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0.0, Float:damage = 0.0, Float:factor = 0.5, type = NONE, suicide = 0)
 {
 	new Float:tempOrigin[3], origin[3];
 	
@@ -4426,6 +4438,8 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 			_cod_inflict_damage(id, player, damage, factor, DMG_CODSKILL);
 		}
 	}
+
+	if(suicide) user_silentkill(id);
 }
 
 stock make_bar_timer(id, duration, start = 0)
