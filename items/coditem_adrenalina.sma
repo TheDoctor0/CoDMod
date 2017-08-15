@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Adrenalina"
-#define VERSION "1.0"
+#define VERSION "1.0.0"
 #define AUTHOR "O'Zone"
 
 new const name[] = "Adrenalina";
@@ -21,7 +21,7 @@ public cod_item_enabled(id, value)
 	itemValue[id] = value == -1 ? random_num(35, 65): value;
 
 public cod_item_upgrade(id)
-	itemValue[id] = max(0, itemValue[id] + random_num(-5, 10));
+	itemValue[id] = max(0, itemValue[id] + random_num(-4, 9));
 
 public cod_item_value(id)
 	return itemValue[id];
