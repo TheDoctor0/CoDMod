@@ -38,7 +38,7 @@ public cod_new_round()
 
 public remove_ents()
 {
-	new ent = find_ent_by_class(-1, boxClass);
+	new ent = find_ent_by_class(NONE, boxClass);
 	
 	while(ent > 0)
 	{
@@ -152,7 +152,7 @@ public get_box(id)
 				return PLUGIN_CONTINUE;
 			}
 			
-			cod_set_user_item(id, -1, -1);
+			cod_set_user_item(id, RANDOM, RANDOM);
 			
 			cod_print_chat(id, "Trafiles na^x04 losowy item^x01!");
 		}
@@ -182,25 +182,25 @@ public get_box(id)
 		}
 		case 7:
 		{
-			cod_add_user_rockets(id, 1, ROUND);
+			cod_add_user_rockets(id, 1);
 			
 			cod_print_chat(id, "Dostales^x04 Rakiete^x01!");
 		}
 		case 8:
 		{
-			cod_add_user_mines(id, 1, ROUND);
+			cod_add_user_mines(id, 1);
 			
 			cod_print_chat(id, "Dostales^x04 Mine^x01!");
 		}
 		case 9:
 		{
-			cod_add_user_medkits(id, 1, ROUND);
+			cod_add_user_medkits(id, 1);
 			
 			cod_print_chat(id, "Dostales^x04 Apteczke^x01!");
 		}
 		case 10:
 		{
-			cod_add_user_dynamites(id, 1, ROUND);
+			cod_add_user_dynamites(id, 1);
 			
 			cod_print_chat(id, "Dostales^x04 Dynamit^x01!");
 		}

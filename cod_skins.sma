@@ -130,7 +130,7 @@ public client_putinserver(id)
 {
 	rem_bit(id, loaded);
 	
-	for(new i = 1; i < CSW_P90 + 1; i++) playerData[id][i] = -1;
+	for(new i = 1; i < CSW_P90 + 1; i++) playerData[id][i] = NONE;
 
 	ArrayClear(playerSkins[id]);
 
@@ -317,7 +317,7 @@ public set_weapon_skin_handle(id, menu, item)
 	}
 	else 
 	{
-		set_skin(id, itemData, -1);
+		set_skin(id, itemData, NONE);
 
 		cod_print_chat(id, "Przywrociles domyslny skin broni^x03 %s^x01.", itemData);
 	}
@@ -415,7 +415,7 @@ public cod_weapon_deploy(id, weapon, ent)
 {
 	if(weapon == CSW_HEGRENADE || weapon == CSW_SMOKEGRENADE || weapon == CSW_FLASHBANG || weapon == CSW_C4) return;
 
-	if(playerData[id][weapon] > -1)
+	if(playerData[id][weapon] > NONE)
 	{
 		static skin[skinsInfo];
 		
@@ -452,7 +452,7 @@ public load_skins_handle(failState, Handle:query, error[], errorNum, playerId[],
 		SQL_ReadResult(query, SQL_FieldNameToNum(query, "skin"), skin[SKIN_NAME], charsmax(skin[SKIN_NAME]));
 		SQL_ReadResult(query, SQL_FieldNameToNum(query, "weapon"), skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]));
 
-		if(contain(skin[SKIN_WEAPON], "ACTIVE") != -1)
+		if(contain(skin[SKIN_WEAPON], "ACTIVE") != NONE)
 		{
 			replace(skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]), " ACTIVE", "");
 
@@ -462,7 +462,7 @@ public load_skins_handle(failState, Handle:query, error[], errorNum, playerId[],
 		{
 			new skinId = get_skin_id(skin[SKIN_NAME], skin[SKIN_WEAPON]);
 
-			if(skinId > -1) ArrayPushCell(playerSkins[id], skinId);
+			if(skinId > NONE) ArrayPushCell(playerSkins[id], skinId);
 		}
 
 		SQL_NextRow(query);
@@ -509,7 +509,7 @@ stock get_skin_id(const name[], const weapon[])
 		if(equal(name, skin[SKIN_NAME]) && equal(weapon, skin[SKIN_WEAPON])) return i;
 	}
 
-	return -1;
+	return NONE;
 }
 
 stock get_skin_info(skinId, info, dataReturn[] = "", dataLength = 0)

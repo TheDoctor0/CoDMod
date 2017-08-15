@@ -4,6 +4,38 @@
 		"selected_items":
 		[
 			[
+				"miss",
+				"missionProgress"
+			],
+			[
+				"cod_item_",
+				"cod_item_spawned\t(cod.inc)"
+			],
+			[
+				"TASK",
+				"TASK_DAMAGE"
+			],
+			[
+				"remove",
+				"remove_task"
+			],
+			[
+				"dama",
+				"damageBits"
+			],
+			[
+				"codPro",
+				"codPromotions"
+			],
+			[
+				"codP",
+				"codPromotion"
+			],
+			[
+				"promo",
+				"promotionData"
+			],
+			[
 				"get_class_pr",
 				"get_class_promotion_info  \tcod_mod.sma - stock"
 			],
@@ -126,10 +158,6 @@
 			[
 				"str_to",
 				"str_to_num  \tstring.inc - native"
-			],
-			[
-				"TASK",
-				"TASK_IP  \tozone_banconfig.sma - define: 9341"
 			]
 		]
 	},
@@ -139,7 +167,7 @@
 			"file": "cod.txt",
 			"settings":
 			{
-				"buffer_size": 71,
+				"buffer_size": 46,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -148,32 +176,7 @@
 			"file": "cod_mod.sma",
 			"settings":
 			{
-				"buffer_size": 139225,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/D/Dawid/Workplace/Mods/BF2/bf2/effect.inl",
-			"settings":
-			{
-				"buffer_size": 3935,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/Users/Dawid/Desktop/Behemoth Grenade & Avalanche Frost/Source Code/avalanche_frost.sma",
-			"settings":
-			{
-				"buffer_size": 10511,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "codclass_elektryk.sma",
-			"settings":
-			{
-				"buffer_size": 2275,
+				"buffer_size": 143074,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -211,9 +214,17 @@
 	"command_palette":
 	{
 		"height": 354.0,
-		"last_filter": "git push",
+		"last_filter": "git p",
 		"selected_items":
 		[
+			[
+				"git p",
+				"git: push"
+			],
+			[
+				"git co",
+				"git: commit including unstaged files"
+			],
 			[
 				"git push",
 				"git: push to branch name"
@@ -354,17 +365,62 @@
 	],
 	"file_history":
 	[
+		"/C/Users/Dawid/Desktop/items/codperk_naboje20mm.sma",
+		"/C/Users/Dawid/Desktop/items/codperk_Wallhack.sma",
+		"/D/Downloads/Chrome/chr_engine.inc",
+		"/D/Downloads/Chrome/meczennik.sma",
+		"/D/Downloads/Chrome/codperk_nanosuit.sma",
+		"/C/Users/Dawid/Desktop/items/codperk_panswiata.sma",
+		"/C/Users/Dawid/Desktop/items/codperk_napalm.sma",
+		"/D/Downloads/Chrome/codperk_plonacenaboje.sma",
+		"/D/Dawid/Workplace/AMXX/include/cod.inc",
+		"/D/Downloads/Chrome/Aimer.sma",
+		"/D/Downloads/Chrome/codclass_merlin.sma",
+		"/C/Users/Dawid/Desktop/todo/spy.sma",
+		"/C/Users/Dawid/Desktop/todo/codclass_japonskiweteran.sma",
+		"/D/Downloads/Chrome/sas_sprint.sma",
+		"/C/Users/Dawid/Desktop/todo/codclass_zawodowiec.sma",
+		"/C/Users/Dawid/Desktop/items/avalanche_frost.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/todo/effect.inl",
+		"/C/Users/Dawid/Desktop/todo/codclass_truciciel.sma",
+		"/C/Users/Dawid/Desktop/todo/codclass_Astronauta.sma",
+		"/D/Downloads/Chrome/codclass_longer.sma",
+		"/C/Users/Dawid/Desktop/todo/bomber.sma",
+		"/D/Downloads/Chrome/codclass_mrdemolka.sma",
+		"/D/Downloads/Chrome/codclass_spowolnienie.sma",
+		"/C/Users/Dawid/Desktop/todo/codclass_szpieg_s.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/include/cod.inc",
-		"/D/Dawid/Workplace/Mods/CoDMod/sklepsms_usluga_cod_transfer.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/sklepsms_usluga_cod_honor.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/sklepsms_usluga_cod_exp.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_vip.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_transfer.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_stats.sma",
+		"/C/Users/Dawid/Desktop/todo/codperk_atakodtylu.sma",
+		"/C/Users/Dawid/Desktop/todo/codperk_zrecznoscskoczka.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_elektromagnes.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_betonowecialo.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_bezglowie.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_intelektozone.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_przekletenaboje.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/todo/codclass_tropiciel.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.810/codperk_chaosorb.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.497/codperk_nicolaseye.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.864/codperk_crossbow.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.824/codperk_Karasapera.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.720/codperk_zrecznoscskoczka.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.101/codclass_adept_ninja.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.700/codclass_kleryk.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.295/codperk_esencja_deagla.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.430/codperk_exekucja.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.114/codperk_flara.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.362/codperk_szczescie.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.792/codperk_swat.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.125/codperk_tajemicahadmina.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.968/codperk_taostatnianiedzila.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.537/codperk_naboje_inteligencji.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_skins.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_stats.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_transfer.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_shop.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_missions.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_menu.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_vip.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_market.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_knife.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_icons.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_honor.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_he_block.sma",
@@ -372,18 +428,40 @@
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_clans_system.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_casino.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_box.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_adrenalina.sma",
+		"/D/Downloads/Chrome/codperk_enemyjump (1).sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_menu.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_accounts.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.524/codperk_perzeklete_naboje.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.036/codperk_tajemicahadmina.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.353/codperk_tajemnica_skazanca.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.631/codperk_taostatnianiedzila.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.494/codclass_adept_ninja.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.319/codclass_kleryk.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.265/codperk_niewidzialny.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa1.987/codperk_oczy.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.987/codperk_Majteczki.sma",
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.195/codperk_esencja_deagla.sma",
+		"/D/Downloads/Chrome/codperk_elektromagnes.sma",
+		"/D/Downloads/Chrome/codperk_dash.sma",
+		"/D/Downloads/Chrome/codperk_akumulator24v.sma",
+		"/D/Downloads/Chrome/cssettifix.sma",
+		"/D/Downloads/Chrome/poisoned_bullets (1).sma",
+		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170815.log",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_snajper.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_elektryk.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170815.log",
+		"/D/Dawid/Workplace/Mods/CoDMod/sklepsms_usluga_cod_transfer.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/sklepsms_usluga_cod_honor.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/sklepsms_usluga_cod_exp.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.748/QTM_CodMod.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170814.log",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_intelektozone.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/codclass_elektryk.sma",
 		"/D/Downloads/Chrome/codclass_elektryk (1).sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_dezerter.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins-cod.ini",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170814.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins.ini",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_adrenalina.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_apteczka.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_butyszturmowca.sma",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sklep_sms.log",
@@ -392,10 +470,8 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170813.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170814 2.log",
 		"/D/Downloads/Chrome/codperk_enemyjump.sma",
-		"/D/Dawid/Workplace/AMXX/include/cod.inc",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_mod.sma",
 		"/D/Downloads/Chrome/codclass_elektryk.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_elektryk.sma",
 		"/D/Downloads/Chrome/codclass_ognik.sma",
 		"/D/Downloads/Chrome/poisoned_bullets.sma",
 		"/D/Downloads/Chrome/codperk_zatrucie.sma",
@@ -416,72 +492,7 @@
 		"/C/Users/Dawid/Desktop/update/hltv.cfg",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 2.ini",
 		"/D/Dawid/Workplace/AMXX/scripting/admincmd.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/.git/config",
-		"/D/Dawid/Workplace/AMXX/scripting/restmenu.sma",
-		"/C/Users/Dawid/Desktop/addons/amxmodx/scripting/adminhelp.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_knife.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod.inc",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_market.sma",
-		"/C/Users/Dawid/Desktop/addons/amxmodx/scripting/admincmd.sma",
-		"/D/Dawid/Workplace/AMXX/scripting/adminhelp.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/game 2.cfg",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/game.cfg",
-		"/C/Users/Dawid/Desktop/addons/amxmodx/configs/amxx.cfg",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/amxx.cfg",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.472/QTM_CodElite_questy_oddzialy.sma",
-		"/C/Windows/System32/drivers/etc/hosts",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/V.php",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod.txt",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_technik.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_ninja.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_duch.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_kucacz.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_bezglowie.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/items/coditem_betonowecialo.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_komandos.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_saper.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_pulkownik.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_amadeusz.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_szturmowiec.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_wsparciechemiczne.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_chemik.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_mysliwy_superpremium.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_msciciel_premium.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_partyzant.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_danger.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_bomberman.sma",
-		"/C/wamp64/www/.htaccess",
-		"/C/wamp64/www/.gitignore",
-		"/C/wamp64/www/bootstrap/autoload.php",
-		"/C/wamp64/www/public/index.php",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/users.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/users 2.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170713.log",
-		"/D/Dawid/Workplace/AMXX/scripting/vip_svip.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/jail_extra_vip.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/zp_vip.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/weaprest.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins-zplague.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins-jb.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/csgo_vip.sma",
-		"/C/Users/Dawid/Desktop/🔍 Facebook Scanner.html",
-		"/D/Dawid/Workplace/AMXX/scripting/stats_system.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sql.cfg",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/L20170708.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170705.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/sql.inc.php",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/admin_sm_bg.php",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/admin_bg.tpl",
-		"/D/Dawid/Workplace/AMXX/scripting/ozone_banconfig.sma",
-		"/D/Downloads/LinkedIn/37.txt",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170708.log",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/get_data 2.php",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/index 2.php",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/cache.html",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/get_data.php",
-		"/C/Users/Dawid/Desktop/sklep_sms.cfg",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/databases 2.cfg",
-		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/databases.cfg"
+		"/D/Dawid/Workplace/Mods/CoDMod/.git/config"
 	],
 	"find":
 	{
@@ -520,6 +531,91 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"repeating",
+			"make_explosion",
+			"noclip",
+			"execute_forward_ignore_two_params",
+			"max_speed",
+			"gravity_changed",
+			"SPEED_CHANGED",
+			"GRAVITY_CHANGED",
+			"RENDER_CHANGED",
+			"gravity_cha",
+			"player_reset_max_speed",
+			"ma_klase",
+			"-1",
+			"teleports",
+			"-1",
+			"NONE",
+			"-1",
+			"cod_get_user_clan",
+			"-1",
+			"ITEM_VALUE",
+			"render_count",
+			"NONE",
+			"electromagnetSounds",
+			"electromagnetModel",
+			"iOrigin",
+			"cod_show_hud",
+			"pcvar_czas_dzialania",
+			"pcvar_zasieg",
+			"fTime",
+			"fVelocity",
+			"fSpeed",
+			"fOrigin",
+			"fEntOrigin",
+			"remove_ents",
+			"new_round",
+			"cvarLevelRatio",
+			"cod_repeating_damage",
+			"MagnetThink",
+			"make_explosion",
+			"_cod_make_explosion",
+			"_cod_repeating_damage",
+			"heal",
+			"_cod_repe",
+			"_cod_add_user_health",
+			"_cod_rep",
+			"_cod_repeating_damage",
+			"client_print",
+			"_cod_repeating_damage",
+			"_cod_repe",
+			"reset_attributes",
+			"player_spawn",
+			"new_round",
+			"FLAGS",
+			"_cod_repeating_damage",
+			"repeating_damage",
+			"repeating",
+			"_cod_repeating_damage",
+			"dmg_a",
+			"_cod_repeating_damage",
+			"client_print_color",
+			"player_take_damage_pre",
+			"_cod_repeating_damage",
+			"player_take_damage_pre",
+			"takedamage",
+			"opis \\r",
+			"confirm",
+			"opis: ",
+			"find_class_promotion",
+			"get_class_promotion_info",
+			"find_class_promotion",
+			"display_class",
+			"find_class_promotion",
+			"get_class_promotion_info",
+			"[64]",
+			"className[64]",
+			"stock get_class_promotion_info",
+			"get_user_class_info",
+			"menuCallback",
+			"#",
+			"Wroc\", classId",
+			"display_classes_description",
+			"confirm",
+			"display_classes_description",
+			"description",
+			"class_de",
 			"prethink",
 			"new_round",
 			"prethink",
@@ -562,92 +658,7 @@
 			"load_class",
 			"cod_get_class_name(i, ",
 			"cod_get_class_name",
-			"get_user_class_info",
-			"select_class",
-			"PROMOTION_",
-			"PROMOTION_LE",
-			"promotionInfo",
-			"select_Class",
-			"get_promotion_info",
-			"get_user_class_info",
-			"cod_register_promotion",
-			"class_enabled",
-			"CLASS_HEAL",
-			"cvarLevelRatio",
-			"get_user_class_info",
-			"select_class",
-			"PROMOTION_DEGREE",
-			"get_user_class_info",
-			"PLAYER_PROMOTION",
-			"check_promotion",
-			"PLAYER_PROMOTION",
-			"PROMOTION_TYPE",
-			"check_promotion",
-			"cod_get_user_class",
-			"_cod_get_user_class",
-			"get_user_class",
-			"_cod_get_user_class",
-			"get_class_info",
-			"get_user_class_info",
-			"get_class_info",
-			"get_promotion_class_info",
-			"get_user_class_info",
-			"stock get_class_info",
-			"get_class_info",
-			"stock get_class_info",
-			"get_class_info",
-			"get_cond",
-			"show_info",
-			"show_hud",
-			"check_promotion",
-			"codPlayer[id][PLAYER_CLASS]",
-			"codPlayer[id][PLAYER_COND]",
-			"PCLASS_WEAPONS",
-			"load_class",
-			"class_weapons",
-			"PLAYER_EXTR_WPNS",
-			"_cod_give_weapon",
-			"player_weapon",
-			"load_class",
-			"class_weapons",
-			"load_class",
-			"register_pro",
-			"register_class",
-			"codClasses",
-			"ArrayDestroy(codClasses);",
-			"codClasses",
-			"PROMOTION_STR",
-			"_cod_register_class",
-			"PLAYER_DYNAMITES",
-			"calculate_rockets_left",
-			"calcula",
-			"set_attributes",
-			"player_spawn",
-			"_cod_set_user_thunders",
-			"calculate_rockets_left",
-			"calculate_teleports_left",
-			"reset_att",
-			"reset_attributes",
-			"codPlayer[id][PLAYER_DYNAMITES][USED]",
-			"codPlayer[id][PLAYER_TELEPORTS][ALL]",
-			"_cod_get_user_dynamites",
-			"_cod_use_user_dynamite",
-			"use_teleport",
-			"+rocket",
-			"codSprites",
-			"use_thu",
-			"make_expl",
-			"make_explo",
-			"CLASS_ENABLED",
-			"CLASS_CHANGED",
-			"show_info",
-			"cvarBlockSkillsTime",
-			"TASK_BLOCK",
-			"use_rock",
-			"use_skill",
-			"TASK_BLOCK",
-			"round_sta",
-			"make_explosion"
+			"get_user_class_info"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -759,15 +770,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 71,
+						"buffer_size": 46,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								38,
-								38
+								13,
+								13
 							]
 						],
 						"settings":
@@ -784,7 +795,7 @@
 								}
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Material Monokai Soda (SL).tmTheme",
-							"git_gutter_is_enabled": false,
+							"git_gutter_is_enabled": true,
 							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
@@ -801,15 +812,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 139225,
+						"buffer_size": 143074,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								74797,
-								74797
+								613,
+								613
 							]
 						],
 						"settings":
@@ -826,138 +837,16 @@
 								}
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
+							"git_gutter_is_enabled": true,
 							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
 							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 38521.0,
+						"translation.y": 2120.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "/D/Dawid/Workplace/Mods/BF2/bf2/effect.inl",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3935,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 714.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "/C/Users/Dawid/Desktop/Behemoth Grenade & Avalanche Frost/Source Code/avalanche_frost.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 10511,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 712.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "codclass_elektryk.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2275,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								373,
-								373
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/atomic-pawn.tmTheme",
-							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
 					"type": "text"
 				}
 			]

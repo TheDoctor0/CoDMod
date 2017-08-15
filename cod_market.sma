@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Market"
-#define VERSION "1.0"
+#define VERSION "1.0.1"
 #define AUTHOR "O'Zone"
 
 #define MAX_ITEMS 5
@@ -494,7 +494,7 @@ stock check_item_id(item)
 		if(marketItem[ID] == item) return i;
 	}
 	
-	return -1;
+	return NONE;
 }
 
 stock remove_seller(id)

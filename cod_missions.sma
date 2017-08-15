@@ -514,7 +514,7 @@ public load_mission(id)
 public reset_mission(id, data, silent)
 {
 	playerData[id][PLAYER_TYPE] = TYPE_NONE;
-	playerData[id][PLAYER_ID] = -1;
+	playerData[id][PLAYER_ID] = NONE;
 	playerData[id][PLAYER_PROGRESS] = 0;
 
 	if(!data) save_mission(id);

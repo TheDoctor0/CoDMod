@@ -13,6 +13,9 @@
 #define COD_STOP 4
 #define COD_BLOCK -1.0
 
+#define	FL_WATERJUMP (1<<11)
+#define	FL_ONGROUND	(1<<9)
+
 #define DMG_BULLET (1<<1)
 #define DMG_HEGRENADE (1<<24)
 #define DMG_CODSKILL (1<<31)
@@ -26,7 +29,7 @@
 enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_DEPLOY, 
 	SOUND_THUNDER, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_BOX, SOUND_APPLAUSE, SOUND_LAUGH };
 enum _:promotions { PROMOTION_NONE, PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION_THIRD };
-enum _:types { NONE = -1, CLASS, ITEM, ADDITIONAL, ROUND, USED, ALL };
+enum _:types { RANDOM = -3, FULL, NONE, CLASS, ITEM, ADDITIONAL, ROUND, USED, ALL };
 enum _:repeating { FIRE, POISON, HEAL };
 enum _:hud { TYPE_HUD, TYPE_DHUD };
 
@@ -88,7 +91,7 @@ Returns clan's name.
 native cod_get_clan_name(clan, dataReturn[], dataLength);
 
 /*------------------------------
-Returns player's mission id (-1 if none).
+Returns player's mission id. NONE (-1) if player have no mission in progress.
 ------------------------------*/
 native cod_get_user_mission(id);
 
@@ -211,8 +214,8 @@ native cod_get_user_item(id, &value = 0);
 
 /*------------------------------
 Sets player's item. 
-If item = -1 an item will be random.
-If value = -1 item value will be random.
+If item = RANDOM (-3) an item will be random.
+If value = RANDOM (-3) item value will be random.
 ------------------------------*/
 native cod_set_user_item(id, item = 0, value = 0);
 
@@ -475,7 +478,7 @@ Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - unti
 native cod_set_user_thunders(id, value, type = ROUND);
 
 /*------------------------------
-Sets player's teleports amount.
+Sets player's teleports amount. Value = FULL (-2) for unlimited teleports.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_set_user_teleports(id, value, type = ROUND);
@@ -528,7 +531,7 @@ Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - unti
 native cod_add_user_thunders(id, value, type = ROUND);
 
 /*------------------------------
-Adds value to player's teleports amount.
+Adds value to player's teleports amount. Value = FULL (-2) for unlimited teleports.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_add_user_teleports(id, value, type = ROUND);
@@ -541,7 +544,7 @@ native cod_add_user_multijumps(id, value, type = ROUND);
 
 /*------------------------------
 Adds value to player's gravity amount.
-Type can be NONE - all, CLASS - for class, ITEM - for item, ADDITIONAL - others.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
 ------------------------------*/
 native cod_add_user_gravity(id, Float:value, type = ROUND);
 
@@ -665,7 +668,7 @@ Diplays text in HUD/DHUD.
 Type can be TYPE_HUD or TYPE_DHUD.
 HUD/DHUD params usage is the same as in set_hudmessage/set_dhudmessage.
 ------------------------------*/
-native cod_show_hud(id, type=0, red=255, green=255, blue=255, Float:x=-1.0, Float:y=0.35, effects=0, Float:fxtime=6.0, Float:holdtime=12.0, Float:fadeintime=0.1, Float:fadeouttime=0.2, const text[], any:...);
+native cod_show_hud(id, type = 0, red = 255, green = 255, blue = 255, Float:x = -1.0, Float:y = 0.35, effects = 0, Float:fxtime = 6.0, Float:holdtime = 12.0, Float:fadeintime = 0.1, Float:fadeouttime = 0.2, const text[], any:...);
 
 /*------------------------------
 Displays screen fade.
@@ -702,18 +705,22 @@ Explosion is explosion effect.
 Damage_distance is distance from ent where players will be hurt.
 Damage specifies damage dealt to players in damage_distance.
 Factor is intelligence bonus for damage.
+Suicide is decision if player will die after explosion
 ------------------------------*/
-native cod_make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0.0, Float:damage = 0.0, Float:factor = 0.5);
+native cod_make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0.0, Float:damage = 0.0, Float:factor = 0.5, suicide = 0);
 
 /*------------------------------
 Makes repeating damage to player.
+Attacker is player that makes damage.
+Victim is player that is receiving damage.
 Damage is damage amount.
 Time is interval between damage.
-Counter is how many times make damage.
-Flags is damage flag.
+Counter is how many times make damage. If counter = 0 effect will last till player death or round end - usefull for constant healing.
+Flags is damage flag (DMG_).
 Flags can also be FIRE, POISON or HEAL (healing player instead of huring) if want to use custom effects out of the box.
+Instant makes first damage immidiately.
 ------------------------------*/
-native cod_repeating_damage(attacker, victim, Float:damage, Float:time, counter, flags);
+native cod_repeating_damage(attacker, victim, Float:damage, Float:time, counter = 1, flags = DMG_CODSKILL, instant = 1);
 
 /*------------------------------
 Inflicts damage with intelligence factor.
@@ -754,12 +761,17 @@ forward cod_item_changed(id, item);
 /*------------------------------
 Multiforward executed when player's render is changed.
 ------------------------------*/
-forward cod_render_changed(id);
+forward cod_render_changed(id, render);
 
 /*------------------------------
 Multiforward executed when player's gravity is changed.
 ------------------------------*/
-forward cod_gravity_changed(id);
+forward cod_gravity_changed(id, Float:gravity);
+
+/*------------------------------
+Multiforward executed when player's gravity is changed.
+------------------------------*/
+forward cod_speed_changed(id, Float:speed);
 
 /*------------------------------
 Multiforward executed on damage event before armor reduce.

@@ -6,7 +6,7 @@
 #include <cod>
 
 #define PLUGIN  "CoD Icons"
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 #define AUTHOR  "O'Zone"
 
 #define TASK_PLANT 6583
@@ -53,12 +53,12 @@ public plugin_init()
 		bsBombSiteB = BOMBSITE_B;	
 	}
 	
-	bombEntity[bsBombSiteA] = find_ent_by_class(-1, "func_bomb_target");
+	bombEntity[bsBombSiteA] = find_ent_by_class(NONE, "func_bomb_target");
 	bombEntity[bsBombSiteB] = find_ent_by_class(bombEntity[bsBombSiteA], "func_bomb_target");
 
 	if(!is_valid_ent(bombEntity[bsBombSiteA]))
 	{
-		bombEntity[bsBombSiteA] = find_ent_by_class(-1, "info_bomb_target");
+		bombEntity[bsBombSiteA] = find_ent_by_class(NONE, "info_bomb_target");
 		bombEntity[bsBombSiteB] = find_ent_by_class(bombEntity[bsBombSiteA], "info_bomb_target");
 	}
 
@@ -141,7 +141,7 @@ public bomb_dropped()
 
 	new bombEnt;
 
-	if((bombEnt = fm_find_ent_by_model(-1, "weaponbox", "models/w_backpack.mdl"))) spawn_sprite(bombEnt, BOMB_DROPPED);
+	if((bombEnt = fm_find_ent_by_model(NONE, "weaponbox", "models/w_backpack.mdl"))) spawn_sprite(bombEnt, BOMB_DROPPED);
 }
 
 public bomb_picked()
@@ -166,7 +166,7 @@ public bomb_planted()
 
 	new bombEnt;
 
-	if((bombEnt = fm_find_ent_by_model(-1, "grenade", "models/w_c4.mdl"))) spawn_sprite(bombEnt, BOMB_PLANTED);
+	if((bombEnt = fm_find_ent_by_model(NONE, "grenade", "models/w_c4.mdl"))) spawn_sprite(bombEnt, BOMB_PLANTED);
 }
 
 public bomb_timer()
@@ -198,7 +198,7 @@ public cod_start_round()
 
 public cod_end_round()
 {
-	bombTimer = -1;
+	bombTimer = NONE;
 
 	roundStarted = false;
 
@@ -300,7 +300,7 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 	}
 	
 	xs_vec_sub(targetOrigin, hostOrigin, middleOirgin);
-	trace_line(-1, hostOrigin, targetOrigin, hitPoint);
+	trace_line(NONE, hostOrigin, targetOrigin, hitPoint);
 	
 	distanceToWall = vector_distance(hostOrigin, hitPoint) - 10.0;
 	normalize(middleOirgin, wallOffset, distanceToWall);

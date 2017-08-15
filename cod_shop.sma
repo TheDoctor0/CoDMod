@@ -214,7 +214,7 @@ public shop_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == TELEPORT && cod_get_user_teleports(id) == -1)
+	if(item == TELEPORT && cod_get_user_teleports(id) == FULL)
 	{
 		cod_print_chat(id, "Masz juz nielimitowany^x03 Teleport^x01!");
 
@@ -286,8 +286,7 @@ public shop_menu_handle(id, menu, item)
 			cod_print_chat(id, "Kupiles^x03 +%i^x01 wytrzymalosci przedmiotu!", cvarDurabilityAmount
 		);
 			
-			if(cod_get_item_durability(id) + cvarDurabilityAmount
-	 >= cod_max_item_durability())
+			if(cod_get_item_durability(id) + cvarDurabilityAmount >= cod_max_item_durability())
 			{
 				cod_set_item_durability(id, cod_max_item_durability());
 
@@ -305,7 +304,7 @@ public shop_menu_handle(id, menu, item)
 		{
 			cod_print_chat(id, "Kupiles^x03 Losowy Przedmiot^x01!");
 			
-			cod_set_user_item(id, -1, -1);
+			cod_set_user_item(id, RANDOM, RANDOM);
 		}
 		case UPGRADE:
 		{
@@ -404,13 +403,13 @@ public shop_menu_handle(id, menu, item)
 		{
 			cod_print_chat(id, "Kupiles^x03 BunnyHop^x01!");
 			
-			cod_set_user_bunnyhop(id, 1, ROUND);
+			cod_set_user_bunnyhop(id, 1);
 		}
 		case SILENT:
 		{
 			cod_print_chat(id, "Kupiles^x03 Ciche Chodzenie^x01!");
 			
-			cod_set_user_footsteps(id, 1, ROUND);
+			cod_set_user_footsteps(id, 1);
 		}
 		case ARMOR:
 		{
