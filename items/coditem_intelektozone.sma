@@ -7,7 +7,7 @@
 #define AUTHOR "O'Zone"
 
 new const name[] = "Intelekt O'Zone";
-new const description[] = "Masz 1/%i szansy na zmiane trajektorii lotu kuli na glowe przy trafieniu, dostajesz +25 sily";
+new const description[] = "Masz 1/%s szansy na zmiane trajektorii lotu kuli na glowe przy trafieniu, dostajesz +25 sily";
 
 new itemValue[MAX_PLAYERS + 1], hasItem;
 

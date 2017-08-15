@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Skins"
-#define VERSION "1.0"
+#define VERSION "1.0.0"
 #define AUTHOR "O'Zone"
 
 #define TASK_LOAD 3045

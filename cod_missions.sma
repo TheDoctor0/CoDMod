@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Missions"
-#define VERSION "1.0"
+#define VERSION "1.0.0"
 #define AUTHOR "O'Zone"
 
 new missionDescription[][] = 
@@ -308,7 +308,7 @@ public select_class(id)
 	
 	for(new i = 1; i < cod_get_classes_num(); i++)
 	{
-		cod_get_class_name(i, className, charsmax(className));
+		cod_get_class_name(i, _, className, charsmax(className));
 		
 		formatex(menuData,charsmax(menuData), className);
 
@@ -441,7 +441,7 @@ public check_mission(id)
 	{
 		new message[128], additional[64];
 
-		if(playerData[id][PLAYER_TYPE] == TYPE_CLASS) cod_get_class_name(playerData[id][PLAYER_ADDITIONAL], additional, charsmax(additional));
+		if(playerData[id][PLAYER_TYPE] == TYPE_CLASS) cod_get_class_name(playerData[id][PLAYER_ADDITIONAL], _, additional, charsmax(additional));
 		else if(playerData[id][PLAYER_TYPE] == TYPE_ITEM) cod_get_item_name(playerData[id][PLAYER_ADDITIONAL], additional, charsmax(additional));
 
 		if(additional[0]) formatex(message, charsmax(message), missionDescription[playerData[id][PLAYER_TYPE]], additional, (get_progress_need(id) - get_progress(id)));
@@ -460,7 +460,7 @@ public cod_class_changed(id, class)
 	
 	save_mission(id);
 
-	cod_get_class_name(cod_get_user_class(id), playerClass[id], charsmax(playerClass[]));
+	cod_get_class_name(cod_get_user_class(id), _, playerClass[id], charsmax(playerClass[]));
 	
 	reset_mission(id, 1, 1);
 

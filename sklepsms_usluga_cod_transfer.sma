@@ -4,7 +4,7 @@
 
 #define PLUGIN "Sklep-SMS: Usluga CoD Exp Transfer"
 #define AUTHOR "O'Zone"
-#define VERSION "3.3.11"
+#define VERSION "3.3.7"
 
 #define TASK_CHECK_FIRST 1000
 #define TASK_CHECK_SECOND 2000
@@ -32,7 +32,7 @@ public ss_service_chosen(id) {
 
 	for(new i = 1; i <= cod_get_classes_num(); i++)
 	{
-		cod_get_class_name(i, className, charsmax(className));
+		cod_get_class_name(i, _, className, charsmax(className));
 		
 		menu_additem(menu, className);
 	}
@@ -63,7 +63,7 @@ public fromClassMenu_handle(id, menu, item)
 
 	for(new i = 1; i <= cod_get_classes_num(); i++)
 	{
-		cod_get_class_name(i, className, charsmax(className));
+		cod_get_class_name(i, _, className, charsmax(className));
 		
 		menu_additem(menu, className, _, _, menu_callback);
 	}
@@ -150,7 +150,7 @@ public bought_checkFirstClass(id)
 		new playerName[32], className[64]; 
 
 		get_user_name(id, playerName, charsmax(playerName));
-		cod_get_class_name(fromClass[id], className, charsmax(className));
+		cod_get_class_name(fromClass[id], _, className, charsmax(className));
 
 		ss_log("Zabrano graczowi %s %d EXPa z klasy %s", playerName, fromClassExp[id], className);
 		
@@ -174,8 +174,8 @@ public bought_checkSecondClass(id)
 		new playerName[32], fromClassName[64], toClassName[64]; 
 
 		get_user_name(id, playerName, charsmax(playerName));
-		cod_get_class_name(fromClass[id], fromClassName, charsmax(fromClassName));
-		cod_get_class_name(toClass[id], toClassName, charsmax(toClassName));
+		cod_get_class_name(fromClass[id], _, fromClassName, charsmax(fromClassName));
+		cod_get_class_name(toClass[id], _, toClassName, charsmax(toClassName));
 
 		ss_log("Przeniesiono graczowi %s %d EXPa z klasy %s na klase %s", playerName, fromClassExp[id], fromClassName, toClassName);
 	}

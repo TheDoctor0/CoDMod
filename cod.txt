@@ -1,3 +1,4 @@
 Do zrobienia:
+- Opis awansów w klasach
 - Klasy i itemy
 - Statystyki WWW

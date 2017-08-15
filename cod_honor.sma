@@ -5,7 +5,7 @@
 
 #define PLUGIN	"CoD Honor System"
 #define AUTHOR	"O'Zone"
-#define VERSION	"1.0"
+#define VERSION	"1.0.0"
 
 new cvarMinPlayers, cvarKill, cvarKillHS, cvarWinRound, cvarBombPlanted, cvarBombDefused, cvarRescueHostage, cvarKillHostage;
 

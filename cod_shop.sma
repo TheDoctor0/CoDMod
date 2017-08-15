@@ -3,16 +3,16 @@
 #include <cod>
 
 #define PLUGIN "CoD Shop"
-#define VERSION "1.0"
+#define VERSION "1.0.0"
 #define AUTHOR "O'Zone"
 
 new const commandShopMenu[][] = { "say /shop", "say_team /shop", "say /sklep", "say_team /sklep", "sklep" };
 
-enum _:shopInfo { EXCHANGE, REPAIR, BUY, UPGRADE, SMALL_EXP, MEDIUM_EXP, BIG_EXP, RANDOM_EXP, SMALL_BANDAGE, 
-	BIG_BANDAGE, ROCKET, MINE, DYNAMITE, FIRST_AID_KIT, TELEPORT, JUMP, BUNNY_HOP, SILENT, ARMOR, DAMAGE, INVISIBLE };
+enum _:shopInfo { EXCHANGE, REPAIR, BUY, UPGRADE, SMALL_BANDAGE, BIG_BANDAGE, SMALL_EXP, MEDIUM_EXP, BIG_EXP, 
+	RANDOM_EXP, ROCKET, MINE, DYNAMITE, FIRST_AID_KIT, TELEPORT, JUMP, BUNNY_HOP, SILENT, ARMOR, DAMAGE, INVISIBLE };
 
-new cvarCostRepair, cvarCostItem, cvarCostUpgrade, cvarCostSmallExp, cvarCostMediumExp, cvarCostBigExp, cvarCostRandomExp, 
-	cvarCostSmallBandage, cvarCostBigBandage, cvarCostRocket, cvarCostMine, cvarCostDynamite, cvarCostFirstAidKit, cvarCostTeleport, 
+new cvarCostRepair, cvarCostItem, cvarCostUpgrade, cvarCostSmallBandage, cvarCostBigBandage, cvarCostSmallExp, cvarCostMediumExp, 
+	cvarCostBigExp, cvarCostRandomExp, cvarCostRocket, cvarCostMine, cvarCostDynamite, cvarCostFirstAidKit, cvarCostTeleport, 
 	cvarCostJump, cvarCostBunnyHop, cvarCostSilent, cvarCostArmor, cvarCostDamage, cvarCostInvisible, cvarExchangeRatio, cvarDurabilityAmount, 
 	cvarSmallExp, cvarMediumExp, cvarBigExp, cvarMinRandomExp, cvarMaxRandomExp, cvarSmallBandageHP, cvarBigBandageHP, cvarArmorAmount, cvarDamageAmount;
 
@@ -29,12 +29,12 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_shop_repair_cost", "10"), cvarCostRepair);
 	bind_pcvar_num(create_cvar("cod_shop_item_cost", "15"), cvarCostItem);
 	bind_pcvar_num(create_cvar("cod_shop_upgrade_cost", "10"), cvarCostUpgrade);
+	bind_pcvar_num(create_cvar("cod_shop_small_bandage_cost", "6"), cvarCostSmallBandage);
+	bind_pcvar_num(create_cvar("cod_shop_big_bandage_cost", "15"), cvarCostBigBandage);
 	bind_pcvar_num(create_cvar("cod_shop_small_exp_cost", "6"), cvarCostSmallExp);
 	bind_pcvar_num(create_cvar("cod_shop_medium_exp_cost", "14"), cvarCostMediumExp);
 	bind_pcvar_num(create_cvar("cod_shop_big_exp_cost", "25"), cvarCostBigExp);
 	bind_pcvar_num(create_cvar("cod_shop_random_exp_cost", "15"), cvarCostRandomExp);
-	bind_pcvar_num(create_cvar("cod_shop_small_bandage_cost", "6"), cvarCostSmallBandage);
-	bind_pcvar_num(create_cvar("cod_shop_big_bandage_cost", "15"), cvarCostBigBandage);
 	bind_pcvar_num(create_cvar("cod_shop_rocket_cost", "15"), cvarCostRocket);
 	bind_pcvar_num(create_cvar("cod_shop_mine_cost", "15"), cvarCostMine);
 	bind_pcvar_num(create_cvar("cod_shop_dynamite_cost", "15"), cvarCostDynamite);
@@ -49,13 +49,13 @@ public plugin_init()
 
 	bind_pcvar_num(create_cvar("cod_shop_exchange_ratio", "1000"), cvarExchangeRatio);
 	bind_pcvar_num(create_cvar("cod_shop_durability_amount", "50"), cvarDurabilityAmount);
+	bind_pcvar_num(create_cvar("cod_shop_small_bandage_hp", "25"), cvarSmallBandageHP);
+	bind_pcvar_num(create_cvar("cod_shop_big_bandage_hp", "75"), cvarBigBandageHP);
 	bind_pcvar_num(create_cvar("cod_shop_small_exp", "25"), cvarSmallExp);
 	bind_pcvar_num(create_cvar("cod_shop_medium_exp", "75"), cvarMediumExp);
 	bind_pcvar_num(create_cvar("cod_shop_big_exp", "150"), cvarBigExp);
 	bind_pcvar_num(create_cvar("cod_shop_random_exp_min", "1"), cvarMinRandomExp);
 	bind_pcvar_num(create_cvar("cod_shop_random_exp_max", "200"), cvarMaxRandomExp);
-	bind_pcvar_num(create_cvar("cod_shop_small_bandage_hp", "25"), cvarSmallBandageHP);
-	bind_pcvar_num(create_cvar("cod_shop_big_bandage_hp", "75"), cvarBigBandageHP);
 	bind_pcvar_num(create_cvar("cod_shop_armor_amount", "100"), cvarArmorAmount);
 	bind_pcvar_num(create_cvar("cod_shop_damage_amount", "5"), cvarDamageAmount);
 }
@@ -83,6 +83,14 @@ public shop_menu(id)
 	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostUpgrade);
 	menu_additem(menu, menuData, menuPrice);
 
+	formatex(menuData, charsmax(menuData), "Maly Bandaz \r[\y+%i HP\r] \wKoszt:\r %iH", cvarSmallBandageHP, cvarCostSmallBandage);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostSmallBandage);
+	menu_additem(menu, menuData, menuPrice);
+
+	formatex(menuData, charsmax(menuData), "Duzy Bandaz \r[\y+%i HP\r] \wKoszt:\r %iH", cvarBigBandageHP, cvarCostBigBandage);
+	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostBigBandage);
+	menu_additem(menu, menuData, menuPrice);
+
 	formatex(menuData, charsmax(menuData), "Male Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", cvarSmallExp, cvarCostSmallExp);
 	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostSmallExp);
 	menu_additem(menu, menuData, menuPrice);
@@ -97,14 +105,6 @@ public shop_menu(id)
 
 	formatex(menuData, charsmax(menuData), "Losowe Doswiadczenie \r[\yLosowo od %i do %i Expa\r] \wKoszt:\r %iH", cvarMinRandomExp, cvarMaxRandomExp, cvarCostRandomExp);
 	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostRandomExp);
-	menu_additem(menu, menuData, menuPrice);
-
-	formatex(menuData, charsmax(menuData), "Maly Bandaz \r[\y+%i HP\r] \wKoszt:\r %iH", cvarSmallBandageHP, cvarCostSmallBandage);
-	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostSmallBandage);
-	menu_additem(menu, menuData, menuPrice);
-
-	formatex(menuData, charsmax(menuData), "Duzy Bandaz \r[\y+%i HP\r] \wKoszt:\r %iH", cvarBigBandageHP, cvarCostBigBandage);
-	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostBigBandage);
 	menu_additem(menu, menuData, menuPrice);
 
 	formatex(menuData, charsmax(menuData), "Dodatkowa Rakieta \r[\y+1 Rakieta\r] \wKoszt:\r %iH", cvarCostRocket);
@@ -318,6 +318,18 @@ public shop_menu_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 		}
+		case SMALL_BANDAGE:
+		{
+			cod_set_user_health(id, cod_get_user_health(id, 1) + cvarSmallBandageHP);
+			
+			cod_print_chat(id, "Kupiles^x03 Maly Bandarz^x01!");
+		}
+		case BIG_BANDAGE:
+		{
+			cod_set_user_health(id, cod_get_user_health(id, 1) + cvarBigBandageHP);
+			
+			cod_print_chat(id, "Kupiles^x03 Duzy Bandarz^x01!");
+		}
 		case SMALL_EXP:
 		{
 			cod_print_chat(id, "Kupiles^x03 Male Doswiadczenie^x01!");
@@ -351,18 +363,6 @@ public shop_menu_handle(id, menu, item)
 			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", randomExp);
 			
 			cod_set_user_exp(id, randomExp);
-		}
-		case SMALL_BANDAGE:
-		{
-			cod_set_user_health(id, cod_get_user_health(id, 1) + cvarSmallBandageHP);
-			
-			cod_print_chat(id, "Kupiles^x03 Maly Bandarz^x01!");
-		}
-		case BIG_BANDAGE:
-		{
-			cod_set_user_health(id, cod_get_user_health(id, 1) + cvarBigBandageHP);
-			
-			cod_print_chat(id, "Kupiles^x03 Duzy Bandarz^x01!");
 		}
 		case ROCKET:
 		{

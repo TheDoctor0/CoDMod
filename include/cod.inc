@@ -13,9 +13,11 @@
 #define COD_STOP 4
 #define COD_BLOCK -1.0
 
-#define DMG_CODSKILL (1<<31)
-#define DMG_HEGRENADE (1<<24)
 #define DMG_BULLET (1<<1)
+#define DMG_BURN (1<<3) 
+#define DMG_ACID (1<<20)
+#define DMG_HEGRENADE (1<<24)
+#define DMG_CODSKILL (1<<31)
 
 #define	RENDER_ALWAYS (1<<1)
 #define	RENDER_MOVE (1<<2)
@@ -24,9 +26,9 @@
 #define	RENDER_SHIFT (1<<5)
 
 enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_DEPLOY, 
-	SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_BOX, SOUND_APPLAUSE, SOUND_LAUGH };
+	SOUND_THUNDER, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_BOX, SOUND_APPLAUSE, SOUND_LAUGH };
 enum _:promotions { PROMOTION_NONE, PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION_THIRD };
-enum _:types { NONE = -1, CLASS, ITEM, ADDITIONAL, ROUND, USED, ALL };
+enum _:types { NONE = -1, CLASS, ITEM, ADDITIONAL, ROUND, USED, ALL, FIRE, POISON };
 enum _:hud { TYPE_HUD, TYPE_DHUD };
 
 new const codSounds[sounds][] =
@@ -39,6 +41,7 @@ new const codSounds[sounds][] =
 	"CoDMod/levelup2.wav",
 	"CoDMod/levelup3.wav",
 	"CoDMod/deploy.wav",
+	"CoDMod/thunder.wav",
 	"CoDMod/one.wav",
 	"CoDMod/last.wav",
 	"CoDMod/force.wav",
@@ -142,9 +145,14 @@ Returns player's highest level.
 native cod_get_user_highest_level(id);
 
 /*------------------------------
-Return player's class.
+Return player's class and promotion if necessary.
 ------------------------------*/
-native cod_get_user_class(id);
+native cod_get_user_class(id, &promotion = 0);
+
+/*------------------------------
+Return player's promotion.
+------------------------------*/
+native cod_get_user_promotion(id);
 
 /*------------------------------
 Set player's class.
@@ -160,37 +168,37 @@ native cod_get_class_id(szClass[]);
 /*------------------------------
 Returns class name.
 ------------------------------*/
-native cod_get_class_name(class, dataReturn[], dataLength);
+native cod_get_class_name(class, promotion = 0, dataReturn[], dataLength);
 
 /*------------------------------
 Returns class description.
 ------------------------------*/
-native cod_get_class_desc(class, dataReturn[], dataLength);
+native cod_get_class_desc(class, promotion = 0, dataReturn[], dataLength);
 
 /*------------------------------
 Returns class health bonus.
 ------------------------------*/
-native cod_get_class_health(class);
+native cod_get_class_health(class, promotion = 0);
 
 /*------------------------------
 Returns class intelligence bonus.
 ------------------------------*/
-native cod_get_class_intelligence(class);
+native cod_get_class_intelligence(class, promotion = 0);
 
 /*------------------------------
 Returns class stamina bonus.
 ------------------------------*/
-native cod_get_class_stamina(class);
+native cod_get_class_stamina(class, promotion = 0);
 
 /*------------------------------
 Returns class strength bonus.
 ------------------------------*/
-native cod_get_class_strength(class);
+native cod_get_class_strength(class, promotion = 0);
 
 /*------------------------------
 Returns class condition bonus.
 ------------------------------*/
-native cod_get_class_condition(class);
+native cod_get_class_condition(class, promotion = 0);
 
 /*------------------------------
 Return classes number.
@@ -409,6 +417,12 @@ Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonu
 native cod_get_user_dynamites(id, type = ALL);
 
 /*------------------------------
+Returns player's thunders amount.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+------------------------------*/
+native cod_get_user_thunders(id, type = ALL);
+
+/*------------------------------
 Returns player's teleports amount.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
@@ -454,6 +468,12 @@ Sets player's dynamites amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_set_user_dynamites(id, value, type = ROUND);
+
+/*------------------------------
+Sets player's thunders amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+------------------------------*/
+native cod_set_user_thunders(id, value, type = ROUND);
 
 /*------------------------------
 Sets player's teleports amount.
@@ -503,6 +523,12 @@ Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - unti
 native cod_add_user_dynamites(id, value, type = ROUND);
 
 /*------------------------------
+Adds value to player's thunders amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+------------------------------*/
+native cod_add_user_thunders(id, value, type = ROUND);
+
+/*------------------------------
 Adds value to player's teleports amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
@@ -539,6 +565,11 @@ native cod_use_user_mine(id);
 Use player's dynamite.
 ------------------------------*/
 native cod_use_user_dynamite(id);
+
+/*------------------------------
+Use player's thunder.
+------------------------------*/
+native cod_use_user_thunder(id);
 
 /*------------------------------
 Use player's medkit.
@@ -640,6 +671,13 @@ native cod_show_hud(id, type=0, red=255, green=255, blue=255, Float:x=-1.0, Floa
 /*------------------------------
 Displays screen fade.
 Duration and holdtime are time seconds.
+Fadetype is fade display type:
+- FFADE_IN 0x0000
+- FFADE_OUT 0x0001 
+- FFADE_MODULATE 0x0002
+- FFADE_STAYOUT 0x0004
+Red, green, blue is fade color in RGB
+Alpha is fade power from 0 to 255
 ------------------------------*/
 native cod_display_fade(id, duration, holdtime, fadetype, red, green, blue, alpha);
 
@@ -656,7 +694,7 @@ Amplitude is power of shakes.
 Duration is time in seconds.
 Frequency is noise frequency.
 ------------------------------*/
-native cod_screen_shake(id, amplitude, duration, frequency);
+native cod_screen_shake(id, amplitude = (7<<14), duration = (1<<13), frequency = (1<<14));
 
 /*------------------------------
 Makes an explosion around ent.
@@ -664,13 +702,23 @@ Distance specifies beam distance.
 Explosion is explosion effect.
 Damage_distance is distance from ent where players will be hurt.
 Damage specifies damage dealt to players in damage_distance.
-Factor is intelligence multiplier for damage.
+Factor is intelligence bonus for damage.
 ------------------------------*/
-native cod_make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0.0, Float:damage = 0.0, Float:factor = 0.5)
+native cod_make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0.0, Float:damage = 0.0, Float:factor = 0.5);
+
+/*------------------------------
+Makes repeating damage to player - poison and fire with custom effects are avaiable out of the box.
+Factor is intelligence bonus for damage.
+Time is interval between damage.
+Counter is how many times make damage.
+Flags is damage flag (DMG_BURN for fire, DMG_ACID for poison).
+Type can be FIRE or POISON if want to use custom effects.
+------------------------------*/
+native cod_repeating_damage(attacker, victim, Float:damage, Float:time, counter, flags, type = NONE);
 
 /*------------------------------
 Inflicts damage with intelligence factor.
-Factor is intelligence multiplier for damage.
+Factor is intelligence bonus for damage.
 ------------------------------*/
 native cod_inflict_damage(attacker, victim, Float:damage, Float:factor = 0.5, flags = 0);
 
@@ -680,14 +728,19 @@ Kills a player imitating kill by another player.
 native cod_kill_player(attacker, victim, damageBits);
 
 /*------------------------------
-Register a new item and return its id.
+Register new item and return its id.
 ------------------------------*/
-native cod_register_item(const itemName[], const itemDesc[]);
+native cod_register_item(const name[], const description[]);
 
 /*------------------------------
-Register a new class and return its id.
+Register new class and return its id.
 ------------------------------*/
-native cod_register_class(const className[], const classDesc[], const classFraction[], weapons, health, intelligence, strength, stamina, condition);
+native cod_register_class(const name[], const description[], const fraction[], weapons, health, intelligence, strength, stamina, condition);
+
+/*------------------------------
+Register new class promotion and return its id.
+------------------------------*/
+native cod_register_promotion(const name[], const description[], const className[], level, promotion, weapons, health, intelligence, strength, stamina, condition);
 
 /*------------------------------
 Multiforward executed when player's class is changed.
@@ -753,6 +806,42 @@ forward cod_start_round();
 Multiforward executed on round end event.
 ------------------------------*/
 forward cod_end_round();
+
+/*------------------------------
+Multiforward executed on medkit player heal.
+Id is medkit owner.
+Player is healed player.
+Healed is healed hp.
+Block effect if COD_BLOCK is returned.
+------------------------------*/
+forward cod_medkit_heal(id, player, Float:healed);
+
+/*------------------------------
+Multiforward executed on rocket explosion (when there is damage).
+Id is rocket owner.
+Player is hurt player.
+Damage is damage that rocket made to player.
+Block effect if COD_BLOCK is returned.
+------------------------------*/
+forward cod_rocket_explode(id, player, Float:damage);
+
+/*------------------------------
+Multiforward executed on mine explosion (when there is damage).
+Id is mine owner.
+Player is hurt player.
+Damage is damage that mine made to player.
+Block effect if COD_BLOCK is returned.
+------------------------------*/
+forward cod_mine_explode(id, player, Float:damage);
+
+/*------------------------------
+Multiforward executed on dynamite explosion (when there is damage).
+Id is dynamite owner.
+Player is hurt player.
+Damage is damage that dynamite made to player.
+Block effect if COD_BLOCK is returned.
+------------------------------*/
+forward cod_dynamite_explode(id, player, Float:damage);
 
 /*------------------------------
 Item forward executed on item give.
