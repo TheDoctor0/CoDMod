@@ -12,7 +12,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.71"
+#define VERSION "1.0.75"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -2920,40 +2920,15 @@ public remove_tasks(id)
 
 stock remove_ents(id = 0)
 {
-	new ent = find_ent_by_class(NONE, "rocket");
-	
-	while(ent > 0)
+	new className[16], ents = engfunc(EngFunc_NumberOfEntities);
+
+	for(new i = get_maxplayers(); i <= ents; i++)
 	{
-		if(!id || entity_get_edict(ent, EV_ENT_owner) == id) remove_entity(ent);
-		
-		ent = find_ent_by_class(ent, "rocket");
-	}
-	
-	ent = find_ent_by_class(NONE, "mine");
-	
-	while(ent > 0)
-	{
-		if(!id || entity_get_edict(ent, EV_ENT_owner) == id) remove_entity(ent);
-		
-		ent = find_ent_by_class(ent, "mine");
-	}
-	
-	ent = find_ent_by_class(NONE, "dynamite");
-	
-	while(ent > 0)
-	{
-		if(!id || entity_get_edict(ent, EV_ENT_owner) == id) remove_entity(ent);
-		
-		ent = find_ent_by_class(ent, "dynamite");
-	}
-	
-	ent = find_ent_by_class(NONE, "medkit");
-	
-	while(ent > 0)
-	{
-		if(!id || entity_get_edict(ent, EV_ENT_owner) == id) remove_entity(ent);
-		
-		ent = find_ent_by_class(ent, "medkit");
+		if(!pev_valid(i) || (id && pev(i, pev_owner) != id)) continue;
+
+		pev(i, pev_classname, className, charsmax(className));
+
+		if(equal(className, "rocket") || equal(className, "mine") || equal(className, "dynamite") || equal(className, "medkit")) engfunc(EngFunc_RemoveEntity, i);
 	}
 }
 
@@ -4371,7 +4346,10 @@ stock remove_render_type(id, type)
 
 stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0.0, Float:damage = 0.0, Float:factor = 0.5, type = NONE, suicide = 0)
 {
-	new Float:tempOrigin[3], origin[3];
+	new Float:tempOrigin[3], origin[3], id;
+
+	if(is_user_valid(ent)) id = ent;
+	else id = entity_get_edict(ent, EV_ENT_owner);
 	
 	entity_get_vector(ent, EV_VEC_origin, tempOrigin);
 
@@ -4417,10 +4395,7 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 
 	if(damage_distance > 0.0)
 	{
-		new entList[33], id, foundPlayers = find_sphere_class(ent, "player", damage_distance, entList, MAX_PLAYERS), player, ret;
-
-		if(is_user_valid(ent)) id = ent;
-		else id = entity_get_edict(ent, EV_ENT_owner);
+		new entList[33], foundPlayers = find_sphere_class(ent, "player", damage_distance, entList, MAX_PLAYERS), player, ret;
 
 		for(new i = 0; i < foundPlayers; i++)
 		{

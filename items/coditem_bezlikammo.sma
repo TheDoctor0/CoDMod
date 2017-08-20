@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Bezlik Amunicji"
-#define VERSION "1.0"
+#define VERSION "1.0.0"
 #define AUTHOR "O'Zone"
 
 new const name[] = "Bezlik Amunicji";
