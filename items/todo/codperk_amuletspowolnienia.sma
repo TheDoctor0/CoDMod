@@ -85,23 +85,6 @@ public Set_Slow_Think(ent)
 	set_pev(ent,pev_nextthink, halflife_time() + 1.0)
 	return PLUGIN_CONTINUE
 }
-stock Display_Icon(id,red,green,blue,name[], enable)
-{
-	if (!pev_valid(id))
-	{
-		return PLUGIN_HANDLED
-	}
-	
-	message_begin( MSG_ONE, get_user_msgid("StatusIcon"), {0,0,0}, id ) 
-	write_byte( enable ) 	
-	write_string( name ) 
-	write_byte( red ) // red 
-	write_byte( green ) // green 
-	write_byte( blue ) // blue 
-	message_end()
-	
-	return PLUGIN_CONTINUE
-}
 stock Spawn_Ent(const classname[]) 
 {
 	new ent = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, classname))

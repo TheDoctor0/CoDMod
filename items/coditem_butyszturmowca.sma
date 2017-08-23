@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Buty Szturmowca"
-#define VERSION "1.0"
+#define VERSION "1.0.0"
 #define AUTHOR "O'Zone"
 
 new const name[] = "Buty Szturmowca";
@@ -17,6 +17,3 @@ public plugin_init()
 
 public cod_item_enabled(id, value)
 	cod_set_user_footsteps(id, 1, ITEM);
-	
-public cod_item_disabled(id)
-	cod_set_user_footsteps(id, 0, ITEM);

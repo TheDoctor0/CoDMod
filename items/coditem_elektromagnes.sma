@@ -9,12 +9,12 @@
 new const name[] = "Elektromagnes";
 new const description[] = "Co runde mozesz polozyc elektromagnes, ktory przyciaga bronie przeciwnikow";
 
-enum _:electromagnetSounds { CHARGE, ACTIVATE, DEPLOY };
+enum _:itemSounds { CHARGE, ACTIVATE, DEPLOY };
 
-new const electromagnetSound[electromagnetSounds][] = { "CoDMod/mine_charge.wav", "CoDMod/mine_activate.wav", "CoDMod/mine_deploy.wav" };
-new const electromagnetModel[] = "models/CodMod/electromagnet.mdl";
+new const itemSound[itemSounds][] = { "CoDMod/mine_charge.wav", "CoDMod/mine_activate.wav", "CoDMod/mine_deploy.wav" };
+new const itemModel[] = "models/CodMod/item.mdl";
 
-new hasElectromagnet, spriteWhite;
+new usedItem, spriteWhite;
 
 public plugin_init()
 {
@@ -28,12 +28,18 @@ public plugin_init()
 
 public plugin_precache()
 {
-	precache_model(electromagnetModel);
+	precache_model(itemModel);
 
-	for(new i = 0; i < sizeof(electromagnetSound); i++) precache_sound(electromagnetSound[i]);
+	for(new i = 0; i < sizeof(itemSound); i++) precache_sound(itemSound[i]);
 
 	spriteWhite = precache_model("sprites/white.spr");
 }
+
+public cod_item_enabled(id, value)
+	rem_bit(id, usedItem);
+
+public cod_item_spawned(id)
+	rem_bit(id, usedItem);
 
 public client_disconnected(id)
 	remove_ents(id);
@@ -41,25 +47,16 @@ public client_disconnected(id)
 public cod_new_round()
 	remove_ents();
 
-public cod_item_spawned(id)
-	set_bit(id, hasElectromagnet);
-
-public cod_item_enabled(id, value)
-	set_bit(id, hasElectromagnet);
-
-public cod_item_disabled(id)
-	rem_bit(id, hasElectromagnet);
-
 public cod_item_skill_used(id)
 {	
-	if(!get_bit(id, hasElectromagnet))
+	if(get_bit(id, usedItem))
 	{
-		cod_show_hud(id, TYPE_HUD, 218, 40, 67, -1.0, 0.35, 0, 0.0, 3.0, 0.0, 0.0, "Wykorzystales juz elektromagnes!");
+		cod_show_hud(id, TYPE_HUD, 218, 40, 67, -1.0, 0.35, 0, 0.0, 3.0, 0.0, 0.0, "Wykorzystales juz elektromagnes w tej rundzie!");
 
 		return PLUGIN_CONTINUE;
 	}
 
-	rem_bit(id, hasElectromagnet);
+	set_bit(id, usedItem);
 	
 	new Float:origin[3], ent = create_entity("info_target");
 
@@ -70,23 +67,23 @@ public cod_item_skill_used(id)
 	entity_set_int(ent, EV_INT_solid, SOLID_NOT);
 	entity_set_vector(ent, EV_VEC_origin, origin);
 	entity_set_float(ent, EV_FL_ltime, halflife_time() + 20.0 + 3.5);
-	entity_set_model(ent, electromagnetModel);
+	entity_set_model(ent, itemModel);
 
 	drop_to_floor(ent);
 	
-	emit_sound(ent, CHAN_VOICE, electromagnetSound[CHARGE], 0.5, ATTN_NORM, 0, PITCH_NORM );
-	emit_sound(ent, CHAN_ITEM, electromagnetSound[DEPLOY], 0.5, ATTN_NORM, 0, PITCH_NORM );
+	emit_sound(ent, CHAN_VOICE, itemSound[CHARGE], 0.5, ATTN_NORM, 0, PITCH_NORM );
+	emit_sound(ent, CHAN_ITEM, itemSound[DEPLOY], 0.5, ATTN_NORM, 0, PITCH_NORM );
 	
 	entity_set_float(ent, EV_FL_nextthink, halflife_time() + 3.5);
 	
 	return PLUGIN_CONTINUE;
 }
 
-public electromagnet_think(ent)
+public item_think(ent)
 {
 	if(entity_get_int(ent, EV_INT_iuser2)) return PLUGIN_CONTINUE;
 	
-	if(!entity_get_int(ent, EV_INT_iuser1)) emit_sound(ent, CHAN_VOICE, electromagnetSound[ACTIVATE], 0.5, ATTN_NORM, 0, PITCH_NORM );
+	if(!entity_get_int(ent, EV_INT_iuser1)) emit_sound(ent, CHAN_VOICE, itemSound[ACTIVATE], 0.5, ATTN_NORM, 0, PITCH_NORM );
 	
 	entity_set_int(ent, EV_INT_iuser1, 1);
 	

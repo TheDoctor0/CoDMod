@@ -1,35 +1,39 @@
-/* ---------------Perk stworzony dla amxx.pl---------------
-------------------przez bulka_z_maslem--------------------- */
-
 #include <amxmodx>
-#include <fun>
-#include <codmod>
+#include <cod>
 
-new nazwa[] = "Adidaski"
-new opis[] = "Dostajesz 50 kondycji oraz nie slychac twoich krokow"
+#define PLUGIN "CoD Item Buty z Kalkuty"
+#define VERSION "1.0.0"
+#define AUTHOR "O'Zone"
 
+new const name[] = "Buty z Kalkuty";
+new const description[] = "Dostajesz +%s kondycji oraz nie slychac twoich krokow";
 
-public plugin_init() 
+new itemValue[MAX_PLAYERS + 1];
+
+public plugin_init()
 {
-	register_plugin(nazwa, "1.0", "bulka_z_maslem");
-	
-	cod_register_perk(nazwa, opis);
+	register_plugin(PLUGIN, VERSION, AUTHOR);
+
+	cod_register_item(name, description);
 }
 
-public cod_perk_enabled(id)
+public cod_item_enabled(id, value)
 {
-	cod_set_user_bonus_trim(id, cod_get_user_trim(id, 0, 0)+50);
-	set_user_footsteps(id, 1);
+	itemValue[id] = value == -1 ? random_num(25, 40): value;
+
+	cod_add_user_bonus_condition(id, itemValue[id]);
+
+	cod_set_user_footsteps(id, 1, ITEM);
 }
-	
-public cod_perk_disabled(id)
+
+public cod_item_upgrade(id)
 {
-	set_user_footsteps(id, 0);
-	cod_set_user_bonus_trim(id, cod_get_user_trim(id, 0, 0)-50);
+	cod_add_user_bonus_condition(id, -itemValue[id]);
+
+	itemValue[id] = max(0, itemValue[id] + random_num(-2, 6));
+
+	cod_add_user_bonus_condition(id, itemValue[id]);
 }
-	
-/* ---------------Perk stworzony dla amxx.pl---------------
-------------------przez bulka_z_maslem--------------------- */
-/* AMXX-Studio Notes - DO NOT MODIFY BELOW HERE
-*{\\ rtf1\\ ansi\\ deff0{\\ fonttbl{\\ f0\\ fnil Tahoma;}}\n\\ viewkind4\\ uc1\\ pard\\ lang1045\\ f0\\ fs16 \n\\ par }
-*/
+
+public cod_item_value(id)
+	return itemValue[id];

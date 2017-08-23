@@ -5,6 +5,12 @@
 #define VERSION "1.0.0"
 #define AUTHOR "O'Zone"
 
+#define RANDOM_MIN 35
+#define RANDOM_MAX 55
+#define UPGRADE_MIN -3
+#define UPGRADE_MAX 6
+#define VALUE_MIN 0
+
 new const name[] = "Adrenalina";
 new const description[] = "Za kazdego fraga dostajesz +%s HP";
 
@@ -18,10 +24,14 @@ public plugin_init()
 }
 
 public cod_item_enabled(id, value)
-	itemValue[id] = value == -1 ? random_num(35, 65): value;
+	itemValue[id] = value == RANDOM ? random_num(RANDOM_MIN, RANDOM_MAX): value;
 
 public cod_item_upgrade(id)
-	itemValue[id] = max(0, itemValue[id] + random_num(-4, 9));
+{
+	if(itemValue[id] <= VALUE_MIN && VALUE_MIN > 0) return COD_STOP;
+	
+	itemValue[id] = max(VALUE_MIN, itemValue[id] + random_num(UPGRADE_MIN, UPGRADE_MAX));
+}
 
 public cod_item_value(id)
 	return itemValue[id];
