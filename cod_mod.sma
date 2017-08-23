@@ -12,7 +12,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.75"
+#define VERSION "1.0.76"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -346,9 +346,10 @@ public plugin_natives()
 	register_native("cod_show_hud", "_cod_show_hud", 1);
 	register_native("cod_make_bartimer", "_cod_make_bartimer", 1);
 	register_native("cod_display_fade", "_cod_display_fade", 1);
+	register_native("cod_display_icon", "_cod_display_icon", 1);
 	register_native("cod_screen_shake", "_cod_screen_shake", 1);
 	register_native("cod_make_explosion", "_cod_make_explosion", 1);
-	register_native("cod_repeating_damage", "_cod_repeating_damage", 1);
+	register_native("cod_repeat_damage", "_cod_repeat_damage", 1);
 	register_native("cod_inflict_damage", "_cod_inflict_damage", 1);
 	register_native("cod_kill_player", "_cod_kill_player", 1);
 	
@@ -3808,6 +3809,23 @@ public _cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:tim
 public _cod_display_fade(id, duration, holdtime, fadetype, red, green, blue, alpha)
 	display_fade(id, duration * (1<<12), holdtime * (1<<12), fadetype, red, green, blue, alpha);
 
+public _cod_display_icon(id, red, green, blue, const name[], enable)
+{
+	if(!is_user_alive(id)) return;
+
+	static msgStatusIcon;
+	
+	if(!msgStatusIcon) msgStatusIcon = get_user_msgid("StatusIcon");
+
+	message_begin(MSG_ONE, msgStatusIcon, {0, 0, 0}, id);
+	write_byte(enable);
+	write_string(name);
+	write_byte(red);
+	write_byte(green);
+	write_byte(blue);
+	message_end();
+}
+
 public _cod_show_hud(id, type, red, green, blue, Float:x, Float:y, effects, Float:fxtime, Float:holdtime, Float:fadeintime, Float:fadeouttime, const text[], any:...)
 {
 	static hudText[128];
@@ -3832,7 +3850,7 @@ public _cod_make_bartimer(id, duration, start)
 public _cod_drop_weapon(id)
 	engclient_cmd(id, "drop");
 
-public _cod_repeating_damage(attacker, victim, Float:damage, Float:time, counter, flags, instant)
+public _cod_repeat_damage(attacker, victim, Float:damage, Float:time, counter, flags, instant)
 {
 	new data[5];
 
@@ -3844,12 +3862,12 @@ public _cod_repeating_damage(attacker, victim, Float:damage, Float:time, counter
 
 	if(task_exists(victim + attacker + TASK_DAMAGE)) remove_task(victim + attacker + TASK_DAMAGE);
 
-	set_task(time, "repeating_damage", victim + attacker + TASK_DAMAGE, data, sizeof(data), counter ? "a" : "b", counter - instant);
+	set_task(time, "repeat_damage", victim + attacker + TASK_DAMAGE, data, sizeof(data), counter ? "a" : "b", counter - instant);
 
-	if(instant) repeating_damage(data);
+	if(instant) repeat_damage(data);
 }
 
-public repeating_damage(data[])
+public repeat_damage(data[])
 {
 	if(!is_user_alive(data[VICTIM]))
 	{
@@ -4126,6 +4144,33 @@ stock get_weapons(weapons)
 	}
 	
 	return weaponsList;
+}
+
+stock calculate_left(id, type)
+{
+	codPlayer[id][type][ALL] = 0;
+
+	if(type == PLAYER_TELEPORTS)
+	{
+		for(new i = CLASS; i <= ROUND; i++)
+		{
+			if(codPlayer[id][PLAYER_TELEPORTS][i] == FULL)
+			{
+				codPlayer[id][PLAYER_TELEPORTS][ALL] = FULL;
+
+				break;
+			}
+			else codPlayer[id][PLAYER_TELEPORTS][ALL] += codPlayer[id][PLAYER_TELEPORTS][i];
+		}
+
+		codPlayer[id][PLAYER_TELEPORTS][ALL] = codPlayer[id][PLAYER_TELEPORTS][ALL] == FULL ? FULL : max(0, codPlayer[id][PLAYER_TELEPORTS][ALL] - codPlayer[id][PLAYER_TELEPORTS][USED]);
+	}
+	else
+	{
+		for(new i = CLASS; i <= ROUND; i++) codPlayer[id][type][ALL] += codPlayer[id][type][i];
+
+		codPlayer[id][type][ALL] = max(0, codPlayer[id][type][ALL] - codPlayer[id][type][USED]);
+	}
 }
 
 stock calculate_rockets_left(id)

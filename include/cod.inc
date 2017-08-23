@@ -684,6 +684,14 @@ Alpha is fade power from 0 to 255
 native cod_display_fade(id, duration, holdtime, fadetype, red, green, blue, alpha);
 
 /*------------------------------
+Displays status icon.
+Red, green, blue is status color in RGB.
+Name is status icon name - all icons can be found here https://forums.alliedmods.net/showthread.php?t=52529.
+Enable defines if show or hide icon.
+------------------------------*/
+native cod_display_icon(id, red, green, blue, const name[], enable = 1);
+
+/*------------------------------
 Displays bartimer.
 Duration is time in seconds.
 Start is value from 0-100 and specifies from what percent of bar it starts.
