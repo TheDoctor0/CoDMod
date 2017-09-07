@@ -2,16 +2,47 @@
 #include <cod>
  
 #define PLUGIN "CoD Menu"
-#define VERSION "1.0.0"
+#define VERSION "1.0.5"
 #define AUTHOR "O'Zone" 
 
-new const commandMenu[][] = { "say /help", "say_team /help", "say /pomoc", "say_team /pomoc", "say /menu", "say_team /menu", "menu" };
+new const commandMenu[][] = { "say /help", "say_team /help", "say /pomoc", "say_team /pomoc", "say /komendy", "say_team /komendy", "say /menu", "say_team /menu", "menu" };
+
+new Array:menuTitles, Array:menuCommands;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
 	for(new i; i < sizeof commandMenu; i++) register_clcmd(commandMenu[i], "display_menu");
+}
+
+public plugin_cfg()
+{	
+	menuTitles = ArrayCreate(64, 1);
+	menuCommands = ArrayCreate(64, 1);
+	
+	new menuFile[128]; 
+	
+	get_localinfo("amxx_configsdir", menuFile, charsmax(menuFile));
+	format(menuFile, charsmax(menuFile), "%s/cod_menu.ini", menuFile);
+	
+	if(!file_exists(menuFile)) set_fail_state("[CoD] Brak pliku cod_menu.ini z zawartoscia glownego menu!");
+	
+	new lineContent[128], menuTitle[64], menuCommand[64], file = fopen(menuFile, "r");
+	
+	while(!feof(file))
+	{
+		fgets(file, lineContent, charsmax(lineContent)); trim(lineContent);
+		
+		if(lineContent[0] == ';' || lineContent[0] == '^0') continue;
+
+		parse(lineContent, menuTitle, charsmax(menuTitle), menuCommand, charsmax(menuCommand));
+		
+		ArrayPushString(menuTitles, menuTitle);
+		ArrayPushString(menuCommands, menuCommand);
+	}
+	
+	fclose(file);
 }
 
 public client_putinserver(id)
@@ -27,29 +58,14 @@ public display_menu(id)
 		
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new menu = menu_create("\yMenu \rCoD Mod\w", "display_menu_handle");
- 
-	menu_additem(menu, "\wSklep \rSMS \y(/sklepsms)");
-	menu_additem(menu, "\wInformacje o \rVIPie \y(/vip)");
-	menu_additem(menu, "\wZmien \rSerwer \y(/serwer)");
-	menu_additem(menu, "\wMenu \rSklep \y(/sklep)");
-	menu_additem(menu, "\wMenu \rRynek \y(/rynek)");
-	menu_additem(menu, "\wMenu \rKlan \y(/klan)");
-	menu_additem(menu, "\wMenu \rMisje \y(/misje)");
-	menu_additem(menu, "\wMenu \rKasyno \y(/kasyno)");
-	menu_additem(menu, "\wSkiny \rBroni \y(/skiny)");
-	menu_additem(menu, "\wOpisy \rKlas \y(/klasy)");
-	menu_additem(menu, "\wOpis \rPrzedmiotu \y(/item)");
-	menu_additem(menu, "\wOpisy \rPrzedmiotow \y(/itemy)");
-	menu_additem(menu, "\wUstawienia \rIkon \y(/ikony)");
-	menu_additem(menu, "\wUstawienia \rHUD \y(/hud)");
-	menu_additem(menu, "\wTwoje \rStatystyki \y(/menustaty)");
-	menu_additem(menu, "\wTwoje \rKonto \y(/konto)");
-	menu_additem(menu, "\wWymien \rItem \y(/wymien)");
-	menu_additem(menu, "\wOddaj \rItem \y(/daj)");
-	menu_additem(menu, "\wWyrzuc \rItem \y(/wyrzuc)");
-	menu_additem(menu, "\wPunkty \rStatystyk \y(/punkty)");
-	menu_additem(menu, "\wReset \rPunktow \y(/reset)");
+	new menuTitle[64], menu = menu_create("\yMenu \rCoD Mod\w", "display_menu_handle");
+	
+	for(new i; i < ArraySize(menuTitles); i++)
+	{
+		ArrayGetString(menuTitles, i, menuTitle, charsmax(menuTitle));
+
+		menu_additem(menu, menuTitle);
+	}
     
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
@@ -74,31 +90,12 @@ public display_menu_handle(id, menu, item)
 	}
 
 	if(!item) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	new menuCommand[64];
     
-	switch(item)
-	{ 
-		case 0: cmd_execute(id, "say /sklepsms");
-		case 1: cmd_execute(id, "vip");
-		case 2: cmd_execute(id, "serwer");
-		case 3: cmd_execute(id, "sklep"); 
-		case 4: cmd_execute(id, "rynek");
-		case 5: cmd_execute(id, "klan");
-		case 6: cmd_execute(id, "misje");
-		case 7: cmd_execute(id, "kasyno");
-		case 8: cmd_execute(id, "skiny");
-		case 9: cmd_execute(id, "klasy"); 
-		case 10: cmd_execute(id, "item"); 
-		case 11: cmd_execute(id, "itemy");  
-		case 12: cmd_execute(id, "ikony");
-		case 13: cmd_execute(id, "hud");
-		case 14: cmd_execute(id, "menustaty");
-		case 15: cmd_execute(id, "konto");
-		case 16: cmd_execute(id, "wymien");
-		case 17: cmd_execute(id, "daj");
-		case 18: cmd_execute(id, "wyrzuc");
-		case 19: cmd_execute(id, "punkty");
-		case 20: cmd_execute(id, "reset");
-	}
+	ArrayGetString(menuCommands, item, menuCommand, charsmax(menuCommand));
+	
+	cmd_execute(id, menuCommand);
 	
 	menu_destroy(menu);
 
