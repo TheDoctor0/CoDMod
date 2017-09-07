@@ -8,7 +8,7 @@
 #define NAME         "Mysliwy"
 #define DESCRIPTION  "1/1 ze Scouta, mala widocznosc na nozu, podwojny skok i 1 dynamit"
 #define FRACTION     "SuperPremium"
-#define WEAPONS      (1<<CSW_DEAGLE)|(1<<CSW_SCOUT)
+#define WEAPONS      (1<<CSW_SCOUT)|(1<<CSW_DEAGLE)
 #define HEALTH       30
 #define INTELLIGENCE 0
 #define STRENGTH     10

@@ -9,7 +9,7 @@
 
 #define NAME         "Pulkownik"
 #define DESCRIPTION  "Zadaje coraz wieksze obrazenia wraz ze spadkiem ilosci amunicji w magazynku M249. Mniejsza widocznosc z nozem."
-#define FRACTION     ""
+#define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_M249)|(1<<CSW_GLOCK18)
 #define HEALTH       20
 #define INTELLIGENCE 0

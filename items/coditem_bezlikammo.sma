@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Bezlik Amunicji"
-#define VERSION "1.0.1"
+#define VERSION "1.0.2"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Bezlik Amunicji"

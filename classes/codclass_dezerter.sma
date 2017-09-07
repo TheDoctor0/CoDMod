@@ -9,12 +9,12 @@
 
 #define NAME         "Dezerter"
 #define DESCRIPTION  "Ma 1 rakiete, ubranie wroga i 1/6 szansy na odrodzenie na respie wroga."
-#define FRACTION     ""
+#define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_GALIL)|(1<<CSW_USP)
 #define HEALTH       -10
 #define INTELLIGENCE 0
 #define STRENGTH     10
-#define STAMINA      10
+#define STAMINA      20
 #define CONDITION    10
 
 public plugin_init() 
@@ -32,11 +32,7 @@ public cod_class_enabled(id)
 }
 
 public cod_spawned(id)
-{
-	cod_add_user_rockets(id, 1);
-
 	if(random_num(1, 6) == 1) set_task(0.1, "teleport_to_enemy_spawn");
-}
 
 public cod_class_skill_used(id)
 	cod_use_user_rocket(id);

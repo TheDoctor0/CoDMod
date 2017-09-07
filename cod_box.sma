@@ -6,7 +6,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Box"
-#define VERSION "1.0.0"
+#define VERSION "1.0.2"
 #define AUTHOR "O'Zone"
 
 new const boxClass[] = "cod_box", boxModel[] = "models/CoDMod/box.mdl";
@@ -114,7 +114,7 @@ public touch_box(ent, id)
 	write_byte(10);
 	message_end();
 	
-	engfunc(EngFunc_EmitSound, id, CHAN_WEAPON, codSounds[SOUND_BOX], 1.0, ATTN_NORM, 0, PITCH_NORM);
+	engfunc(EngFunc_EmitSound, id, CHAN_WEAPON, codSounds[SOUND_PICKUP], 1.0, ATTN_NORM, 0, PITCH_NORM);
 
 	get_box(id);
 	

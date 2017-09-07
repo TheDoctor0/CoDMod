@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Intelekt O'Zone"
-#define VERSION "1.0.10"
+#define VERSION "1.0.11"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Intelekt O'Zone"

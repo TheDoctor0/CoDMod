@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Apteczka"
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Apteczka"

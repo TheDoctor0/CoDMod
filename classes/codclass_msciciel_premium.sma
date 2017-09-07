@@ -9,7 +9,7 @@
 #define NAME         "Bomberman"
 #define DESCRIPTION  "1/2 z AWP, 1/2 z noza (PPM), mniejsza widocznosc podczas kucania, zmniejszona grawitacja"
 #define FRACTION     "Premium"
-#define WEAPONS      (1<<CSW_USP)|(1<<CSW_AWP)
+#define WEAPONS      (1<<CSW_AWP)|(1<<CSW_USP)
 #define HEALTH       20
 #define INTELLIGENCE 0
 #define STRENGTH     5

@@ -8,7 +8,7 @@
 
 #define NAME         "Grabiezca"
 #define DESCRIPTION  "Masz 1/4 szansy na kradziez itemu swojej ofiary. Pelny magazynek po zabiciu."
-#define FRACTION     ""
+#define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_FAMAS)|(1<<CSW_USP)
 #define HEALTH       10
 #define INTELLIGENCE 0

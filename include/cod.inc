@@ -5,18 +5,18 @@
 
 #pragma unused codSounds
 
+#define is_user_valid(%1) (1 <= %1 <= MAX_PLAYERS)
+
 #define get_bit(%2,%1) (%1 & (1<<(%2&31)))
 #define set_bit(%2,%1) (%1 |= (1<<(%2&31)))
 #define rem_bit(%2,%1) (%1 &= ~(1 <<(%2&31)))
 
-#define is_user_valid(%1) (1 <= %1 <= MAX_PLAYERS)
+#define COD_CONTINUE  0
+#define COD_STOP      4
+#define COD_BLOCK     -1.0
 
-#define COD_CONTINUE 0
-#define COD_STOP     4
-#define COD_BLOCK    -1.0
-
-#define FL_WATERJUMP (1<<11)
-#define FL_ONGROUND  (1<<9)
+#define FL_WATERJUMP  (1<<11)
+#define FL_ONGROUND   (1<<9)
 
 #define DMG_BULLET    (1<<1)
 #define DMG_BURN      (1<<3)
@@ -30,8 +30,8 @@
 #define RENDER_DUCK   (1<<4)
 #define RENDER_SHIFT  (1<<5)
 
-enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_DEPLOY, 
-    SOUND_THUNDER, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_BOX, SOUND_APPLAUSE, SOUND_LAUGH };
+enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_DEPLOY, SOUND_ACTIVATE, 
+	SOUND_CHARGE, SOUND_PICKUP, SOUND_THUNDER, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_APPLAUSE, SOUND_LAUGH };
 enum _:promotions { PROMOTION_NONE, PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION_THIRD };
 enum _:types { RANDOM = -3, FULL, NONE, CLASS, ITEM, ADDITIONAL, ROUND, USED, ALL };
 enum _:repeating { FIRE, POISON, HEAL };
@@ -39,38 +39,40 @@ enum _:hud { TYPE_HUD, TYPE_DHUD };
 
 new const codSounds[sounds][] =
 {
-    "CoDMod/select.wav",
-    "CoDMod/close.wav",
-    "CoDMod/start.wav",
-    "CoDMod/start2.wav",
-    "CoDMod/levelup.wav",
-    "CoDMod/levelup2.wav",
-    "CoDMod/levelup3.wav",
-    "CoDMod/deploy.wav",
-    "CoDMod/thunder.wav",
-    "CoDMod/one.wav",
-    "CoDMod/last.wav",
-    "CoDMod/force.wav",
-    "CoDMod/humiliation.wav",
-    "CoDMod/bomb.wav",
-    "CoDMod/box.wav",
-    "CoDMod/applause.wav",
-    "CoDMod/laugh.wav"
+	"CoDMod/select.wav",
+	"CoDMod/close.wav",
+	"CoDMod/start.wav",
+	"CoDMod/start2.wav",
+	"CoDMod/levelup.wav",
+	"CoDMod/levelup2.wav",
+	"CoDMod/levelup3.wav",
+	"CoDMod/deploy.wav",
+	"CoDMod/activate.wav",
+	"CoDMod/charge.wav",
+	"CoDMod/pickup.wav",
+	"CoDMod/thunder.wav",
+	"CoDMod/one.wav",
+	"CoDMod/last.wav",
+	"CoDMod/force.wav",
+	"CoDMod/humiliation.wav",
+	"CoDMod/bomb.wav",
+	"CoDMod/applause.wav",
+	"CoDMod/laugh.wav"
 };
 
 /*------------------------------
-Returns if player is logged in his account.
+Return if player is logged in his account.
 Account menu is diplayed if not logged in.
 ------------------------------*/
 native cod_check_account(id);
 
 /*------------------------------
-Returns if player has a VIP.
+Return if player has a VIP.
 ------------------------------*/
 native cod_get_user_vip(id);
 
 /*------------------------------
-Returns player's honor amount.
+Return player's honor amount.
 ------------------------------*/
 native cod_get_user_honor(id);
 
@@ -85,27 +87,27 @@ Adds value to player's honor amount.
 native cod_add_user_honor(id, value);
 
 /*------------------------------
-Returns clan.
+Return clan.
 ------------------------------*/
 native cod_get_user_clan(id);
 
 /*------------------------------
-Returns clan's name.
+Return clan's name.
 ------------------------------*/
 native cod_get_clan_name(clan, dataReturn[], dataLength);
 
 /*------------------------------
-Returns player's mission id. NONE (-1) if player have no mission in progress.
+Return player's mission id. NONE (-1) if player have no mission in progress.
 ------------------------------*/
 native cod_get_user_mission(id);
 
 /*------------------------------
-Returns player's mission progress.
+Return player's mission progress.
 ------------------------------*/
 native cod_get_user_mission_progress(id);
 
 /*------------------------------
-Returns player's mission need.
+Return player's mission need.
 ------------------------------*/
 native cod_get_user_mission_need(id);
 
@@ -120,7 +122,17 @@ Removes entity of box and icon.
 native cod_remove_box_icon(ent);
 
 /*------------------------------
-Returns player's exp.
+Return player's time in seconds
+------------------------------*/
+native cod_get_user_time(id);
+
+/*------------------------------
+Return player's time as text with hours, minutes, seconds
+------------------------------*/
+native cod_get_user_time_text(id, dataReturn[], dataLength);
+
+/*------------------------------
+Return player's exp.
 ------------------------------*/
 native cod_get_user_exp(id);
 
@@ -131,7 +143,7 @@ To remove exp use negative value.
 native cod_set_user_exp(id, value);
 
 /*------------------------------
-Returns exp multiplied by player's exp bonus.
+Return exp multiplied by player's exp bonus.
 ------------------------------*/
 native cod_get_user_bonus_exp(id, value);
 
@@ -141,12 +153,12 @@ Return exp needed for level.
 native cod_get_level_exp(level);
 
 /*------------------------------
-Returns player's level.
+Return player's level.
 ------------------------------*/
 native cod_get_user_level(id);
 
 /*------------------------------
-Returns player's highest level.
+Return player's highest level.
 ------------------------------*/
 native cod_get_user_highest_level(id);
 
@@ -172,37 +184,37 @@ Return class using class name.
 native cod_get_class_id(szClass[]);
 
 /*------------------------------
-Returns class name.
+Return class name.
 ------------------------------*/
 native cod_get_class_name(class, promotion = 0, dataReturn[], dataLength);
 
 /*------------------------------
-Returns class description.
+Return class description.
 ------------------------------*/
 native cod_get_class_desc(class, promotion = 0, dataReturn[], dataLength);
 
 /*------------------------------
-Returns class health bonus.
+Return class health bonus.
 ------------------------------*/
 native cod_get_class_health(class, promotion = 0);
 
 /*------------------------------
-Returns class intelligence bonus.
+Return class intelligence bonus.
 ------------------------------*/
 native cod_get_class_intelligence(class, promotion = 0);
 
 /*------------------------------
-Returns class stamina bonus.
+Return class stamina bonus.
 ------------------------------*/
 native cod_get_class_stamina(class, promotion = 0);
 
 /*------------------------------
-Returns class strength bonus.
+Return class strength bonus.
 ------------------------------*/
 native cod_get_class_strength(class, promotion = 0);
 
 /*------------------------------
-Returns class condition bonus.
+Return class condition bonus.
 ------------------------------*/
 native cod_get_class_condition(class, promotion = 0);
 
@@ -212,7 +224,7 @@ Return classes number.
 native cod_get_classes_num();
 
 /*------------------------------
-Returns item and assigns value of item to variable.
+Return item and assigns value of item to variable.
 ------------------------------*/
 native cod_get_user_item(id, &value = 0);
 
@@ -225,12 +237,12 @@ native cod_set_user_item(id, item = 0, value = 0);
 
 /*------------------------------
 Upgrades player's item
-If check = 1 returns if item is upgradable.
+If check = 1 Return if item is upgradable.
 ------------------------------*/
 native cod_upgrade_user_item(id, check = 0);
 
 /*------------------------------
-Returns item id using item name.
+Return item id using item name.
 ------------------------------*/
 native cod_get_item_id(szItem[]);
 
@@ -240,12 +252,12 @@ Zwraca nazwe itemu.
 native cod_get_item_name(item, dataReturn[], dataLength);
 
 /*------------------------------
-Returns item description.
+Return item description.
 ------------------------------*/
 native cod_get_item_desc(item, dataReturn[], dataLength);
 
 /*------------------------------
-Returns items number.
+Return items number.
 ------------------------------*/
 native cod_get_items_num();
 
@@ -282,8 +294,8 @@ If maximum = 1 player's max health limit is applied.
 native cod_add_user_health(id, value, maximum = 1);
 
 /*------------------------------
-Returns health statistic points.
-If current_health = 1 returns current health points.
+Return health statistic points.
+If current_health = 1 Return current health points.
 If class_health = 1 adds class health points.
 If stats_health = 1 adds stats health points.
 If bonus_health = 1 adds extra health points.
@@ -292,7 +304,7 @@ If base_health = 1 adds base 100HP.
 native cod_get_user_health(id, currect_health = 0, class_health = 1, stats_health = 1, bonus_health = 1, base_health = 0);
 
 /*------------------------------
-Returns intelligence statistic points.
+Return intelligence statistic points.
 If class_intelligence = 1 adds class intelligence points.
 If stats_intelligence = 1 adds stats intelligence points.
 If bonus_intelligence = 1 adds extra intelligence points.
@@ -300,7 +312,7 @@ If bonus_intelligence = 1 adds extra intelligence points.
 native cod_get_user_intelligence(id, class_intelligence = 1, stats_intelligence = 1, bonus_intelligence = 1);
 
 /*------------------------------
-Returns stamina statistic points.
+Return stamina statistic points.
 If class_stamina = 1 adds class stamina points.
 If stats_stamina = 1 adds stats stamina points.
 If bonus_stamina = 1 adds extra stamina points.
@@ -308,7 +320,7 @@ If bonus_stamina = 1 adds extra stamina points.
 native cod_get_user_stamina(id, class_stamina = 1, stats_stamina = 1, bonus_stamina = 1);
 
 /*------------------------------
-Returns strength statistic points.
+Return strength statistic points.
 If class_strength = 1 adds class strength points.
 If stats_strength = 1 adds stats strength points.
 If bonus_strength = 1 adds extra strength points.
@@ -316,7 +328,7 @@ If bonus_strength = 1 adds extra strength points.
 native cod_get_user_strength(id, class_strength = 1, stats_strength = 1, bonus_strength = 1);
 
 /*------------------------------
-Returns condition statistic points.
+Return condition statistic points.
 If class_condition = 1 adds class condition points.
 If stats_condition = 1 adds stats condition points.
 If bonus_condition = 1 adds extra condition points.
@@ -324,27 +336,27 @@ If bonus_condition = 1 adds extra condition points.
 native cod_get_user_condition(id, class_condition = 1, stats_condition = 1, bonus_condition = 1);
 
 /*------------------------------
-Returns player's extra health points.
+Return player's extra health points.
 ------------------------------*/
 native cod_get_user_bonus_health(id);
 
 /*------------------------------
-Returns player's extra intelligence points.
+Return player's extra intelligence points.
 ------------------------------*/
 native cod_get_user_bonus_intelligence(id);
 
 /*------------------------------
-Returns player's extra stamina points.
+Return player's extra stamina points.
 ------------------------------*/
 native cod_get_user_bonus_stamina(id);
 
 /*------------------------------
-Returns player's extra strength points.
+Return player's extra strength points.
 ------------------------------*/
 native cod_get_user_bonus_strength(id);
 
 /*------------------------------
-Returns player's extra condition points.
+Return player's extra condition points.
 ------------------------------*/
 native cod_get_user_bonus_condition(id);
 
@@ -399,55 +411,55 @@ Adds value to player's extra condition points.
 native cod_add_user_bonus_condition(id, value);
 
 /*------------------------------
-Returns player's rockets amount.
+Return player's rockets amount.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_get_user_rockets(id, type = ALL);
 
 /*------------------------------
-Returns player's mines amount.
+Return player's mines amount.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_get_user_mines(id, type = ALL);
 
 /*------------------------------
-Returns player's medkits amount.
+Return player's medkits amount.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_get_user_medkits(id, type = ALL);
 
 /*------------------------------
-Returns player's dynamites amount.
+Return player's dynamites amount.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_get_user_dynamites(id, type = ALL);
 
 /*------------------------------
-Returns player's thunders amount.
+Return player's thunders amount.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_get_user_thunders(id, type = ALL);
 
 /*------------------------------
-Returns player's teleports amount.
+Return player's teleports amount.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_get_user_teleports(id, type = ALL);
 
 /*------------------------------
-Returns player's multijumps amount.
+Return player's multijumps amount.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_get_user_multijumps(id, type = ALL);
 
 /*------------------------------
-Returns player's gravity amount.
+Return player's gravity amount.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native Float:cod_get_user_gravity(id, type = ALL);
 
 /*------------------------------
-Returns player's armor amount.
+Return player's armor amount.
 ------------------------------*/
 native cod_get_user_armor(id);
 
@@ -498,6 +510,12 @@ Sets player's gravity amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_set_user_gravity(id, Float:value, type = ROUND);
+
+/*------------------------------
+Sets player's speed amount. Alternative to Condition bonus.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+------------------------------*/
+native cod_set_user_speed(id, Float:value, type = ROUND);
 
 /*------------------------------
 Sets player's armor amount.
@@ -553,6 +571,12 @@ Type can be CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - unt
 native cod_add_user_gravity(id, Float:value, type = ROUND);
 
 /*------------------------------
+Adds value to player's speed amount. Alternative to Condition bonus.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+------------------------------*/
+native cod_add_user_speed(id, Float:value, type = ROUND);
+
+/*------------------------------
 Adds value to player's armor amount.
 ------------------------------*/
 native cod_add_user_armor(id, value);
@@ -588,24 +612,24 @@ Use player's teleport.
 native cod_use_user_teleport(id);
 
 /*------------------------------
-Returns if player have resistance for powers.
+Return if player have resistance for powers.
 ------------------------------*/
 native cod_get_user_resistance(id);
 
 /*------------------------------
-Returns if player have bunnyhop.
+Return if player have bunnyhop.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
 ------------------------------*/
 native cod_get_user_bunnyhop(id, type = ALL);
 
 /*------------------------------
-Returns if player have silent walk.
+Return if player have silent walk.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 ------------------------------*/
 native cod_get_user_footsteps(id, type = ALL);
 
 /*------------------------------
-Returns if player have model of the opponent.
+Return if player have model of the opponent.
 Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 ------------------------------*/
 native cod_get_user_model(id, type = ALL);
@@ -644,7 +668,7 @@ Removes player a weapon and disallows player to own it
 native cod_take_weapon(id, weapon);
 
 /*------------------------------
-Returns player's render amount.
+Return player's render amount.
 Type can be NONE - at this moment (with status and weapon rules applied), ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_get_user_render(id, type = NONE);
@@ -730,9 +754,9 @@ Time is interval between damage.
 Counter is how many times make damage. If counter = 0 effect will last till player death or round end - usefull for constant healing.
 Flags is damage flag (DMG_).
 Flags can also be FIRE, POISON or HEAL (healing player instead of huring) if want to use custom effects out of the box.
-Instant makes first damage immidiately.
+Instant makes first damage immediately.
 ------------------------------*/
-native cod_repeating_damage(attacker, victim, Float:damage, Float:time, counter = 1, flags = DMG_CODSKILL, instant = 1);
+native cod_repeat_damage(attacker, victim, Float:damage, Float:time, counter = 1, flags = DMG_CODSKILL, instant = 1);
 
 /*------------------------------
 Inflicts damage with intelligence factor.
@@ -975,50 +999,50 @@ Item value will always be at least 0;
 ------------------------------*/
 stock cod_random_upgrade(&value, upgradeMin, upgradeMax, valueMin = NONE, valueMax = NONE)
 {
-    if((valueMin != NONE && value <= valueMin) || (valueMax != NONE && value >= valueMax)) return COD_STOP;
+	if((valueMin != NONE && value <= valueMin) || (valueMax != NONE && value >= valueMax)) return COD_STOP;
 
-    value = max(0, value + (upgradeMin & upgradeMin) ? random_num(upgradeMin, upgradeMax) : (random(2) ? random_num(upgradeMin, -1) : random_num(1, upgradeMax)));
+	value = max(0, value + (upgradeMin & upgradeMin) ? random_num(upgradeMin, upgradeMax) : (random(2) ? random_num(upgradeMin, -1) : random_num(1, upgradeMax)));
 
-    if(valueMax != NONE) value = min(value, valueMax);
+	if(valueMax != NONE) value = min(value, valueMax);
 
-    return COD_CONTINUE;
+	return COD_CONTINUE;
 }
 
 stock cod_print_chat(id, const text[] = "", any:...)
 {
-    new message[192];
+	new message[192];
 
-    if(numargs() == 2) copy(message, charsmax(message), text);
-    else vformat(message, charsmax(message), text, 3);
+	if(numargs() == 2) copy(message, charsmax(message), text);
+	else vformat(message, charsmax(message), text, 3);
 
-    client_print_color(id, id, "^x04[CoD]^x01 %s", message);
+	client_print_color(id, id, "^x04[CoD]^x01 %s", message);
 }
 
 stock cmd_execute(id, const text[], any:...) 
 {
-    #pragma unused text
+	#pragma unused text
 
-    new message[256];
+	new message[256];
 
-    format_args(message, charsmax(message), 1);
+	format_args(message, charsmax(message), 1);
 
-    message_begin(id == 0 ? MSG_ALL : MSG_ONE, SVC_DIRECTOR, _, id);
-    write_byte(strlen(message) + 2);
-    write_byte(10);
-    write_string(message);
-    message_end();
+	message_begin(id == 0 ? MSG_ALL : MSG_ONE, SVC_DIRECTOR, _, id);
+	write_byte(strlen(message) + 2);
+	write_byte(10);
+	write_string(message);
+	message_end();
 }
 
 stock mysql_escape_string(const source[], dest[], length)
 {
-    copy(dest, length, source);
-    
-    replace_all(dest, length, "\\", "\\\\");
-    replace_all(dest, length, "\0", "\\0");
-    replace_all(dest, length, "\n", "\\n");
-    replace_all(dest, length, "\r", "\\r");
-    replace_all(dest, length, "\x1a", "\Z");
-    replace_all(dest, length, "'", "\'");
-    replace_all(dest, length, "`", "\`");
-    replace_all(dest, length, "^"", "\^"");
+	copy(dest, length, source);
+	
+	replace_all(dest, length, "\\", "\\\\");
+	replace_all(dest, length, "\0", "\\0");
+	replace_all(dest, length, "\n", "\\n");
+	replace_all(dest, length, "\r", "\\r");
+	replace_all(dest, length, "\x1a", "\Z");
+	replace_all(dest, length, "'", "\'");
+	replace_all(dest, length, "`", "\`");
+	replace_all(dest, length, "^"", "\^"");
 }

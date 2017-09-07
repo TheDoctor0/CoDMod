@@ -1,35 +1,29 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Class Szturmowiec"
+#define PLUGIN "CoD Class Mnich"
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new const name[] = "Mnich";
-new const description[] = "Posiada teleport, ktorego moze uzyc co 15 sekund";
-new const fraction[] = "";
-new const weapons = (1<<CSW_AK47)|(1<<CSW_P228);
-new const health = 20;
-new const intelligence = 0;
-new const strength = 0;
-new const stamina = 10;
-new const condition = 20;
+#define NAME         "Mnich"
+#define DESCRIPTION  "Posiada teleport, ktorego moze uzyc co 15 sekund"
+#define FRACTION     "Podstawowe"
+#define WEAPONS      (1<<CSW_AK47)|(1<<CSW_P228)
+#define HEALTH       15
+#define INTELLIGENCE 0
+#define STRENGTH     10
+#define STAMINA      5
+#define CONDITION    10
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	cod_register_class(name, description, fraction, weapons, health, intelligence, strength, stamina, condition);
+	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
 public cod_class_enabled(id, promotion)
-	cod_set_user_teleports(id, -1);
-	
-public cod_class_disabled(id, promotion)
-	cod_set_user_teleports(id, 0);
-
-public cod_class_spawned(id)
-	cod_set_user_teleports(id, -1);
+	cod_set_user_teleports(id, FULL, CLASS);
 
 public cod_class_skill_used(id)
 	cod_use_user_teleport(id);

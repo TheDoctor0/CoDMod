@@ -5,10 +5,10 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-#define NAME        "Aimer"
-#define DESCRIPTION "Ma 1/4 szansy na natychmiastowe zabicie z HeadShota"
-#define FRACTION     ""
-#define WEAPONS      (1<<CSW_P228)|(1<<CSW_M4A1)
+#define NAME         "Aimer"
+#define DESCRIPTION  "Ma 1/4 szansy na natychmiastowe zabicie z HeadShota"
+#define FRACTION     "Podstawowe"
+#define WEAPONS      (1<<CSW_M4A1)|(1<<CSW_P228)
 #define HEALTH       20
 #define INTELLIGENCE 0
 #define STRENGTH     10

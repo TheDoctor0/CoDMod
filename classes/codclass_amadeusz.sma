@@ -7,8 +7,8 @@
 
 #define NAME         "Amadeusz"
 #define DESCRIPTION  "Dodatkowe 3 (+inteligencja) obrazenia z MP5. Posiada podwojny skok."
-#define FRACTION     ""
-#define WEAPONS      (1<<CSW_USP)|(1<<CSW_MP5NAVY)
+#define FRACTION     "Podstawowe"
+#define WEAPONS      (1<<CSW_MP5NAVY)|(1<<CSW_USP)
 #define HEALTH       10
 #define INTELLIGENCE 0
 #define STRENGTH     0

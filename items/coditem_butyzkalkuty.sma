@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Buty z Kalkuty"
-#define VERSION "1.0.4"
+#define VERSION "1.0.5"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Buty z Kalkuty"

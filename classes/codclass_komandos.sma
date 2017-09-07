@@ -8,7 +8,7 @@
 
 #define NAME         "Komandos"
 #define DESCRIPTION  "Natychmiastowe zabicie z noza (PPM), 1/10 z Deagle, podwojny skok"
-#define FRACTION     ""
+#define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_DEAGLE)
 #define HEALTH       30
 #define INTELLIGENCE 0
@@ -28,14 +28,7 @@ public cod_class_enabled(id, promotion)
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
 {
-	if(weapon == CSW_KNIFE && !(pev(attacker, pev_button) & IN_ATTACK))
-	{
-		damage = COD_BLOCK;
-
-		cod_kill_player(attacker, victim, damageBits);
-	}
-
-	if(weapon == CSW_DEAGLE && damageBits & DMG_BULLET && random_num(1, 10) == 1)
+	if((weapon == CSW_KNIFE && !(pev(attacker, pev_button) & IN_ATTACK)) || (weapon == CSW_DEAGLE && damageBits & DMG_BULLET && random_num(1, 10) == 1))
 	{
 		damage = COD_BLOCK;
 

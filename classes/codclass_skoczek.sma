@@ -7,7 +7,7 @@
 
 #define NAME         "Skoczek"
 #define DESCRIPTION  "Ma BunnyHop i dodatkowy skok."
-#define FRACTION     ""
+#define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_UMP45)|(1<<CSW_FIVESEVEN)
 #define HEALTH       0
 #define INTELLIGENCE 0

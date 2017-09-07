@@ -3,7 +3,7 @@
 #include <fakemeta>
 
 #define PLUGIN "CoD Item Przeklete Naboje"
-#define VERSION "1.0.4"
+#define VERSION "1.0.6"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Przeklete Naboje"

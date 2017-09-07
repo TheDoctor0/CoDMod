@@ -7,7 +7,7 @@
 
 #define NAME         "Bomberman"
 #define DESCRIPTION  "Ma 2 dynamity, ktore moze podkladac i detonowac. Ma i polowe mniejsza grawitacje"
-#define FRACTION     ""
+#define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_UMP45)|(1<<CSW_FIVESEVEN)
 #define HEALTH       10
 #define INTELLIGENCE 0

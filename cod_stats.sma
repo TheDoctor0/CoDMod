@@ -8,7 +8,7 @@
 #include <unixtime>
 
 #define PLUGIN "CoD Stats"
-#define VERSION "1.0.0"
+#define VERSION "1.0.2"
 #define AUTHOR "O'Zone"
 
 #define TASK_TIME 9054
@@ -1060,7 +1060,11 @@ public _cod_get_user_time_text(id, dataReturn[], dataLength)
 {
 	if(!is_user_valid(id)) return;
 
-	new tempData[64], seconds = (playerStats[id][TIME] + get_user_time(id)), minutes, hours;
+	static seconds, minutes, hours;
+
+	seconds = playerStats[id][TIME] + get_user_time(id);
+
+	minutes = 0; hours = 0;
 	
 	while(seconds >= 60)
 	{
@@ -1075,9 +1079,7 @@ public _cod_get_user_time_text(id, dataReturn[], dataLength)
 	
 	param_convert(2);
 	
-	formatex(tempData, charsmax(tempData), "%i h %i min %i s", hours, minutes, seconds);
-
-	copy(dataReturn, dataLength, tempData);
+	formatex(dataReturn, dataLength, "%i h %i min %i s", hours, minutes, seconds);
 }
 
 stock get_loguser_index()

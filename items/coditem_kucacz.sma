@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Kucacz"
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Kucacz"

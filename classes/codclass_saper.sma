@@ -7,7 +7,7 @@
 
 #define NAME         "Saper"
 #define DESCRIPTION  "Ma 2 miny i nieco zmniejszona grawitacje. Jest mniej widoczny z P90."
-#define FRACTION     ""
+#define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_P90)|(1<<CSW_FIVESEVEN)
 #define HEALTH       10
 #define INTELLIGENCE 0

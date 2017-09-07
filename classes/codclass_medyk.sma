@@ -5,28 +5,25 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new const name[] = "Medyk";
-new const description[] = "Ma 2 apteczki, ktorymi moze leczyc siebie i innych.";
-new const fraction[] = "";
-new const weapons = (1<<CSW_M4A1)|(1<<CSW_GLOCK18);
-new const health = 10;
-new const intelligence = 0;
-new const strength = 0;
-new const stamina = 30;
-new const condition = 0;
+#define NAME         "Medyk"
+#define DESCRIPTION  "Ma 2 apteczki, ktorymi moze leczyc siebie i innych."
+#define FRACTION     "Podstawowe"
+#define WEAPONS      (1<<CSW_M4A1)|(1<<CSW_GLOCK18)
+#define HEALTH       10
+#define INTELLIGENCE 0
+#define STRENGTH     10
+#define STAMINA      20
+#define CONDITION    0
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	cod_register_class(name, description, fraction, weapons, health, intelligence, strength, stamina, condition);
+	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
 public cod_class_enabled(id, promotion)
-	cod_set_user_medkits(id, 2);
-
-public cod_class_spawned(id)
-	cod_add_user_medkits(id, 2);
+	cod_set_user_medkits(id, 2, CLASS);
 
 public cod_class_skill_used(id)
 	cod_use_user_medkit(id);

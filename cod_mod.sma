@@ -12,7 +12,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.95"
+#define VERSION "1.0.106"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -554,7 +554,7 @@ public select_fraction_handle(id, menu, item)
 	
 	menu_destroy(menu);
 	
-	new menu = menu_create("\yWybierz \rKlase\w:", "select_class_handle");
+	new menu = menu_create("\yWybierz \rKlase\w:", "select_class_confirm");
 
 	for(new i = 1; i < ArraySize(codClasses); i++)
 	{
@@ -656,8 +656,8 @@ public select_class_confirm(id, menu, item)
 	if(codPlayer[id][PLAYER_PROMOTION]) ArrayGetArray(codPromotions, codPlayer[id][PLAYER_PROMOTION_ID], codClass);
 	else ArrayGetArray(codClasses, class, codClass);
 	
-	format(menuData, charsmax(menuData), "\yKlasa: \w%s^n\yBronie:\w %s^n\yZdrowie: \w%i^n\yInteligencja: \w%i^n\ySila: \w%i^n\yWytrzymalosc: \w%i^n\yKondycja: \w%i^n\yOpis: \w%s^n", 
-		codClass[CLASS_NAME], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_HEAL], codClass[CLASS_INT], codClass[CLASS_STR], codClass[CLASS_STAM], codClass[CLASS_COND], codClass[CLASS_DESC]);
+	format(menuData, charsmax(menuData), "\yKlasa: \r%s^n\yBronie:\w %s^n\yZdrowie: \w%i^n\yInteligencja: \w%i^n\ySila: \w%i^n\yWytrzymalosc: \w%i^n\yKondycja: \w%i^n\yOpis: \w%s^n", 
+		codClass[CLASS_NAME], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_HEAL], codClass[CLASS_INT], codClass[CLASS_STR], codClass[CLASS_STAM], codClass[CLASS_COND], codClass[CLASS_DESC], codClass[CLASS_DESC]);
 
 	menu = menu_create(menuData, "select_class_confirm_handle");
 
@@ -759,7 +759,7 @@ public display_classes_description_handle(id, menu, item)
 	
 	ArrayGetArray(codClasses, class, codClass);
 
-	format(menuData, charsmax(menuData), "\yKlasa: \w%s^n\yBronie:\w %s^n\yZdrowie: \w%i^n\yInteligencja: \w%i^n\ySila: \w%i^n\yWytrzymalosc: \w%i^n\yKondycja: \w%i^n\yOpis: \w%s^n", 
+	format(menuData, charsmax(menuData), "\yKlasa: \r%s^n\yBronie:\w %s^n\yZdrowie: \w%i^n\yInteligencja: \w%i^n\ySila: \w%i^n\yWytrzymalosc: \w%i^n\yKondycja: \w%i^n\yOpis: \w%s^n", 
 		codClass[CLASS_NAME], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_HEAL], codClass[CLASS_INT], codClass[CLASS_STR], codClass[CLASS_STAM], codClass[CLASS_COND], codClass[CLASS_DESC]);
 
 	menu = menu_create(menuData, "classes_description_handle");
@@ -2462,7 +2462,7 @@ public show_info(id)
 		return PLUGIN_CONTINUE;
 	}
 	
-	static hudData[512], className[MAX_NAME], itemName[MAX_NAME], clanName[MAX_NAME], missionProgress[MAX_NAME], Float:levelPercent, exp, target;
+	static hudData[512], className[MAX_NAME], itemName[MAX_NAME], clanName[MAX_NAME], missionProgress[MAX_NAME], gameTime[MAX_NAME], Float:levelPercent, exp, target;
 
 	clanName = ""; missionProgress = "";
 	
@@ -2488,13 +2488,16 @@ public show_info(id)
 		format(clanName, charsmax(clanName), "^n[Klan : %s]", clanName);
 	}
 
-	if(cod_get_user_mission(id) > NONE) formatex(missionProgress, charsmax(missionProgress), "^n[Misja : %i/%i (%0.1f%s)]", cod_get_user_mission_progress(id), cod_get_user_mission_need(id), float(cod_get_user_mission_progress(id)) / float(cod_get_user_mission_need(id)) * 100.0, "%%");
+	if(cod_get_user_mission(id) > NONE) formatex(missionProgress, charsmax(missionProgress), "^n[Misja : %i/%i (%0.1f%s)]", 
+		cod_get_user_mission_progress(id), cod_get_user_mission_need(id), float(cod_get_user_mission_progress(id)) / float(cod_get_user_mission_need(id)) * 100.0, "%%");
+
+	cod_get_user_time_text(id, gameTime, charsmax(gameTime));
 
 	exp = codPlayer[target][PLAYER_LEVEL] - 1 >= 0 ? get_level_exp(codPlayer[target][PLAYER_LEVEL] - 1) : 0;
 	levelPercent = codPlayer[target][PLAYER_LEVEL] < cvarLevelLimit ? (float((codPlayer[target][PLAYER_EXP] - exp)) / float((get_level_exp(codPlayer[target][PLAYER_LEVEL]) - exp))) * 100.0 : 0.0;
 	
-	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot : %s (%i/%i)]%s^n[Zycie : %i]^n[Honor : %i]", 
-	className, clanName, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, codPlayer[target][PLAYER_ITEM_DURA], cvarMaxDurability, missionProgress, get_user_health(id), cod_get_user_honor(target));
+	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot : %s (%i/%i)]%s^n[Zycie : %i]^n[Honor : %i]^n[Czas Gry : %s]", 
+	className, clanName, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, codPlayer[target][PLAYER_ITEM_DURA], cvarMaxDurability, missionProgress, get_user_health(id), cod_get_user_honor(target), gameTime);
 	
 	if(get_exp_bonus(target, 100) > 100) format(hudData, charsmax(hudData), "%s^n[Exp Bonus : %i%s]", hudData, get_exp_bonus(target, 100) - 100, "%%");
 
@@ -3642,16 +3645,16 @@ public _cod_set_user_multijumps(id, value, type)
 	codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS][ALL];
 }
 	
-public _cod_set_user_gravity(id, type, Float:value)
+public _cod_set_user_gravity(id, Float:value, type)
 {
 	codPlayer[id][PLAYER_GRAVITY][type] = _:(type == ALL ? floatmax(0.01, value) : value);
 
 	set_gravity(id);
 }
 
-public _cod_set_user_speed(id, type, Float:value)
+public _cod_set_user_speed(id, Float:value, type)
 {
-	codPlayer[id][PLAYER_SPEED][type] = value;
+	codPlayer[id][PLAYER_SPEED][type] = _:value;
 
 	set_speed(id);
 }
@@ -3710,16 +3713,16 @@ public _cod_add_user_multijumps(id, value, type)
 	codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS][ALL];
 }
 	
-public _cod_add_user_gravity(id, type, Float:value)
+public _cod_add_user_gravity(id, Float:value, type)
 {
 	codPlayer[id][PLAYER_GRAVITY][type] = _:(type == ALL ? floatmax(0.01, codPlayer[id][PLAYER_GRAVITY][type] + value) : codPlayer[id][PLAYER_GRAVITY][type] + value);
 	
 	set_gravity(id);
 }
 
-public _cod_add_user_speed(id, type, Float:value)
+public _cod_add_user_speed(id, Float:value, type)
 {
-	codPlayer[id][PLAYER_SPEED][type] += value;
+	codPlayer[id][PLAYER_SPEED][type] += _:value;
 	
 	set_speed(id);
 }
@@ -3760,7 +3763,7 @@ public _cod_get_user_model(id, type)
 public _cod_set_user_resistance(id, value)
 	codPlayer[id][PLAYER_RESISTANCE] = value;
 
-public _cod_set_user_bunnyhop(id, type, value)
+public _cod_set_user_bunnyhop(id, value, type)
 {
 	codPlayer[id][PLAYER_BUNNYHOP][type] = value;
 
@@ -3771,7 +3774,7 @@ public _cod_set_user_bunnyhop(id, type, value)
 	codPlayer[id][PLAYER_BUNNYHOP][ALL] = enabled;
 }
 
-public _cod_set_user_footsteps(id, type, value)
+public _cod_set_user_footsteps(id, value, type)
 {
 	codPlayer[id][PLAYER_FOOTSTEPS][type] = value;
 
@@ -3784,7 +3787,7 @@ public _cod_set_user_footsteps(id, type, value)
 	set_user_footsteps(id, enabled);
 }
 
-public _cod_set_user_model(id, type, value)
+public _cod_set_user_model(id, value, type)
 {
 	codPlayer[id][PLAYER_MODEL][type] = value;
 
@@ -3824,7 +3827,7 @@ public _cod_take_weapon(id, weapon)
 public _cod_get_user_render(id, type)
 	return render_count(id, type);
 
-public _cod_set_user_render(id, type, value, status, weapon, Float:timer)
+public _cod_set_user_render(id, value, type, status, weapon, Float:timer)
 {
 	if(timer == 0.0)
 	{

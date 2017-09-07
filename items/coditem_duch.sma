@@ -2,11 +2,11 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Duch"
-#define VERSION "1.0.3"
+#define VERSION "1.0.5"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Duch"
-#define DESCRIPTION "Jestes calkowicie niewidzialny, ale masz 1 HP. Dodatkowo masz podwojny skok"
+#define DESCRIPTION "Jestes calkowicie niewidzialny, ale masz tylko 1 HP. Dodatkowo masz podwojny skok."
 
 new itemActive;
 

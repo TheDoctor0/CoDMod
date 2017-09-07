@@ -6,9 +6,9 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Skrytobojca"
-#define DESCRIPTION  "Po uzyciu mocy klasy jest niewidzialny przez 15s. Ma podwojny skok i 1/2 na zabicie z noza (PPM)."
-#define FRACTION     ""
-#define WEAPONS      (1<<CSW_DEAGLE)|(1<<CSW_UMP45)
+#define DESCRIPTION  "Po uzyciu mocy klasy jest niewidzialny przez 15s. Posiada podwojny skok."
+#define FRACTION     "Podstawowe"
+#define WEAPONS      (1<<CSW_UMP45)|(1<<CSW_DEAGLE)
 #define HEALTH       -10
 #define INTELLIGENCE 0
 #define STRENGTH     10
@@ -24,9 +24,6 @@ public plugin_init()
 
 public cod_class_enabled(id, promotion)
 	cod_set_user_multijumps(id, 1, CLASS);
-
-public cod_class_spawned(id)
-	cod_add_user_multijumps(id, 1, CLASS);
 
 public cod_class_skill_used(id)
 	cod_set_user_render(id, 0, CLASS, RENDER_ALWAYS, 0, 15.0);

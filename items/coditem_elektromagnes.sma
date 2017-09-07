@@ -3,18 +3,15 @@
 #include <engine>
 
 #define PLUGIN "CoD Item Elektromagnes"
-#define VERSION "1.0.4"
+#define VERSION "1.0.9"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Elektromagnes"
 #define DESCRIPTION "Co runde mozesz polozyc elektromagnes, ktory przyciaga bronie przeciwnikow"
 
-enum _:itemSounds { CHARGE, ACTIVATE, DEPLOY };
+new const itemModel[] = "models/CodMod/magnet.mdl";
 
-new const itemSound[itemSounds][] = { "CoDMod/mine_charge.wav", "CoDMod/mine_activate.wav", "CoDMod/mine_deploy.wav" };
-new const itemModel[] = "models/CodMod/item.mdl";
-
-new itemUsed, spriteWhite;
+new itemUsed;
 
 public plugin_init()
 {
@@ -26,13 +23,7 @@ public plugin_init()
 }
 
 public plugin_precache()
-{
 	precache_model(itemModel);
-
-	for(new i = 0; i < sizeof(itemSound); i++) precache_sound(itemSound[i]);
-
-	spriteWhite = precache_model("sprites/white.spr");
-}
 
 public cod_item_enabled(id, value)
 	rem_bit(id, itemUsed);
@@ -70,8 +61,8 @@ public cod_item_skill_used(id)
 
 	drop_to_floor(ent);
 	
-	emit_sound(ent, CHAN_VOICE, itemSound[CHARGE], 0.5, ATTN_NORM, 0, PITCH_NORM );
-	emit_sound(ent, CHAN_ITEM, itemSound[DEPLOY], 0.5, ATTN_NORM, 0, PITCH_NORM );
+	emit_sound(ent, CHAN_VOICE, codSounds[SOUND_CHARGE], 0.5, ATTN_NORM, 0, PITCH_NORM);
+	emit_sound(ent, CHAN_ITEM, codSounds[SOUND_DEPLOY], 0.5, ATTN_NORM, 0, PITCH_NORM);
 	
 	entity_set_float(ent, EV_FL_nextthink, halflife_time() + 3.5);
 	
@@ -82,7 +73,7 @@ public item_think(ent)
 {
 	if(entity_get_int(ent, EV_INT_iuser2)) return PLUGIN_CONTINUE;
 	
-	if(!entity_get_int(ent, EV_INT_iuser1)) emit_sound(ent, CHAN_VOICE, itemSound[ACTIVATE], 0.5, ATTN_NORM, 0, PITCH_NORM );
+	if(!entity_get_int(ent, EV_INT_iuser1)) emit_sound(ent, CHAN_VOICE, codSounds[SOUND_ACTIVATE], 0.5, ATTN_NORM, 0, PITCH_NORM);
 	
 	entity_set_int(ent, EV_INT_iuser1, 1);
 	
@@ -121,31 +112,8 @@ public item_think(ent)
 
 		return PLUGIN_CONTINUE;
 	}
-	
-	new beamOrigin[3];
 
-	FVecIVec(origin, beamOrigin);
-	
-	message_begin(MSG_BROADCAST, SVC_TEMPENTITY, beamOrigin);
-	write_byte(TE_BEAMCYLINDER);
-	write_coord(beamOrigin[0]);
-	write_coord(beamOrigin[1]);
-	write_coord(beamOrigin[2]);
-	write_coord(beamOrigin[0]);
-	write_coord(beamOrigin[1] + floatround(distance));
-	write_coord(beamOrigin[2] + floatround(distance));
-	write_short(spriteWhite);
-	write_byte(0);
-	write_byte(0);
-	write_byte(10);
-	write_byte(10);
-	write_byte(255);
-	write_byte(0);
-	write_byte(100);
-	write_byte(255);
-	write_byte(5);
-	write_byte(0);
-	message_end();
+	cod_make_explosion(ent, floatround(distance), 0);
 	
 	entity_set_float(ent, EV_FL_nextthink, halflife_time() + 0.1);
 	

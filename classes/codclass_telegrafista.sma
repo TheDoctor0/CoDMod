@@ -8,27 +8,27 @@
 #define TASK_RADAR 84722
 #define TASK_STOP 89431
 
-new const name[] = "Telegrafista";
-new const description[] = "Moze aktywowac na 60s radar pokazujacy pozycje przeciwnikow.";
-new const fraction[] = "";
-new const weapons = (1<<CSW_AK47)|(1<<CSW_GLOCK18);
-new const health = 20;
-new const intelligence = 0;
-new const strength = 0;
-new const stamina = 20;
-new const condition = 0;
+#define NAME         "Telegrafista"
+#define DESCRIPTION  "Moze aktywowac na 60s radar pokazujacy pozycje przeciwnikow."
+#define FRACTION     "Podstawowe"
+#define WEAPONS      (1<<CSW_AK47)|(1<<CSW_GLOCK18)
+#define HEALTH       20
+#define INTELLIGENCE 0
+#define STRENGTH     0
+#define STAMINA      20
+#define CONDITION    0
 
-new used;
+new classUsed;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	cod_register_class(name, description, fraction, weapons, health, intelligence, strength, stamina, condition);
+	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
 public cod_class_enabled(id)
-	rem_bit(id, used);
+	rem_bit(id, classUsed);
 
 public cod_class_disabled(id)
 {
@@ -41,7 +41,7 @@ public cod_class_spawned(id)
 	remove_task(id + TASK_RADAR);
 	remove_task(id + TASK_STOP);
 
-	rem_bit(id, used);
+	rem_bit(id, classUsed);
 }
 
 public cod_class_skill_used(id)
@@ -54,14 +54,14 @@ public radar_stop(id)
 {
 	id -= TASK_STOP;
 
-	set_bit(id, used);
+	set_bit(id, classUsed);
 }
 
 public radar_scan(id)
 {
 	id -= TASK_RADAR;
 
-	if(!is_user_alive(id) || get_bit(id, used))
+	if(!is_user_alive(id) || get_bit(id, classUsed))
 	{
 		remove_task(id + TASK_RADAR);
 
