@@ -6,7 +6,7 @@
 #include <cod>
 
 #define PLUGIN  "CoD Icons"
-#define VERSION "1.0.1"
+#define VERSION "1.0.2"
 #define AUTHOR  "O'Zone"
 
 #define TASK_PLANT 6583
@@ -137,7 +137,7 @@ public bomb_drop()
 
 public bomb_dropped()
 {
-	remove_ent(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
+	remove_icon(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
 
 	new bombEnt;
 
@@ -148,7 +148,7 @@ public bomb_picked()
 {
 	remove_task(TASK_DROPPED);
 
-	remove_ent(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
+	remove_icon(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
 }
 
 public bomb_plant()
@@ -162,7 +162,7 @@ public bomb_plant()
 
 public bomb_planted()
 {
-	remove_ent(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
+	remove_icon(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
 
 	new bombEnt;
 
@@ -180,7 +180,7 @@ public bomb_timer()
 
 	if(--bombTimer == 10)
 	{
-		remove_ent(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
+		remove_icon(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
 
 		spawn_sprite(bombEntity[BOMB_PLANTED], BOMB_EXPLODE);
 	}
@@ -188,9 +188,9 @@ public bomb_timer()
 
 public cod_new_round()
 {
-	remove_ent(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
-	remove_ent(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
-	remove_ent(iconEntity[BOMB_EXPLODE], BOMB_EXPLODE);
+	remove_icon(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
+	remove_icon(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
+	remove_icon(iconEntity[BOMB_EXPLODE], BOMB_EXPLODE);
 }
 
 public cod_start_round()
@@ -204,9 +204,9 @@ public cod_end_round()
 
 	bombEntity[BOMB_PLANTED] = 0;
 
-	remove_ent(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
-	remove_ent(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
-	remove_ent(iconEntity[BOMB_EXPLODE], BOMB_EXPLODE);
+	remove_icon(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
+	remove_icon(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
+	remove_icon(iconEntity[BOMB_EXPLODE], BOMB_EXPLODE);
 
 	remove_task(TASK_PLANT);
 	remove_task(TASK_PLANTED);
@@ -248,6 +248,7 @@ public check_visible(ent, pSet)
 	if(!pev_valid(ent)) return FMRES_IGNORED;
 	
 	static className[32];
+
 	pev(ent, pev_classname, className, charsmax(className));
 
 	if(!check_classname(className)) return FMRES_IGNORED;
@@ -264,6 +265,7 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 	if(!is_user_connected(host) || !pev_valid(ent) || !pev_valid(pev(ent, pev_iuser1))) return FMRES_IGNORED;
 	
 	static className[32];
+
 	pev(ent, pev_classname, className, charsmax(className));
 
 	if(!check_classname(className)) return FMRES_IGNORED;
@@ -421,13 +423,14 @@ public _cod_remove_box_icon(ent)
 
 		if(pev_valid(icon)) remove_entity(icon);
 		
-		remove_ent(ent, BOX);
+		remove_icon(ent, BOX);
 	}
 }
 
 stock normalize(Float:originIn[3], Float:originOut[3], Float:multiplier)
 {
 	new Float:fLen = xs_vec_len(originIn);
+
 	xs_vec_copy(originIn, originOut);
 	
 	originOut[0] /= fLen, originOut[1] /= fLen, originOut[2] /= fLen;
@@ -441,7 +444,7 @@ stock check_classname(const className[])
 	return false;
 }
 
-stock remove_ent(ent, sprite)
+stock remove_icon(ent, sprite)
 {
 	if(pev_valid(ent))
 	{
