@@ -6,15 +6,15 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new const name[] = "Grabiezca";
-new const description[] = "Masz 1/4 szansy na kradziez itemu swojej ofiary. Pelny magazynek po zabiciu.";
-new const fraction[] = "";
-new const weapons = (1<<CSW_FAMAS)|(1<<CSW_USP);
-new const health = 10;
-new const intelligence = 0;
-new const strength = 0;
-new const stamina = 0;
-new const condition = 30;
+#define NAME         "Grabiezca"
+#define DESCRIPTION  "Masz 1/4 szansy na kradziez itemu swojej ofiary. Pelny magazynek po zabiciu."
+#define FRACTION     ""
+#define WEAPONS      (1<<CSW_FAMAS)|(1<<CSW_USP)
+#define HEALTH       10
+#define INTELLIGENCE 0
+#define STRENGTH     5
+#define STAMINA      0
+#define CONDITION    15
 
 new const maxClip[31] = { -1, 13, -1, 10,  1,  7,  1,  30, 30,  1,  30,  20,  25, 
 	30, 35, 25,  12,  20, 10,  30, 100,  8, 30,  30, 20,  2,  7, 30, 30, -1,  50 };
@@ -23,7 +23,7 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	cod_register_class(name, description, fraction, weapons, health, intelligence, strength, stamina, condition);
+	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
 public cod_class_kill(killer, victim)
@@ -32,16 +32,6 @@ public cod_class_kill(killer, victim)
 
 	if(cod_get_user_item(victim) && cod_get_user_item(killer) != cod_get_user_item(victim) && random_num(1, 4) == 1) show_question(killer, victim);
 }
-
-stock set_user_clip(id)
-{
-	new weaponName[32], weaponid = -1, weapon = get_user_weapon(id);
-
-	get_weaponname(weapon, weaponName, charsmax(weaponName));
-
-	while((weaponid = engfunc(EngFunc_FindEntityByString, weaponid, "classname", weaponName)) != 0) if(pev(weaponid, pev_owner) == id) set_pdata_int(weaponid, 51, maxClip[weapon], 4);
-}
-
 
 public show_question(id, victim)
 {
@@ -94,4 +84,13 @@ public show_question_handle(id, menu, item)
 
 	cod_set_user_item(victim);
 	cod_set_user_item(id, item, itemValue);
+}
+
+stock set_user_clip(id)
+{
+	new weaponName[32], weaponid = -1, weapon = get_user_weapon(id);
+
+	get_weaponname(weapon, weaponName, charsmax(weaponName));
+
+	while((weaponid = engfunc(EngFunc_FindEntityByString, weaponid, "classname", weaponName)) != 0) if(pev(weaponid, pev_owner) == id) set_pdata_int(weaponid, 51, maxClip[weapon], 4);
 }

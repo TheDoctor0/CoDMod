@@ -1,8 +1,3 @@
 Do zrobienia:
 - Klasy i itemy
 - Statystyki WWW
-- Cvary prędkości
-
-CS:GO
-Zastapic ent id broni
-new weapon = fm_get_user_weapon_entity(id,CSW_KNIFE)

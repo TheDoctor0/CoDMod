@@ -3,17 +3,16 @@
 #include <fakemeta>
 
 #define PLUGIN "CoD Item Przeklete Naboje"
-#define VERSION "1.0.0"
+#define VERSION "1.0.4"
 #define AUTHOR "O'Zone"
 
-#define RANDOM_MIN 6
-#define RANDOM_MAX 9
+#define NAME        "Przeklete Naboje"
+#define DESCRIPTION "Masz 1/%s szansy na wyrzucenie przeciwnika w powietrze przy trafieniu"
+#define RANDOM_MIN  6
+#define RANDOM_MAX  9
 #define UPGRADE_MIN -1
 #define UPGRADE_MAX 1
-#define VALUE_MIN 3
-
-new const name[] = "Przeklete Naboje";
-new const description[] = "Masz 1/%s szansy na wyrzucenie przeciwnika w powietrze przy trafieniu";
+#define VALUE_MIN   3
 
 new itemValue[MAX_PLAYERS + 1];
 
@@ -21,18 +20,14 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
-	cod_register_item(name, description);
+	cod_register_item(NAME, DESCRIPTION, RANDOM_MIN, RANDOM_MAX);
 }
 
 public cod_item_enabled(id, value)
-	itemValue[id] = value == RANDOM ? random_num(RANDOM_MIN, RANDOM_MAX): value;
+	itemValue[id] = value;
 
 public cod_item_upgrade(id)
-{
-	if(itemValue[id] <= VALUE_MIN && VALUE_MIN > 0) return COD_STOP;
-	
-	itemValue[id] = max(VALUE_MIN, itemValue[id] + random_num(UPGRADE_MIN, UPGRADE_MAX));
-}
+	return cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, VALUE_MIN);
 
 public cod_item_value(id)
 	return itemValue[id];

@@ -3,19 +3,17 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Betonowe Cialo"
-#define VERSION "1.0.0"
+#define VERSION "1.0.2"
 #define AUTHOR "O'Zone"
 
 #define TASK_ITEM 90342
 
-#define RANDOM_MIN 10
-#define RANDOM_MAX 15
+#define NAME        "Betonowe Cialo"
+#define DESCRIPTION "Po aktywacji przez %ss otrzymujesz obrazenia jedynie od strzalow w glowe"
+#define RANDOM_MIN  10
+#define RANDOM_MAX  15
 #define UPGRADE_MIN -2
 #define UPGRADE_MAX 3
-#define VALUE_MIN 0
-
-new const name[] = "Betonowe Cialo";
-new const description[] = "Po aktywacji przez %ss otrzymujesz obrazenia jedynie od strzalow w glowe";
 
 new itemValue[MAX_PLAYERS + 1], itemUsed, itemActive;
 
@@ -23,7 +21,7 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
-	cod_register_item(name, description);
+	cod_register_item(NAME, DESCRIPTION, RANDOM_MIN, RANDOM_MAX);
 
 	register_forward(FM_TraceLine, "trace_line");
 }
@@ -32,7 +30,7 @@ public cod_item_enabled(id, value)
 {
 	rem_bit(id, itemUsed);
 
-	itemValue[id] = value == RANDOM ? random_num(RANDOM_MIN, RANDOM_MAX): value;
+	itemValue[id] = value;
 }
 
 public cod_item_disabled(id)
@@ -47,12 +45,8 @@ public cod_item_spawned(id)
 }
 
 public cod_item_upgrade(id)
-{
-	if(itemValue[id] <= VALUE_MIN && VALUE_MIN > 0) return COD_STOP;
+	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
 	
-	itemValue[id] = max(VALUE_MIN, itemValue[id] + random_num(UPGRADE_MIN, UPGRADE_MAX));
-}
-
 public cod_item_value(id)
 	return itemValue[id];
 

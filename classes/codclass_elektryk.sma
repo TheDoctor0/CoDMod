@@ -5,34 +5,37 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new const name[] = "Elektryk";
-new const nameFirst[] = "Zaawansowany Elektryk";
-new const nameSecond[] = "Elitarny Elektryk";
-new const nameThird[] = "Mistrzowski Elektryk";
-new const description[] = "Posiada 3 blyskawice. Ma 10% szansy ma podpalenie przeciwnika po trafieniu USP.";
-new const descriptionFirst[] = "Posiada 4 blyskawice. Ma 10% szansy ma podpalenie przeciwnika po trafieniu USP.";
-new const descriptionSecond[] = "Posiada 5 blyskawic. Ma 10% szansy ma podpalenie przeciwnika po trafieniu USP.";
-new const descriptionThird[] = "Posiada 5 blyskawic. Ma 10% szansy ma podpalenie przeciwnika po trafieniu USP.";
-new const fraction[] = "";
-new const weapons = (1<<CSW_M4A1)|(1<<CSW_USP);
-new const weaponsFirst = (1<<CSW_M4A1)|(1<<CSW_AK47)|(1<<CSW_USP);
-new const health = 30;
-new const intelligence = 0;
-new const strength = 0;
-new const stamina = 10;
-new const condition = 0;
+#define NAME         "Elektryk"
+#define DESCRIPTION  "Posiada 3 blyskawice. Ma 10% szansy ma podpalenie przeciwnika po trafieniu USP."
+#define FRACTION     ""
+#define WEAPONS      (1<<CSW_M4A1)|(1<<CSW_USP)
+#define HEALTH       15
+#define INTELLIGENCE 0
+#define STRENGTH     0
+#define STAMINA      10
+#define CONDITION    5
+
+#define NAME2        "Wyszkolony Elektryk"
+#define DESCRIPTION2 "Posiada 4 blyskawice. Ma 10% szansy ma podpalenie przeciwnika po trafieniu USP."
+
+#define NAME3        "Elitarny Elektryk"
+#define DESCRIPTION3 "Posiada 5 blyskawic. Ma 10% szansy ma podpalenie przeciwnika po trafieniu USP."
+
+#define NAME4        "Mistrzowski Elektryk"
+#define DESCRIPTION4 "Posiada 6 blyskawic. Ma 10% szansy ma podpalenie przeciwnika po trafieniu USP."
+#define WEAPONS4     (1<<CSW_M4A1)|(1<<CSW_AK47)|(1<<CSW_USP)
 
 new classPromotion[MAX_PLAYERS + 1];
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
-	cod_register_class(name, description, fraction, weapons, health, intelligence, strength, stamina, condition);
 
-	cod_register_promotion(nameFirst, descriptionFirst, name, 25, PROMOTION_FIRST, weaponsFirst, health, intelligence, strength, stamina, condition);
-	cod_register_promotion(nameSecond, descriptionSecond, name, 50, PROMOTION_SECOND, weapons, health, intelligence, strength, stamina, condition);
-	cod_register_promotion(nameThird, descriptionThird, name, 150, PROMOTION_THIRD, weapons, health, intelligence, strength, stamina, condition);
+	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
+
+	cod_register_promotion(NAME2, DESCRIPTION2, NAME, 25, PROMOTION_FIRST);
+	cod_register_promotion(NAME3, DESCRIPTION2, NAME, 50, PROMOTION_SECOND);
+	cod_register_promotion(NAME4, DESCRIPTION2, NAME, 150, PROMOTION_THIRD, WEAPONS4);
 }
 
 public cod_class_enabled(id, promotion)

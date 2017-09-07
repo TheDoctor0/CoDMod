@@ -2,17 +2,17 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Kucacz"
-#define VERSION "1.0"
+#define VERSION "1.0.2"
 #define AUTHOR "O'Zone"
 
-new const name[] = "Kucacz";
-new const description[] = "Gdy kucasz jestes praktycznie niewidzialny";
+#define NAME        "Kucacz"
+#define DESCRIPTION "Gdy kucasz jestes praktycznie niewidzialny"
 
 public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
-	cod_register_item(name, description);
+	cod_register_item(NAME, DESCRIPTION);
 }
 
 public cod_item_enabled(id, value)

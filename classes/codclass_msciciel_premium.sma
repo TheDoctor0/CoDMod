@@ -1,32 +1,33 @@
 #include <amxmodx>
+#include <fakemeta>
 #include <cod>
 
 #define PLUGIN "CoD Class Msciciel"
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new const name[] = "Msciciel";
-new const description[] = "1/2 z awp, 1/2 z noża (PPM), mniejsza widocznosc podczas kucania, zmniejszona grawitacja";
-new const fraction[] = "Premium";
-new const weapons = (1<<CSW_USP)|(1<<CSW_AWP);
-new const health = 25;
-new const intelligence = 0;
-new const strength = 0;
-new const stamina = 10;
-new const condition = 20;
+#define NAME         "Bomberman"
+#define DESCRIPTION  "1/2 z AWP, 1/2 z noza (PPM), mniejsza widocznosc podczas kucania, zmniejszona grawitacja"
+#define FRACTION     "Premium"
+#define WEAPONS      (1<<CSW_USP)|(1<<CSW_AWP)
+#define HEALTH       20
+#define INTELLIGENCE 0
+#define STRENGTH     5
+#define STAMINA      20
+#define CONDITION    5
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	cod_register_class(name, description, fraction, weapons, health, intelligence, strength, stamina, condition);
+	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
 public cod_class_enabled(id)
 {
-	cod_add_user_gravity(id, CLASS, -0.45);
+	cod_add_user_gravity(id, 0.45, CLASS);
 
-	cod_set_user_render(id, CLASS, 120, RENDER_DUCK);
+	cod_set_user_render(id, 120, CLASS, RENDER_DUCK);
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)

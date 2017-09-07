@@ -5,21 +5,21 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new const name[] = "Aimer";
-new const description[] = "Ma 1/4 szansy na natychmiastowe zabicie z HeadShota";
-new const fraction[] = "";
-new const weapons = (1<<CSW_P228)|(1<<CSW_M4A1);
-new const health = 20;
-new const intelligence = 0;
-new const strength = 10;
-new const stamina = 0;
-new const condition = 5;
+#define NAME        "Aimer"
+#define DESCRIPTION "Ma 1/4 szansy na natychmiastowe zabicie z HeadShota"
+#define FRACTION     ""
+#define WEAPONS      (1<<CSW_P228)|(1<<CSW_M4A1)
+#define HEALTH       20
+#define INTELLIGENCE 0
+#define STRENGTH     10
+#define STAMINA      0
+#define CONDITION    5
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	cod_register_class(name, description, fraction, weapons, health, intelligence, strength, stamina, condition);
+	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)

@@ -3,27 +3,26 @@
 #include <engine>
 
 #define PLUGIN "CoD Item Elektromagnes"
-#define VERSION "1.0.0"
+#define VERSION "1.0.4"
 #define AUTHOR "O'Zone"
 
-new const name[] = "Elektromagnes";
-new const description[] = "Co runde mozesz polozyc elektromagnes, ktory przyciaga bronie przeciwnikow";
+#define NAME        "Elektromagnes"
+#define DESCRIPTION "Co runde mozesz polozyc elektromagnes, ktory przyciaga bronie przeciwnikow"
 
 enum _:itemSounds { CHARGE, ACTIVATE, DEPLOY };
 
 new const itemSound[itemSounds][] = { "CoDMod/mine_charge.wav", "CoDMod/mine_activate.wav", "CoDMod/mine_deploy.wav" };
 new const itemModel[] = "models/CodMod/item.mdl";
 
-new usedItem, spriteWhite;
+new itemUsed, spriteWhite;
 
 public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
-	cod_register_item(name, description);
+	cod_register_item(NAME, DESCRIPTION);
 	
 	register_think("electromagnet", "electromagnet_think");
-	
 }
 
 public plugin_precache()
@@ -36,10 +35,10 @@ public plugin_precache()
 }
 
 public cod_item_enabled(id, value)
-	rem_bit(id, usedItem);
+	rem_bit(id, itemUsed);
 
 public cod_item_spawned(id)
-	rem_bit(id, usedItem);
+	rem_bit(id, itemUsed);
 
 public client_disconnected(id)
 	remove_ents(id);
@@ -49,14 +48,14 @@ public cod_new_round()
 
 public cod_item_skill_used(id)
 {	
-	if(get_bit(id, usedItem))
+	if(get_bit(id, itemUsed))
 	{
 		cod_show_hud(id, TYPE_HUD, 218, 40, 67, -1.0, 0.35, 0, 0.0, 3.0, 0.0, 0.0, "Wykorzystales juz elektromagnes w tej rundzie!");
 
 		return PLUGIN_CONTINUE;
 	}
 
-	set_bit(id, usedItem);
+	set_bit(id, itemUsed);
 	
 	new Float:origin[3], ent = create_entity("info_target");
 

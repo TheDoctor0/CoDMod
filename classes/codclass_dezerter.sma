@@ -7,33 +7,28 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new const name[] = "Dezerter";
-new const description[] = "Ma 1 rakiete, ubranie wroga i 1/6 szansy na odrodzenie na respie wroga.";
-new const fraction[] = "";
-new const weapons = (1<<CSW_GALIL)|(1<<CSW_USP);
-new const health = -10;
-new const intelligence = 0;
-new const strength = 10;
-new const stamina = 10;
-new const condition = 10;
+#define NAME         "Dezerter"
+#define DESCRIPTION  "Ma 1 rakiete, ubranie wroga i 1/6 szansy na odrodzenie na respie wroga."
+#define FRACTION     ""
+#define WEAPONS      (1<<CSW_GALIL)|(1<<CSW_USP)
+#define HEALTH       -10
+#define INTELLIGENCE 0
+#define STRENGTH     10
+#define STAMINA      10
+#define CONDITION    10
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	cod_register_class(name, description, fraction, weapons, health, intelligence, strength, stamina, condition);
+	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
 public cod_class_enabled(id)
 {
-	cod_set_user_rockets(id, 1);
-	cod_set_user_model(id, CLASS, 1);
-}
-
-public cod_class_disabled(id)
-{
-	cod_set_user_rockets(id, 0);
-	cod_set_user_model(id, CLASS, 0);
+	cod_set_user_rockets(id, 1, CLASS);
+	
+	cod_set_user_model(id, 1, CLASS);
 }
 
 public cod_spawned(id)
@@ -55,8 +50,9 @@ public teleport_to_enemy_spawn(id)
 	FVecIVec(originFloat, origin);
 
 	fm_set_user_origin(id, origin);
+
 	set_pev(id, pev_angles, angle);
-}  
+}
 
 stock const spawnEntString[2][] = {"info_player_deathmatch", "info_player_start"};
 
@@ -70,7 +66,7 @@ stock find_free_spawn(teamNumber, Float:spawnOrigin[3], Float:spawnAngle[3])
 
 	new Float:vicinity = 100.0, entList[1], i;
 
-	for(i = 0; i<maxSpawns; i++) spawnChecked[i] = false;
+	for(i = 0; i < maxSpawns; i++) spawnChecked[i] = false;
 
 	i = 0;
 
@@ -95,10 +91,10 @@ stock find_free_spawn(teamNumber, Float:spawnOrigin[3], Float:spawnAngle[3])
 	}
 
 	return 0;
- }
+}
 
- stock fm_find_sphere_class(ent, const className[], Float:radius, entList[], maxEnts, Float:origin[3]={0.0,0.0,0.0})
- {
+stock fm_find_sphere_class(ent, const className[], Float:radius, entList[], maxEnts, Float:origin[3] = {0.0, 0.0, 0.0})
+{
 	if(pev_valid(ent)) pev(ent, pev_origin, origin);
 
 	new tempEnt, tempClass[32], entsFound;

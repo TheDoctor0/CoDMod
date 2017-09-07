@@ -5,32 +5,29 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-new const name[] = "Bomberman";
-new const description[] = "Ma 2 dynamity, ktore moze podkladac i detonowac. Ma mniejsza grawitacje.";
-new const fraction[] = "";
-new const weapons = (1<<CSW_AUG)|(1<<CSW_USP);
-new const health = 10;
-new const intelligence = 0;
-new const strength = 10;
-new const stamina = 20;
-new const condition = 0;
+#define NAME         "Bomberman"
+#define DESCRIPTION  "Ma 2 dynamity, ktore moze podkladac i detonowac. Ma i polowe mniejsza grawitacje"
+#define FRACTION     ""
+#define WEAPONS      (1<<CSW_UMP45)|(1<<CSW_FIVESEVEN)
+#define HEALTH       10
+#define INTELLIGENCE 0
+#define STRENGTH     0
+#define STAMINA      20
+#define CONDITION    0
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	cod_register_class(name, description, fraction, weapons, health, intelligence, strength, stamina, condition);
+	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
 public cod_class_enabled(id, promotion)
 {
-	cod_set_user_dynamites(id, 2);
+	cod_set_user_dynamites(id, 2, CLASS);
 
-	cod_set_user_gravity(id, CLASS, 0.5);
+	cod_set_user_gravity(id, 0.5, CLASS);
 }
-
-public cod_class_spawned(id)
-	cod_add_user_dynamites(id, 2);
 
 public cod_class_skill_used(id)
 	cod_use_user_dynamite(id);

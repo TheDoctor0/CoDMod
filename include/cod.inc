@@ -3,6 +3,8 @@
 #endif
 #define _cod_included
 
+#pragma unused codSounds
+
 #define get_bit(%2,%1) (%1 & (1<<(%2&31)))
 #define set_bit(%2,%1) (%1 |= (1<<(%2&31)))
 #define rem_bit(%2,%1) (%1 &= ~(1 <<(%2&31)))
@@ -10,24 +12,26 @@
 #define is_user_valid(%1) (1 <= %1 <= MAX_PLAYERS)
 
 #define COD_CONTINUE 0
-#define COD_STOP 4
-#define COD_BLOCK -1.0
+#define COD_STOP     4
+#define COD_BLOCK    -1.0
 
-#define	FL_WATERJUMP (1<<11)
-#define	FL_ONGROUND	(1<<9)
+#define FL_WATERJUMP (1<<11)
+#define FL_ONGROUND  (1<<9)
 
-#define DMG_BULLET (1<<1)
+#define DMG_BULLET    (1<<1)
+#define DMG_BURN      (1<<3)
+#define DMG_NERVEGAS  (1<<16)
 #define DMG_HEGRENADE (1<<24)
-#define DMG_CODSKILL (1<<31)
+#define DMG_CODSKILL  (1<<31)
 
-#define	RENDER_ALWAYS (1<<1)
-#define	RENDER_MOVE (1<<2)
-#define	RENDER_STAND (1<<3)
-#define	RENDER_DUCK (1<<4)
-#define	RENDER_SHIFT (1<<5)
+#define RENDER_ALWAYS (1<<1)
+#define RENDER_MOVE   (1<<2)
+#define RENDER_STAND  (1<<3)
+#define RENDER_DUCK   (1<<4)
+#define RENDER_SHIFT  (1<<5)
 
 enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_DEPLOY, 
-	SOUND_THUNDER, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_BOX, SOUND_APPLAUSE, SOUND_LAUGH };
+    SOUND_THUNDER, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_BOX, SOUND_APPLAUSE, SOUND_LAUGH };
 enum _:promotions { PROMOTION_NONE, PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION_THIRD };
 enum _:types { RANDOM = -3, FULL, NONE, CLASS, ITEM, ADDITIONAL, ROUND, USED, ALL };
 enum _:repeating { FIRE, POISON, HEAL };
@@ -35,23 +39,23 @@ enum _:hud { TYPE_HUD, TYPE_DHUD };
 
 new const codSounds[sounds][] =
 {
-	"CoDMod/select.wav",
-	"CoDMod/close.wav",
-	"CoDMod/start.wav",
-	"CoDMod/start2.wav",
-	"CoDMod/levelup.wav",
-	"CoDMod/levelup2.wav",
-	"CoDMod/levelup3.wav",
-	"CoDMod/deploy.wav",
-	"CoDMod/thunder.wav",
-	"CoDMod/one.wav",
-	"CoDMod/last.wav",
-	"CoDMod/force.wav",
-	"CoDMod/humiliation.wav",
-	"CoDMod/bomb.wav",
-	"CoDMod/box.wav",
-	"CoDMod/applause.wav",
-	"CoDMod/laugh.wav"
+    "CoDMod/select.wav",
+    "CoDMod/close.wav",
+    "CoDMod/start.wav",
+    "CoDMod/start2.wav",
+    "CoDMod/levelup.wav",
+    "CoDMod/levelup2.wav",
+    "CoDMod/levelup3.wav",
+    "CoDMod/deploy.wav",
+    "CoDMod/thunder.wav",
+    "CoDMod/one.wav",
+    "CoDMod/last.wav",
+    "CoDMod/force.wav",
+    "CoDMod/humiliation.wav",
+    "CoDMod/bomb.wav",
+    "CoDMod/box.wav",
+    "CoDMod/applause.wav",
+    "CoDMod/laugh.wav"
 };
 
 /*------------------------------
@@ -733,6 +737,7 @@ native cod_repeating_damage(attacker, victim, Float:damage, Float:time, counter 
 /*------------------------------
 Inflicts damage with intelligence factor.
 Factor is intelligence bonus for damage.
+Flags are damage flags (COD_SKILL flag will be added).
 ------------------------------*/
 native cod_inflict_damage(attacker, victim, Float:damage, Float:factor = 0.5, flags = 0);
 
@@ -743,8 +748,11 @@ native cod_kill_player(attacker, victim, damageBits);
 
 /*------------------------------
 Register new item and return its id.
+ValueMin is normal item value or random min value.
+ValueMax is random max value.
+Those values are used for item description and generating random value passed to item plugin.
 ------------------------------*/
-native cod_register_item(const name[], const description[]);
+native cod_register_item(const name[], const description[], valueMin = 0, valueMax = 0);
 
 /*------------------------------
 Register new class and return its id.
@@ -753,8 +761,9 @@ native cod_register_class(const name[], const description[], const fraction[], w
 
 /*------------------------------
 Register new class promotion and return its id.
+Values weapons to condition will be copied from class if not specified.
 ------------------------------*/
-native cod_register_promotion(const name[], const description[], const className[], level, promotion, weapons, health, intelligence, strength, stamina, condition);
+native cod_register_promotion(const name[], const description[], const className[], level, promotion, weapons = NONE, health = NONE, intelligence = NONE, strength = NONE, stamina = NONE, condition = NONE);
 
 /*------------------------------
 Multiforward executed when player's class is changed.
@@ -955,41 +964,61 @@ Class function for victim damage change.
 ------------------------------*/
 forward cod_class_damage_victim(attacker, victim, weapon, &Float:damage, damageBits);
 
-stock cmd_execute(id, const text[], any:...) 
+/*------------------------------
+Stock for easy item upgrade.
+Value is current item value.
+UpgradeMin is minimum upgrade value (can be lower than 0).
+UpgradeMax is maximum upgrade value.
+ValueMin is minimum item value. If reached function will return COD_STOP.
+ValueMax is maximum item value. If reached function will return COD_STOP.
+Item value will always be at least 0;
+------------------------------*/
+stock cod_random_upgrade(&value, upgradeMin, upgradeMax, valueMin = NONE, valueMax = NONE)
 {
-	#pragma unused text
+    if((valueMin != NONE && value <= valueMin) || (valueMax != NONE && value >= valueMax)) return COD_STOP;
 
-	new message[256];
+    value = max(0, value + (upgradeMin & upgradeMin) ? random_num(upgradeMin, upgradeMax) : (random(2) ? random_num(upgradeMin, -1) : random_num(1, upgradeMax)));
 
-	format_args(message, charsmax(message), 1);
+    if(valueMax != NONE) value = min(value, valueMax);
 
-	message_begin(id == 0 ? MSG_ALL : MSG_ONE, SVC_DIRECTOR, _, id);
-	write_byte(strlen(message) + 2);
-	write_byte(10);
-	write_string(message);
-	message_end();
+    return COD_CONTINUE;
 }
 
 stock cod_print_chat(id, const text[] = "", any:...)
 {
-	new message[192];
+    new message[192];
 
-	if(numargs() == 2) copy(message, charsmax(message), text);
-	else vformat(message, charsmax(message), text, 3);
+    if(numargs() == 2) copy(message, charsmax(message), text);
+    else vformat(message, charsmax(message), text, 3);
 
-	client_print_color(id, id, "^x04[CoD]^x01 %s", message);
+    client_print_color(id, id, "^x04[CoD]^x01 %s", message);
+}
+
+stock cmd_execute(id, const text[], any:...) 
+{
+    #pragma unused text
+
+    new message[256];
+
+    format_args(message, charsmax(message), 1);
+
+    message_begin(id == 0 ? MSG_ALL : MSG_ONE, SVC_DIRECTOR, _, id);
+    write_byte(strlen(message) + 2);
+    write_byte(10);
+    write_string(message);
+    message_end();
 }
 
 stock mysql_escape_string(const source[], dest[], length)
 {
-	copy(dest, length, source);
-	
-	replace_all(dest, length, "\\", "\\\\");
-	replace_all(dest, length, "\0", "\\0");
-	replace_all(dest, length, "\n", "\\n");
-	replace_all(dest, length, "\r", "\\r");
-	replace_all(dest, length, "\x1a", "\Z");
-	replace_all(dest, length, "'", "\'");
-	replace_all(dest, length, "`", "\`");
-	replace_all(dest, length, "^"", "\^"");
+    copy(dest, length, source);
+    
+    replace_all(dest, length, "\\", "\\\\");
+    replace_all(dest, length, "\0", "\\0");
+    replace_all(dest, length, "\n", "\\n");
+    replace_all(dest, length, "\r", "\\r");
+    replace_all(dest, length, "\x1a", "\Z");
+    replace_all(dest, length, "'", "\'");
+    replace_all(dest, length, "`", "\`");
+    replace_all(dest, length, "^"", "\^"");
 }

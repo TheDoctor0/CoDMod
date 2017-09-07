@@ -2,17 +2,15 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Buty z Kalkuty"
-#define VERSION "1.0.0"
+#define VERSION "1.0.4"
 #define AUTHOR "O'Zone"
 
-#define RANDOM_MIN 25
-#define RANDOM_MAX 40
+#define NAME        "Buty z Kalkuty"
+#define DESCRIPTION "Dostajesz +%s kondycji oraz nie slychac twoich krokow"
+#define RANDOM_MIN  25
+#define RANDOM_MAX  40
 #define UPGRADE_MIN -2
 #define UPGRADE_MAX 5
-#define VALUE_MIN 3
-
-new const name[] = "Buty z Kalkuty";
-new const description[] = "Dostajesz +%s kondycji oraz nie slychac twoich krokow";
 
 new itemValue[MAX_PLAYERS + 1];
 
@@ -20,12 +18,12 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
-	cod_register_item(name, description);
+	cod_register_item(NAME, DESCRIPTION);
 }
 
 public cod_item_enabled(id, value)
 {
-	itemValue[id] = value == RANDOM ? random_num(RANDOM_MIN, RANDOM_MAX): value;
+	itemValue[id] = value;
 
 	cod_add_user_bonus_condition(id, itemValue[id]);
 
@@ -37,11 +35,9 @@ public cod_item_disabled(id)
 
 public cod_item_upgrade(id)
 {
-	if(itemValue[id] <= VALUE_MIN && VALUE_MIN > 0) return COD_STOP;
-	
 	cod_add_user_bonus_condition(id, -itemValue[id]);
 
-	itemValue[id] = max(VALUE_MIN, itemValue[id] + random_num(UPGRADE_MIN, UPGRADE_MAX));
+	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
 
 	cod_add_user_bonus_condition(id, itemValue[id]);
 }
