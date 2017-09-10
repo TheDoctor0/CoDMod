@@ -12,7 +12,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.106"
+#define VERSION "1.0.109"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -44,7 +44,7 @@ new const commandBlock[][] = { "fullupdate", "cl_autobuy", "cl_rebuy", "cl_setau
 new const maxAmmo[] = { 0, 52, 0, 90, 1, 31, 1, 100, 90, 1, 120, 100, 100, 90, 90, 90, 100, 120, 30, 120, 200, 31, 90, 120, 90, 2, 35, 90, 90,0, 100 };
 new const maxBpAmmo[] = { 0, 30, 90, 200, 90, 32, 100, 100, 35, 52, 120 };
 
-new const pointsDistribution[] = { 1, 3, 5, 10, 25, -1 };
+new const pointsDistribution[] = { 1, 3, 5, 10, 25, FULL };
 
 enum _:models { MODEL_ROCKET, MODEL_MINE, MODEL_DYNAMITE, MODEL_MEDKIT };
 
@@ -2986,7 +2986,7 @@ public show_bonus_info()
 		{
 			new playersToFull = cvarMinBonusPlayers - get_players_amount();
 
-			cod_print_chat(0, "Do pelnego serwera brakuj%s^x03 %i osob%s^x01. Exp jest wiekszy o^x03 %i%%^x01!", playersToFull > 1 ? (playersToFull < 5 ? "a" : "e") : "e", playersToFull, playersToFull == 1 ? "a" : (playersToFull < 5 ? "y" : ""), get_players_amount() * 10);
+			cod_print_chat(0, "Do pelnego serwera brakuj%s^x03 %i osob%s^x01. Exp jest wiekszy o^x03 %i%s^x01!", playersToFull > 1 ? (playersToFull < 5 ? "a" : "e") : "e", playersToFull, playersToFull == 1 ? "a" : (playersToFull < 5 ? "y" : ""), get_players_amount() * 10, "%%");
 		}
 		
 		lastInfo = floatround(get_gametime());
