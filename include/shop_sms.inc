@@ -14,29 +14,9 @@ native ss_register_service(const service_id[]);
  * service_id[] - id uslugi
 ------------------------------*/
 
-native ss_add_code(sms_code[], tariff);
-/*------------------------------
- * Dodaje kod do listy kodow do wykorzystania
- * ---------------------------
- * sms_code[] - kod SMS
- * tariff - taryfa kodu ( wartosc )
-------------------------------*/
-
 native ss_show_sms_info(id);
 /*------------------------------
  * Kontynuuje proces zakupu po zwroceniu wartosci SS_STOP w forwardzie ss_service_chosen
- * ---------------------------
- * id - index gracza dokonujacego zakupu
-------------------------------*/
-
-native ss_log(const message[],any:...);
-/*------------------------------
- * Dodaje informacje do logów.
-------------------------------*/
-
-native bool:ss_is_steam(id);
-/*------------------------------
- * Sprawdza, czy gracz ma steama
  * ---------------------------
  * id - index gracza dokonujacego zakupu
 ------------------------------*/
@@ -83,9 +63,3 @@ forward ss_service_bought(id, amount);
  * id - index gracza dokonujacego zakupu
  * amount - ilosc wykupionej uslugi
 ------------------------------*/
-
-stock pause_plugin() {
-	static szFile[32];
-	get_plugin(-1, szFile, sizeof szFile);
-	pause("ad",szFile);
-}
