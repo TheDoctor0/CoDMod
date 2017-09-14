@@ -32,16 +32,13 @@ public cod_item_disabled(id)
 
 public message_curweapon(msgId, msgDest, id)
 {
-	if(get_msg_arg_int(1) && get_bit(id, itemActive))
-	{
+	if(get_msg_arg_int(1) && get_bit(id, itemActive)) {
 		new maxClip = maxClips[get_msg_arg_int(1)];
 
-		if(get_msg_arg_int(2) < maxClip)
-		{
+		if(get_msg_arg_int(2) < maxClip) {
 			new weapon = get_pdata_cbase(id, 373, 5);
 
-			if(weapon > 0 && (!(((1<<CSW_HEGRENADE)|(1<<CSW_SMOKEGRENADE)|(1<<CSW_FLASHBANG)|(1<<CSW_KNIFE)|(1<<CSW_C4)) & (1<<weapon))))
-			{
+			if(weapon > 0 && (!(((1<<CSW_HEGRENADE)|(1<<CSW_SMOKEGRENADE)|(1<<CSW_FLASHBANG)|(1<<CSW_KNIFE)|(1<<CSW_C4)) & (1<<weapon)))) {
 				set_pdata_int(weapon, 51, maxClip, 4);
 				set_pdata_int(weapon, 52, maxClip, 4);
 

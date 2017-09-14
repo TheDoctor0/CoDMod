@@ -999,11 +999,13 @@ Item value will always be at least 0;
 ------------------------------*/
 stock cod_random_upgrade(&value, upgradeMin, upgradeMax, valueMin = NONE, valueMax = NONE)
 {
-	if((valueMin != NONE && value <= valueMin) || (valueMax != NONE && value >= valueMax)) return COD_STOP;
+	if((valueMin != NONE && value <= valueMin) || (valueMax != NONE && value >= valueMax))
+		return COD_STOP;
 
 	value = max(0, value + (upgradeMin & upgradeMin) ? random_num(upgradeMin, upgradeMax) : (random(2) ? random_num(upgradeMin, -1) : random_num(1, upgradeMax)));
 
-	if(valueMax != NONE) value = min(value, valueMax);
+	if(valueMax != NONE)
+		value = min(value, valueMax);
 
 	return COD_CONTINUE;
 }
@@ -1012,8 +1014,10 @@ stock cod_print_chat(id, const text[] = "", any:...)
 {
 	new message[192];
 
-	if(numargs() == 2) copy(message, charsmax(message), text);
-	else vformat(message, charsmax(message), text, 3);
+	if(numargs() == 2)
+		copy(message, charsmax(message), text);
+	else
+		vformat(message, charsmax(message), text, 3);
 
 	client_print_color(id, id, "^x04[CoD]^x01 %s", message);
 }

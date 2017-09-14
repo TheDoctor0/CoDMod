@@ -65,10 +65,10 @@ public plugin_cfg()
 	new filePath[64]; 
 	
 	get_localinfo("amxx_configsdir", filePath, charsmax(filePath));
+
 	format(filePath, charsmax(filePath), "%s/cod_missions.ini", filePath);
 	
-	if(!file_exists(filePath))
-	{
+	if(!file_exists(filePath)) {
 		new error[128];
 
 		formatex(error, charsmax(error), "[CoD] Nie mozna znalezc pliku cod_missions.ini w lokalizacji %s", filePath);
@@ -78,8 +78,7 @@ public plugin_cfg()
 	
 	new lineData[128], missionData[4][16], codMission[missionInfo], file = fopen(filePath, "r");
 	
-	while(!feof(file)) 
-	{
+	while(!feof(file)) {
 		fgets(file, lineData, charsmax(lineData));
 		
 		if(lineData[0] == ';' || lineData[0] == '^0') continue;
@@ -136,8 +135,7 @@ public mission_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
     
-	if(item == MENU_EXIT)
-    {
+	if(item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -147,8 +145,7 @@ public mission_menu_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	switch(item)
-	{
+	switch(item) {
 		case 0: select_chapter(id);
 		case 1: reset_mission(id, 0, 0);
 		case 2: check_mission(id);
@@ -159,8 +156,7 @@ public mission_menu_handle(id, menu, item)
 
 public mission_menu_callback(id, menu, item)
 {
-	switch(item)
-	{
+	switch(item) {
 		case 0: if(playerData[id][PLAYER_TYPE]) return ITEM_DISABLED;
 		case 1, 2: if(!playerData[id][PLAYER_TYPE]) return ITEM_DISABLED;
 	}
@@ -172,8 +168,7 @@ public select_chapter(id)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(playerData[id][PLAYER_TYPE])
-	{
+	if(playerData[id][PLAYER_TYPE]) {
 		cod_print_chat(id, "Najpierw wykonaj lub zrezygnuj z obecnej misji.");
 
 		return PLUGIN_HANDLED;
@@ -181,8 +176,7 @@ public select_chapter(id)
 
 	new menuData[128], menu = menu_create("\yWybierz \rRozdzial\w:", "select_mission"), callback = menu_makecallback("select_chapter_callback");
 
-	for(new i = 0; i < sizeof(missionChapter); i++)
-	{
+	for(new i = 0; i < sizeof(missionChapter); i++) {
 		formatex(menuData, charsmax(menuData), "Rozdzial \y%s \w(\r%i \wPoziom - \r%i \wPoziom)", missionChapterName[i], missionChapter[i][0], missionChapter[i][1]);
 
 		menu_additem(menu, menuData, _, _, callback);
@@ -206,8 +200,7 @@ public select_mission(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
     
-	if(item == MENU_EXIT)
-    {
+	if(item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -223,14 +216,11 @@ public select_mission(id, menu, item)
 	
 	new menuData[128], missionId[6], codMission[missionInfo], menu = menu_create("\yWybierz \rMisje\w:", "select_mission_handle");
 	
-	for(new i = 0; i < ArraySize(codMissions); i++)
-	{	
+	for(new i = 0; i < ArraySize(codMissions); i++) {	
 		ArrayGetArray(codMissions, i, codMission);
 
-		if(playerData[id][PLAYER_CHAPTER] == codMission[QUEST_CHAPTER])
-		{		
-			switch(codMission[QUEST_TYPE])
-			{
+		if(playerData[id][PLAYER_CHAPTER] == codMission[QUEST_CHAPTER]) {		
+			switch(codMission[QUEST_TYPE]) {
 				case TYPE_KILL: formatex(menuData, charsmax(menuData), "Zabij %i osob \y(Nagroda: %i Expa)", codMission[QUEST_AMOUNT], codMission[QUEST_REWARD]);
 				case TYPE_HEADSHOT: formatex(menuData, charsmax(menuData), "Zabij %i osob z HS \y(Nagroda: %i Expa)",  codMission[QUEST_AMOUNT], codMission[QUEST_REWARD]);
 				case TYPE_PLANT: formatex(menuData, charsmax(menuData), "Podloz %i bomb \y(Nagroda: %i Expa)",  codMission[QUEST_AMOUNT], codMission[QUEST_REWARD]);
@@ -263,8 +253,7 @@ public select_mission_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
     
-	if(item == TYPE_ITEM + 2)
-    {
+	if(item == TYPE_ITEM + 2) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -283,12 +272,10 @@ public select_mission_handle(id, menu, item)
 	playerData[id][PLAYER_ID] = str_to_num(missionId);
 	playerData[id][PLAYER_TYPE] = get_mission_info(playerData[id][PLAYER_ID], QUEST_TYPE);
 	
-	switch(playerData[id][PLAYER_TYPE])
-	{
+	switch(playerData[id][PLAYER_TYPE]) {
 		case TYPE_CLASS: select_class(id);
 		case TYPE_ITEM: select_item(id);
-		default:
-		{
+		default: {
 			cod_print_chat(id, "Rozpoczales wykonywac^x03 misje^x01. Powodzenia!");
 
 			save_mission(id);
@@ -306,8 +293,7 @@ public select_class(id)
 	
 	new menuData[128], className[64], classId[6], menu = menu_create("\yWybierz \rKlase \ydo \yMisji\w:", "select_handle");
 	
-	for(new i = 1; i < cod_get_classes_num(); i++)
-	{
+	for(new i = 1; i < cod_get_classes_num(); i++) {
 		cod_get_class_name(i, _, className, charsmax(className));
 		
 		formatex(menuData,charsmax(menuData), className);
@@ -332,8 +318,7 @@ public select_item(id)
 	
 	new menuData[128], itemName[64], itemId[6], menu = menu_create("\yWybierz \rItem \ydo \yMisji\w:", "select_handle");
 	
-	for(new i = 1; i < cod_get_items_num(); i++)
-	{
+	for(new i = 1; i < cod_get_items_num(); i++) {
 		cod_get_item_name(i, itemName, charsmax(itemName));
 		
 		formatex(menuData,charsmax(menuData), itemName);
@@ -356,8 +341,7 @@ public select_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
     
-	if(item == MENU_EXIT)
-	{
+	if(item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -384,8 +368,7 @@ public select_handle(id, menu, item)
 
 public cod_killed(killer, victim, weaponId, hitPlace)
 {
-	switch(playerData[killer][PLAYER_TYPE])
-	{
+	switch(playerData[killer][PLAYER_TYPE]) {
 		case TYPE_KILL: add_progress(killer);
 		case TYPE_HEADSHOT: if(hitPlace == HIT_HEAD) add_progress(killer);
 		case TYPE_CLASS: if(playerData[killer][PLAYER_ADDITIONAL] == cod_get_user_class(victim)) add_progress(killer);
@@ -404,6 +387,7 @@ public log_event_mission()
 	
 	read_logargv(0, userLog, charsmax(userLog));
 	read_logargv(2, userAction, charsmax(userAction));
+
 	parse_loguser(userLog, userName, charsmax(userName));
 	
 	new id = get_user_index(userName);
@@ -411,9 +395,7 @@ public log_event_mission()
 	if(!is_user_connected(id) || playerData[id][PLAYER_TYPE] == TYPE_NONE) return PLUGIN_HANDLED;
 	
 	if(equal(userAction, "Planted_The_Bomb") && playerData[id][PLAYER_TYPE] == TYPE_PLANT) add_progress(id);
-	
 	if(equal(userAction, "Defused_The_Bomb") && playerData[id][PLAYER_TYPE] == TYPE_DEFUSE) add_progress(id);
-	
 	if(equal(userAction, "Rescued_A_Hostage") && playerData[id][PLAYER_TYPE] == TYPE_RESCUE) add_progress(id);
 
 	return PLUGIN_HANDLED;
@@ -437,8 +419,7 @@ public give_reward(id)
 public check_mission(id)
 {
 	if(!playerData[id][PLAYER_TYPE]) cod_print_chat(id, "Nie wykonujesz zadnej misji.");
-	else
-	{
+	else {
 		new message[128], additional[64];
 
 		if(playerData[id][PLAYER_TYPE] == TYPE_CLASS) cod_get_class_name(playerData[id][PLAYER_ADDITIONAL], _, additional, charsmax(additional));
@@ -493,8 +474,7 @@ public load_mission(id)
 
 	set_bit(id, loaded);
 
-	if(nvault_get(missions, vaultKey, vaultData, charsmax(vaultData)))
-	{
+	if(nvault_get(missions, vaultKey, vaultData, charsmax(vaultData))) {
 		parse(vaultData, missionData[0], charsmax(missionData[]), missionData[1], charsmax(missionData[]), missionData[2], charsmax(missionData[]), missionData[3], charsmax(missionData[]), missionData[4], charsmax(missionData[]));
 	
 		for(new i = 0; i < sizeof missionParam; i++) missionParam[i] = str_to_num(missionData[i]);
@@ -518,7 +498,6 @@ public reset_mission(id, data, silent)
 	playerData[id][PLAYER_PROGRESS] = 0;
 
 	if(!data) save_mission(id);
-
 	if(!silent) cod_print_chat(id, "Zrezygnowales z wykonywania wybranej wczesniej^x03 misji^x01.");
 }
 

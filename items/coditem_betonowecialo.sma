@@ -69,8 +69,7 @@ public trace_line(Float:startVector[3], Float:endVector[3], conditions, id)
 
 	if(!is_user_alive(ent) || id == ent) return FMRES_IGNORED;
 
-	if(get_tr(TR_iHitgroup) != 1) 
-	{
+	if(get_tr(TR_iHitgroup) != 1) {
 		set_tr(TR_flFraction, 1.0);
 
 		return FMRES_SUPERCEDE;

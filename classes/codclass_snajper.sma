@@ -25,12 +25,7 @@ public plugin_init()
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
 {
-	if(weapon == CSW_KNIFE && pev(attacker, pev_button) & IN_ATTACK2 && random_num(1, 2) == 1)
-	{
-		damage = COD_BLOCK;
-
-		cod_kill_player(attacker, victim, damageBits);
-	}
+	if(weapon == CSW_KNIFE && pev(attacker, pev_button) & IN_ATTACK2 && random_num(1, 2) == 1) damage = cod_kill_player(attacker, victim, damageBits);
 
 	if(weapon == CSW_AWP && damageBits & DMG_BULLET) damage = damage * 1.3 + 0.2 * cod_get_user_intelligence(attacker);
 }

@@ -59,8 +59,7 @@ public change_knife(id)
 
 	new knifeData[64], knifeId[3], menu = menu_create("\yWybierz \rModel Noza\w:", "change_knife_handle");
 	
-	for(new i = 0; i < sizeof(knifeModels); i++)
-	{
+	for(new i = 0; i < sizeof(knifeModels); i++) {
 		formatex(knifeData, charsmax(knifeData), "%s \y%s", knifeModels[i][NAME], knifeModels[i][BONUS]);
 
 		num_to_str(i, knifeId, charsmax(knifeId));
@@ -81,8 +80,7 @@ public change_knife_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT)
-	{
+	if(item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -128,8 +126,7 @@ public set_bonus(id, oldKnife, newKnife)
 {
 	switch(oldKnife)
 	{
-		case DEFAULT:
-		{
+		case DEFAULT: {
 			cod_set_user_bonus_health(id, -2);
 			cod_set_user_bonus_intelligence(id, -2);
 			cod_set_user_bonus_stamina(id, -2);
@@ -145,8 +142,7 @@ public set_bonus(id, oldKnife, newKnife)
 
 	switch(newKnife)
 	{
-		case DEFAULT:
-		{
+		case DEFAULT: {
 			cod_set_user_bonus_health(id, 2);
 			cod_set_user_bonus_intelligence(id, 2);
 			cod_set_user_bonus_stamina(id, 2);
@@ -185,8 +181,7 @@ public load_knife(id)
 	
 	formatex(vaultKey, charsmax(vaultKey), "%s-cod_knife", playerName[id]);
 	
-	if(nvault_get(knives, vaultKey, vaultData, charsmax(vaultData)))
-	{
+	if(nvault_get(knives, vaultKey, vaultData, charsmax(vaultData))) {
 		playerKnife[id] = str_to_num(vaultData);
 
 		set_bonus(id, DEFAULT, playerKnife[id]);

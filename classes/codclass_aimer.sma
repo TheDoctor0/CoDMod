@@ -23,11 +23,4 @@ public plugin_init()
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
-{
-	if(damageBits & DMG_BULLET && random_num(1, 4))
-	{
-		cod_kill_player(attacker, victim, damageBits);
-
-		damage = COD_BLOCK;
-	}
-}
+	if(damageBits & DMG_BULLET && random_num(1, 4)) damage = cod_kill_player(attacker, victim, damageBits);

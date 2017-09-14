@@ -62,8 +62,7 @@ public casino_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT)
-	{
+	if(item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -73,8 +72,7 @@ public casino_menu_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
     
-	switch(item)
-	{ 
+	switch(item) { 
 		case DICE: dice_menu(id, 0);
 		case ROULETTE: roulette_menu(id, 0);
 	}
@@ -92,18 +90,15 @@ public dice_menu(id, number)
 
 	new menuData[128], menu;
 
-	if(number > 0)
-	{
+	if(number > 0) {
 		new bool:win, amount = playerData[id][GAME_BID];
 
-		if(playerDice[id][DICE_TYPE] == DICE_NORMAL && playerDice[id][DICE_NUMBER] == number)
-		{
+		if(playerDice[id][DICE_TYPE] == DICE_NORMAL && playerDice[id][DICE_NUMBER] == number) {
 			amount = playerData[id][GAME_BID] * 5;
 
 			win = true;
 		}
-		else if(playerDice[id][DICE_TYPE] == DICE_LOWHIGH && (playerDice[id][DICE_NUMBER] == DICE_LOW && number <= 3) || (playerDice[id][DICE_NUMBER] == DICE_HIGH && number > 3))
-		{
+		else if(playerDice[id][DICE_TYPE] == DICE_LOWHIGH && (playerDice[id][DICE_NUMBER] == DICE_LOW && number <= 3) || (playerDice[id][DICE_NUMBER] == DICE_HIGH && number > 3)) {
 			amount = floatround(playerData[id][GAME_BID] * 1.8);
 
 			win = true;
@@ -147,8 +142,7 @@ public dice_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT)
-	{
+	if(item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -160,12 +154,9 @@ public dice_menu_handle(id, menu, item)
 
 	menu_destroy(menu);
     
-	switch(item)
-	{ 
-		case 0: 
-		{
-			if(cod_get_user_honor(id) < playerData[id][GAME_BID]) 
-			{ 
+	switch(item) { 
+		case 0: {
+			if(cod_get_user_honor(id) < playerData[id][GAME_BID]) { 
 				cod_print_chat(id, "Nie masz wystarczajaco^x03 honoru^x01, aby grac na tej stawce!");
 
 				return PLUGIN_HANDLED;
@@ -175,8 +166,7 @@ public dice_menu_handle(id, menu, item)
 
 			return PLUGIN_HANDLED;
 		}
-		case 1: 
-		{
+		case 1: {
 			playerDice[id][DICE_TYPE] = playerDice[id][DICE_TYPE] == DICE_NORMAL ? DICE_LOWHIGH : DICE_NORMAL;
 
 			if(playerDice[id][DICE_TYPE] == DICE_NORMAL) playerDice[id][DICE_NUMBER] = 1;
@@ -184,15 +174,13 @@ public dice_menu_handle(id, menu, item)
 
 			dice_menu(id, 0);
 		}
-		case 2:
-		{
+		case 2: {
 			if(playerDice[id][DICE_TYPE] == DICE_NORMAL && ++playerDice[id][DICE_NUMBER] > 6) playerDice[id][DICE_NUMBER] = 1;
 			else if(playerDice[id][DICE_TYPE] == DICE_LOWHIGH) playerDice[id][DICE_NUMBER] = playerDice[id][DICE_NUMBER] == DICE_LOW ? DICE_HIGH : DICE_LOW;
 
 			dice_menu(id, 0);
 		}
-		case 3:
-		{
+		case 3: {
 			cod_print_chat(id, "Wpisz nowa^x04 stawke^x01.");
 
 			cod_show_hud(id, TYPE_HUD, 255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Wpisz nowa stawke.");
@@ -212,18 +200,15 @@ public roulette_menu(id, number)
 
 	new menuData[128], menu;
 
-	if(--number >= 0)
-	{
+	if(--number >= 0) {
 		new bool:win, amount = playerData[id][GAME_BID];
 
-		if(playerRoulette[id] == ROULETTE_GREEN && number == 0)
-		{
+		if(playerRoulette[id] == ROULETTE_GREEN && number == 0) {
 			amount = playerData[id][GAME_BID] * 14;
 
 			win = true;
 		}
-		else if((playerRoulette[id] == ROULETTE_BLACK && number <= 7 && number > 0) || (playerRoulette[id] == ROULETTE_RED && number > 7))
-		{
+		else if((playerRoulette[id] == ROULETTE_BLACK && number <= 7 && number > 0) || (playerRoulette[id] == ROULETTE_RED && number > 7)) {
 			amount = playerData[id][GAME_BID] * 2;
 
 			win = true;
@@ -260,8 +245,7 @@ public roulette_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT)
-	{
+	if(item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -273,12 +257,9 @@ public roulette_menu_handle(id, menu, item)
 
 	menu_destroy(menu);
     
-	switch(item)
-	{ 
-		case 0: 
-		{
-			if(cod_get_user_honor(id) < playerData[id][GAME_BID]) 
-			{ 
+	switch(item) { 
+		case 0:  {
+			if(cod_get_user_honor(id) < playerData[id][GAME_BID]) { 
 				cod_print_chat(id, "Nie masz wystarczajaco^x03 honoru^x01, aby grac na tej stawce!");
 
 				return PLUGIN_HANDLED;
@@ -288,14 +269,12 @@ public roulette_menu_handle(id, menu, item)
 
 			return PLUGIN_HANDLED;
 		}
-		case 1: 
-		{
+		case 1: {
 			if(++playerRoulette[id] > ROULETTE_GREEN) playerRoulette[id] = ROULETTE_BLACK;
 
 			roulette_menu(id, 0);
 		}
-		case 2:
-		{
+		case 2: {
 			cod_print_chat(id, "Wpisz nowa^x04 stawke^x01.");
 
 			cod_show_hud(id, TYPE_HUD, 255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Wpisz nowa stawke.");
@@ -320,15 +299,13 @@ public change_bid(id)
 
 	bid = str_to_num(bidData);
 	
-	if(bid <= 0)
-	{ 
+	if(bid <= 0) { 
 		cod_print_chat(id, "Nie mozesz ustawic stawki mniejszej niz^x03 1 honoru^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 	
-	if(cod_get_user_honor(id) < bid) 
-	{ 
+	if(cod_get_user_honor(id) < bid) { 
 		cod_print_chat(id, "Nie mozesz ustawic stawki wiekszej niz twoja ilosc^x03 honoru^x01!");
 
 		return PLUGIN_HANDLED;
@@ -336,8 +313,7 @@ public change_bid(id)
 
 	playerData[id][GAME_BID] = bid;
 
-	switch(playerData[id][GAME_TYPE])
-	{ 
+	switch(playerData[id][GAME_TYPE]) { 
 		case DICE: dice_menu(id, 0);
 		case ROULETTE: roulette_menu(id, 0);
 	}

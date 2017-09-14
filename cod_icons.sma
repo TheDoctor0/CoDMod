@@ -42,13 +42,11 @@ public plugin_init()
 
 	get_mapname(mapName, charsmax(mapName));
 	
-	if(equal(mapName, "de_chateau") || equal(mapName, "de_dust2") || equal(mapName, "de_train"))
-	{
+	if(equal(mapName, "de_chateau") || equal(mapName, "de_dust2") || equal(mapName, "de_train")) {
 		bsBombSiteA = BOMBSITE_B;
 		bsBombSiteB = BOMBSITE_A;
 	}
-	else
-	{
+	else {
 		bsBombSiteA = BOMBSITE_A;
 		bsBombSiteB = BOMBSITE_B;	
 	}
@@ -56,8 +54,7 @@ public plugin_init()
 	bombEntity[bsBombSiteA] = find_ent_by_class(NONE, "func_bomb_target");
 	bombEntity[bsBombSiteB] = find_ent_by_class(bombEntity[bsBombSiteA], "func_bomb_target");
 
-	if(!is_valid_ent(bombEntity[bsBombSiteA]))
-	{
+	if(!is_valid_ent(bombEntity[bsBombSiteA])) {
 		bombEntity[bsBombSiteA] = find_ent_by_class(NONE, "info_bomb_target");
 		bombEntity[bsBombSiteB] = find_ent_by_class(bombEntity[bsBombSiteA], "info_bomb_target");
 	}
@@ -102,15 +99,13 @@ public client_disconnected(id)
 
 public client_putinserver(id)
 {
-	if(is_user_bot(id) || is_user_hltv(id))
-	{
+	if(is_user_bot(id) || is_user_hltv(id)) {
 		rem_bit(id, iconBombSites);
 		rem_bit(id, iconDropped);
 		rem_bit(id, iconPlanted);
 		rem_bit(id, iconBox);
 	}
-	else
-	{
+	else {
 		set_bit(id, iconBombSites);
 		set_bit(id, iconDropped);
 		set_bit(id, iconPlanted);
@@ -171,15 +166,13 @@ public bomb_planted()
 
 public bomb_timer()
 {
-	if(bombTimer < 0)
-	{
+	if(bombTimer < 0) {
 		remove_task(TASK_PLANTED);
 
 		return;
 	}
 
-	if(--bombTimer == 10)
-	{
+	if(--bombTimer == 10) {
 		remove_icon(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
 
 		spawn_sprite(bombEntity[BOMB_PLANTED], BOMB_EXPLODE);
@@ -294,8 +287,7 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 	if(distance > 1.0 && distance <= 100.0) set_es(es, ES_Frame, 100.0 - floatround(distance));
 	else set_es(es, ES_Frame, 100.0);
 	
-	if(!is_in_viewcone(host, targetOrigin))
-	{
+	if(!is_in_viewcone(host, targetOrigin)) {
 		set_es(es, ES_Effects, get_es(es, ES_Effects) | EF_NODRAW);
 
 		return FMRES_IGNORED;
@@ -351,8 +343,7 @@ public change_icons_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT)
-	{
+	if(item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -362,8 +353,7 @@ public change_icons_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	switch(item)
-	{
+	switch(item) {
 		case 0: get_bit(id, iconBombSites) ? rem_bit(id, iconBombSites) : set_bit(id, iconBombSites);
 		case 1: get_bit(id, iconDropped) ? rem_bit(id, iconDropped) : set_bit(id, iconDropped);
 		case 2: get_bit(id, iconPlanted) ? rem_bit(id, iconPlanted) : set_bit(id, iconPlanted);
@@ -399,8 +389,7 @@ public load_icons(id)
 	
 	formatex(vaultKey, charsmax(vaultKey), "%s-cod_icons", playerName[id]);
 	
-	if(nvault_get(icons, vaultKey, vaultData, charsmax(vaultData)))
-	{
+	if(nvault_get(icons, vaultKey, vaultData, charsmax(vaultData))) {
 		parse(vaultData, iconsData[0], charsmax(iconsData), iconsData[1], charsmax(iconsData), iconsData[2], charsmax(iconsData), iconsData[3], charsmax(iconsData));
 
 		if(!str_to_num(iconsData[0])) rem_bit(id, iconBombSites);
@@ -417,8 +406,7 @@ public _cod_spawn_box_icon(ent)
 
 public _cod_remove_box_icon(ent)
 {
-	if(pev_valid(ent))
-	{
+	if(pev_valid(ent)) {
 		new icon = pev(ent, pev_iuser1);
 
 		if(pev_valid(icon)) remove_entity(icon);
@@ -446,8 +434,7 @@ stock check_classname(const className[])
 
 stock remove_icon(ent, sprite)
 {
-	if(pev_valid(ent))
-	{
+	if(pev_valid(ent)) {
 		remove_entity(ent);
 
 		iconEntity[sprite] = 0;

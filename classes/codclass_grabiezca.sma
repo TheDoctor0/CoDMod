@@ -53,8 +53,7 @@ public show_question(id, victim)
 
 public show_question_handle(id, menu, item)
 {
-	if(item)
-	{
+	if(item) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -92,5 +91,7 @@ stock set_user_clip(id)
 
 	get_weaponname(weapon, weaponName, charsmax(weaponName));
 
-	while((weaponid = engfunc(EngFunc_FindEntityByString, weaponid, "classname", weaponName)) != 0) if(pev(weaponid, pev_owner) == id) set_pdata_int(weaponid, 51, maxClip[weapon], 4);
+	while((weaponid = engfunc(EngFunc_FindEntityByString, weaponid, "classname", weaponName)) != 0) {
+		if(pev(weaponid, pev_owner) == id) set_pdata_int(weaponid, 51, maxClip[weapon], 4);
+	}
 }

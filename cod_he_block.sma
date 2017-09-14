@@ -39,8 +39,7 @@ public cod_end_round()
 public cod_weapon_deploy(id, weapon, ent)
 {
 	if(weapon == CSW_HEGRENADE && block) set_task(0.1, "show_info", id + TASK_INFO, .flags = "b");
-	else if(task_exists(id + TASK_INFO))
-	{
+	else if(task_exists(id + TASK_INFO)) {
 		client_print(id, print_center, "");
 
 		remove_task(id + TASK_INFO);
@@ -53,8 +52,7 @@ public show_info(id)
 
 	new Float:currentTime = (roundStart + cvarBlockTime) - get_gametime();
 
-	if(currentTime <= 0.0)
-	{
+	if(currentTime <= 0.0) {
 		client_print(id, print_center, "");
 
 		remove_task(id + TASK_INFO);
@@ -67,8 +65,7 @@ public show_info(id)
 
 public block_he(weapon)
 {
-	if(block) 
-	{ 
+	if(block) { 
 		new id = pev(weapon, pev_owner);
 
 		if(!task_exists(id + TASK_INFO)) set_task(0.1, "show_info", id + TASK_INFO, .flags = "b");

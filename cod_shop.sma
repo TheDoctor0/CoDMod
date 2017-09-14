@@ -164,8 +164,7 @@ public shop_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT)
-	{
+	if(item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -175,8 +174,7 @@ public shop_menu_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	if(item == EXCHANGE)
-	{
+	if(item == EXCHANGE) {
 		client_print(id, print_center, "Wpisz ile Honoru chcesz kupic.");
 
 		cod_print_chat(id, "Wpisz ile^x03 Honoru^x01 chcesz kupic.");
@@ -186,80 +184,68 @@ public shop_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == REPAIR && cod_get_item_durability(id) >= cod_max_item_durability())
-	{
+	if(item == REPAIR && cod_get_item_durability(id) >= cod_max_item_durability()) {
 		cod_print_chat(id, "Twoj przedmiot jest juz w pelni^x03 naprawiony^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if((item == SMALL_BANDAGE || item == BIG_BANDAGE) && cod_get_user_health(id, 1) == cod_get_user_max_health(id))
-	{
+	if((item == SMALL_BANDAGE || item == BIG_BANDAGE) && cod_get_user_health(id, 1) == cod_get_user_max_health(id)) {
 		cod_print_chat(id, "Jestes juz w pelni^x03 uzdrowiony^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == SILENT && cod_get_user_footsteps(id))
-	{
+	if(item == SILENT && cod_get_user_footsteps(id)) {
 		cod_print_chat(id, "Masz juz ^x03 Ciche Chodzenie^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == BUNNY_HOP && cod_get_user_bunnyhop(id))
-	{
+	if(item == BUNNY_HOP && cod_get_user_bunnyhop(id)) {
 		cod_print_chat(id, "Masz juz ^x03 Bunny Hop^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == TELEPORT && cod_get_user_teleports(id) == FULL)
-	{
+	if(item == TELEPORT && cod_get_user_teleports(id) == FULL) {
 		cod_print_chat(id, "Masz juz nielimitowany^x03 Teleport^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == JUMP && cod_get_user_multijumps(id) >= 3)
-	{
+	if(item == JUMP && cod_get_user_multijumps(id) >= 3) {
 		cod_print_chat(id, "Mozesz miec maksymalnie^x03 3 Dodatkowe Skoki^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == ARMOR && cod_get_user_armor(id) >= 300)
-	{
+	if(item == ARMOR && cod_get_user_armor(id) >= 300) {
 		cod_print_chat(id, "Mozesz miec maksymalnie^x03 300 Pancerza^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == DAMAGE && get_bit(id, damageBonus))
-	{
+	if(item == DAMAGE && get_bit(id, damageBonus)) {
 		cod_print_chat(id, "W tej rundzie juz kupiles^x03 Wieksze Obrazenia^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == INVISIBLE && !cod_get_user_render(id))
-	{
+	if(item == INVISIBLE && !cod_get_user_render(id)) {
 		cod_print_chat(id, "Masz juz^x03 Pelna Niewidzialnosc^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 	
-	if(item == UPGRADE)
-	{
-		if(!cod_get_user_item(id))
-		{
+	if(item == UPGRADE) {
+		if(!cod_get_user_item(id)) {
 			cod_print_chat(id, "Nie masz zadnego przedmiotu!");
 
 			return PLUGIN_HANDLED;
 		}
 
-		if(!cod_upgrade_user_item(id, 1))
-		{
+		if(!cod_upgrade_user_item(id, 1)) {
 			cod_print_chat(id, "Ulepszenie twojego przedmiotu nie jest mozliwe!");
 
 			return PLUGIN_HANDLED;
@@ -272,89 +258,73 @@ public shop_menu_handle(id, menu, item)
 	
 	new price = str_to_num(itemPrice);
 	
-	if(cod_get_user_honor(id) < price)
-	{
+	if(cod_get_user_honor(id) < price) {
 		cod_print_chat(id, "Nie masz wystarczajaco duzo^x03 Honoru^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 	
-	switch(item)
-	{
-		case REPAIR:
-		{
-			cod_print_chat(id, "Kupiles^x03 +%i^x01 wytrzymalosci przedmiotu!", cvarDurabilityAmount
-		);
+	switch(item) {
+		case REPAIR: {
+			cod_print_chat(id, "Kupiles^x03 +%i^x01 wytrzymalosci przedmiotu!", cvarDurabilityAmount);
 			
-			if(cod_get_item_durability(id) + cvarDurabilityAmount >= cod_max_item_durability())
-			{
+			if(cod_get_item_durability(id) + cvarDurabilityAmount >= cod_max_item_durability()) {
 				cod_set_item_durability(id, cod_max_item_durability());
 
 				cod_print_chat(id, "Twoj przedmiot jest teraz w pelni naprawiony!");
 			}
-			else
-			{
-				cod_set_item_durability(id, cod_get_item_durability(id) + cvarDurabilityAmount
-			);
+			else {
+				cod_set_item_durability(id, cod_get_item_durability(id) + cvarDurabilityAmount);
 
 				cod_print_chat(id, "Wytrzymalosc twojego przedmiotu wynosi^x03 %i^x01!", cod_get_item_durability(id));
 			}
 		}
-		case BUY:
-		{
+		case BUY: {
 			cod_print_chat(id, "Kupiles^x03 Losowy Przedmiot^x01!");
 			
 			cod_set_user_item(id, RANDOM, RANDOM);
 		}
-		case UPGRADE:
-		{
+		case UPGRADE: {
 			cod_print_chat(id, "Kupiles^x03 Ulepszenie Przedmiotu^x01!");
 
-			if(!cod_upgrade_user_item(id))
-			{
+			if(!cod_upgrade_user_item(id)) {
 				cod_print_chat(id, "Twoj przedmiot nie moze juz zostac^x03 ulepszony^x01. Honor nie zostal pobrany z konta.");
 
 				return PLUGIN_HANDLED;
 			}
 		}
-		case SMALL_BANDAGE:
-		{
+		case SMALL_BANDAGE: {
 			cod_set_user_health(id, cod_get_user_health(id, 1) + cvarSmallBandageHP);
 			
 			cod_print_chat(id, "Kupiles^x03 Maly Bandarz^x01!");
 		}
-		case BIG_BANDAGE:
-		{
+		case BIG_BANDAGE: {
 			cod_set_user_health(id, cod_get_user_health(id, 1) + cvarBigBandageHP);
 			
 			cod_print_chat(id, "Kupiles^x03 Duzy Bandarz^x01!");
 		}
-		case SMALL_EXP:
-		{
+		case SMALL_EXP: {
 			cod_print_chat(id, "Kupiles^x03 Male Doswiadczenie^x01!");
 
 			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", cvarSmallExp);
 			
 			cod_set_user_exp(id, cvarSmallExp);
 		}
-		case MEDIUM_EXP:
-		{
+		case MEDIUM_EXP: {
 			cod_print_chat(id, "Kupiles^x03 Srednie Doswiadczenie^x01!");
 
 			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", cvarMediumExp);
 			
 			cod_set_user_exp(id, cvarMediumExp);
 		}
-		case BIG_EXP:
-		{
+		case BIG_EXP: {
 			cod_print_chat(id, "Kupiles^x03 Duze Doswiadczenie^x01!");
 
 			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", cvarBigExp);
 			
 			cod_set_user_exp(id, cvarBigExp);
 		}
-		case RANDOM_EXP:
-		{
+		case RANDOM_EXP: {
 			new randomExp = random_num(cvarMinRandomExp, cvarMaxRandomExp);
 
 			cod_print_chat(id, "Kupiles^x03 Losowe Doswiadczenie^x01!");
@@ -363,68 +333,57 @@ public shop_menu_handle(id, menu, item)
 			
 			cod_set_user_exp(id, randomExp);
 		}
-		case ROCKET:
-		{
+		case ROCKET: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowa Rakiete^x01!");
 			
 			cod_add_user_mines(id, 1);
 		}
-		case MINE:
-		{
+		case MINE: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowa Mine^x01!");
 			
 			cod_add_user_rockets(id, 1);
 		}
-		case DYNAMITE:
-		{
+		case DYNAMITE: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Dynamit^x01!");
 			
 			cod_add_user_dynamites(id, 1);
 		}
-		case FIRST_AID_KIT:
-		{
+		case FIRST_AID_KIT: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowa Apteczke^x01!");
 			
 			cod_add_user_medkits(id, 1);
 		}
-		case TELEPORT:
-		{
+		case TELEPORT: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Teleport^x01!");
 			
 			cod_add_user_teleports(id, 1);
 		}
-		case JUMP:
-		{
+		case JUMP: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Skok^x01!");
 			
 			cod_add_user_multijumps(id, 1);
 		}
-		case BUNNY_HOP:
-		{
+		case BUNNY_HOP: {
 			cod_print_chat(id, "Kupiles^x03 BunnyHop^x01!");
 			
 			cod_set_user_bunnyhop(id, 1);
 		}
-		case SILENT:
-		{
+		case SILENT: {
 			cod_print_chat(id, "Kupiles^x03 Ciche Chodzenie^x01!");
 			
 			cod_set_user_footsteps(id, 1);
 		}
-		case ARMOR:
-		{
+		case ARMOR: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Armor^x01!");
 			
 			cod_add_user_armor(id, cvarArmorAmount);
 		}
-		case DAMAGE:
-		{
+		case DAMAGE: {
 			cod_print_chat(id, "Kupiles^x03 Wieksze Obrazenia^x01!");
 
 			set_bit(id, damageBonus);
 		}
-		case INVISIBLE:
-		{
+		case INVISIBLE: {
 			cod_print_chat(id, "Kupiles^x03 Peleryne Niewidke^x01!");
 
 			cod_set_user_render(id, 0, ROUND, RENDER_ALWAYS);
@@ -451,15 +410,13 @@ public buy_honor_handle(id)
 
 	honorAmount = str_to_num(honorData);
 	
-	if(honorAmount <= 0)
-	{ 
+	if(honorAmount <= 0) { 
 		cod_print_chat(id, "Nie mozesz kupic mniej niz^x03 1 Honoru^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 	
-	if(cs_get_user_money(id) < honorAmount * cvarExchangeRatio) 
-	{ 
+	if(cs_get_user_money(id) < honorAmount * cvarExchangeRatio) { 
 		cod_print_chat(id, "Nie masz wystarczajaco^x03 kasy^x01, aby kupic tyle^x03 Honoru^x01!");
 
 		return PLUGIN_HANDLED;

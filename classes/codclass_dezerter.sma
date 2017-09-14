@@ -66,19 +66,16 @@ stock find_free_spawn(teamNumber, Float:spawnOrigin[3], Float:spawnAngle[3])
 
 	i = 0;
 
-	while(i++ < spawnsFound * 10)
-    {
+	while(i++ < spawnsFound * 10) {
 		spawnNum = random(spawnsFound);
 		spawnPoint = spawnPoints[spawnNum];
 
-		if(spawnPoint && !spawnChecked[spawnNum])
-		{
+		if(spawnPoint && !spawnChecked[spawnNum]) {
 			spawnChecked[spawnNum] = true;
 
 			pev(spawnPoint, pev_origin, spawnOrigin)
 
-			if(!fm_find_sphere_class(0, "player", vicinity, entList, 1, spawnOrigin))
-			{
+			if(!fm_find_sphere_class(0, "player", vicinity, entList, 1, spawnOrigin)) {
 				pev(spawnPoint, pev_angles, spawnAngle);
 
 				return spawnPoint;
@@ -91,14 +88,14 @@ stock find_free_spawn(teamNumber, Float:spawnOrigin[3], Float:spawnAngle[3])
 
 stock fm_find_sphere_class(ent, const className[], Float:radius, entList[], maxEnts, Float:origin[3] = {0.0, 0.0, 0.0})
 {
-	if(pev_valid(ent)) pev(ent, pev_origin, origin);
+	if(!pev_valid(ent)) return;
+
+	pev(ent, pev_origin, origin);
 
 	new tempEnt, tempClass[32], entsFound;
 
-	while((tempEnt = fm_find_ent_in_sphere(tempEnt, origin, radius)) && entsFound < maxEnts)
-	{
-		if(pev_valid(tempEnt))
-		{
+	while((tempEnt = fm_find_ent_in_sphere(tempEnt, origin, radius)) && entsFound < maxEnts) {
+		if(pev_valid(tempEnt)) {
 			pev(tempEnt, pev_classname, tempClass, charsmax(tempClass));
 
 			if(equal(className, tempClass)) entList[entsFound++] = tempEnt;

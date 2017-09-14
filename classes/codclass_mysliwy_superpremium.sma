@@ -32,11 +32,4 @@ public cod_class_enabled(id)
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
-{
-	if(weapon == CSW_SCOUT && damageBits & DMG_BULLET)
-	{
-		damage = COD_BLOCK;
-
-		cod_kill_player(attacker, victim, damageBits);
-	}
-}
+	if(weapon == CSW_SCOUT && damageBits & DMG_BULLET) damage = cod_kill_player(attacker, victim, damageBits);

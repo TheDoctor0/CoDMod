@@ -25,8 +25,7 @@ public cod_item_spawned(id)
 	
 public cod_item_skill_used(id)
 {
-	if(get_bit(id, itemUsed))
-	{
+	if(get_bit(id, itemUsed)) {
 		cod_print_chat(id, "Apteczke mozesz uzyc tylko raz na runde.");
 
 		return COD_CONTINUE;

@@ -1,3 +1,4 @@
 Do zrobienia:
+- Zaktualizować sklep
 - Klasy i itemy
 - Statystyki WWW

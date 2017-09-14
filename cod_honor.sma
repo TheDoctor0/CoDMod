@@ -85,8 +85,7 @@ public round_winner(team)
 {
 	if(get_playersnum() < cvarMinPlayers) return;
 
-	for(new id = 1; id < MAX_PLAYERS; id++) 
-	{
+	for(new id = 1; id < MAX_PLAYERS; id++) {
 		if(!cod_get_user_class(id) || get_user_team(id) != team) continue;
 
 		playerHonor[id] += cod_get_user_vip(id) ? cvarWinRound * 2 : cvarWinRound;
@@ -141,8 +140,7 @@ public hostage_killed()
 
 public message_intermission() 
 {
-	for(new id = 1; id < MAX_PLAYERS; id++)
-	{
+	for(new id = 1; id < MAX_PLAYERS; id++) {
 		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
 		
 		save_honor(id, 1);
@@ -164,8 +162,7 @@ public sql_init()
 
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
-	if(errorNum)
-	{
+	if(errorNum) {
 		log_to_file("cod_mod.log", "Error: %s", error);
 		
 		return;
@@ -193,8 +190,7 @@ public load_honor(id)
 
 public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
-	if(failState) 
-	{
+	if(failState) {
 		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
 		
 		return;
@@ -203,8 +199,7 @@ public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], d
 	new id = tempId[0];
 	
 	if(SQL_MoreResults(query)) playerHonor[id] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
-	else
-	{
+	else {
 		new queryData[128];
 		
 		//formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_honor` (`name`) VALUES ('%s')", playerName[id]);
@@ -227,17 +222,14 @@ stock save_honor(id, end = 0)
 		
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_honor` SET honor = '%i' WHERE name = '%s'", playerHonor[id], playerName[id]);
 		
-	switch(end)
-	{
+	switch(end) {
 		case 0: SQL_ThreadQuery(sql, "ignore_handle", queryData);
-		case 1:
-		{
+		case 1: {
 			new error[128], errorNum, Handle:sqlConnection, Handle:query;
 			
 			sqlConnection = SQL_Connect(sql, errorNum, error, charsmax(error));
 
-			if(!sqlConnection)
-			{
+			if(!sqlConnection) {
 				log_to_file("cod_mod.log", "Save - Could not connect to SQL database. [%d] %s", error, error);
 				
 				SQL_FreeHandle(sqlConnection);
@@ -247,8 +239,7 @@ stock save_honor(id, end = 0)
 			
 			query = SQL_PrepareQuery(sqlConnection, queryData);
 			
-			if(!SQL_Execute(query))
-			{
+			if(!SQL_Execute(query)) {
 				errorNum = SQL_QueryError(query, error, charsmax(error));
 				
 				log_to_file("cod_mod.log", "Save Query Nonthreaded failed. [%d] %s", errorNum, error);
@@ -269,8 +260,7 @@ stock save_honor(id, end = 0)
 
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
-	if (failState) 
-	{
+	if (failState) {
 		if(failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
 		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "Query failed. [%d] %s", errorNum, error);
 	}

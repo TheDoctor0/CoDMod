@@ -61,8 +61,7 @@ public radar_scan(id)
 {
 	id -= TASK_RADAR;
 
-	if(!is_user_alive(id) || get_bit(id, classUsed))
-	{
+	if(!is_user_alive(id) || get_bit(id, classUsed)) {
 		remove_task(id + TASK_RADAR);
 
 		return;
@@ -73,8 +72,7 @@ public radar_scan(id)
 	if(!msgHostageAdd) msgHostageAdd = get_user_msgid("HostagePos");
 	if(!msgHostageDel) msgHostageDel = get_user_msgid("HostageK");
 
-	for(new i = 1; i <= MAX_PLAYERS; i++)
-	{       
+	for(new i = 1; i <= MAX_PLAYERS; i++) {       
 		if(!is_user_alive(i) || get_user_team(i) == get_user_team(id)) continue;
 
 		get_user_origin(i, playerOrigin);

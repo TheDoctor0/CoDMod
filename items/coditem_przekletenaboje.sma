@@ -34,8 +34,7 @@ public cod_item_value(id)
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
 {
-	if(damageBits == DMG_BULLET && random_num(1, itemValue[attacker]) == 1)
-	{
+	if(damageBits == DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
 		new Float:velocity[3];
 
 		velocity[0] = 0.0;

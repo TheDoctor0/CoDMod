@@ -35,11 +35,4 @@ public cod_class_skill_used(id)
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
-{
-	if(weapon == CSW_DEAGLE && damageBits & DMG_BULLET && random_num(1, 8) == 1)
-	{
-		damage = COD_BLOCK;
-
-		cod_kill_player(attacker, victim, damageBits);
-	}
-}
+	if(weapon == CSW_DEAGLE && damageBits & DMG_BULLET && random_num(1, 8) == 1) damage = cod_kill_player(attacker, victim, damageBits);

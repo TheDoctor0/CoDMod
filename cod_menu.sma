@@ -30,8 +30,7 @@ public plugin_cfg()
 	
 	new lineContent[128], menuTitle[64], menuCommand[64], file = fopen(menuFile, "r");
 	
-	while(!feof(file))
-	{
+	while(!feof(file)) {
 		fgets(file, lineContent, charsmax(lineContent)); trim(lineContent);
 		
 		if(lineContent[0] == ';' || lineContent[0] == '^0') continue;
@@ -60,8 +59,7 @@ public display_menu(id)
 	
 	new menuTitle[64], menu = menu_create("\yMenu \rCoD Mod\w", "display_menu_handle");
 	
-	for(new i; i < ArraySize(menuTitles); i++)
-	{
+	for(new i; i < ArraySize(menuTitles); i++) {
 		ArrayGetString(menuTitles, i, menuTitle, charsmax(menuTitle));
 
 		menu_additem(menu, menuTitle);
@@ -80,8 +78,7 @@ public display_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT)
-	{
+	if(item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);

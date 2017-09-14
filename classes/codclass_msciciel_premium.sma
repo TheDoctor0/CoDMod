@@ -31,11 +31,4 @@ public cod_class_enabled(id)
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
-{
-	if((weapon == CSW_AWP && damageBits & DMG_BULLET && random_num(1, 2)) || (weapon == CSW_KNIFE && random_num(1, 2) && !(pev(attacker, pev_button) & IN_ATTACK)))
-	{
-		damage = COD_BLOCK;
-
-		cod_kill_player(attacker, victim, damageBits);
-	}
-}
+	if((weapon == CSW_AWP && damageBits & DMG_BULLET && random_num(1, 2)) || (weapon == CSW_KNIFE && random_num(1, 2) && !(pev(attacker, pev_button) & IN_ATTACK))) damage = cod_kill_player(attacker, victim, damageBits);

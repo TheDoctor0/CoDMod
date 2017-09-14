@@ -48,8 +48,7 @@ public transfer_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT)
-	{
+	if(item == MENU_EXIT) {
 		menu_destroy(menu);
 
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -57,8 +56,7 @@ public transfer_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 	
-	switch(item)
-	{
+	switch(item) {
 		case 0: transfer_cash_menu(id);
 		case 1: transfer_honor_menu(id);	
 	}
@@ -76,8 +74,7 @@ public transfer_honor_menu(id)
 
 	new menuData[256], playerName[64], playerId[3], players, menu = menu_create("\yWybierz \rGracza\y, ktoremu chcesz przelac \rHonor\w:", "transfer_honor_menu_handle");
 	
-	for(new player = 1; player <= maxPlayers; player++)
-	{
+	for(new player = 1; player <= maxPlayers; player++) {
 		if(!is_user_connected(player) || !cod_get_user_class(player) || player == id) continue;
 		
 		get_user_name(player, playerName, charsmax(playerName));
@@ -95,8 +92,7 @@ public transfer_honor_menu(id)
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
-	if(!players)
-	{
+	if(!players) {
 		menu_destroy(menu);
 
 		cod_print_chat(id, "Na serwerze nie ma gracza, ktoremu moglbys przelac^x03 honor^x01!");
@@ -110,8 +106,7 @@ public transfer_honor_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT)
-	{
+	if(item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -129,8 +124,7 @@ public transfer_honor_menu_handle(id, menu, item)
 
 	menu_destroy(menu);
 	
-	if(!is_user_connected(player))
-	{
+	if(!is_user_connected(player)) {
 		cod_print_chat(id, "Tego gracza nie ma juz na serwerze!");
 
 		return PLUGIN_HANDLED;
@@ -153,8 +147,7 @@ public transfer_honor_handle(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 		
-	if(!is_user_connected(transferPlayer[id]))
-	{
+	if(!is_user_connected(transferPlayer[id])) {
 		cod_print_chat(id, "Gracza, ktoremu chcesz przelac^x03 honor^x01 nie ma juz na serwerze!");
 
 		return PLUGIN_HANDLED;
@@ -167,15 +160,13 @@ public transfer_honor_handle(id)
 
 	honorAmount = str_to_num(honorData);
 	
-	if(honorAmount <= 0)
-	{ 
+	if(honorAmount <= 0) { 
 		cod_print_chat(id, "Nie mozesz przelac mniej niz^x03 1 honoru^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 	
-	if(cod_get_user_honor(id) < honorAmount) 
-	{ 
+	if(cod_get_user_honor(id) < honorAmount) { 
 		cod_print_chat(id, "Nie masz tyle^x03 honoru^x01!");
 
 		return PLUGIN_HANDLED;
@@ -202,8 +193,7 @@ public transfer_cash_menu(id)
 
 	new menuData[256], playerName[64], playerId[3], players, menu = menu_create("\yWybierz \rGracza\y, ktoremu chcesz przelac \rKase\w:", "transfer_cash_menu_handle");
 	
-	for(new player = 1; player <= maxPlayers; player++)
-	{
+	for(new player = 1; player <= maxPlayers; player++) {
 		if(!is_user_connected(player) || !cod_get_user_class(player) || player == id) continue;
 		
 		get_user_name(player, playerName, charsmax(playerName));
@@ -221,8 +211,7 @@ public transfer_cash_menu(id)
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	
-	if(!players)
-	{
+	if(!players) {
 		menu_destroy(menu);
 
 		cod_print_chat(id, "Na serwerze nie ma gracza, ktoremu moglbys przelac^x03 kase^x01!");
@@ -236,8 +225,7 @@ public transfer_cash_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT)
-	{
+	if(item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -255,8 +243,7 @@ public transfer_cash_menu_handle(id, menu, item)
 
 	menu_destroy(menu);
 	
-	if(!is_user_connected(player))
-	{
+	if(!is_user_connected(player)) {
 		cod_print_chat(id, "Tego gracza nie ma juz na serwerze!");
 
 		return PLUGIN_HANDLED;
@@ -279,8 +266,7 @@ public transfer_cash_handle(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 		
-	if(!is_user_connected(transferPlayer[id]))
-	{
+	if(!is_user_connected(transferPlayer[id])) {
 		cod_print_chat(id, "Gracza, ktoremu chcesz przelac^x03 kase^x01 nie ma juz na serwerze!");
 
 		return PLUGIN_HANDLED;
@@ -293,15 +279,13 @@ public transfer_cash_handle(id)
 
 	cashAmount = str_to_num(cashData);
 	
-	if(cashAmount <= 0)
-	{ 
+	if(cashAmount <= 0) { 
 		cod_print_chat(id, "Nie mozesz przelac mniej niz^x03 1$^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 	
-	if(cs_get_user_money(id) < cashAmount) 
-	{ 
+	if(cs_get_user_money(id) < cashAmount) { 
 		cod_print_chat(id, "Nie masz tyle^x03 kasy^x01!");
 
 		return PLUGIN_HANDLED;

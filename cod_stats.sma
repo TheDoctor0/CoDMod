@@ -109,7 +109,9 @@ public stats_menu(id)
 	new menu = menu_create("\yMenu \yStatystyk\r", "stats_menu_handle");
  
 	menu_additem(menu, "\wMoj \rCzas \y(/czas)", "1");
+
 	if(get_user_flags(id) & ADMIN_BAN) menu_additem(menu, "\wCzas \rAdminow \y(/adminczas)", "2");
+
 	menu_additem(menu, "\wTop \rCzasu \y(/ctop15)", "3");
 	menu_additem(menu, "\wNajlepsze \rStaty \y(/staty)", "4");
 	menu_additem(menu, "\wTop \rStatow \y(/stop15)", "5");
@@ -127,8 +129,7 @@ public stats_menu_handle(id, menu, item)
 {
 	if(!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT)
-	{
+	if(item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -144,8 +145,7 @@ public stats_menu_handle(id, menu, item)
     
 	new item = str_to_num(itemData);
     
-	switch(item)
-    { 
+	switch(item) { 
 		case 1: command_time(id);
 		case 2: command_time_admin(id)
 		case 3: command_time_top(id);
@@ -169,6 +169,7 @@ public command_time(id)
 	tempId[0] = id;
 
 	formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `time` > '%i' ORDER BY `time` DESC) b", playerStats[id][TIME] + get_user_time(id));
+	
 	SQL_ThreadQuery(sql, "show_time", queryData, tempId, sizeof(tempId));
 
 	return PLUGIN_HANDLED;
@@ -176,8 +177,7 @@ public command_time(id)
 
 public show_time(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
-	if(failState) 
-	{
+	if(failState) {
 		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
@@ -189,13 +189,12 @@ public show_time(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 
 	new rank = SQL_ReadResult(query, 0) + 1, players = SQL_ReadResult(query, 1), seconds = (playerStats[id][TIME] + get_user_time(id)), minutes, hours;
 	
-	while(seconds >= 60)
-	{
+	while(seconds >= 60) {
 		seconds -= 60;
 		minutes++;
 	}
-	while(minutes >= 60)
-	{
+
+	while(minutes >= 60) {
 		minutes -= 60;
 		hours++;
 	}
@@ -210,13 +209,13 @@ public command_time_admin(id)
 {
 	if(!(get_user_flags(id) & ADMIN_BAN) || !is_user_connected(id)) return PLUGIN_HANDLED;
 
-
 	new queryData[128], tempData[2];
 	
 	tempData[0] = id;
 	tempData[1] = 1;
 
 	formatex(queryData, charsmax(queryData), "SELECT name, time FROM `cod_stats` WHERE admin = '1' ORDER BY time DESC");
+
 	SQL_ThreadQuery(sql, "show_top_time", queryData, tempData, sizeof(tempData));
 
 	return PLUGIN_HANDLED;
@@ -232,6 +231,7 @@ public command_time_top(id)
 	tempId[1] = 0;
 
 	formatex(queryData, charsmax(queryData), "SELECT name, time FROM `cod_stats` ORDER BY time DESC LIMIT 15");
+
 	SQL_ThreadQuery(sql, "show_top_time", queryData, tempId, sizeof(tempId));
 
 	return PLUGIN_HANDLED;
@@ -239,8 +239,7 @@ public command_time_top(id)
 
 public show_top_time(failState, Handle:query, error[], errorNum, tempData[], dataSize)
 {
-	if(failState) 
-	{
+	if(failState) {
 		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
@@ -257,23 +256,22 @@ public show_top_time(failState, Handle:query, error[], errorNum, tempData[], dat
 	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
 	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %13s^n", "#", "Nick", "Czas Gry");
 	
-	while(SQL_MoreResults(query))
-	{
+	while(SQL_MoreResults(query)) {
 		rank++;
 		
 		SQL_ReadResult(query, 0, userName, charsmax(userName));
+
 		seconds = SQL_ReadResult(query, 1);
 		
 		replace_all(userName, charsmax(userName), "<", "");
 		replace_all(userName, charsmax(userName), ">", "");
 		
-		while(seconds >= 60)
-		{
+		while(seconds >= 60) {
 			seconds -= 60;
 			minutes++;
 		}
-		while(minutes >= 60)
-		{
+
+		while(minutes >= 60) {
 			minutes -= 60;
 			hours++;
 		}
@@ -309,8 +307,7 @@ public command_best_stats(id)
 
 public show_best_stats(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
-	if(failState) 
-	{
+	if(failState) {
 		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
@@ -346,8 +343,7 @@ public command_top_stats(id)
 
 public show_top_stats(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
-	if(failState) 
-	{
+	if(failState) {
 		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
@@ -364,8 +360,7 @@ public show_top_stats(failState, Handle:query, error[], errorNum, tempId[], data
 	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
 	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %19s %4s^n", "#", "Nick", "Zabojstwa", "Zgony");
 	
-	while(SQL_MoreResults(query))
-	{
+	while(SQL_MoreResults(query)) {
 		rank++;
 		
 		SQL_ReadResult(query, 0, userName, charsmax(userName));
@@ -397,6 +392,7 @@ public command_medals(id)
 	tempId[0] = id;
 
 	formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `medals` > '%i' ORDER BY `medals` DESC) b", playerStats[id][MEDALS]);
+	
 	SQL_ThreadQuery(sql, "show_medals", queryData, tempId, sizeof(tempId));
 
 	return PLUGIN_HANDLED;
@@ -404,8 +400,7 @@ public command_medals(id)
 
 public show_medals(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
-	if(failState) 
-	{
+	if(failState) {
 		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
@@ -439,8 +434,7 @@ public command_top_medals(id)
 
 public show_top_medals(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
-	if(failState) 
-	{
+	if(failState) {
 		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
@@ -457,8 +451,7 @@ public show_top_medals(failState, Handle:query, error[], errorNum, tempId[], dat
 	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
 	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %6s %8s %8s %5s^n", "#", "Nick", "Zlote", "Srebrne", "Brazowe", "Suma");
 	
-	while(SQL_MoreResults(query))
-	{
+	while(SQL_MoreResults(query)) {
 		rank++;
 		
 		SQL_ReadResult(query, 0, userName, charsmax(userName));
@@ -488,8 +481,7 @@ public check_time(id)
 	
 	if(get_bit(id, visitInfo)) return;
 	
-	if(get_bit(id, dataLoaded))
-	{ 
+	if(get_bit(id, dataLoaded)) { 
 		set_task(3.0, "check_time", id + TASK_TIME);
 
 		return;
@@ -533,8 +525,7 @@ public cod_new_round()
 {
 	showedOneAndOnly = false;
 
-	if(!round)
-	{
+	if(!round) {
 		set_task(30.0, "first_round");
 
 		blockCount = true;
@@ -544,22 +535,19 @@ public cod_new_round()
 
 	new bestId, bestRoundId, bestFrags, bestRoundFrags, bestRoundHS, tempFrags, bestDeaths, tempDeaths;
 
-	for(new id = 1; id <= MAX_PLAYERS; id++) 
-	{
+	for(new id = 1; id <= MAX_PLAYERS; id++) {
 		if(!is_user_connected(id) || is_user_bot(id) || is_user_hltv(id)) continue;
 
 		tempFrags = get_user_frags(id);
 		tempDeaths = get_user_deaths(id);
 
-		if(tempFrags > 0 && tempFrags > bestFrags)
-		{
+		if(tempFrags > 0 && tempFrags > bestFrags) {
 			bestFrags = tempFrags;
 			bestDeaths = tempDeaths;
 			bestId = id;
 		}
 
-		if(playerStats[id][ROUND_KILLS] > 0 && (playerStats[id][ROUND_KILLS] > bestRoundFrags || (playerStats[id][ROUND_KILLS] == bestRoundFrags && playerStats[id][ROUND_HS_KILLS] > bestRoundHS)))
-		{
+		if(playerStats[id][ROUND_KILLS] > 0 && (playerStats[id][ROUND_KILLS] > bestRoundFrags || (playerStats[id][ROUND_KILLS] == bestRoundFrags && playerStats[id][ROUND_HS_KILLS] > bestRoundHS))) {
 			bestRoundFrags = playerStats[id][ROUND_KILLS];
 			bestRoundHS = playerStats[id][ROUND_HS_KILLS];
 			bestRoundId = id;
@@ -569,8 +557,7 @@ public cod_new_round()
 		playerStats[id][ROUND_HS_KILLS] = 0;
 	}
 
-	if(is_user_connected(bestRoundId)) 
-	{
+	if(is_user_connected(bestRoundId)) {
 		new bestRoundName[64];
 
 		get_user_name(bestRoundId, bestRoundName, charsmax(bestRoundName));
@@ -578,8 +565,7 @@ public cod_new_round()
 		cod_print_chat(0, "^x03%s^x01 byl najlepszym graczem rundy. Ustrzelil^x04 %i^x01 frag%s, w tym^x04 %i^x01 z HeadShotem.", bestRoundName, bestRoundFrags, bestRoundFrags > 1 ? "i" : "a", bestRoundHS);
 	}
 
-	if(is_user_connected(bestId)) 
-	{
+	if(is_user_connected(bestId)) {
 		new bestName[64];
 
 		get_user_name(bestId, bestName, charsmax(bestName));
@@ -599,16 +585,13 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 	playerStats[killer][ROUND_KILLS]++;
 	playerStats[killer][KILLS]++;
 		
-	if(hitPlace == HIT_HEAD)
-	{
+	if(hitPlace == HIT_HEAD) {
 		playerStats[killer][CURRENT_HS_KILLS]++;
 		playerStats[killer][ROUND_HS_KILLS]++;
 	}
 
-	if(weaponId == CSW_KNIFE)
-	{
-		for(new i = 1; i <= MAX_PLAYERS; i++)
-		{
+	if(weaponId == CSW_KNIFE) {
+		for(new i = 1; i <= MAX_PLAYERS; i++) {
 			if(!is_user_connected(i)) continue;
 
 			if(pev(i, pev_iuser2) == victim || i == victim) client_cmd(i, "spk %s", codSounds[SOUND_HUMILIATION]);
@@ -619,12 +602,10 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 	{
 		new assist = 0, damage = 0;
 
-		for(new id = 1; id <= MAX_PLAYERS; id++)
-		{
+		for(new id = 1; id <= MAX_PLAYERS; id++) {
 			if(!is_user_connected(id) || is_user_bot(id) || is_user_hltv(id) || id == killer) continue;
 
-			if(playerDamage[id][victim] > damage)
-			{
+			if(playerDamage[id][victim] > damage) {
 				assist = id;
 				damage = playerDamage[id][victim];
 			}
@@ -632,8 +613,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 			playerDamage[id][victim] = 0;
 		}
 
-		if(assist > 0 && damage > cvarAssistDamage)
-		{
+		if(assist > 0 && damage > cvarAssistDamage) {
 			set_user_frags(assist, get_user_frags(assist) + 1);
 
 			cs_set_user_deaths(assist, cs_get_user_deaths(assist));
@@ -644,8 +624,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 			cs_set_user_money(assist, playerMoney);
 
-			if(is_user_alive(playerMoney))
-			{
+			if(is_user_alive(playerMoney)) {
 				static msgMoney;
 
 				if(!msgMoney) msgMoney = get_user_msgid("Money");
@@ -671,29 +650,23 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 	new tCount, ctCount, lastT, lastCT;
 
-	for(new i = 1; i <= MAX_PLAYERS; i++)
-	{
+	for(new i = 1; i <= MAX_PLAYERS; i++) {
 		if(!is_user_alive(i)) continue;
 
-		switch(get_user_team(i))
-		{
-			case 1: 
-			{
+		switch(get_user_team(i)) {
+			case 1: {
 				tCount++;
 				lastT = i;
 			}
-			case 2: 
-			{
+			case 2: {
 				ctCount++;
 				lastCT = i;
 			}
 		}
 	}
 	
-	if(tCount == 1 && ctCount == 1)
-	{
-		for(new i = 1; i <= MAX_PLAYERS; i++)
-		{
+	if(tCount == 1 && ctCount == 1) {
+		for(new i = 1; i <= MAX_PLAYERS; i++) {
 			if(!is_user_connected(i)) continue;
 
 			if(pev(i, pev_iuser2) == lastT || pev(i, pev_iuser2) == lastCT || i == lastT || i == lastCT) client_cmd(i, "spk %s", codSounds[SOUND_FORCE]);
@@ -706,12 +679,10 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 		cod_show_hud(0, TYPE_DHUD, 255, 128, 0, -1.0, 0.30, 0, 5.0, 5.0, 0.5, 0.15, "%s vs. %s", lastTName, lastCTName);
 	}
-	if(tCount == 1 && ctCount > 1 && !showedOneAndOnly)
-	{
+	if(tCount == 1 && ctCount > 1 && !showedOneAndOnly) {
 		showedOneAndOnly = true;
 
-		for(new i = 1; i <= MAX_PLAYERS; i++)
-		{
+		for(new i = 1; i <= MAX_PLAYERS; i++) {
 			if(!is_user_connected(i)) continue;
 
 			if((is_user_alive(i) && get_user_team(i) == 2) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 2)) client_cmd(i, "spk %s", codSounds[SOUND_LAST]);
@@ -721,12 +692,10 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 		cod_show_hud(0, TYPE_DHUD, 255, 128, 0, -1.0, 0.30, 0, 5.0, 5.0, 0.5, 0.15, "%i vs %i", tCount, ctCount);
 	}
-	if(tCount > 1 && ctCount == 1 && !showedOneAndOnly)
-	{
+	if(tCount > 1 && ctCount == 1 && !showedOneAndOnly) {
 		showedOneAndOnly = true;
 
-		for(new i = 1; i <= MAX_PLAYERS; i++)
-		{
+		for(new i = 1; i <= MAX_PLAYERS; i++) {
 			if(!is_user_connected(i)) continue;
 			
 			if((is_user_alive(i) && get_user_team(i) == 1) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 1)) client_cmd(i, "spk %s", codSounds[SOUND_LAST]);
@@ -740,8 +709,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 public bomb_planted(planter)
 {
-	for(new i = 1; i <= MAX_PLAYERS; i++)
-	{
+	for(new i = 1; i <= MAX_PLAYERS; i++) {
 		if(!is_user_connected(i)) continue;
 
 		if((is_user_alive(i) && get_user_team(i) == 2) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 2)) client_cmd(i, "spk %s", codSounds[SOUND_BOMB]);
@@ -752,19 +720,16 @@ public message_intermission()
 {
 	new playerName[32], winnersId[3], winnersFrags[3], tempFrags, swapFrags, swapId, exp;
 
-	for(new id = 1; id <= MAX_PLAYERS; id++)
-	{
+	for(new id = 1; id <= MAX_PLAYERS; id++) {
 		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
 		
 		tempFrags = get_user_frags(id);
 		
-		if(tempFrags > winnersFrags[THIRD])
-		{
+		if(tempFrags > winnersFrags[THIRD]) {
 			winnersFrags[THIRD] = tempFrags;
 			winnersId[THIRD] = id;
 			
-			if(tempFrags > winnersFrags[SECOND])
-			{
+			if(tempFrags > winnersFrags[SECOND]) {
 				swapFrags = winnersFrags[SECOND];
 				swapId = winnersId[SECOND];
 				winnersFrags[SECOND] = tempFrags;
@@ -772,8 +737,7 @@ public message_intermission()
 				winnersFrags[THIRD] = swapFrags;
 				winnersId[THIRD] = swapId;
 				
-				if(tempFrags > winnersFrags[FIRST])
-				{
+				if(tempFrags > winnersFrags[FIRST]) {
 					swapFrags = winnersFrags[FIRST];
 					swapId = winnersId[FIRST];
 					winnersFrags[FIRST] = tempFrags;
@@ -791,24 +755,19 @@ public message_intermission()
 	
 	cod_print_chat(0, "Gratulacje dla^x03 Najlepszych Graczy^x01!");
 	
-	for(new i = 2; i >= 0; i--)
-	{
-		switch(i)
-		{
-			case THIRD:
-			{
+	for(new i = 2; i >= 0; i--) {
+		switch(i) {
+			case THIRD: {
 				exp = cvarBronzeMedalExp;
 
 				playerStats[winnersId[i]][BRONZE]++;
 			}
-			case SECOND: 
-			{
+			case SECOND: {
 				exp = cvarSilverMedalExp;
 
 				playerStats[winnersId[i]][SILVER]++;
 			}
-			case FIRST:
-			{
+			case FIRST: {
 				exp = cvarGoldMedalExp;
 
 				playerStats[winnersId[i]][GOLD]++;
@@ -824,8 +783,7 @@ public message_intermission()
 		cod_print_chat(0, "^x03 %s^x01 -^x03 %i^x01 Zabojstw - %s Medal (+^x03%i^x01 Doswiadczenia).", playerName, winnersFrags[i], medals[i], exp);
 	}
 	
-	for(new id = 1; id <= MAX_PLAYERS; id++)
-	{
+	for(new id = 1; id <= MAX_PLAYERS; id++) {
 		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
 		
 		save_stats(id, 1);
@@ -838,8 +796,7 @@ public say_text(msgId, msgDest, msgEnt)
 {
 	new id = get_msg_arg_int(1);
 	
-	if(is_user_connected(id))
-	{
+	if(is_user_connected(id)) {
 		new tempMessage[192], message[192], chatPrefix[16], stats[8], body[8], rank;
 		
 		get_msg_arg_string(2, tempMessage, charsmax(tempMessage));
@@ -847,21 +804,18 @@ public say_text(msgId, msgDest, msgEnt)
 
 		if(rank > 3) return PLUGIN_CONTINUE;
 			
-		switch(rank)
-		{
+		switch(rank) {
 			case 1: formatex(chatPrefix, charsmax(chatPrefix), "^x04[TOP1]");
 			case 2: formatex(chatPrefix, charsmax(chatPrefix), "^x04[TOP2]");
 			case 3: formatex(chatPrefix, charsmax(chatPrefix), "^x04[TOP3]");
 		}
 		
-		if(!equal(tempMessage, "#Cstrike_Chat_All"))
-		{
+		if(!equal(tempMessage, "#Cstrike_Chat_All")) {
 			add(message, charsmax(message), chatPrefix);
 			add(message, charsmax(message), " ");
 			add(message, charsmax(message), tempMessage);
 		}
-		else
-		{
+		else {
 			add(message, charsmax(message), chatPrefix);
 			add(message, charsmax(message), "^x03 %s1^x01 :  %s2");
 		}
@@ -894,8 +848,7 @@ public sql_init()
 
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
-	if(errorNum)
-	{
+	if(errorNum) {
 		log_to_file("cod_mod.log", "Error: %s", error);
 		
 		return;
@@ -927,8 +880,7 @@ public load_stats(id)
 
 public load_stats_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
-	if(failState) 
-	{
+	if(failState) {
 		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
 		
 		return;
@@ -938,8 +890,7 @@ public load_stats_handle(failState, Handle:query, error[], errorNum, tempId[], d
 	
 	if(!is_user_connected(id)) return;
 	
-	if(SQL_NumRows(query))
-	{
+	if(SQL_NumRows(query)) {
 		playerStats[id][KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "kills"));
 		playerStats[id][TIME] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "time"));
 		playerStats[id][FIRST_VISIT] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "firstvisit"));
@@ -973,16 +924,14 @@ save_stats(id, end = 0)
 		
 	playerStats[id][CURRENT_STATS] = playerStats[id][CURRENT_KILLS]*2 + playerStats[id][CURRENT_HS_KILLS] - playerStats[id][CURRENT_DEATHS]*2;
 	
-	if(playerStats[id][CURRENT_STATS] > playerStats[id][BEST_STATS])
-	{			
+	if(playerStats[id][CURRENT_STATS] > playerStats[id][BEST_STATS]) {			
 		formatex(queryStats, charsmax(queryStats), ", `bestkills` = %d, `besths` = %d, `bestdeaths` = %d, `beststats` = %d", 
 		playerStats[id][CURRENT_KILLS], playerStats[id][CURRENT_HS_KILLS], playerStats[id][CURRENT_DEATHS], playerStats[id][CURRENT_STATS]);
 	}
 
 	medals = playerStats[id][GOLD]*3 + playerStats[id][SILVER]*2 + playerStats[id][BRONZE];
 	
-	if(medals > playerStats[id][MEDALS])
-	{			
+	if(medals > playerStats[id][MEDALS]) {			
 		formatex(queryStats, charsmax(queryStats), ", `gold` = %d, `silver` = %d, `bronze` = %d, `medals` = %d", 
 		playerStats[id][GOLD], playerStats[id][SILVER], playerStats[id][BRONZE], medals);
 	}
@@ -990,17 +939,14 @@ save_stats(id, end = 0)
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_stats` SET `admin` = %i, `kills` = %i, `time` = %i, `lastvisit` = %i%s%s WHERE name = '%s' AND `time` <= %i", 
 	playerStats[id][ADMIN], playerStats[id][KILLS], playerStats[id][TIME] + get_user_time(id), get_systime(), queryStats, queryMedals, playerName[id], playerStats[id][TIME] + get_user_time(id));
 		
-	switch(end)
-	{
+	switch(end) {
 		case 0: SQL_ThreadQuery(sql, "ignore_handle", queryData);
-		case 1:
-		{
+		case 1: {
 			new error[128], errorNum, Handle:sqlConnection, Handle:query;
 			
 			sqlConnection = SQL_Connect(sql, errorNum, error, charsmax(error));
 
-			if(!sqlConnection)
-			{
+			if(!sqlConnection) {
 				log_to_file("cod_mod.log", "Save - Could not connect to SQL database.  [%d] %s", error, error);
 				
 				SQL_FreeHandle(sqlConnection);
@@ -1010,8 +956,7 @@ save_stats(id, end = 0)
 			
 			query = SQL_PrepareQuery(sqlConnection, queryData);
 			
-			if(!SQL_Execute(query))
-			{
+			if(!SQL_Execute(query)) {
 				errorNum = SQL_QueryError(query, error, charsmax(error));
 				
 				log_to_file("cod_mod.log", "Save Query Nonthreaded failed. [%d] %s", errorNum, error);
@@ -1032,8 +977,7 @@ save_stats(id, end = 0)
 
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
-	if (failState) 
-	{
+	if(failState) {
 		if(failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
 		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "Query failed. [%d] %s", errorNum, error);
 	}
@@ -1066,13 +1010,12 @@ public _cod_get_user_time_text(id, dataReturn[], dataLength)
 
 	minutes = 0; hours = 0;
 	
-	while(seconds >= 60)
-	{
+	while(seconds >= 60) {
 		seconds -= 60;
 		minutes++;
 	}
-	while(minutes >= 60)
-	{
+
+	while(minutes >= 60) {
 		minutes -= 60;
 		hours++;
 	}
@@ -1085,7 +1028,9 @@ public _cod_get_user_time_text(id, dataReturn[], dataLength)
 stock get_loguser_index()
 {
 	new userLog[80], userName[32];
+
 	read_logargv(0, userLog, charsmax(userLog));
+	
 	parse_loguser(userLog, userName, charsmax(userName));
 
 	return get_user_index(userName);
