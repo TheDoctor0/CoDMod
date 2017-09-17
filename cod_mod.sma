@@ -12,7 +12,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.148"
+#define VERSION "1.0.154"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -4103,7 +4103,7 @@ stock get_players_amount()
 
 stock check_promotion(id, info = 0, class = 0)
 {
-	if(codPlayer[id][PLAYER_PROMOTION] == PROMOTION_THIRD) return codPlayer[id][PLAYER_PROMOTION];
+	if(!class && codPlayer[id][PLAYER_PROMOTION] == PROMOTION_THIRD) return codPlayer[id][PLAYER_PROMOTION];
 
 	new codPromotion[classInfo], promotionId, promotion;
 	

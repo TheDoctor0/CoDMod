@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"cod_set_user_reco",
+				"cod_set_user_recoil_eliminator\t(cod_mod.sma)"
+			],
+			[
+				"cod_get_user_reco",
+				"cod_get_user_recoil_eliminator\t(cod_mod.sma)"
+			],
+			[
+				"upda",
+				"update_client_data"
+			],
+			[
 				"COD",
 				"COD_BLOCK  \tcod.inc - define: -1.0"
 			],
@@ -363,8 +375,16 @@
 			"file": "cod.txt",
 			"settings":
 			{
-				"buffer_size": 68,
+				"buffer_size": 46,
 				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "cod_shop.sma",
+			"settings":
+			{
+				"buffer_size": 16243,
 				"line_ending": "Windows"
 			}
 		},
@@ -372,41 +392,17 @@
 			"file": "cod_mod.sma",
 			"settings":
 			{
-				"buffer_size": 146033,
+				"buffer_size": 152138,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "classes/codclass_grabiezca.sma",
+			"file": "/D/Dawid/Workplace/AMXX/include/cod.inc",
 			"settings":
 			{
-				"buffer_size": 2130,
+				"buffer_size": 38422,
 				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/D/Dawid/Workplace/Mods/CoD Mod Old/perki/codperk_eliminatorrozrzutu.sma",
-			"settings":
-			{
-				"buffer_size": 721,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/D/Dawid/Workplace/Mods/CoD Mod Old/perki/codperk_bezlikammo.sma",
-			"settings":
-			{
-				"buffer_size": 947,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/D/Dawid/Workplace/Mods/CoD Mod Old/perki/codperk_ogranicznikrozrzutu.sma",
-			"settings":
-			{
-				"buffer_size": 709,
 				"line_ending": "Windows"
 			}
 		},
@@ -619,11 +615,16 @@
 	},
 	"expanded_folders":
 	[
-		"/D/Dawid/Workplace/Mods/CoDMod",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes"
+		"/D/Dawid/Workplace/Mods/CoDMod"
 	],
 	"file_history":
 	[
+		"/D/Dawid/Workplace/Mods/CoDMod/cod_shop.sma",
+		"/D/Dawid/Workplace/Mods/CoD Mod Old/perki/codperk_bezlikammo.sma",
+		"/D/Dawid/Workplace/Mods/CoD Mod Old/perki/codperk_ogranicznikrozrzutu.sma",
+		"/D/Dawid/Workplace/Mods/CoD Mod Old/perki/codperk_eliminatorrozrzutu.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_grabiezca.sma",
+		"/D/Dawid/Workplace/Mods/CoDMod/cod.inc",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170915.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/100 2.log",
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/error_20170916.log",
@@ -652,9 +653,7 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/weaprest.ini",
 		"/D/Dawid/Workplace/AMXX/scripting/voicesmanagement.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_dezerter.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod_shop.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_clans_system.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/cod.inc",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_vip.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_transfer.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/cod_stats.sma",
@@ -684,7 +683,6 @@
 		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_mnich.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_medyk.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_komandos.sma",
-		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_grabiezca.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_elektryk.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_bomberman.sma",
 		"/D/Dawid/Workplace/Mods/CoDMod/classes/codclass_amadeusz.sma",
@@ -748,10 +746,7 @@
 		"/C/Users/Dawid/AppData/Local/Temp/fz3temp-2/plugins 3.ini",
 		"/D/Dawid/Workplace/AMXX/scripting/ozone_banconfig.sma",
 		"/D/Downloads/Chrome/log_ms.sma",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.243/resources.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.771/resources.ini",
-		"/C/Users/Dawid/Desktop/config.ini",
-		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.758/config.ini"
+		"/C/Users/Dawid/AppData/Local/Temp/Rar$DIa0.243/resources.ini"
 	],
 	"find":
 	{
@@ -802,6 +797,44 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"check_promotion",
+			"PROMOTION_THIRD",
+			"cod_get_user_bunnyhop",
+			"CSW_",
+			"model",
+			"PLAYER_REDUCER_WEAPONS",
+			"PLAYER_ELIMINATOR_WEAPONS",
+			"PLAYER_UNLIMITED_AMMO_WEAPONS",
+			"PLAYER_UNLIMITED_AMMO",
+			"PLAYER_red",
+			"PLAYER_eli",
+			"PLAYER_e",
+			"PLAYER_UNLIMITED_AMMO",
+			"render_change",
+			"cur_weap",
+			"PLAYER_UNLIMITED_AMMO",
+			"PLAYER_REDUCER",
+			"codPlayer[id][PLAYER_REDUCER]",
+			"_cod_get_user_model",
+			"cmd_start",
+			"_cod_get_user_model",
+			"cur_weapon",
+			"message_health",
+			"cmd_start",
+			"PLAYER_REDUCTOR",
+			"cmd_start",
+			"update_client_data",
+			"prethink",
+			"PLAYER_ELIMINATOR",
+			"cmd_start",
+			"PLAYER_ELIMINATOR",
+			"prethink",
+			"PLAYER_MODEL",
+			"render_change",
+			"PLAYER_MODEL",
+			"get_user_weapon",
+			"player_weapon",
+			"get_user_weapon",
 			"weapon_deploy_post",
 			"_cod_screen_shake",
 			"maxClip",
@@ -891,45 +924,7 @@
 			"GREGOR2",
 			"gregor2",
 			"'password'",
-			"/admin",
-			"admins",
-			"getUser",
-			"updateUser",
-			"responsi",
-			"＆*Zadymka*＆ Szymon",
-			"AdminCommand_VoiceOn",
-			"SUPER_ADMIN_PRIORITY",
-			"g_bAdminListen",
-			"g_mute",
-			"Forward_SetClientListening",
-			"＆*Zadymka*＆ Szymon",
-			"AwekeN",
-			"-=",
-			"Forward_SetClientListening",
-			"AwekeN",
-			"_Raddes_",
-			"load_da",
-			"_csgo_get_money",
-			"native",
-			"[BvH] RyChu",
-			"AwekeN",
-			"exchange_question_handle",
-			"Exchange",
-			"license_expires",
-			"Licencja wygasa",
-			"3.3.6",
-			"sid2",
-			"load_flags",
-			"forwardcl",
-			"forwardAdminConnect",
-			"forwardClientAuthorized",
-			"amxbans_admin_connect",
-			"autho",
-			"amxbans",
-			"g_ozone",
-			"QUERY",
-			"forwardClientAuthorized",
-			"reload_players_flags"
+			"/admin"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1033,7 +1028,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 2,
 			"sheets":
 			[
 				{
@@ -1042,15 +1037,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 68,
+						"buffer_size": 46,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								35,
-								35
+								13,
+								13
 							]
 						],
 						"settings":
@@ -1075,24 +1070,65 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "cod_mod.sma",
+					"file": "cod_shop.sma",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 146033,
+						"buffer_size": 16243,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								70659,
-								70677
+								257,
+								265
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".#",
+									"selector": "text.html"
+								}
+							],
+							"git_savvy.repo_path": "D:\\Dawid\\Workplace\\Mods\\CoDMod",
+							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "cod_mod.sma",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 152138,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								137555,
+								137555
 							]
 						],
 						"settings":
@@ -1115,27 +1151,27 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 33337.0,
+						"translation.y": 69343.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "classes/codclass_grabiezca.sma",
+					"buffer": 3,
+					"file": "/D/Dawid/Workplace/AMXX/include/cod.inc",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2130,
+						"buffer_size": 38422,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								471,
-								471
+								1065,
+								1080
 							]
 						],
 						"settings":
@@ -1160,134 +1196,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "/D/Dawid/Workplace/Mods/CoD Mod Old/perki/codperk_eliminatorrozrzutu.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 721,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								18,
-								18
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"git_gutter_is_enabled": false,
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "/D/Dawid/Workplace/Mods/CoD Mod Old/perki/codperk_bezlikammo.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 947,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								279,
-								279
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"git_gutter_is_enabled": false,
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "/D/Dawid/Workplace/Mods/CoD Mod Old/perki/codperk_ogranicznikrozrzutu.sma",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 709,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".#",
-									"selector": "text.html"
-								}
-							],
-							"git_gutter_is_enabled": false,
-							"syntax": "Packages/amxmodx/AMXX-Pawn.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 4,
 					"file": "/C/Users/Dawid/Desktop/Aktualne/DB2 - Cheat Sheet.txt",
 					"semi_transient": false,
 					"settings":
@@ -1324,7 +1237,7 @@
 						"translation.y": 1581.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 4,
 					"type": "text"
 				}
 			]
@@ -1371,7 +1284,7 @@
 	},
 	"output.exec":
 	{
-		"height": 179.0
+		"height": 230.0
 	},
 	"output.find_results":
 	{
