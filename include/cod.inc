@@ -635,35 +635,77 @@ Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - other
 native cod_get_user_model(id, type = ALL);
 
 /*------------------------------
-Set's player's bunnyhop.
+Return if player have clip unlimited ammo.
+Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
+Weapon defines if defined weapons condition has to be checked.
+------------------------------*/
+native cod_get_user_unlimited_ammo(id, type = ALL, weapon = 0);
+
+/*------------------------------
+Return if player have recoil eliminator.
+Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
+Weapon defines if defined weapons condition has to be checked.
+------------------------------*/
+native cod_get_user_recoil_eliminator(id, type = ALL);
+
+/*------------------------------
+Return if player have recoil reducer.
+Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
+Weapon defines if defined weapons condition has to be checked.
+------------------------------*/
+native cod_get_user_recoil_reducer(id, type = ALL);
+
+/*------------------------------
+Set player's bunnyhop.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_set_user_bunnyhop(id, value, type = ROUND);
 
 /*------------------------------
-Set's player's silent walk.
+Set player's silent walk.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_set_user_footsteps(id, value, type = ROUND);
 
 /*------------------------------
-Set's player's model of the opponent.
+Set player's model of the opponent.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_set_user_model(id, value, type = ROUND);
 
 /*------------------------------
-Set's player's resistance for powers.
+Set player's unlimited clip ammo.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+Weapon is weapon id (CSW_) or FULL for all weapons.
+------------------------------*/
+native cod_set_user_unlimited_ammo(id, value, type = ROUND, weapon = FULL);
+
+/*------------------------------
+Set player's recoil eliminator.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+Weapon is weapon id (CSW_) or FULL for all weapons.
+------------------------------*/
+native cod_set_user_recoil_eliminator(id, value, type = ROUND, weapon = FULL);
+
+/*------------------------------
+Set player's recoil reducer.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+Weapon is weapon id (CSW_) or FULL for all weapons.
+------------------------------*/
+native cod_set_user_recoil_reducer(id, value, type = ROUND, weapon = FULL);
+
+/*------------------------------
+Set player's resistance for powers.
 ------------------------------*/
 native cod_set_user_resistance(id, value);
 
 /*------------------------------
-Gives player a weapon and allows player to own it
+Give player a weapon and allows player to own it
 ------------------------------*/
 native cod_give_weapon(id, weapon);
 
 /*------------------------------
-Removes player a weapon and disallows player to own it
+Remove player a weapon and disallows player to own it
 ------------------------------*/
 native cod_take_weapon(id, weapon);
 
@@ -674,32 +716,32 @@ Type can be NONE - at this moment (with status and weapon rules applied), ALL - 
 native cod_get_user_render(id, type = NONE);
 
 /*------------------------------
-Sets player's render.
+Set player's render.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 There can be only one render for CLASS, ITEM, ADDITIONAL, but multiple for ROUND - every set adds new render record.
 Value is number from -255 to 255, but for CLASS type must be 0 or more (negative numbers substract it from player's current render value, positive and 0 sets it to this value).
 Status is player state for render. It can be a bitsum of RENDER_ALWAYS, RENDER_STAND, RENDER_MOVE, RENDER_DUCK, RENDER_SHIFT.
-Weapon is weapon id (CSW_), 0 for all weapons.
+Weapon is weapon id (CSW_) or FULL for all weapons.
 Timer sets render value for certain amount of time - it ignores type, status and weapon.
 ------------------------------*/
-native cod_set_user_render(id, value, type = ROUND, status = RENDER_ALWAYS, weapon = 0, Float:timer = 0.0);
+native cod_set_user_render(id, value, type = ROUND, status = RENDER_ALWAYS, weapon = FULL, Float:timer = 0.0);
 
 /*------------------------------
-Set's player's render glow.
+Set player's render glow.
 Usage is the same as in set_user_rendering native.
 Timer sets glow for certain amount of time.
 ------------------------------*/
 native cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:timer = 0.0);
 
 /*------------------------------
-Diplays text in HUD/DHUD.
+Diplay text in HUD/DHUD.
 Type can be TYPE_HUD or TYPE_DHUD.
 HUD/DHUD params usage is the same as in set_hudmessage/set_dhudmessage.
 ------------------------------*/
 native cod_show_hud(id, type = 0, red = 255, green = 255, blue = 255, Float:x = -1.0, Float:y = 0.35, effects = 0, Float:fxtime = 6.0, Float:holdtime = 12.0, Float:fadeintime = 0.1, Float:fadeouttime = 0.2, const text[], any:...);
 
 /*------------------------------
-Displays screen fade.
+Display screen fade.
 Duration and holdtime are time seconds.
 Fadetype is fade display type:
 - FFADE_IN 0x0000
@@ -712,7 +754,7 @@ Alpha is fade power from 0 to 255
 native cod_display_fade(id, duration, holdtime, fadetype, red, green, blue, alpha);
 
 /*------------------------------
-Displays status icon.
+Display status icon.
 Red, green, blue is status color in RGB.
 Name is status icon name - all icons can be found here https://forums.alliedmods.net/showthread.php?t=52529.
 Enable defines if show or hide icon.
@@ -720,14 +762,14 @@ Enable defines if show or hide icon.
 native cod_display_icon(id, red, green, blue, const name[], enable = 1);
 
 /*------------------------------
-Displays bartimer.
+Display bartimer.
 Duration is time in seconds.
 Start is value from 0-100 and specifies from what percent of bar it starts.
 ------------------------------*/
 native cod_make_bartimer(id, duration, start = 0);
 
 /*------------------------------
-Shakes player's screen.
+Shake player's screen.
 Amplitude is power of shakes.
 Duration is time in seconds.
 Frequency is noise frequency.
@@ -735,7 +777,12 @@ Frequency is noise frequency.
 native cod_screen_shake(id, amplitude = (7<<14), duration = (1<<13), frequency = (1<<14));
 
 /*------------------------------
-Makes an explosion around ent.
+Refill player's clip ammo.
+------------------------------*/
+native cod_refill_ammo(id);
+
+/*------------------------------
+Make an explosion around ent.
 Distance specifies beam distance.
 Explosion is explosion effect.
 Damage_distance is distance from ent where players will be hurt.
@@ -746,7 +793,7 @@ Suicide is decision if player will die after explosion
 native cod_make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0.0, Float:damage = 0.0, Float:factor = 0.5, suicide = 0);
 
 /*------------------------------
-Makes repeating damage to player.
+Make repeating damage to player.
 Attacker is player that makes damage.
 Victim is player that is receiving damage.
 Damage is damage amount.
@@ -759,14 +806,14 @@ Instant makes first damage immediately.
 native cod_repeat_damage(attacker, victim, Float:damage, Float:time, counter = 1, flags = DMG_CODSKILL, instant = 1);
 
 /*------------------------------
-Inflicts damage with intelligence factor.
+Make damage with intelligence factor.
 Factor is intelligence bonus for damage.
 Flags are damage flags (COD_SKILL flag will be added).
 ------------------------------*/
 native cod_inflict_damage(attacker, victim, Float:damage, Float:factor = 0.5, flags = 0);
 
 /*------------------------------
-Kills a player imitating kill by another player.
+Kill a player imitating kill by another player.
 ------------------------------*/
 native cod_kill_player(attacker, victim, damageBits);
 
@@ -999,11 +1046,13 @@ Item value will always be at least 0;
 ------------------------------*/
 stock cod_random_upgrade(&value, upgradeMin, upgradeMax, valueMin = NONE, valueMax = NONE)
 {
-	if((valueMin != NONE && value <= valueMin) || (valueMax != NONE && value >= valueMax)) return COD_STOP;
+	if((valueMin != NONE && value <= valueMin) || (valueMax != NONE && value >= valueMax))
+		return COD_STOP;
 
 	value = max(0, value + (upgradeMin & upgradeMin) ? random_num(upgradeMin, upgradeMax) : (random(2) ? random_num(upgradeMin, -1) : random_num(1, upgradeMax)));
 
-	if(valueMax != NONE) value = min(value, valueMax);
+	if(valueMax != NONE)
+		value = min(value, valueMax);
 
 	return COD_CONTINUE;
 }
@@ -1012,8 +1061,10 @@ stock cod_print_chat(id, const text[] = "", any:...)
 {
 	new message[192];
 
-	if(numargs() == 2) copy(message, charsmax(message), text);
-	else vformat(message, charsmax(message), text, 3);
+	if(numargs() == 2)
+		copy(message, charsmax(message), text);
+	else
+		vformat(message, charsmax(message), text, 3);
 
 	client_print_color(id, id, "^x04[CoD]^x01 %s", message);
 }

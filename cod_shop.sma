@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Shop"
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 #define AUTHOR "O'Zone"
 
 new const commandShopMenu[][] = { "say /shop", "say_team /shop", "say /sklep", "say_team /sklep", "sklep" };
@@ -386,7 +386,7 @@ public shop_menu_handle(id, menu, item)
 		case INVISIBLE: {
 			cod_print_chat(id, "Kupiles^x03 Peleryne Niewidke^x01!");
 
-			cod_set_user_render(id, 0, ROUND, RENDER_ALWAYS);
+			cod_set_user_render(id, 0);
 		}
 	}
 

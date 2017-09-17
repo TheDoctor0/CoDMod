@@ -16,9 +16,6 @@
 #define STAMINA      0
 #define CONDITION    15
 
-new const maxClip[31] = { -1, 13, -1, 10,  1,  7,  1,  30, 30,  1,  30,  20,  25, 
-	30, 35, 25,  12,  20, 10,  30, 100,  8, 30,  30, 20,  2,  7, 30, 30, -1,  50 };
-
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
@@ -28,7 +25,7 @@ public plugin_init()
 
 public cod_class_kill(killer, victim)
 {
-	set_user_clip(killer);
+	cod_refill_ammo(killer);
 
 	if(cod_get_user_item(victim) && cod_get_user_item(killer) != cod_get_user_item(victim) && random_num(1, 4) == 1) show_question(killer, victim);
 }
@@ -83,15 +80,4 @@ public show_question_handle(id, menu, item)
 
 	cod_set_user_item(victim);
 	cod_set_user_item(id, item, itemValue);
-}
-
-stock set_user_clip(id)
-{
-	new weaponName[32], weaponid = -1, weapon = get_user_weapon(id);
-
-	get_weaponname(weapon, weaponName, charsmax(weaponName));
-
-	while((weaponid = engfunc(EngFunc_FindEntityByString, weaponid, "classname", weaponName)) != 0) {
-		if(pev(weaponid, pev_owner) == id) set_pdata_int(weaponid, 51, maxClip[weapon], 4);
-	}
 }

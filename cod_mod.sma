@@ -12,7 +12,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.116"
+#define VERSION "1.0.148"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -41,7 +41,7 @@ new const commandBinds[][] = { "bindy", "say /bind", "say_team /bind", "say /bin
 new const commandTop[][] = { "top", "say /toplvl", "say_team /toplvl", "say /toplevel", "say_team /toplevel", "say /toppoziom", "say_team /toppoziom", "say /ltop15", "say_team /ltop15", "say /ptop15", "say_team /ptop15" };
 new const commandBlock[][] = { "fullupdate", "cl_autobuy", "cl_rebuy", "cl_setautobuy", "rebuy", "autobuy", "hegren", "sgren", "flash", "-rocket", "-mine", "-dynamite", "-medkit", "-teleport" };
 
-new const maxAmmo[] = { 0, 52, 0, 90, 1, 31, 1, 100, 90, 1, 120, 100, 100, 90, 90, 90, 100, 120, 30, 120, 200, 31, 90, 120, 90, 2, 35, 90, 90,0, 100 };
+new const maxClipAmmo[] = { -1, 13, -1, 10,  1,  7,  1,  30, 30,  1,  30,  20,  25, 30, 35, 25,  12,  20, 10,  30, 100,  8, 30,  30, 20,  2,  7, 30, 30, -1,  50 };
 new const maxBpAmmo[] = { 0, 30, 90, 200, 90, 32, 100, 100, 35, 52, 120 };
 
 new const pointsDistribution[] = { 1, 3, 5, 10, 25, FULL };
@@ -94,7 +94,8 @@ enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_
 	PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_WEAPON, PLAYER_WEAPONS, PLAYER_STATUS, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_KS, PLAYER_TIME_KS, PLAYER_RESISTANCE, Float:PLAYER_LAST_ROCKET, 
 	Float:PLAYER_LAST_MINE, Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, 
 	PLAYER_HUD_POSX, PLAYER_HUD_POSY, PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], 
-	PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1], PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_NAME] };
+	PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1], PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1], PLAYER_ELIMINATOR[ALL + 1], 
+	PLAYER_ELIMINATOR_WEAPONS[ALL + 1], PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_NAME] };
 
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 
@@ -182,6 +183,7 @@ public plugin_init()
 	
 	register_event("HLTV", "new_round", "a", "1=0", "2=0");
 	register_event("Health", "message_health", "be", "1!255");
+	register_event("CurWeapon","cur_weapon", "be", "1=1");
 	register_event("SendAudio", "t_win_round" , "a", "2&%!MRAD_terwin");
 	register_event("SendAudio", "ct_win_round", "a", "2&%!MRAD_ct_win_round");
 	register_event("TextMsg", "hostages_rescued", "a", "2&#All_Hostages_R");
@@ -189,6 +191,7 @@ public plugin_init()
 	register_forward(FM_CmdStart, "cmd_start");
 	register_forward(FM_EmitSound, "sound_emit");
 	register_forward(FM_PlayerPreThink, "player_prethink");
+	register_forward(FM_UpdateClientData, "update_client_data", 1);
 	
 	register_message(get_user_msgid("SayText"), "say_text");
 	register_message(get_user_msgid("AmmoX"), "message_ammo");
@@ -333,11 +336,17 @@ public plugin_natives()
 	register_native("cod_get_user_footsteps", "_cod_get_user_footsteps", 1);
 	register_native("cod_get_user_model", "_cod_get_user_model", 1);
 	register_native("cod_get_user_resistance", "_cod_get_user_resistance", 1);
+	register_native("cod_get_user_unlimited_ammo", "_cod_get_user_unlimited_ammo", 1);
+	register_native("cod_get_user_recoil_eliminator", "_cod_get_recoil_eliminator", 1);
+	register_native("cod_get_user_recoil_reducer", "_cod_get_recoil_reducer", 1);
 	
 	register_native("cod_set_user_bunnyhop", "_cod_set_user_bunnyhop", 1);
 	register_native("cod_set_user_footsteps", "_cod_set_user_footsteps", 1);
 	register_native("cod_set_user_model", "_cod_set_user_model", 1);
 	register_native("cod_set_user_resistance", "_cod_set_user_resistance", 1);
+	register_native("cod_set_user_unlimited_ammo", "_cod_set_user_unlimited_ammo", 1);
+	register_native("cod_set_user_recoil_eliminator", "_cod_set_recoil_eliminator", 1);
+	register_native("cod_set_user_recoil_reducer", "_cod_set_recoil_reducer", 1);
 	
 	register_native("cod_give_weapon", "_cod_give_weapon", 1);
 	register_native("cod_take_weapon", "_cod_take_weapon", 1);
@@ -351,6 +360,7 @@ public plugin_natives()
 	register_native("cod_display_fade", "_cod_display_fade", 1);
 	register_native("cod_display_icon", "_cod_display_icon", 1);
 	register_native("cod_screen_shake", "_cod_screen_shake", 1);
+	register_native("cod_refill_ammo", "_cod_refill_ammo", 1);
 	register_native("cod_make_explosion", "_cod_make_explosion", 1);
 	register_native("cod_repeat_damage", "_cod_repeat_damage", 1);
 	register_native("cod_inflict_damage", "_cod_inflict_damage", 1);
@@ -1765,7 +1775,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 
 	static function, weapon;
 
-	weapon = get_user_weapon(attacker);
+	weapon = codPlayer[attacker][PLAYER_WEAPON];
 	
 	if(!(0 < inflictor <= MAX_PLAYERS)) weapon = CSW_HEGRENADE;
 
@@ -1854,7 +1864,7 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 	
 	static ret, weapon;
 
-	weapon = get_user_weapon(attacker);
+	weapon = codPlayer[attacker][PLAYER_WEAPON];
 	
 	if(!(0 < inflictor <= MAX_PLAYERS)) weapon = CSW_HEGRENADE;
 
@@ -2047,6 +2057,13 @@ public message_health(id)
 		message_end(); 
 	} 
 }
+
+public cur_weapon(id)
+{
+	if(!is_user_connected(id) || (codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] && (!codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] || codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] & codPlayer[id][PLAYER_WEAPON]))) return;
+	
+	set_user_clip(id);
+}
 	
 public t_win_round()
 	round_winner(1);
@@ -2184,6 +2201,17 @@ public cmd_start(id, ucHandle)
 
 	if(get_user_maxspeed(id) > speed * 1.8) set_pev(id, pev_flTimeStepSound, 300);
 
+	if(codPlayer[id][PLAYER_REDUCER][ALL] && (!codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] || codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] & codPlayer[id][PLAYER_WEAPON]) && button & IN_ATTACK)
+	{
+		new Float:punchAngle[3];
+
+		pev(id, pev_punchangle, punchAngle);
+
+		for(new i = 0; i < 3; i++) punchAngle[i] *= 0.9;
+
+		set_pev(id, pev_punchangle, punchAngle);
+	}
+
 	if(speed == 0.0) playerState |= RENDER_STAND;
 	else playerState |= RENDER_MOVE;
 
@@ -2244,6 +2272,8 @@ public player_prethink(id)
 
 	execute_forward_ignore_one_param(codForwards[PRETHINK], id);
 
+	if(codPlayer[id][PLAYER_ELIMINATOR][ALL] && (!codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] || codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] & codPlayer[id][PLAYER_WEAPON])) set_pev(id, pev_punchangle, {0.0, 0.0, 0.0});
+
 	if(!codPlayer[id][PLAYER_BUNNYHOP][ALL]) return FMRES_IGNORED;
 
 	entity_set_float(id, EV_FL_fuser2, 0.0);
@@ -2266,6 +2296,9 @@ public player_prethink(id)
 	
 	return FMRES_IGNORED;
 }
+
+public update_client_data(id, sendWeapons, cdHandle)
+	if(codPlayer[id][PLAYER_ELIMINATOR][ALL] && (codPlayer[id][PLAYER_ELIMINATOR][ALL] && codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] & codPlayer[id][PLAYER_WEAPON])) set_cd(cdHandle, CD_PunchAngle, {0.0, 0.0, 0.0});
 
 public say_text(msgId, msgDest, msgEnt)
 {
@@ -2595,6 +2628,12 @@ public reset_attributes(id, type)
 	codPlayer[id][PLAYER_BUNNYHOP][type] = 0;
 	codPlayer[id][PLAYER_FOOTSTEPS][type] = 0;
 	codPlayer[id][PLAYER_MODEL][type] = 0;
+	codPlayer[id][PLAYER_UNLIMITED_AMMO][type] = 0;
+	codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] = 0;
+	codPlayer[id][PLAYER_ELIMINATOR][type] = 0;
+	codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] = 0;
+	codPlayer[id][PLAYER_REDUCER][type] = 0;
+	codPlayer[id][PLAYER_REDUCER_WEAPONS][type] = 0;
 	codPlayer[id][PLAYER_TELEPORTS][type] = 0;
 
 	codPlayer[id][PLAYER_GRAVITY][type] = _:1.0;
@@ -2606,10 +2645,6 @@ public reset_attributes(id, type)
 		codPlayer[id][PLAYER_DYNAMITES][USED] = 0;
 		codPlayer[id][PLAYER_THUNDERS][USED] = 0;
 		codPlayer[id][PLAYER_MEDKITS][USED] = 0;
-		codPlayer[id][PLAYER_JUMPS][USED] = 0;
-		codPlayer[id][PLAYER_BUNNYHOP][USED] = 0;
-		codPlayer[id][PLAYER_FOOTSTEPS][USED] = 0;
-		codPlayer[id][PLAYER_MODEL][USED] = 0;
 		codPlayer[id][PLAYER_TELEPORTS][USED] = 0;
 
 		if(task_exists(id + TASK_END_KILL_STREAK)) remove_task(id + TASK_END_KILL_STREAK);
@@ -2629,17 +2664,31 @@ public reset_attributes(id, type)
 		calculate_teleports_left(id);
 	}
 
-	new bool:footstepsEnabled, bunnyHopEnabled, modelEnabled;
+	new bool:footstepsEnabled, bunnyHopEnabled, modelEnabled, unlimitedAmmoEnabled, eliminatorEnabled, reductorEnabled;
+
+	codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] = 0;
+	codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] = 0;
+	codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] = 0;
 
 	for(new i = CLASS; i <= ROUND; i++) {
 		if(codPlayer[id][PLAYER_FOOTSTEPS][i]) footstepsEnabled = true;
 		if(codPlayer[id][PLAYER_BUNNYHOP][i]) bunnyHopEnabled = true;
 		if(codPlayer[id][PLAYER_MODEL][i]) modelEnabled = true;
+		if(codPlayer[id][PLAYER_UNLIMITED_AMMO][i]) unlimitedAmmoEnabled = true;
+		if(codPlayer[id][PLAYER_ELIMINATOR][i]) eliminatorEnabled = true;
+		if(codPlayer[id][PLAYER_REDUCER][i]) reductorEnabled = true;
+
+		codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] |= codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i];
+		codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] |= codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][i];
+		codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] |= codPlayer[id][PLAYER_REDUCER_WEAPONS][i];
 	}
 
 	codPlayer[id][PLAYER_FOOTSTEPS][ALL] = footstepsEnabled;
 	codPlayer[id][PLAYER_BUNNYHOP][ALL] = bunnyHopEnabled;
 	codPlayer[id][PLAYER_MODEL][ALL] = modelEnabled;
+	codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] = unlimitedAmmoEnabled;
+	codPlayer[id][PLAYER_ELIMINATOR][ALL] = eliminatorEnabled;
+	codPlayer[id][PLAYER_REDUCER][ALL] = reductorEnabled;
 
 	remove_render_type(id, type);
 
@@ -2673,10 +2722,12 @@ public set_attributes(id)
 
 	speed_change(id);
 
+	render_change(id);
+
 	StripWeapons(id, Primary);
 	StripWeapons(id, Secondary);
 	
-	new playerWeapons[32], weaponName[22], weaponTypes;
+	new weaponName[22];
 	
 	for(new i = 1; i < 32; i++) {
 		if((1<<i) & (codPlayer[id][PLAYER_WEAPONS] | codPlayer[id][PLAYER_EXTR_WPNS])) {
@@ -2684,10 +2735,12 @@ public set_attributes(id)
 			give_item(id, weaponName);
 		}
 	}
+
+	//new playerWeapons[32], weaponTypes;
 	
-	get_user_weapons(id, playerWeapons, weaponTypes);
+	//get_user_weapons(id, playerWeapons, weaponTypes);
 	
-	for(new i = 0; i < weaponTypes; i++) if(maxAmmo[playerWeapons[i]] > 0) cs_set_user_bpammo(id, playerWeapons[i], maxAmmo[playerWeapons[i]]);
+	//for(new i = 0; i < weaponTypes; i++) if(maxAmmo[playerWeapons[i]] > 0) cs_set_user_bpammo(id, playerWeapons[i], maxAmmo[playerWeapons[i]]);
 }
 
 public gravity_change(id)
@@ -2774,6 +2827,12 @@ public reset_player(id)
 		codPlayer[id][PLAYER_BUNNYHOP][i] = 0;
 		codPlayer[id][PLAYER_FOOTSTEPS][i] = 0;
 		codPlayer[id][PLAYER_MODEL][i] = 0;
+		codPlayer[id][PLAYER_ELIMINATOR][i] = 0;
+		codPlayer[id][PLAYER_REDUCER][i] = 0;
+		codPlayer[id][PLAYER_UNLIMITED_AMMO][i] = 0;
+		codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][i] = 0;
+		codPlayer[id][PLAYER_REDUCER_WEAPONS][i] = 0;
+		codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i] = 0;
 	}
 
 	codPlayer[id][PLAYER_HUD_RED] = 0;
@@ -3594,6 +3653,24 @@ public _cod_get_user_footsteps(id, type)
 
 public _cod_get_user_model(id, type)
 	return codPlayer[id][PLAYER_MODEL][type];
+
+public _cod_get_user_unlimited_ammo(id, type, weapon)
+{
+	if(weapon) return (codPlayer[id][PLAYER_UNLIMITED_AMMO][type] && (!codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] || codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] & codPlayer[id][PLAYER_WEAPON]));
+	else return codPlayer[id][PLAYER_UNLIMITED_AMMO][type];
+}
+
+public _cod_get_user_recoil_eliminator(id, type, weapon)
+{
+	if(weapon) return (codPlayer[id][PLAYER_ELIMINATOR][type] && (!codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] || codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] & codPlayer[id][PLAYER_WEAPON]));
+	return codPlayer[id][PLAYER_ELIMINATOR][type];
+}
+
+public _cod_get_user_recoil_reducer(id, type, weapon)
+{
+	if(weapon) return (codPlayer[id][PLAYER_REDUCER][type] && (!codPlayer[id][PLAYER_REDUCER_WEAPONS][type] || codPlayer[id][PLAYER_REDUCER_WEAPONS][type] & codPlayer[id][PLAYER_WEAPON]));
+	return codPlayer[id][PLAYER_REDUCER][type];
+}
 	
 public _cod_set_user_resistance(id, value)
 	codPlayer[id][PLAYER_RESISTANCE] = value;
@@ -3604,7 +3681,9 @@ public _cod_set_user_bunnyhop(id, value, type)
 
 	new bool:enabled;
 
-	for(new i = CLASS; i <= ROUND; i++) if(codPlayer[id][PLAYER_BUNNYHOP][i]) enabled = true;
+	for(new i = CLASS; i <= ROUND; i++) {
+		if(codPlayer[id][PLAYER_BUNNYHOP][i]) enabled = true;
+	}
 
 	codPlayer[id][PLAYER_BUNNYHOP][ALL] = enabled;
 }
@@ -3615,7 +3694,9 @@ public _cod_set_user_footsteps(id, value, type)
 
 	new bool:enabled;
 
-	for(new i = CLASS; i <= ROUND; i++) if(codPlayer[id][PLAYER_FOOTSTEPS][i]) enabled = true;
+	for(new i = CLASS; i <= ROUND; i++) {
+		if(codPlayer[id][PLAYER_FOOTSTEPS][i]) enabled = true;
+	}
 
 	codPlayer[id][PLAYER_FOOTSTEPS][ALL] = enabled;
 
@@ -3628,11 +3709,67 @@ public _cod_set_user_model(id, value, type)
 
 	new bool:enabled;
 
-	for(new i = CLASS; i <= ROUND; i++) if(codPlayer[id][PLAYER_MODEL][i]) enabled = true;
+	for(new i = CLASS; i <= ROUND; i++) {
+		if(codPlayer[id][PLAYER_MODEL][i]) enabled = true;
+	}
 
 	codPlayer[id][PLAYER_MODEL][ALL] = enabled;
 
 	model_change(id);
+}
+
+public _cod_set_user_unlimited_ammo(id, value, type, weapon)
+{
+	codPlayer[id][PLAYER_UNLIMITED_AMMO][type] = value;
+	codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] = weapon;
+
+	new bool:enabled, weapons;
+
+	for(new i = CLASS; i <= ROUND; i++) {
+		if(codPlayer[id][PLAYER_UNLIMITED_AMMO][i]) enabled = true;
+
+		if(codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i] == FULL) weapons = FULL;
+		else if(codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i]) weapons == FULL ? (weapons = FULL) : (weapons |= codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i]);
+	}
+
+	codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] = enabled;
+	codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] = weapons;
+}
+
+public _cod_set_user_recoil_eliminator(id, value, type, weapon)
+{
+	codPlayer[id][PLAYER_ELIMINATOR][type] = value;
+	codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] = weapon;
+
+	new bool:enabled, weapons;
+
+	for(new i = CLASS; i <= ROUND; i++) {
+		if(codPlayer[id][PLAYER_ELIMINATOR][i]) enabled = true;
+
+		if(codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][i] == FULL) weapons = FULL;
+		else if(codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][i]) weapons == FULL ? (weapons = FULL) : (weapons |= codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][i]);
+	}
+
+	codPlayer[id][PLAYER_ELIMINATOR][ALL] = enabled;
+	codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] = weapons;
+}
+
+public _cod_set_user_recoil_reducer(id, value, type, weapon)
+{
+	codPlayer[id][PLAYER_REDUCER][type] = value;
+	codPlayer[id][PLAYER_REDUCER_WEAPONS][type] = weapon;
+
+	new bool:enabled, weapons;
+
+	for(new i = CLASS; i <= ROUND; i++) {
+		if(codPlayer[id][PLAYER_REDUCER][i]) enabled = true;
+
+		if(codPlayer[id][PLAYER_REDUCER_WEAPONS][i] == FULL) weapons = FULL;
+		else if(codPlayer[id][PLAYER_REDUCER_WEAPONS][i]) weapons == FULL ? (weapons = FULL) : (weapons |= codPlayer[id][PLAYER_REDUCER_WEAPONS][i]);
+	}
+
+	codPlayer[id][PLAYER_REDUCER][ALL] = enabled;
+	codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] = weapons;
 }
 
 public _cod_give_weapon(id, weapon)
@@ -3737,6 +3874,9 @@ public _cod_show_hud(id, type, red, green, blue, Float:x, Float:y, effects, Floa
 	
 public _cod_screen_shake(id, amplitude, duration, frequency)
 	screen_shake(id, amplitude, duration, frequency);
+
+public _cod_refill_ammo(id)
+	set_user_clip(id);
 	
 public _cod_make_explosion(ent, distance, explosion, Float:damage_distance, Float:damage, Float:factor, suicide)
 	make_explosion(ent, distance, explosion, damage_distance, damage, factor, suicide);
@@ -4395,6 +4535,19 @@ stock screen_shake(id, amplitude, duration, frequency)
 	write_short(duration);
 	write_short(frequency);
 	message_end();
+}
+
+stock set_user_clip(id)
+{
+	if(!is_user_alive(id)) return;
+
+	new weaponName[32], weaponid = -1, weapon = codPlayer[id][PLAYER_WEAPON];
+
+	get_weaponname(weapon, weaponName, charsmax(weaponName));
+
+	while((weaponid = engfunc(EngFunc_FindEntityByString, weaponid, "classname", weaponName)) != 0) {
+		if(pev(weaponid, pev_owner) == id) set_pdata_int(weaponid, 51, maxClipAmmo[weapon], 4);
+	}
 }
 
 stock get_loguser_index()
