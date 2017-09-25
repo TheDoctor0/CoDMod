@@ -127,33 +127,33 @@ public set_bonus(id, oldKnife, newKnife)
 	switch(oldKnife)
 	{
 		case DEFAULT: {
-			cod_set_user_bonus_health(id, -2);
-			cod_set_user_bonus_intelligence(id, -2);
-			cod_set_user_bonus_stamina(id, -2);
-			cod_set_user_bonus_strength(id, -2);
-			cod_set_user_bonus_condition(id, -2);
+			cod_add_user_bonus_health(id, -2);
+			cod_add_user_bonus_intelligence(id, -2);
+			cod_add_user_bonus_stamina(id, -2);
+			cod_add_user_bonus_strength(id, -2);
+			cod_add_user_bonus_condition(id, -2);
 		}
-		case HEALTH: cod_set_user_bonus_health(id, -10);
-		case INTELLIGENCE: cod_set_user_bonus_intelligence(id, -10);
-		case STAMINA: cod_set_user_bonus_stamina(id, -10);
-		case STRENGTH: cod_set_user_bonus_strength(id, -10);
-		case CONDITION: cod_set_user_bonus_condition(id, -10);
+		case HEALTH: cod_add_user_bonus_health(id, -10);
+		case INTELLIGENCE: cod_add_user_bonus_intelligence(id, -10);
+		case STAMINA: cod_add_user_bonus_stamina(id, -10);
+		case STRENGTH: cod_add_user_bonus_strength(id, -10);
+		case CONDITION: cod_add_user_bonus_condition(id, -10);
 	}
 
 	switch(newKnife)
 	{
 		case DEFAULT: {
-			cod_set_user_bonus_health(id, 2);
-			cod_set_user_bonus_intelligence(id, 2);
-			cod_set_user_bonus_stamina(id, 2);
-			cod_set_user_bonus_strength(id, 2);
-			cod_set_user_bonus_condition(id, 2);
+			cod_add_user_bonus_health(id, 2);
+			cod_add_user_bonus_intelligence(id, 2);
+			cod_add_user_bonus_stamina(id, 2);
+			cod_add_user_bonus_strength(id, 2);
+			cod_add_user_bonus_condition(id, 2);
 		}
-		case HEALTH: cod_set_user_bonus_health(id, 10);
-		case INTELLIGENCE: cod_set_user_bonus_intelligence(id, 10);
-		case STAMINA: cod_set_user_bonus_stamina(id, 10);
-		case STRENGTH: cod_set_user_bonus_strength(id, 10);
-		case CONDITION: cod_set_user_bonus_condition(id, 10);
+		case HEALTH: cod_add_user_bonus_health(id, 10);
+		case INTELLIGENCE: cod_add_user_bonus_intelligence(id, 10);
+		case STAMINA: cod_add_user_bonus_stamina(id, 10);
+		case STRENGTH: cod_add_user_bonus_strength(id, 10);
+		case CONDITION: cod_add_user_bonus_condition(id, 10);
 	}
 
 	playerKnife[id] = newKnife;

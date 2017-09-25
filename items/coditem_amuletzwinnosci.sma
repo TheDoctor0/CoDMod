@@ -1,15 +1,15 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Item Adrenalina"
-#define VERSION "1.0.6"
+#define PLUGIN "CoD Item Amulet Zwinnosci"
+#define VERSION "1.0.3"
 #define AUTHOR "O'Zone"
 
-#define NAME        "Adrenalina"
-#define DESCRIPTION "Za kazdego fraga dostajesz +%s HP"
-#define RANDOM_MIN  40
-#define RANDOM_MAX  55
-#define UPGRADE_MIN -3
+#define NAME        "Amulet Zwinnosci"
+#define DESCRIPTION "Dostajesz +%s kondycji."
+#define RANDOM_MIN  50
+#define RANDOM_MAX  75
+#define UPGRADE_MIN -4
 #define UPGRADE_MAX 6
 #define VALUE_MAX   100
 
@@ -23,13 +23,23 @@ public plugin_init()
 }
 
 public cod_item_enabled(id, value)
+{
 	itemValue[id] = value;
+
+	cod_add_user_bonus_condition(id, itemValue[id]);
+}
+
+public cod_item_disabled(id)
+	cod_add_user_bonus_condition(id, -itemValue[id]);
 
 public cod_item_value(id)
 	return itemValue[id];
 
 public cod_item_upgrade(id)
+{
+	new oldValue = itemValue[id];
+
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, _, VALUE_MAX);
 
-public cod_item_kill(killer, victim)
-	cod_add_user_health(killer, itemValue[killer]);
+	cod_add_user_bonus_condition(id, itemValue[id] - oldValue);
+}

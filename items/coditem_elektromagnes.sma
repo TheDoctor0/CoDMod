@@ -128,20 +128,19 @@ stock remove_ents(id = 0)
 
 stock get_velocity_to_origin(ent, Float:origin[3], Float:speed, Float:velocity[3])
 {
-	new Float:endOrigin[3];
+	new Float:endOrigin[3], Float:distance[3];
 
 	entity_get_vector(ent, EV_VEC_origin, endOrigin);
 	
-	new Float:fDistance[3];
-	fDistance[0] = endOrigin[0] - origin[0];
-	fDistance[1] = endOrigin[1] - origin[1];
-	fDistance[2] = endOrigin[2] - origin[2];
+	distance[0] = endOrigin[0] - origin[0];
+	distance[1] = endOrigin[1] - origin[1];
+	distance[2] = endOrigin[2] - origin[2];
 	
 	new Float:time = -(vector_distance(endOrigin, origin) / speed);
 	
-	velocity[0] = fDistance[0] / time;
-	velocity[1] = fDistance[1] / time;
-	velocity[2] = fDistance[2] / time + 50.0;
+	velocity[0] = distance[0] / time;
+	velocity[1] = distance[1] / time;
+	velocity[2] = distance[2] / time + 50.0;
 	
 	return (velocity[0] && velocity[1] && velocity[2]);
 }

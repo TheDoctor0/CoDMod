@@ -50,6 +50,5 @@ Temporary Items
 compiled
 compile.dat
 codmod.sublime-workspace
-*.sublime-workspace
+codmod.sublime-project
 codmod.sublime-workspace
-*.sublime-workspace
