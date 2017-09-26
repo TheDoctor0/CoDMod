@@ -11,7 +11,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.16"
+#define VERSION "1.0.17"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -390,7 +390,7 @@ public plugin_cfg()
 	}
 
 	log_amx("%s by %s v%s.", PLUGIN, AUTHOR, VERSION);
-	log_amx("Loaded %i classes and %i items.", ArraySize(codClasses), ArraySize(codItems));
+	log_amx("Loaded %i classes and %i items.", ArraySize(codClasses) - 1, ArraySize(codItems) - 1);
 }
 
 public plugin_end()
