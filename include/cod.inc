@@ -23,6 +23,8 @@
 
 #define DMG_BULLET    (1<<1)
 #define DMG_BURN      (1<<3)
+#define DMG_FREEZE    (1<<4)
+#define DMG_FALL      (1<<5)
 #define DMG_NERVEGAS  (1<<16)
 #define DMG_HEGRENADE (1<<24)
 #define DMG_CODSKILL  (1<<31)
@@ -847,8 +849,9 @@ native cod_kill_player(attacker, victim, damageBits);
 
 /*------------------------------
 Immediately respawn player.
+If enemy is true, will respawn player on enemy spawn.
 ------------------------------*/
-native cod_respawn_player(id);
+native cod_respawn_player(id, enemy = 0);
 
 /*------------------------------
 Register new item and return its id.
@@ -1079,7 +1082,7 @@ Class function for victim damage change.
 forward cod_class_damage_victim(attacker, victim, weapon, &Float:damage, damageBits);
 
 /*------------------------------
-Stock for easy item upgrade.
+Random item upgrade.
 Value is current item value.
 UpgradeMin is minimum upgrade value (can be lower than 0).
 UpgradeMax is maximum upgrade value.
@@ -1097,6 +1100,12 @@ stock cod_random_upgrade(&value, upgradeMin, upgradeMax, valueMin = NONE, valueM
 
 	return COD_CONTINUE;
 }
+
+/*------------------------------
+Return true/false result for given percent chance.
+*/
+stock cod_percent_chance(percent)
+	return random_num(1, 100) <= percent ? true : false;
 
 stock cod_print_chat(id, const text[], any:...)
 {

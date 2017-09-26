@@ -23,6 +23,8 @@
 
 #define DMG_BULLET    (1<<1)
 #define DMG_BURN      (1<<3)
+#define DMG_FREEZE    (1<<4)
+#define DMG_FALL      (1<<5)
 #define DMG_NERVEGAS  (1<<16)
 #define DMG_HEGRENADE (1<<24)
 #define DMG_CODSKILL  (1<<31)
@@ -847,8 +849,9 @@ native cod_kill_player(attacker, victim, damageBits);
 
 /*------------------------------
 Immediately respawn player.
+If enemy is true, will respawn player on enemy spawn.
 ------------------------------*/
-native cod_respawn_player(id);
+native cod_respawn_player(id, enemy = 0);
 
 /*------------------------------
 Register new item and return its id.

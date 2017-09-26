@@ -1874,7 +1874,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 
 	ExecuteForward(codForwards[DAMAGE_PRE], ret, attacker, victim, weapon, damage, damageBits);
 
-	if(damage <= 0.0) return HAM_SUPERCEDE;
+	if(damage <= 0.0 || ret == COD_BLOCK) return HAM_SUPERCEDE;
 
 	SetHamParamFloat(4, damage);
 
@@ -4002,11 +4002,29 @@ public _cod_kill_player(killer, victim, flags)
 	return _:COD_BLOCK;
 }
 
-public _cod_respawn_player(id)
-	if(!is_user_alive(id)) set_task(0.1, "respawn_player", id + TASK_RESPAWN);
+public _cod_respawn_player(id, enemy)
+{
+	if(!is_user_alive(id)) {
+		if(enemy) set_task(0.1, "respawn_player", id + TASK_RESPAWN);
+		else set_task(0.1, "respawn_player_enemy_spawn", id + TASK_RESPAWN);
+	}
+}
 
 public respawn_player(id)
 	ExecuteHamB(Ham_CS_RoundRespawn, id - TASK_RESPAWN);
+
+public respawn_player_enemy_spawn(id)
+{
+	id -= TASK_RESPAWN;
+
+	new CsTeams:team = cs_get_user_team(id);
+
+	cs_set_user_team(id, (team == CS_TEAM_CT) ? CS_TEAM_T : CS_TEAM_CT);
+
+	ExecuteHam(Ham_CS_RoundRespawn, id);
+	
+	cs_set_user_team(id, team);
+}
 	
 public _cod_register_item(plugin, params)
 {
