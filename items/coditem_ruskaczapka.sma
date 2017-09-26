@@ -2,11 +2,11 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Ruska Czapka"
-#define VERSION "1.0.3"
+#define VERSION "1.0.4"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Ruska Czapka"
-#define DESCRIPTION "Masz 1/%s na natychmiastowe zabicie z AK47. Dostajesz +25 zycia."
+#define DESCRIPTION "Masz 1/%s na natychmiastowe zabicie z AK47. Dostajesz +25 zycia"
 #define RANDOM_MIN  9
 #define RANDOM_MAX  11
 #define UPGRADE_MIN -1

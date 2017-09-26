@@ -4,11 +4,11 @@
 #include <engine>
 
 #define PLUGIN "CoD Item Aimbot"
-#define VERSION "1.0.8"
+#define VERSION "1.0.9"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Aimbot"
-#define DESCRIPTION "Po uzyciu itemu namierzona zostaje glowa najblizszego przeciwnika."
+#define DESCRIPTION "Po uzyciu itemu namierzona zostaje glowa najblizszego przeciwnika"
 
 new itemActive;
 

@@ -2,11 +2,11 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Antyitem"
-#define VERSION "1.0.3"
+#define VERSION "1.0.4"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Antyitem"
-#define DESCRIPTION "Po uzyciu mozesz zniszczyc item dowolnego gracza i swoj."
+#define DESCRIPTION "Po uzyciu mozesz zniszczyc item dowolnego gracza i swoj"
 
 public plugin_init()
 {

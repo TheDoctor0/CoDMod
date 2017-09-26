@@ -2,11 +2,11 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Agent 007"
-#define VERSION "1.0.3"
+#define VERSION "1.0.4"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Agent 007"
-#define DESCRIPTION "Masz 1/%s na natychmiastowe zabicie z p228 i +10 obrazen z niego."
+#define DESCRIPTION "Masz 1/%s na natychmiastowe zabicie z p228 i +10 obrazen z niego"
 #define RANDOM_MIN  5
 #define RANDOM_MAX  7
 #define UPGRADE_MIN -1

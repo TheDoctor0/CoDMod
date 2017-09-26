@@ -2,11 +2,11 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Amulet Zwinnosci"
-#define VERSION "1.0.3"
+#define VERSION "1.0.4"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Amulet Zwinnosci"
-#define DESCRIPTION "Dostajesz +%s kondycji."
+#define DESCRIPTION "Dostajesz +%s kondycji"
 #define RANDOM_MIN  50
 #define RANDOM_MAX  75
 #define UPGRADE_MIN -4

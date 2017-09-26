@@ -2,13 +2,13 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Opaska Terrorysty"
-#define VERSION "1.0.5"
+#define VERSION "1.0.10"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Opaska Terrorysty"
-#define DESCRIPTION "Zadajesz %s obrazen wiecej. Masz 1/2 na natychmiastowe zabicie z HE."
-#define RANDOM_MIN  8
-#define RANDOM_MAX  12
+#define DESCRIPTION "Zadajesz %s obrazen wiecej. Masz 1/2 na natychmiastowe zabicie z HE"
+#define RANDOM_MIN  6
+#define RANDOM_MAX  10
 #define UPGRADE_MIN -2
 #define UPGRADE_MAX 3
 
