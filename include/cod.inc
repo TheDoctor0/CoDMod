@@ -11,9 +11,12 @@
 #define set_bit(%2,%1) (%1 |= (1<<(%2&31)))
 #define rem_bit(%2,%1) (%1 &= ~(1 <<(%2&31)))
 
-#define COD_CONTINUE  0
 #define COD_STOP      4
+#define COD_CONTINUE  0
 #define COD_BLOCK     -1.0
+#define COD_FREEZE    0.1
+
+#define MAX_MONEY     99999
 
 #define FL_WATERJUMP  (1<<11)
 #define FL_ONGROUND   (1<<9)
@@ -77,12 +80,12 @@ Return player's honor amount.
 native cod_get_user_honor(id);
 
 /*------------------------------
-Sets player's honor amount.
+Set player's honor amount.
 ------------------------------*/
 native cod_set_user_honor(id, value);
 
 /*------------------------------
-Adds value to player's honor amount.
+Add value to player's honor amount.
 ------------------------------*/
 native cod_add_user_honor(id, value);
 
@@ -137,7 +140,7 @@ Return player's exp.
 native cod_get_user_exp(id);
 
 /*------------------------------
-Sets player's gained exp.
+Set player's gained exp.
 To remove exp use negative value.
 ------------------------------*/
 native cod_set_user_exp(id, value);
@@ -229,7 +232,7 @@ Return item and assigns value of item to variable.
 native cod_get_user_item(id, &value = 0);
 
 /*------------------------------
-Sets player's item. 
+Set player's item. 
 If item = RANDOM (-3) an item will be random.
 If value = RANDOM (-3) item value will be random.
 ------------------------------*/
@@ -282,58 +285,58 @@ Return player's maximum health points
 native cod_get_user_max_health(id);
 
 /*------------------------------
-Sets player's health point.
+Set player's health point.
 If maximum = 1 player's max health limit is applied.
 ------------------------------*/
 native cod_set_user_health(id, value, maximum = 1);
 
 /*------------------------------
-Adds value to player's health point.
+Add value to player's health point.
 If maximum = 1 player's max health limit is applied.
 ------------------------------*/
 native cod_add_user_health(id, value, maximum = 1);
 
 /*------------------------------
 Return health statistic points.
-If current_health = 1 Return current health points.
-If class_health = 1 adds class health points.
-If stats_health = 1 adds stats health points.
-If bonus_health = 1 adds extra health points.
-If base_health = 1 adds base 100HP.
+If currentHealth = 1 Return current health points.
+If classHealth = 1 adds class health points.
+If statsHealth = 1 adds stats health points.
+If bonusHealth = 1 adds extra health points.
+If baseHealth = 1 adds base 100HP.
 ------------------------------*/
-native cod_get_user_health(id, currect_health = 0, class_health = 1, stats_health = 1, bonus_health = 1, base_health = 0);
+native cod_get_user_health(id, currentHealth = 0, classHealth = 1, statsHealth = 1, bonusHealth = 1, baseHealth = 0);
 
 /*------------------------------
 Return intelligence statistic points.
-If class_intelligence = 1 adds class intelligence points.
-If stats_intelligence = 1 adds stats intelligence points.
-If bonus_intelligence = 1 adds extra intelligence points.
+If classIntelligence = 1 adds class intelligence points.
+If statsIntelligence = 1 adds stats intelligence points.
+If bonusIntelligence = 1 adds extra intelligence points.
 ------------------------------*/
-native cod_get_user_intelligence(id, class_intelligence = 1, stats_intelligence = 1, bonus_intelligence = 1);
+native cod_get_user_intelligence(id, classIntelligence = 1, statsIntelligence = 1, bonusIntelligence = 1);
 
 /*------------------------------
 Return stamina statistic points.
-If class_stamina = 1 adds class stamina points.
-If stats_stamina = 1 adds stats stamina points.
-If bonus_stamina = 1 adds extra stamina points.
+If classStamina = 1 adds class stamina points.
+If statsStamina = 1 adds stats stamina points.
+If bonusStamina = 1 adds extra stamina points.
 ------------------------------*/
-native cod_get_user_stamina(id, class_stamina = 1, stats_stamina = 1, bonus_stamina = 1);
+native cod_get_user_stamina(id, classStamina = 1, statsStamina = 1, bonusStamina = 1);
 
 /*------------------------------
 Return strength statistic points.
-If class_strength = 1 adds class strength points.
-If stats_strength = 1 adds stats strength points.
-If bonus_strength = 1 adds extra strength points.
+If classStrength = 1 adds class strength points.
+If statsStrength = 1 adds stats strength points.
+If bonusStrength = 1 adds extra strength points.
 ------------------------------*/
-native cod_get_user_strength(id, class_strength = 1, stats_strength = 1, bonus_strength = 1);
+native cod_get_user_strength(id, classStrength = 1, statsStrength = 1, bonusStrength = 1);
 
 /*------------------------------
 Return condition statistic points.
-If class_condition = 1 adds class condition points.
-If stats_condition = 1 adds stats condition points.
-If bonus_condition = 1 adds extra condition points.
+If classCondition = 1 adds class condition points.
+If statsCondition = 1 adds stats condition points.
+If bonusCondition = 1 adds extra condition points.
 ------------------------------*/
-native cod_get_user_condition(id, class_condition = 1, stats_condition = 1, bonus_condition = 1);
+native cod_get_user_condition(id, classCondition = 1, statsCondition = 1, bonusCondition = 1);
 
 /*------------------------------
 Return player's extra health points.
@@ -361,52 +364,52 @@ Return player's extra condition points.
 native cod_get_user_bonus_condition(id);
 
 /*------------------------------
-Sets player's extra health points.
+Set player's extra health points.
 ------------------------------*/
 native cod_set_user_bonus_health(id, value);
 
 /*------------------------------
-Sets player's extra intelligence points.
+Set player's extra intelligence points.
 ------------------------------*/
 native cod_set_user_bonus_intelligence(id, value);
 
 /*------------------------------
-Sets player's extra stamina points.
+Set player's extra stamina points.
 ------------------------------*/
 native cod_set_user_bonus_stamina(id, value);
 
 /*------------------------------
-Sets player's extra strength points.
+Set player's extra strength points.
 ------------------------------*/
 native cod_set_user_bonus_strength(id, value);
 
 /*------------------------------
-Adds value to player's extra condition points.
+Add value to player's extra condition points.
 ------------------------------*/
 native cod_set_user_bonus_condition(id, value);
 
 /*------------------------------
-Adds value to player's extra health points.
+Add value to player's extra health points.
 ------------------------------*/
 native cod_add_user_bonus_health(id, value);
 
 /*------------------------------
-Adds value to player's extra intelligence points.
+Add value to player's extra intelligence points.
 ------------------------------*/
 native cod_add_user_bonus_intelligence(id, value);
 
 /*------------------------------
-Adds value to player's extra stamina points.
+Add value to player's extra stamina points.
 ------------------------------*/
 native cod_add_user_bonus_stamina(id, value);
 
 /*------------------------------
-Adds value to player's extra strength points.
+Add value to player's extra strength points.
 ------------------------------*/
 native cod_add_user_bonus_strength(id, value);
 
 /*------------------------------
-Adds value to player's extra condition points.
+Add value to player's extra condition points.
 ------------------------------*/
 native cod_add_user_bonus_condition(id, value);
 
@@ -459,127 +462,152 @@ Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonu
 native Float:cod_get_user_gravity(id, type = ALL);
 
 /*------------------------------
+Return player's speed bonus amount.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+------------------------------*/
+native Float:cod_get_user_speed(id, type = ALL);
+
+/*------------------------------
 Return player's armor amount.
 ------------------------------*/
 native cod_get_user_armor(id);
 
 /*------------------------------
-Sets player's rockets amount.
+Return player's money amount.
+------------------------------*/
+native cod_get_user_money(id);
+
+/*------------------------------
+Set player's rockets amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_set_user_rockets(id, value, type = ROUND);
 
 /*------------------------------
-Sets player's mines amount.
+Set player's mines amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_set_user_mines(id, value, type = ROUND);
 
 /*------------------------------
-Sets player's medkits amount.
+Set player's medkits amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_set_user_medkits(id, value, type = ROUND);
 
 /*------------------------------
-Sets player's dynamites amount.
+Set player's dynamites amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_set_user_dynamites(id, value, type = ROUND);
 
 /*------------------------------
-Sets player's thunders amount.
+Set player's thunders amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_set_user_thunders(id, value, type = ROUND);
 
 /*------------------------------
-Sets player's teleports amount. Value = FULL (-2) for unlimited teleports.
+Set player's teleports amount. Value = FULL (-2) for unlimited teleports.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_set_user_teleports(id, value, type = ROUND);
 
 /*------------------------------
-Sets player's multijumps amount.
+Set player's multijumps amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_set_user_multijumps(id, value, type = ROUND);
 
 /*------------------------------
-Sets player's gravity amount.
+Set player's gravity amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+Lower gravity (but higher than 0) has priority and will be reduced by gravity lower than 0.
 ------------------------------*/
 native cod_set_user_gravity(id, Float:value, type = ROUND);
 
 /*------------------------------
-Sets player's speed amount. Alternative to Condition bonus.
+Set player's speed bonus - can be lower than 0. Alternative to Condition bonus.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+Player speed is calculated from base speed, condition bonus and speed bonus.
+Higher speed bonus has priority, but still will be reduced by bonuses lower than 0.
+Set to COD_FREEZE (0.1) to prevent player from moving.
 ------------------------------*/
 native cod_set_user_speed(id, Float:value, type = ROUND);
 
 /*------------------------------
-Sets player's armor amount.
+Set player's armor amount.
 ------------------------------*/
 native cod_set_user_armor(id, value);
 
 /*------------------------------
-Adds value to player's rockets amount.
+Set player's money amount.
+------------------------------*/
+native cod_set_user_money(id, value);
+
+/*------------------------------
+Add value to player's rockets amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_add_user_rockets(id, value, type = ROUND);
 
 /*------------------------------
-Adds value to player's mines amount.
+Add value to player's mines amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_add_user_mines(id, value, type = ROUND);
 
 /*------------------------------
-Adds value to player's medkits amount.
+Add value to player's medkits amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_add_user_medkits(id, value, type = ROUND);
 
 /*------------------------------
-Adds value to player's dynamites amount.
+Add value to player's dynamites amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_add_user_dynamites(id, value, type = ROUND);
 
 /*------------------------------
-Adds value to player's thunders amount.
+Add value to player's thunders amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_add_user_thunders(id, value, type = ROUND);
 
 /*------------------------------
-Adds value to player's teleports amount. Value = FULL (-2) for unlimited teleports.
+Add value to player's teleports amount. Value = FULL (-2) for unlimited teleports.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_add_user_teleports(id, value, type = ROUND);
 
 /*------------------------------
-Adds value to player's multijumps amount.
+Add value to player's multijumps amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_add_user_multijumps(id, value, type = ROUND);
 
 /*------------------------------
-Adds value to player's gravity amount.
+Add value to player's gravity amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
 ------------------------------*/
 native cod_add_user_gravity(id, Float:value, type = ROUND);
 
 /*------------------------------
-Adds value to player's speed amount. Alternative to Condition bonus.
+Add value to player's speed amount. Alternative to Condition bonus.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
 native cod_add_user_speed(id, Float:value, type = ROUND);
 
 /*------------------------------
-Adds value to player's armor amount.
+Add value to player's armor amount.
 ------------------------------*/
 native cod_add_user_armor(id, value);
+
+/*------------------------------
+Add value to player's money amount.
+------------------------------*/
+native cod_add_user_money(id, value);
 
 /*------------------------------
 Use player's rocket.
@@ -738,7 +766,7 @@ Diplay text in HUD/DHUD.
 Type can be TYPE_HUD or TYPE_DHUD.
 HUD/DHUD params usage is the same as in set_hudmessage/set_dhudmessage.
 ------------------------------*/
-native cod_show_hud(id, type = 0, red = 255, green = 255, blue = 255, Float:x = -1.0, Float:y = 0.35, effects = 0, Float:fxtime = 6.0, Float:holdtime = 12.0, Float:fadeintime = 0.1, Float:fadeouttime = 0.2, const text[], any:...);
+native cod_show_hud(id, type = 0, red = 255, green = 255, blue = 255, Float:x = -1.0, Float:y = 0.35, effects = 0, Float:fxtime = 6.0, Float:holdTime = 12.0, Float:fadeInTime = 0.1, Float:fadeOutTime = 0.2, const text[], any:...);
 
 /*------------------------------
 Display screen fade.
@@ -751,7 +779,7 @@ Fadetype is fade display type:
 Red, green, blue is fade color in RGB
 Alpha is fade power from 0 to 255
 ------------------------------*/
-native cod_display_fade(id, duration, holdtime, fadetype, red, green, blue, alpha);
+native cod_display_fade(id, duration, holdTime, fadeType, red, green, blue, alpha);
 
 /*------------------------------
 Display status icon.
@@ -790,7 +818,7 @@ Damage specifies damage dealt to players in damage_distance.
 Factor is intelligence bonus for damage.
 Suicide is decision if player will die after explosion
 ------------------------------*/
-native cod_make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0.0, Float:damage = 0.0, Float:factor = 0.5, suicide = 0);
+native cod_make_explosion(ent, distance = 0, explosion = 1, Float:damageDistance = 0.0, Float:damage = 0.0, Float:factor = 0.5, suicide = 0);
 
 /*------------------------------
 Make repeating damage to player.
@@ -816,6 +844,11 @@ native cod_inflict_damage(attacker, victim, Float:damage, Float:factor = 0.5, fl
 Kill a player imitating kill by another player.
 ------------------------------*/
 native cod_kill_player(attacker, victim, damageBits);
+
+/*------------------------------
+Immediately respawn player.
+------------------------------*/
+native cod_respawn_player(id);
 
 /*------------------------------
 Register new item and return its id.
@@ -971,6 +1004,11 @@ Item forward executed on spawn event.
 forward cod_item_spawned(id);
 
 /*------------------------------
+Item forward executed on kill event.
+------------------------------*/
+forward cod_item_kill(killer, victim);
+
+/*------------------------------
 Item forward executed on death event.
 ------------------------------*/
 forward cod_item_killed(id);
@@ -1016,6 +1054,11 @@ Class forward executed on spawn event.
 forward cod_class_spawned(id);
 
 /*------------------------------
+Class forward executed on kill event.
+------------------------------*/
+forward cod_class_kill(killer, victim);
+
+/*------------------------------
 Class forward executed on death event.
 ------------------------------*/
 forward cod_class_killed(id);
@@ -1055,7 +1098,7 @@ stock cod_random_upgrade(&value, upgradeMin, upgradeMax, valueMin = NONE, valueM
 	return COD_CONTINUE;
 }
 
-stock cod_print_chat(id, const text[] = "", any:...)
+stock cod_print_chat(id, const text[], any:...)
 {
 	new message[192];
 
