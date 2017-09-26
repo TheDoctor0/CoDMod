@@ -1,16 +1,16 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Item Cios zza grobu"
-#define VERSION "1.0.2"
+#define PLUGIN "CoD Item Pierscien Skoczka"
+#define VERSION "1.0.7"
 #define AUTHOR "O'Zone"
 
-#define NAME        "Cios zza grobu"
-#define DESCRIPTION "Po smierci wybuchasz zadajac %s (+int) obrazen wrogom w poblizu"
-#define RANDOM_MIN  75
-#define RANDOM_MAX  100
-#define UPGRADE_MIN -5
-#define UPGRADE_MAX 7
+#define NAME        "Pierscien Skoczka"
+#define DESCRIPTION "Masz %s dodatkowe skoki w powietrzu"
+#define RANDOM_MIN  2
+#define RANDOM_MAX  3
+#define UPGRADE_MIN -1
+#define UPGRADE_MAX 1
 
 new itemValue[MAX_PLAYERS + 1];
 
@@ -22,13 +22,18 @@ public plugin_init()
 }
 
 public cod_item_enabled(id, value)
+{
 	itemValue[id] = value;
+
+	cod_set_user_multijumps(id, itemValue[id], ITEM);
+}
 
 public cod_item_value(id)
 	return itemValue[id];
 
 public cod_item_upgrade(id)
+{
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
 
-public cod_item_killed(id)
-	cod_make_explosion(id, 300, 1, 300.0, float(itemValue[id]), 0.5);
+	cod_set_user_multijumps(id, itemValue[id], ITEM);
+}

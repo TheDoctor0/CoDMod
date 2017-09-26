@@ -1,16 +1,16 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Item Buty z Kalkuty"
-#define VERSION "1.0.5"
+#define PLUGIN "CoD Item Tajemnica Komandosa"
+#define VERSION "1.0.6"
 #define AUTHOR "O'Zone"
 
-#define NAME        "Buty z Kalkuty"
-#define DESCRIPTION "Dostajesz +%s kondycji oraz nie slychac twoich krokow"
-#define RANDOM_MIN  25
-#define RANDOM_MAX  35
-#define UPGRADE_MIN -2
-#define UPGRADE_MAX 4
+#define NAME        "Tajemnica Komandosa"
+#define DESCRIPTION "Dostajesz +%s kondycji i +25 zdrowia"
+#define RANDOM_MIN  40
+#define RANDOM_MAX  60
+#define UPGRADE_MIN -3
+#define UPGRADE_MAX 5
 
 new itemValue[MAX_PLAYERS + 1];
 
@@ -26,12 +26,14 @@ public cod_item_enabled(id, value)
 	itemValue[id] = value;
 
 	cod_add_user_bonus_condition(id, itemValue[id]);
-
-	cod_set_user_footsteps(id, 1, ITEM);
+	cod_add_user_bonus_health(id, 25);
 }
 
 public cod_item_disabled(id)
+{
 	cod_add_user_bonus_condition(id, -itemValue[id]);
+	cod_add_user_bonus_health(id, -25);
+}
 
 public cod_item_upgrade(id)
 {

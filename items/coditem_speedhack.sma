@@ -1,12 +1,12 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Item Cios zza grobu"
-#define VERSION "1.0.2"
+#define PLUGIN "CoD Item Speedhack"
+#define VERSION "1.0.12"
 #define AUTHOR "O'Zone"
 
-#define NAME        "Cios zza grobu"
-#define DESCRIPTION "Po smierci wybuchasz zadajac %s (+int) obrazen wrogom w poblizu"
+#define NAME        "Speedhack"
+#define DESCRIPTION "Dostajesz +%s kondycji"
 #define RANDOM_MIN  75
 #define RANDOM_MAX  100
 #define UPGRADE_MIN -5
@@ -22,13 +22,20 @@ public plugin_init()
 }
 
 public cod_item_enabled(id, value)
+{
 	itemValue[id] = value;
 
-public cod_item_value(id)
-	return itemValue[id];
+	cod_add_user_bonus_condition(id, itemValue[id]);
+}
+
+public cod_item_disabled(id)
+	cod_add_user_bonus_health(id, -itemValue[id]);
 
 public cod_item_upgrade(id)
+{
+	cod_add_user_bonus_health(id, -itemValue[id]);
+
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
 
-public cod_item_killed(id)
-	cod_make_explosion(id, 300, 1, 300.0, float(itemValue[id]), 0.5);
+	cod_add_user_bonus_health(id, itemValue[id]);
+}
