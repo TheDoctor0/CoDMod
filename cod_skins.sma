@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Skins"
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 #define AUTHOR "O'Zone"
 
 #define TASK_LOAD 3045
@@ -134,7 +134,7 @@ public client_putinserver(id)
 	
 	get_user_name(id, playerData[id][NAME], charsmax(playerData[][NAME]));
 	
-	mysql_escape_string(playerData[id][NAME], playerData[id][NAME], charsmax(playerData[][NAME]));
+	cod_sql_string(playerData[id][NAME], playerData[id][NAME], charsmax(playerData[][NAME]));
 	
 	load_skins(id);
 }

@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Clans System"
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 #define AUTHOR "O'Zone"
 
 new const commandClan[][] = { "say /clan", "say_team /clan", "say /clans", "say_team /clans", "say /klany", "say_team /klany", "say /klan", "say_team /klan", "klan" };
@@ -78,7 +78,7 @@ public client_putinserver(id)
 
 	get_user_name(id, playerName[id], charsmax(playerName));
 
-	mysql_escape_string(playerName[id], playerName[id], charsmax(playerName));
+	cod_sql_string(playerName[id], playerName[id], charsmax(playerName));
 
 	load_data(id);
 }
@@ -1675,7 +1675,7 @@ public save_clan(clan)
 	
 	ArrayGetArray(codClans, clan, codClan);
 
-	mysql_escape_string(codClan[CLAN_NAME], safeClanName, charsmax(safeClanName));
+	cod_sql_string(codClan[CLAN_NAME], safeClanName, charsmax(safeClanName));
 	
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET name = '%s', level = '%i', honor = '%i', kills = '%i', members = '%i', health = '%i', gravity = '%i', weapondrop = '%i', damage = '%i' WHERE name = '%s'", 
 	safeClanName, codClan[CLAN_LEVEL], codClan[CLAN_HONOR], codClan[CLAN_KILLS], codClan[CLAN_MEMBERS], codClan[CLAN_HEALTH], codClan[CLAN_GRAVITY], codClan[CLAN_DROP], codClan[CLAN_DAMAGE], safeClanName);
@@ -1760,7 +1760,7 @@ stock save_member(id, status = 0, change = 0, const name[] = "")
 {
 	new queryData[128], safeName[64];
 
-	if(strlen(name)) mysql_escape_string(name, safeName, charsmax(safeName));
+	if(strlen(name)) cod_sql_string(name, safeName, charsmax(safeName));
 	else copy(safeName, charsmax(safeName), playerName[id]);
 
 	if(status) {
@@ -1863,7 +1863,7 @@ stock remove_application(id, const name[] = "")
 
 	new queryData[128], safeName[64];
 
-	if(strlen(name)) mysql_escape_string(name, safeName, charsmax(safeName));
+	if(strlen(name)) cod_sql_string(name, safeName, charsmax(safeName));
 	else copy(safeName, charsmax(safeName), playerName[id]);
 
 	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_applications` WHERE name = '%s' AND clan = '%i'", safeName, clan[id]);
@@ -1875,7 +1875,7 @@ stock remove_applications(id, const name[] = "")
 {
 	new queryData[128], safeName[64];
 
-	if(strlen(name)) mysql_escape_string(name, safeName, charsmax(safeName));
+	if(strlen(name)) cod_sql_string(name, safeName, charsmax(safeName));
 	else copy(safeName, charsmax(safeName), playerName[id]);
 
 	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_applications` WHERE name = '%s'", safeName);
@@ -1917,7 +1917,7 @@ stock check_clan_name(const clanName[])
 {
 	new queryData[128], safeClanName[64], error[128], errorNum, bool:foundClan;
 
-	mysql_escape_string(clanName, safeClanName, charsmax(safeClanName));
+	cod_sql_string(clanName, safeClanName, charsmax(safeClanName));
 	
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans` WHERE `name` = '%s'", safeClanName);
 	
@@ -1945,7 +1945,7 @@ stock check_user_clan(const userName[])
 {
 	new queryData[128], safeUserName[64], error[128], errorNum, bool:foundClan;
 
-	mysql_escape_string(userName, safeUserName, charsmax(safeUserName));
+	cod_sql_string(userName, safeUserName, charsmax(safeUserName));
 	
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_members` WHERE `name` = '%s' AND clan > 0", userName);
 	
@@ -1973,7 +1973,7 @@ stock create_clan(id, const clanName[])
 {
 	new codClan[clanInfo], queryData[128], safeClanName[64], error[128], errorNum;
 
-	mysql_escape_string(clanName, safeClanName, charsmax(safeClanName));
+	cod_sql_string(clanName, safeClanName, charsmax(safeClanName));
 	
 	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_clans` (`name`) VALUES ('%s');", safeClanName);
 	

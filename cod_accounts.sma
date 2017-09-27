@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Accounts System"
-#define VERSION "1.0.0"
+#define VERSION "1.0.2"
 #define AUTHOR "O'Zone"
 
 #define SETINFO "_csrpass"
@@ -73,7 +73,7 @@ public client_connect(id)
 
 	get_user_name(id, playerName[id], charsmax(playerName[]));
 	
-	mysql_escape_string(playerName[id], playerSafeName[id], charsmax(playerSafeName[]));
+	cod_sql_string(playerName[id], playerSafeName[id], charsmax(playerSafeName[]));
 	
 	load_account(id);
 }
@@ -417,8 +417,8 @@ public register_confirmation_handle(id, menu, item)
 			cod_print_chat(id, "Twoj nick zostal pomyslnie^x04 zarejestrowany^x01.");
 			cod_print_chat(id, "Wpisz w konsoli komende^x04 setinfo ^"%s^" ^"%s^"^x01, aby twoje haslo bylo ladowane automatycznie.", SETINFO, playerPassword[id]);
 	
-			cmd_execute(id, "setinfo %s %s", SETINFO, playerPassword[id]);
-			cmd_execute(id, "writecfg %s", CONFIG);
+			cod_cmd_execute(id, "setinfo %s %s", SETINFO, playerPassword[id]);
+			cod_cmd_execute(id, "writecfg %s", CONFIG);
 	
 			engclient_cmd(id, "chooseteam");
 		}
@@ -541,8 +541,8 @@ public change_step_three(id)
 	cod_print_chat(id, "Twoje haslo zostalo pomyslnie^x04 zmienione^x01.");
 	cod_print_chat(id, "Wpisz w konsoli komende^x04 setinfo ^"%s^" ^"%s^"^x01, aby twoje haslo bylo ladowane automatycznie.", SETINFO, playerPassword[id]);
 	
-	cmd_execute(id, "setinfo %s %s", SETINFO, playerPassword[id]);
-	cmd_execute(id, "writecfg %s", CONFIG);
+	cod_cmd_execute(id, "setinfo %s %s", SETINFO, playerPassword[id]);
+	cod_cmd_execute(id, "writecfg %s", CONFIG);
 	
 	return PLUGIN_HANDLED;
 }
@@ -662,7 +662,7 @@ public load_account_handle(failState, Handle:query, error[], errorNum, tempId[],
 
 			get_user_info(id, "name", info, charsmax(info));
 		
-			cmd_execute(id, "exec %s.cfg", CONFIG);
+			cod_cmd_execute(id, "exec %s.cfg", CONFIG);
 		
 			get_user_info(id, SETINFO, password, charsmax(password));
 
@@ -673,7 +673,7 @@ public load_account_handle(failState, Handle:query, error[], errorNum, tempId[],
 			}
 			else playerStatus[id] = NOT_LOGGED;
 
-			cmd_execute(id, "exec config.cfg");
+			cod_cmd_execute(id, "exec config.cfg");
 		}
 	}
 
@@ -686,7 +686,7 @@ public account_query(id, type)
 
 	new queryData[128], password[33];
 
-	mysql_escape_string(playerPassword[id], password, charsmax(password));
+	cod_sql_string(playerPassword[id], password, charsmax(password));
 
 	switch(type) {
 		case INSERT: formatex(queryData, charsmax(queryData), "INSERT INTO `cod_accounts` VALUES ('%s', '%s')", playerSafeName[id], password);

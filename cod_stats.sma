@@ -8,7 +8,7 @@
 #include <unixtime>
 
 #define PLUGIN "CoD Stats"
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
 #define AUTHOR "O'Zone"
 
 #define TASK_TIME 9054
@@ -84,7 +84,7 @@ public client_putinserver(id)
 
 	get_user_name(id, playerName[id], charsmax(playerName[]));
 
-	mysql_escape_string(playerName[id], playerName[id], charsmax(playerName[]));
+	cod_sql_string(playerName[id], playerName[id], charsmax(playerName[]));
 	
 	rem_bit(id, dataLoaded);
 	rem_bit(id, visitInfo);

@@ -2,7 +2,7 @@
 #include <cod>
  
 #define PLUGIN "CoD Menu"
-#define VERSION "1.0.5"
+#define VERSION "1.0.7"
 #define AUTHOR "O'Zone" 
 
 new const commandMenu[][] = { "say /help", "say_team /help", "say /pomoc", "say_team /pomoc", "say /komendy", "say_team /komendy", "say /menu", "say_team /menu", "menu" };
@@ -46,9 +46,9 @@ public plugin_cfg()
 
 public client_putinserver(id)
 {
-	cmd_execute(id, "bind v menu");
-	cmd_execute(id, "bind ^"v^" ^"menu^"");
-	cmd_execute(id, "echo ^"^";^"bind ^"v^" ^"menu^"");
+	cod_cmd_execute(id, "bind v menu");
+	cod_cmd_execute(id, "bind ^"v^" ^"menu^"");
+	cod_cmd_execute(id, "echo ^"^";^"bind ^"v^" ^"menu^"");
 }
 
 public display_menu(id)
@@ -92,7 +92,7 @@ public display_menu_handle(id, menu, item)
     
 	ArrayGetString(menuCommands, item, menuCommand, charsmax(menuCommand));
 	
-	cmd_execute(id, menuCommand);
+	cod_cmd_execute(id, menuCommand);
 	
 	menu_destroy(menu);
 

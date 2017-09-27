@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Adrenalina"
-#define VERSION "1.0.6"
+#define VERSION "1.0.7"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Adrenalina"

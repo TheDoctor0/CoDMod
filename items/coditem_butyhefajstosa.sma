@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Buty Hefajstosa"
-#define VERSION "1.0.3"
+#define VERSION "1.0.5"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Buty Hefajstosa"
@@ -28,11 +28,7 @@ public cod_item_disabled(id)
 
 public take_damage(victim, inflictor, attacker, Float:damage, damageBits)
 {
-	if(damageBits == DMG_FALL && get_bit(victim, itemActive)) {
-		SetHamReturnInteger(0);
-
-		return HAM_SUPERCEDE;
-	}
+	if(damageBits == DMG_FALL && get_bit(victim, itemActive)) return HAM_SUPERCEDE;
 
 	return HAM_IGNORED;
 }

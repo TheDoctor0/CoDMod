@@ -5,7 +5,7 @@
 
 #define PLUGIN	"CoD Honor System"
 #define AUTHOR	"O'Zone"
-#define VERSION	"1.0.0"
+#define VERSION	"1.0.1"
 
 new cvarMinPlayers, cvarKill, cvarKillHS, cvarWinRound, cvarBombPlanted, cvarBombDefused, cvarRescueHostage, cvarKillHostage;
 
@@ -56,7 +56,7 @@ public client_putinserver(id)
 
 	get_user_name(id, playerName[id], charsmax(playerName[]));
 
-	mysql_escape_string(playerName[id], playerName[id], charsmax(playerName[]));
+	cod_sql_string(playerName[id], playerName[id], charsmax(playerName[]));
 	
 	load_honor(id);
 }
