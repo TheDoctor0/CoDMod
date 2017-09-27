@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Cios zza grobu"
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Cios zza grobu"
@@ -31,4 +31,4 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
 
 public cod_item_killed(id)
-	cod_make_explosion(id, 300, 1, 300.0, float(itemValue[id]), 0.5);
+	cod_make_explosion(id, 250, 1, 250.0, float(itemValue[id]), 0.5);

@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Duch"
-#define VERSION "1.0.7"
+#define VERSION "1.0.8"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Duch"
@@ -21,7 +21,7 @@ public plugin_init()
 
 public cod_item_enabled(id, value)
 {
-	cod_set_user_render(id, 0, ITEM, RENDER_ALWAYS);
+	cod_set_user_render(id, 0, ITEM);
 
 	cod_set_user_footsteps(id, 1, ITEM);
 

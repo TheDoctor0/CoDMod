@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item AWP Nevermore"
-#define VERSION "1.0.11"
+#define VERSION "1.0.13"
 #define AUTHOR "O'Zone"
 
 #define NAME        "AWP Nevermore"
@@ -49,10 +49,4 @@ public cod_item_upgrade(id)
 }
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
-{
-	if(weapon == CSW_AWP & random_num(1, 2) == 1) {
-		cod_kill_player(attacker, victim, damageBits);
-
-		damage = COD_BLOCK;
-	}
-}
+	if(weapon == CSW_AWP && random_num(1, 2) == 1) damage = cod_kill_player(attacker, victim, damageBits);
