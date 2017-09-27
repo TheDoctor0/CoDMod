@@ -11,7 +11,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.17"
+#define VERSION "1.0.32"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -40,6 +40,11 @@ new const commandHud[][] = { "hud", "say /hud", "say_team /hud", "say /zmienhud"
 new const commandBinds[][] = { "bindy", "say /bind", "say_team /bind", "say /bindy", "say_team /bindy", "say /binds", "say_team /binds" };
 new const commandTop[][] = { "top", "say /toplvl", "say_team /toplvl", "say /toplevel", "say_team /toplevel", "say /toppoziom", "say_team /toppoziom", "say /ltop15", "say_team /ltop15", "say /ptop15", "say_team /ptop15" };
 new const commandBlock[][] = { "fullupdate", "cl_autobuy", "cl_rebuy", "cl_setautobuy", "rebuy", "autobuy", "hegren", "sgren", "flash", "-rocket", "-mine", "-dynamite", "-medkit", "-teleport" };
+
+new const weapons[][] = { "weapon_p228", "weapon_scout", "weapon_hegrenade", "weapon_xm1014", "weapon_c4", "weapon_mac10", 
+		"weapon_aug", "weapon_smokegrenade", "weapon_elite", "weapon_fiveseven", "weapon_ump45", "weapon_sg550", "weapon_galil", 
+		"weapon_famas", "weapon_usp", "weapon_glock18", "weapon_awp", "weapon_mp5navy", "weapon_m249", "weapon_m3", "weapon_m4a1", 
+		"weapon_tmp", "weapon_g3sg1", "weapon_flashbang", "weapon_deagle", "weapon_sg552", "weapon_ak47", "weapon_knife", "weapon_p90" };
 
 new const maxClipAmmo[] = { -1, 13, -1, 10,  1,  7,  1,  30, 30,  1,  30,  20,  25, 30, 35, 25,  12,  20, 10,  30, 100,  8, 30,  30, 20,  2,  7, 30, 30, -1,  50 };
 new const maxBpAmmo[] = { 0, 30, 90, 200, 90, 32, 100, 100, 35, 52, 120 };
@@ -90,12 +95,12 @@ enum _:playerClassInfo { PCLASS_LEVEL, PCLASS_EXP, PCLASS_HEAL, PCLASS_INT, PCLA
 enum _:renderInfo { RENDER_TYPE, RENDER_VALUE, RENDER_STATUS, RENDER_WEAPON };
 
 enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL, PLAYER_INT, 
-	PLAYER_STAM, PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTR_HEAL, PLAYER_EXTR_INT, PLAYER_EXTR_STAM, PLAYER_EXTR_STR, PLAYER_EXTR_COND, PLAYER_EXTR_WPNS, 
-	PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_WEAPON, PLAYER_WEAPONS, PLAYER_STATUS, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_KS, PLAYER_TIME_KS, PLAYER_RESISTANCE, Float:PLAYER_LAST_ROCKET, 
-	Float:PLAYER_LAST_MINE, Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_TYPE, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, 
-	PLAYER_HUD_POSX, PLAYER_HUD_POSY, PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], 
-	PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1], PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1], PLAYER_ELIMINATOR[ALL + 1], 
-	PLAYER_ELIMINATOR_WEAPONS[ALL + 1], PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_NAME] };
+	PLAYER_STAM, PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTRA_HEAL, PLAYER_EXTRA_INT, PLAYER_EXTRA_STAM, PLAYER_EXTRA_STR, PLAYER_EXTRA_COND, PLAYER_EXTRA_WEAPONS, 
+	PLAYER_WEAPON, PLAYER_WEAPONS, PLAYER_FORCED_WEAPON, PLAYER_STATUS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_KS, PLAYER_TIME_KS, PLAYER_RESISTANCE, 
+	Float:PLAYER_LAST_ROCKET, Float:PLAYER_LAST_MINE, Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_TYPE, PLAYER_HUD_RED, 
+	PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1], 
+	PLAYER_TELEPORTS[ALL + 1], PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1], PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1], 
+	PLAYER_ELIMINATOR[ALL + 1], PLAYER_ELIMINATOR_WEAPONS[ALL + 1], PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_NAME] };
 
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 
@@ -112,10 +117,10 @@ public plugin_init()
 
 	create_arrays();
 
-	create_cvar("cod_sql_host", "sql.pukawka.pl", FCVAR_SPONLY|FCVAR_PROTECTED); 
-	create_cvar("cod_sql_user", "590489", FCVAR_SPONLY|FCVAR_PROTECTED); 
-	create_cvar("cod_sql_pass", "rIMxucY8RIMUEv", FCVAR_SPONLY|FCVAR_PROTECTED); 
-	create_cvar("cod_sql_db", "590489_cod", FCVAR_SPONLY|FCVAR_PROTECTED);
+	create_cvar("cod_sql_host", "sql.pukawka.pl", FCVAR_SPONLY | FCVAR_PROTECTED); 
+	create_cvar("cod_sql_user", "590489", FCVAR_SPONLY | FCVAR_PROTECTED); 
+	create_cvar("cod_sql_pass", "rIMxucY8RIMUEv", FCVAR_SPONLY | FCVAR_PROTECTED); 
+	create_cvar("cod_sql_db", "590489_cod", FCVAR_SPONLY | FCVAR_PROTECTED);
 
 	bind_pcvar_num(create_cvar("cod_kill_exp", "20"), cvarExpKill);
 	bind_pcvar_num(create_cvar("cod_hs_exp", "10"), cvarExpKillHS);
@@ -170,11 +175,6 @@ public plugin_init()
 	RegisterHam(Ham_Touch, "weaponbox", "touch_weapon");
 	RegisterHam(Ham_CS_Player_ResetMaxSpeed, "player", "speed_change", 1);
 	RegisterHam(Ham_Spawn, "func_buyzone", "block_buyzone");
-
-	new const weapons[][] = { "weapon_p228", "weapon_scout", "weapon_hegrenade", "weapon_xm1014", "weapon_c4", "weapon_mac10", 
-		"weapon_aug", "weapon_smokegrenade", "weapon_elite", "weapon_fiveseven", "weapon_ump45", "weapon_sg550", "weapon_galil", 
-		"weapon_famas", "weapon_usp", "weapon_glock18", "weapon_awp", "weapon_mp5navy", "weapon_m249", "weapon_m3", "weapon_m4a1", 
-		"weapon_tmp", "weapon_g3sg1", "weapon_flashbang", "weapon_deagle", "weapon_sg552", "weapon_ak47", "weapon_knife", "weapon_p90" };
 	
 	for (new i = 0; i < sizeof weapons; i++) RegisterHam(Ham_Item_Deploy, weapons[i], "weapon_deploy_post", 1);
 	
@@ -349,6 +349,7 @@ public plugin_natives()
 	
 	register_native("cod_give_weapon", "_cod_give_weapon", 1);
 	register_native("cod_take_weapon", "_cod_take_weapon", 1);
+	register_native("cod_force_weapon", "_cod_force_weapon", 1);
 
 	register_native("cod_get_user_render", "_cod_get_user_render", 1);
 	register_native("cod_set_user_render", "_cod_set_user_render", 1);
@@ -365,6 +366,12 @@ public plugin_natives()
 	register_native("cod_inflict_damage", "_cod_inflict_damage", 1);
 	register_native("cod_kill_player", "_cod_kill_player", 1);
 	register_native("cod_respawn_player", "_cod_respawn_player", 1);
+	register_native("cod_teleport_to_spawn", "_cod_teleport_to_spawn", 1);
+	register_native("cod_random_upgrade", "_cod_random_upgrade", 1);
+	register_native("cod_percent_chance", "_cod_percent_chance", 1);
+	register_native("cod_print_chat", "_cod_print_chat", 1);
+	register_native("cod_cmd_execute", "_cod_cmd_execute", 1);
+	register_native("cod_sql_string", "_cod_sql_string", 1);
 	
 	register_native("cod_register_item", "_cod_register_item");
 	register_native("cod_register_class", "_cod_register_class");
@@ -434,7 +441,7 @@ public client_connect(id)
 	
 	get_user_name(id, codPlayer[id][PLAYER_NAME], charsmax(codPlayer[]));
 	
-	mysql_escape_string(codPlayer[id][PLAYER_NAME], codPlayer[id][PLAYER_NAME], charsmax(codPlayer[]));
+	cod_sql_string(codPlayer[id][PLAYER_NAME], codPlayer[id][PLAYER_NAME], charsmax(codPlayer[]));
 	
 	load_data(id);
 }
@@ -506,7 +513,7 @@ public select_fraction(id)
 
 	if(!get_bit(id, dataLoaded)) {
 		cod_print_chat(id, "Trwa wczytywanie twoich klas...");
-		
+
 		return PLUGIN_HANDLED;
 	}
 	
@@ -1046,7 +1053,7 @@ public assign_points_handler(id, menu, item)
 		(pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]] > codPlayer[id][PLAYER_POINTS] ? codPlayer[id][PLAYER_POINTS] : pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]]);
 	
 	switch(item) { 
-		case 0: if(++codPlayer[id][PLAYER_POINTS_SPEED] >= sizeof(pointsDistribution)) codPlayer[id][PLAYER_POINTS_SPEED] = 0;     
+		case 0: if(++codPlayer[id][PLAYER_POINTS_SPEED] >= sizeof pointsDistribution) codPlayer[id][PLAYER_POINTS_SPEED] = 0;     
 		case 1: {
 			if(codPlayer[id][PLAYER_HEAL] < statsLimit) {
 				if(pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_HEAL]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_HEAL];
@@ -1249,7 +1256,7 @@ public level_top(id)
 	tempId[0] = id;
 
 	formatex(queryData, charsmax(queryData), "SELECT name, class, level, exp FROM `cod_mod` ORDER BY exp DESC LIMIT 15");
-	SQL_ThreadQuery(sql, "show_level_top", queryData, tempId, sizeof(tempId));
+	SQL_ThreadQuery(sql, "show_level_top", queryData, tempId, sizeof tempId);
 
 	return PLUGIN_HANDLED;
 }
@@ -1285,7 +1292,7 @@ public show_level_top(failState, Handle:query, error[], errorNum, tempData[], da
 		replace_all(name, charsmax(name), "<", "");
 		replace_all(name, charsmax(name), ">", "");
 		
-		if(rank < sizeof(rankColors)) motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "<tr style=color:%s;font-weight:bold;><td>%i.<td>%s<td>%s<td>%i<td>%i", rankColors[rank], rank + 1, name, class, level, exp);
+		if(rank < sizeof rankColors) motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "<tr style=color:%s;font-weight:bold;><td>%i.<td>%s<td>%s<td>%i<td>%i", rankColors[rank], rank + 1, name, class, level, exp);
 		else motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "<tr><td>%i.<td>%s<td>%s<td>%i<td>%i", rank + 1, name, class, level, exp);
 		
 		rank++;
@@ -1559,7 +1566,7 @@ public think_medkit(ent)
 
 			if(get_user_team(id) != get_user_team(player) || !is_user_alive(player)) continue;
 
-			_cod_add_user_health(player, bonusHealth, 1);
+			cod_add_user_health(player, bonusHealth, 1);
 
 			ExecuteForward(codForwards[MEDKIT_HEAL], ret, id, player, float(bonusHealth));
 		}
@@ -1985,7 +1992,7 @@ public touch_weapon(weapon, id)
 	
 	new weaponType = ((modelName[0] == 'a') ? cs_get_armoury_type(weapon): cs_get_weaponbox_type(weapon));
 
-	if((1 << weaponType) & (codPlayer[id][PLAYER_WEAPONS] | codPlayer[id][PLAYER_EXTR_WPNS] | allowedWeapons)) return HAM_IGNORED;
+	if((1 << weaponType) & (codPlayer[id][PLAYER_WEAPONS] | codPlayer[id][PLAYER_EXTRA_WEAPONS] | allowedWeapons)) return HAM_IGNORED;
 
 	return HAM_SUPERCEDE;
 }
@@ -2015,6 +2022,15 @@ public weapon_deploy_post(ent)
 	if(!is_user_alive(id)) return HAM_IGNORED;
 
 	new ret, weapon = codPlayer[id][PLAYER_WEAPON] = cs_get_weapon_id(ent);
+
+	if(codPlayer[id][PLAYER_FORCED_WEAPON] && codPlayer[id][PLAYER_FORCED_WEAPON] != weapon) {
+		engclient_cmd(id, weapons[codPlayer[id][PLAYER_FORCED_WEAPON]]);
+
+		//set_pdata_cbase (id, 373, weapons[codPlayer[id][PLAYER_FORCED_WEAPON]);
+		//ExecuteHam(Ham_Item_Deploy, weapons[codPlayer[id][PLAYER_FORCED_WEAPON]);
+
+		return HAM_IGNORED; 
+	}
 
 	ExecuteForward(codForwards[WEAPON_DEPLOY], ret, id, weapon, ent);
 
@@ -2510,15 +2526,15 @@ public set_speed_limit(id)
 {
 	id -= TASK_SPEED_LIMIT;
 	
-	cmd_execute(id, "cl_forwardspeed 450");
-	cmd_execute(id, "cl_backspeed 450");
-	cmd_execute(id, "cl_sidespeed 450");
-	cmd_execute(id, "^"cl_forwardspeed^" 450");
-	cmd_execute(id, "^"cl_backspeed^" 450");
-	cmd_execute(id, "^"cl_sidespeed^" 450");
-	cmd_execute(id, "echo ^"^";^"cl_forwardspeed^" 450");
-	cmd_execute(id, "echo ^"^";^"cl_backspeed^" 450");
-	cmd_execute(id, "echo ^"^";^"cl_sidespeed^" 450");
+	cod_cmd_execute(id, "cl_forwardspeed 450");
+	cod_cmd_execute(id, "cl_backspeed 450");
+	cod_cmd_execute(id, "cl_sidespeed 450");
+	cod_cmd_execute(id, "^"cl_forwardspeed^" 450");
+	cod_cmd_execute(id, "^"cl_backspeed^" 450");
+	cod_cmd_execute(id, "^"cl_sidespeed^" 450");
+	cod_cmd_execute(id, "echo ^"^";^"cl_forwardspeed^" 450");
+	cod_cmd_execute(id, "echo ^"^";^"cl_backspeed^" 450");
+	cod_cmd_execute(id, "echo ^"^";^"cl_sidespeed^" 450");
 }
 
 public set_new_class(id)
@@ -2761,7 +2777,7 @@ public set_attributes(id)
 	new weaponName[22];
 	
 	for(new i = 1; i < 32; i++) {
-		if((1<<i) & (codPlayer[id][PLAYER_WEAPONS] | codPlayer[id][PLAYER_EXTR_WPNS])) {
+		if((1<<i) & (codPlayer[id][PLAYER_WEAPONS] | codPlayer[id][PLAYER_EXTRA_WEAPONS])) {
 			get_weaponname(i, weaponName, charsmax(weaponName));
 			give_item(id, weaponName);
 		}
@@ -2949,7 +2965,7 @@ stock get_health(id, class_health = 1, stats_health = 1, bonus_health = 1, base_
 	
 	if(class_health) health += get_user_class_info(id, codPlayer[id][PLAYER_CLASS], CLASS_HEAL);
 	if(stats_health) health += codPlayer[id][PLAYER_HEAL];
-	if(bonus_health) health += codPlayer[id][PLAYER_EXTR_HEAL];
+	if(bonus_health) health += codPlayer[id][PLAYER_EXTRA_HEAL];
 	if(base_health) health += 100;
 
 	return health;
@@ -2961,7 +2977,7 @@ stock get_intelligence(id, class_intelligence = 1, stats_intelligence = 1, bonus
 	
 	if(class_intelligence) intelligence += get_user_class_info(id, codPlayer[id][PLAYER_CLASS], CLASS_INT);
 	if(stats_intelligence) intelligence += codPlayer[id][PLAYER_INT];
-	if(bonus_intelligence) intelligence += codPlayer[id][PLAYER_EXTR_INT];
+	if(bonus_intelligence) intelligence += codPlayer[id][PLAYER_EXTRA_INT];
 	
 	return intelligence;
 }
@@ -2972,7 +2988,7 @@ stock get_strength(id, class_strength = 1, stats_strength = 1, bonus_strength = 
 	
 	if(class_strength) strength += get_user_class_info(id, codPlayer[id][PLAYER_CLASS], CLASS_STR);
 	if(stats_strength) strength += codPlayer[id][PLAYER_STR];
-	if(bonus_strength) strength += codPlayer[id][PLAYER_EXTR_STR];
+	if(bonus_strength) strength += codPlayer[id][PLAYER_EXTRA_STR];
 	
 	return strength;
 }
@@ -2983,7 +2999,7 @@ stock get_stamina(id, class_stamina = 1, stats_stamina = 1, bonus_stamina = 1)
 	
 	if(class_stamina) stamina += get_user_class_info(id, codPlayer[id][PLAYER_CLASS], CLASS_STAM);
 	if(stats_stamina) stamina += codPlayer[id][PLAYER_STAM];
-	if(bonus_stamina) stamina += codPlayer[id][PLAYER_EXTR_STAM];
+	if(bonus_stamina) stamina += codPlayer[id][PLAYER_EXTRA_STAM];
 	
 	return stamina;
 }
@@ -2994,7 +3010,7 @@ stock get_condition(id, class_condition = 1, stats_condition = 1, bonus_conditio
 	
 	if(class_condition) condition += get_user_class_info(id, codPlayer[id][PLAYER_CLASS], CLASS_COND);
 	if(stats_condition) condition += codPlayer[id][PLAYER_COND];
-	if(bonus_condition) condition += codPlayer[id][PLAYER_EXTR_COND];
+	if(bonus_condition) condition += codPlayer[id][PLAYER_EXTRA_COND];
 	
 	return condition;
 }
@@ -3037,7 +3053,7 @@ public load_data(id)
 	
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_mod` WHERE name = '%s'", codPlayer[id][PLAYER_NAME]);
 	
-	SQL_ThreadQuery(sql, "load_data_handle", queryData, playerId, sizeof(playerId));
+	SQL_ThreadQuery(sql, "load_data_handle", queryData, playerId, sizeof playerId);
 }
 
 public load_data_handle(failState, Handle:query, error[], errorNum, playerId[], dataSize)
@@ -3394,54 +3410,54 @@ public _cod_max_item_durability(id)
 	return cvarMaxDurability;
 
 public _cod_get_user_bonus_health(id)
-	return codPlayer[id][PLAYER_EXTR_HEAL];
+	return codPlayer[id][PLAYER_EXTRA_HEAL];
 
 public _cod_get_user_bonus_intelligence(id)
-	return codPlayer[id][PLAYER_EXTR_INT];
+	return codPlayer[id][PLAYER_EXTRA_INT];
 
 public _cod_get_user_bonus_stamina(id)
-	return codPlayer[id][PLAYER_EXTR_STAM];
+	return codPlayer[id][PLAYER_EXTRA_STAM];
 
 public _cod_get_user_bonus_strength(id)
-	return codPlayer[id][PLAYER_EXTR_STR];
+	return codPlayer[id][PLAYER_EXTRA_STR];
 
 public _cod_get_user_bonus_condition(id)
-	return codPlayer[id][PLAYER_EXTR_COND];
+	return codPlayer[id][PLAYER_EXTRA_COND];
 
 public _cod_set_user_bonus_health(id, value)
-	codPlayer[id][PLAYER_EXTR_HEAL] = value;
+	codPlayer[id][PLAYER_EXTRA_HEAL] = value;
 	
 public _cod_set_user_bonus_intelligence(id, value)
-	codPlayer[id][PLAYER_EXTR_INT] = value;
+	codPlayer[id][PLAYER_EXTRA_INT] = value;
 
 public _cod_set_user_bonus_stamina(id, value)
-	codPlayer[id][PLAYER_EXTR_STAM] = value;
+	codPlayer[id][PLAYER_EXTRA_STAM] = value;
 
 public _cod_set_user_bonus_strength(id, value)
-	codPlayer[id][PLAYER_EXTR_STR] = value;
+	codPlayer[id][PLAYER_EXTRA_STR] = value;
 
 public _cod_set_user_bonus_condition(id, value)
 {
-	codPlayer[id][PLAYER_EXTR_COND] = value;
+	codPlayer[id][PLAYER_EXTRA_COND] = value;
 
 	set_speed(id);
 }
 
 public _cod_add_user_bonus_health(id, value)
-	codPlayer[id][PLAYER_EXTR_HEAL] += value;
+	codPlayer[id][PLAYER_EXTRA_HEAL] += value;
 	
 public _cod_add_user_bonus_intelligence(id, value)
-	codPlayer[id][PLAYER_EXTR_INT] += value;
+	codPlayer[id][PLAYER_EXTRA_INT] += value;
 
 public _cod_add_user_bonus_stamina(id, value)
-	codPlayer[id][PLAYER_EXTR_STAM] += value;
+	codPlayer[id][PLAYER_EXTRA_STAM] += value;
 
 public _cod_add_user_bonus_strength(id, value)
-	codPlayer[id][PLAYER_EXTR_STR] += value;
+	codPlayer[id][PLAYER_EXTRA_STR] += value;
 
 public _cod_add_user_bonus_condition(id, value)
 {
-	codPlayer[id][PLAYER_EXTR_COND] += value;
+	codPlayer[id][PLAYER_EXTRA_COND] += value;
 
 	set_speed(id);
 }
@@ -3797,7 +3813,7 @@ public _cod_give_weapon(id, weapon)
 {
 	new weaponName[22];
 	
-	codPlayer[id][PLAYER_EXTR_WPNS] |= (1<<weapon);
+	codPlayer[id][PLAYER_EXTRA_WEAPONS] |= (1<<weapon);
 	
 	get_weaponname(weapon, weaponName, charsmax(weaponName));
 	
@@ -3806,7 +3822,7 @@ public _cod_give_weapon(id, weapon)
 
 public _cod_take_weapon(id, weapon)
 {
-	codPlayer[id][PLAYER_EXTR_WPNS] &= ~(1<<weapon);
+	codPlayer[id][PLAYER_EXTRA_WEAPONS] &= ~(1<<weapon);
 	
 	if((1<<weapon) & (allowedWeapons | codPlayer[id][PLAYER_WEAPONS])) return;
 	
@@ -3815,6 +3831,13 @@ public _cod_take_weapon(id, weapon)
 	get_weaponname(weapon, weaponName, charsmax(weaponName));
 	
 	if(!((1<<weapon) & (1<<CSW_HEGRENADE | 1<<CSW_SMOKEGRENADE | 1<<CSW_FLASHBANG))) engclient_cmd(id, "drop", weaponName);
+}
+
+public _cod_force_weapon(id, weapon)
+{
+	if(!((allowedWeapons | codPlayer[id][PLAYER_EXTRA_WEAPONS] | codPlayer[id][PLAYER_WEAPONS]) & weapon)) return;
+
+	codPlayer[id][PLAYER_FORCED_WEAPON] = weapon;
 }
 
 public _cod_get_user_render(id, type)
@@ -3920,7 +3943,7 @@ public _cod_repeat_damage(attacker, victim, Float:damage, Float:time, counter, f
 
 	if(task_exists(victim + attacker + TASK_DAMAGE)) remove_task(victim + attacker + TASK_DAMAGE);
 
-	set_task(time, "repeat_damage", victim + attacker + TASK_DAMAGE, data, sizeof(data), counter ? "a" : "b", counter - instant);
+	set_task(time, "repeat_damage", victim + attacker + TASK_DAMAGE, data, sizeof data, counter ? "a" : "b", counter - instant);
 
 	if(instant) repeat_damage(data);
 }
@@ -3968,24 +3991,24 @@ public repeat_damage(data[])
 			write_byte(200);
 			message_end();
 
-			_cod_display_fade(data[VICTIM], 1, 1, 0x0000, 255, 165, 0, 80);
+			cod_display_fade(data[VICTIM], 1, 1, 0x0000, 255, 165, 0, 80);
 
 			data[FLAGS] = DMG_BURN;
 		}
 		case POISON: {
-			_cod_display_fade(data[VICTIM], 1, 1, 0x0000, 0, 150, 60, 120);
+			cod_display_fade(data[VICTIM], 1, 1, 0x0000, 0, 150, 60, 120);
 
 			data[FLAGS] = DMG_NERVEGAS;
 		}
 		case HEAL: {
-			_cod_display_fade(data[VICTIM], 1, 1, 0x0000, 250, 0, 0, 40);
-			_cod_add_user_health(data[VICTIM], data[DAMAGE], 1);
+			cod_display_fade(data[VICTIM], 1, 1, 0x0000, 250, 0, 0, 40);
+			cod_add_user_health(data[VICTIM], data[DAMAGE], 1);
 
 			return;
 		}
 	}
 
-	_cod_inflict_damage(data[ATTACKER], data[VICTIM], float(data[DAMAGE]), 0.0, data[FLAGS]);
+	cod_inflict_damage(data[ATTACKER], data[VICTIM], float(data[DAMAGE]), 0.0, data[FLAGS]);
 }
 
 public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
@@ -3996,7 +4019,7 @@ public _cod_kill_player(killer, victim, flags)
 	if(is_user_alive(victim)) {
 		cs_set_user_armor(victim, 0, CS_ARMOR_NONE);
 		
-		_cod_inflict_damage(killer, victim, float(get_user_health(victim) + 1), 0.0, flags);
+		cod_inflict_damage(killer, victim, float(get_user_health(victim) + 1), 0.0, flags);
 	}
 
 	return _:COD_BLOCK;
@@ -4024,6 +4047,69 @@ public respawn_player_enemy_spawn(id)
 	ExecuteHam(Ham_CS_RoundRespawn, id);
 	
 	cs_set_user_team(id, team);
+}
+
+public _cod_teleport_to_spawn(id, enemy)
+{
+	new Float:spawnOrigin[3], Float:spawnAngle[3], team = get_user_team(id);
+
+	find_free_spawn(enemy ? (team == 1 ? 2 : 1) : team, spawnOrigin, spawnAngle);
+
+	set_pev(id, pev_origin, spawnOrigin);
+	set_pev(id, pev_angles, spawnAngle);
+}
+
+public _cod_random_upgrade(&value, upgradeMin, upgradeMax, valueMin, valueMax)
+{
+	if((valueMin != NONE && value <= valueMin) || (valueMax != NONE && value >= valueMax)) return COD_STOP;
+
+	value = max(0, value + (upgradeMin & upgradeMin) ? random_num(upgradeMin, upgradeMax) : (random(2) ? random_num(upgradeMin, -1) : random_num(1, upgradeMax)));
+
+	if(valueMax != NONE) value = min(value, valueMax);
+
+	return COD_CONTINUE;
+}
+
+public _cod_percent_chance(percent)
+	return random_num(1, 100) <= percent ? true : false;
+
+public _cod_print_chat(id, const text[], any:...)
+{
+	new message[192];
+
+	if(numargs() == 2) copy(message, charsmax(message), text);
+	else vformat(message, charsmax(message), text, 3);
+
+	client_print_color(id, id, "^x04[CoD]^x01 %s", message);
+}
+
+public _cod_cmd_execute(id, const text[], any:...)
+{
+	#pragma unused text
+
+	new message[192];
+
+	format_args(message, charsmax(message), 1);
+
+	message_begin(id == 0 ? MSG_ALL : MSG_ONE, SVC_DIRECTOR, _, id);
+	write_byte(strlen(message) + 2);
+	write_byte(10);
+	write_string(message);
+	message_end();
+}
+
+public _cod_sql_string(const source[], dest[], length)
+{
+	copy(dest, length, source);
+	
+	replace_all(dest, length, "\\", "\\\\");
+	replace_all(dest, length, "\0", "\\0");
+	replace_all(dest, length, "\n", "\\n");
+	replace_all(dest, length, "\r", "\\r");
+	replace_all(dest, length, "\x1a", "\Z");
+	replace_all(dest, length, "'", "\'");
+	replace_all(dest, length, "`", "\`");
+	replace_all(dest, length, "^"", "\^"");
 }
 	
 public _cod_register_item(plugin, params)
@@ -4507,7 +4593,7 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 				if(ret == COD_BLOCK) continue;
 			}
 
-			_cod_inflict_damage(id, player, damage, factor, DMG_CODSKILL);
+			cod_inflict_damage(id, player, damage, factor, DMG_CODSKILL);
 		}
 	}
 
@@ -4709,4 +4795,38 @@ stock bool:is_hull_vacant(const Float:origin[3], hull, id)
 	if(!get_tr2(trace, TR_StartSolid) || !get_tr2(trace, TR_AllSolid)) return true;
 	
 	return false;
+}
+
+stock const spawnEntString[2][] = {"info_player_start", "info_player_deathmatch"}
+
+stock find_free_spawn(team, Float:spawnOrigin[3], Float:spawnAngle[3])
+{
+	const maxSpawns = 128;
+
+	new spawnPoints[maxSpawns], bool:spawnChecked[maxSpawns], entList[1], spawnPoint, spawnNum, ent = -1, spawnsFound = 0, i;
+
+	while((ent = find_ent_by_class(ent, spawnEntString[team == 2 ? 0 : 1])) && spawnsFound < maxSpawns) spawnPoints[spawnsFound++] = ent;
+
+	for(i = 0; i < maxSpawns; i++) spawnChecked[i] = false;
+
+	i = 0;
+
+	while(i++ < spawnsFound * 10) {
+		spawnNum = random(spawnsFound);
+		spawnPoint = spawnPoints[spawnNum];
+
+		if(spawnPoint && !spawnChecked[spawnNum]) {
+			spawnChecked[spawnNum] = true;
+
+			pev(spawnPoint, pev_origin, spawnOrigin);
+
+			if(!find_sphere_class(0, "player", 100.0, entList, sizeof entList, spawnOrigin)) {
+				pev(spawnPoint, pev_angles, spawnAngle);
+
+				return spawnPoint;
+			}
+		}
+	}
+
+	return 0;
 }
