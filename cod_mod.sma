@@ -11,7 +11,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.32"
+#define VERSION "1.0.38"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -369,9 +369,6 @@ public plugin_natives()
 	register_native("cod_teleport_to_spawn", "_cod_teleport_to_spawn", 1);
 	register_native("cod_random_upgrade", "_cod_random_upgrade", 1);
 	register_native("cod_percent_chance", "_cod_percent_chance", 1);
-	register_native("cod_print_chat", "_cod_print_chat", 1);
-	register_native("cod_cmd_execute", "_cod_cmd_execute", 1);
-	register_native("cod_sql_string", "_cod_sql_string", 1);
 	
 	register_native("cod_register_item", "_cod_register_item");
 	register_native("cod_register_class", "_cod_register_class");
@@ -4014,7 +4011,7 @@ public repeat_damage(data[])
 public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
 	if(!codPlayer[victim][PLAYER_RESISTANCE] || (codPlayer[victim][PLAYER_RESISTANCE] && !(flags & DMG_CODSKILL))) ExecuteHam(Ham_TakeDamage, victim, attacker, attacker, damage + get_intelligence(attacker) * factor, DMG_CODSKILL | flags);
 	
-public _cod_kill_player(killer, victim, flags)
+public Float:_cod_kill_player(killer, victim, flags)
 {
 	if(is_user_alive(victim)) {
 		cs_set_user_armor(victim, 0, CS_ARMOR_NONE);
@@ -4022,7 +4019,7 @@ public _cod_kill_player(killer, victim, flags)
 		cod_inflict_damage(killer, victim, float(get_user_health(victim) + 1), 0.0, flags);
 	}
 
-	return _:COD_BLOCK;
+	return COD_BLOCK;
 }
 
 public _cod_respawn_player(id, enemy)
@@ -4072,45 +4069,6 @@ public _cod_random_upgrade(&value, upgradeMin, upgradeMax, valueMin, valueMax)
 
 public _cod_percent_chance(percent)
 	return random_num(1, 100) <= percent ? true : false;
-
-public _cod_print_chat(id, const text[], any:...)
-{
-	new message[192];
-
-	if(numargs() == 2) copy(message, charsmax(message), text);
-	else vformat(message, charsmax(message), text, 3);
-
-	client_print_color(id, id, "^x04[CoD]^x01 %s", message);
-}
-
-public _cod_cmd_execute(id, const text[], any:...)
-{
-	#pragma unused text
-
-	new message[192];
-
-	format_args(message, charsmax(message), 1);
-
-	message_begin(id == 0 ? MSG_ALL : MSG_ONE, SVC_DIRECTOR, _, id);
-	write_byte(strlen(message) + 2);
-	write_byte(10);
-	write_string(message);
-	message_end();
-}
-
-public _cod_sql_string(const source[], dest[], length)
-{
-	copy(dest, length, source);
-	
-	replace_all(dest, length, "\\", "\\\\");
-	replace_all(dest, length, "\0", "\\0");
-	replace_all(dest, length, "\n", "\\n");
-	replace_all(dest, length, "\r", "\\r");
-	replace_all(dest, length, "\x1a", "\Z");
-	replace_all(dest, length, "'", "\'");
-	replace_all(dest, length, "`", "\`");
-	replace_all(dest, length, "^"", "\^"");
-}
 	
 public _cod_register_item(plugin, params)
 {

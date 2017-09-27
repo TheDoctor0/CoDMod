@@ -854,8 +854,9 @@ native cod_inflict_damage(attacker, victim, Float:damage, Float:factor = 0.5, fl
 
 /*------------------------------
 Kill a player imitating kill by another player.
+Return COD_BLOCK.
 ------------------------------*/
-native cod_kill_player(attacker, victim, damageBits);
+native Float:cod_kill_player(attacker, victim, damageBits);
 
 /*------------------------------
 Immediately respawn player.
@@ -884,22 +885,6 @@ native cod_random_upgrade(&value, upgradeMin, upgradeMax, valueMin = NONE, value
 Return true/false result for given percent chance.
 */
 native cod_percent_chance(percent);
-
-/*------------------------------
-Print message to player with [CoD] prefix.
-Color formaters are allowed.
-*/
-native cod_print_chat(id, const text[], any:...);
-
-/*------------------------------
-Execute command on player.
-*/
-native cod_cmd_execute(id, const text[], any:...);
-
-/*------------------------------
-Prepare safe sql string.
-*/
-native cod_sql_string(const source[], dest[], length);
 
 /*------------------------------
 Register new item and return its id.
@@ -1128,3 +1113,46 @@ forward cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damag
 Class function for victim damage change.
 ------------------------------*/
 forward cod_class_damage_victim(attacker, victim, weapon, &Float:damage, damageBits);
+
+/*------------------------------
+Print message to player with [CoD] prefix.
+Color formaters are allowed.
+*/
+stock cod_print_chat(id, const text[], any:...)
+{
+	new message[192];
+
+	if(numargs() == 2) copy(message, charsmax(message), text);
+	else vformat(message, charsmax(message), text, 3);
+
+	client_print_color(id, id, "^x04[CoD]^x01 %s", message);
+}
+
+stock cod_cmd_execute(id, const text[], any:...)
+{
+	#pragma unused text
+
+	new message[192];
+
+	format_args(message, charsmax(message), 1);
+
+	message_begin(id == 0 ? MSG_ALL : MSG_ONE, SVC_DIRECTOR, _, id);
+	write_byte(strlen(message) + 2);
+	write_byte(10);
+	write_string(message);
+	message_end();
+}
+
+stock cod_sql_string(const source[], dest[], length)
+{
+	copy(dest, length, source);
+	
+	replace_all(dest, length, "\\", "\\\\");
+	replace_all(dest, length, "\0", "\\0");
+	replace_all(dest, length, "\n", "\\n");
+	replace_all(dest, length, "\r", "\\r");
+	replace_all(dest, length, "\x1a", "\Z");
+	replace_all(dest, length, "'", "\'");
+	replace_all(dest, length, "`", "\`");
+	replace_all(dest, length, "^"", "\^"");
+}
