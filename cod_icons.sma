@@ -6,7 +6,7 @@
 #include <cod>
 
 #define PLUGIN  "CoD Icons"
-#define VERSION "1.0.3"
+#define VERSION "1.0.5"
 #define AUTHOR  "O'Zone"
 
 #define TASK_PLANT 6583

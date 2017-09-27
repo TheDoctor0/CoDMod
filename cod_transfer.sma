@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Transfer"
-#define VERSION "1.0.1"
+#define VERSION "1.0.3"
 #define AUTHOR "O'Zone"
 
 new const commandTransfer[][] = { "say /przelew", "say_team /przelew", "say /przelej", "say_team /przelej", "przelej" };
