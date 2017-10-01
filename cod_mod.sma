@@ -11,7 +11,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.44"
+#define VERSION "1.0.52"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -46,8 +46,8 @@ new const weapons[][] = { "weapon_p228", "weapon_scout", "weapon_hegrenade", "we
 		"weapon_famas", "weapon_usp", "weapon_glock18", "weapon_awp", "weapon_mp5navy", "weapon_m249", "weapon_m3", "weapon_m4a1", 
 		"weapon_tmp", "weapon_g3sg1", "weapon_flashbang", "weapon_deagle", "weapon_sg552", "weapon_ak47", "weapon_knife", "weapon_p90" };
 
-new const maxClipAmmo[] = { -1, 13, -1, 10,  1,  7,  1,  30, 30,  1,  30,  20,  25, 30, 35, 25,  12,  20, 10,  30, 100,  8, 30,  30, 20,  2,  7, 30, 30, -1,  50 };
-new const maxBpAmmo[] = { 0, 30, 90, 200, 90, 32, 100, 100, 35, 52, 120 };
+new const maxClipAmmo[] = { -1, 13, -1, 10, 1, 7, 1, 30, 30, 1, 30, 20, 25, 30, 35, 25, 12, 20, 10, 30, 100, 8, 30, 30, 20, 2, 7, 30, 30, -1, 50 };
+new const maxBpAmmo[] = { -1, 52, -1, 90, 1, 32, 1, 100, 90, 1, 120, 100, 100, 90, 90, 90, 100, 120, 30, 120, 200, 32, 90, 120, 90, 1, 35, 90, 90, -1, 100 }
 
 new const pointsDistribution[] = { 1, 3, 5, 10, 25, FULL };
 
@@ -2102,7 +2102,7 @@ public message_health(id)
 
 public cur_weapon(id)
 {
-	if(!is_user_connected(id) || (codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] && (!codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] || codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] & codPlayer[id][PLAYER_WEAPON]))) return;
+	if(!is_user_connected(id) || !codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] || (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] && !(codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] & codPlayer[id][PLAYER_WEAPON]))) return;
 	
 	set_user_clip(id);
 }
@@ -2381,16 +2381,9 @@ public say_text(msgId, msgDest, msgEnt)
 
 public message_ammo(msgId, msgDest, id)
 {
-	new weaponAmmo = get_msg_arg_int(1);
-
-	if(is_user_alive(id) && weaponAmmo && weaponAmmo <= 10) {
-		new weaponMaxBpAmmo = maxBpAmmo[weaponAmmo];
-
-		if(get_msg_arg_int(2) < weaponMaxBpAmmo) {
-			set_msg_arg_int(2, ARG_BYTE, weaponMaxBpAmmo);
-			set_pdata_int(id, 376 + weaponAmmo, weaponMaxBpAmmo, 5);
-		}
-	}
+	new weapon = get_user_weapon(id);
+    
+	if(weapon && weapon != CSW_KNIFE && weapon != CSW_C4 && weapon != CSW_HEGRENADE && weapon != CSW_FLASHBANG && weapon != CSW_SMOKEGRENADE) cs_set_user_bpammo(id, weapon, maxBpAmmo[weapon]);
 }
 
 public message_intermission()
@@ -2714,7 +2707,9 @@ public reset_attributes(id, type)
 		calculate_teleports_left(id);
 	}
 
-	new bool:footstepsEnabled, bunnyHopEnabled, modelEnabled, unlimitedAmmoEnabled, eliminatorEnabled, reductorEnabled;
+	new bool:footstepsEnabled, bool:bunnyHopEnabled, bool:modelEnabled, bool:unlimitedAmmoEnabled, bool:eliminatorEnabled, bool:reductorEnabled;
+
+	new unlimitedWeapons, eliminatorWeapons, reductorWeapons;
 
 	codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] = 0;
 	codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] = 0;
@@ -2728,9 +2723,14 @@ public reset_attributes(id, type)
 		if(codPlayer[id][PLAYER_ELIMINATOR][i]) eliminatorEnabled = true;
 		if(codPlayer[id][PLAYER_REDUCER][i]) reductorEnabled = true;
 
-		codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] |= codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i];
-		codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] |= codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][i];
-		codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] |= codPlayer[id][PLAYER_REDUCER_WEAPONS][i];
+		if(codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i] == FULL) unlimitedWeapons = FULL;
+		else if(codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i]) unlimitedWeapons == FULL ? (unlimitedWeapons = FULL) : (unlimitedWeapons |= codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i]);
+
+		if(codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][i] == FULL) eliminatorWeapons = FULL;
+		else if(codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][i]) eliminatorWeapons == FULL ? (eliminatorWeapons = FULL) : (eliminatorWeapons |= codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][i]);
+
+		if(codPlayer[id][PLAYER_REDUCER_WEAPONS][i] == FULL) reductorWeapons = FULL;
+		else if(codPlayer[id][PLAYER_REDUCER_WEAPONS][i]) reductorWeapons == FULL ? (reductorWeapons = FULL) : (reductorWeapons |= codPlayer[id][PLAYER_REDUCER_WEAPONS][i]);
 	}
 
 	codPlayer[id][PLAYER_FOOTSTEPS][ALL] = footstepsEnabled;
@@ -2739,6 +2739,10 @@ public reset_attributes(id, type)
 	codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] = unlimitedAmmoEnabled;
 	codPlayer[id][PLAYER_ELIMINATOR][ALL] = eliminatorEnabled;
 	codPlayer[id][PLAYER_REDUCER][ALL] = reductorEnabled;
+
+	codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] = unlimitedWeapons
+	codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] = eliminatorWeapons;
+	codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] = reductorWeapons;
 
 	remove_render_type(id, type);
 
@@ -2786,11 +2790,11 @@ public set_attributes(id)
 		}
 	}
 
-	//new playerWeapons[32], weaponTypes;
+	new playerWeapons[32], weaponsNum;
 	
-	//get_user_weapons(id, playerWeapons, weaponTypes);
+	get_user_weapons(id, playerWeapons, weaponsNum);
 	
-	//for(new i = 0; i < weaponTypes; i++) if(maxAmmo[playerWeapons[i]] > 0) cs_set_user_bpammo(id, playerWeapons[i], maxAmmo[playerWeapons[i]]);
+	for(new i = 0; i < weaponsNum; i++) if(maxBpAmmo[playerWeapons[i]] > 0) cs_set_user_bpammo(id, playerWeapons[i], maxBpAmmo[playerWeapons[i]]);
 }
 
 public gravity_change(id)
@@ -4676,7 +4680,7 @@ stock cs_get_weaponbox_type(weaponTypeBox)
 
 stock is_enough_space(id)
 {
-	new Float:origin[3], Float:start[3], Float:end[3], Float:limit = 135.0;
+	new Float:origin[3], Float:start[3], Float:end[3], Float:limit = 100.0;
 	
 	pev(id, pev_origin, origin);
  
