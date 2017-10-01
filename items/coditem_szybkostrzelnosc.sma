@@ -2,8 +2,8 @@
 #include <fakemeta_util>
 #include <cod>
 
-#define PLUGIN "CoD Item Ruska Czapka"
-#define VERSION "1.0.6"
+#define PLUGIN "CoD Item Szybkostrzelnosc"
+#define VERSION "1.0.9"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Szybkostrzelnosc"
@@ -27,8 +27,6 @@ public plugin_init()
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
 	cod_register_item(NAME, DESCRIPTION, RANDOM_MIN, RANDOM_MAX);
-
-	register_event("CurWeapon", "cur_weapon", "be", "1=1");
 }
 
 public cod_item_enabled(id, value)
@@ -47,9 +45,9 @@ public cod_item_value(id)
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, _, VALUE_MAX);
 
-public cur_weapon(id)
+public cod_cur_weapon(id, weapon)
 {
-	if(!is_user_connected(id) || !is_user_alive(id) || !get_bit(id, itemActive)) return;
+	if(!get_bit(id, itemActive)) return;
 		
 	static Float:speedMultiplier, ent;
 	

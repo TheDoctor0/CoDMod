@@ -943,6 +943,13 @@ Ent is weapon entity.
 forward cod_weapon_deploy(id, weapon, ent);
 
 /*------------------------------
+Multiforward executed on cur weapon event.
+Id is player id.
+Weapon is CSW_ format.
+------------------------------*/
+forward cod_cur_weapon(id, weapon);
+
+/*------------------------------
 Multiforward executed on death event.
 ------------------------------*/
 forward cod_killed(killer, victim, weapon, hitPlace);
