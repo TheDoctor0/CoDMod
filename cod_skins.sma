@@ -4,14 +4,14 @@
 #include <cod>
 
 #define PLUGIN "CoD Skins"
-#define VERSION "1.0.3"
+#define VERSION "1.0.10"
 #define AUTHOR "O'Zone"
 
 #define TASK_LOAD 3045
 
 new const commandSkins[][] = { "skiny", "say /skins", "say_team /skins", "say /skin", "say_team /skin", "say /skiny", "say_team /skiny", "say /modele", "say_team /modele", "say /model", "say_team /model" };
 
-enum _:playerInfo { NAME[32], ACTIVE[CSW_P90 + 1] };
+enum _:playerInfo { NAME[32], ACTIVE[CSW_P90 + 1], WEAPON, SKIN };
 enum _:skinsInfo { SKIN_NAME[64], SKIN_WEAPON[32], SKIN_MODEL[64], SKIN_PRICE };
 
 new playerData[MAX_PLAYERS + 1][playerInfo], Array:playerSkins[MAX_PLAYERS + 1], Array:skins, Array:weapons, Handle:sql, loaded;
@@ -21,6 +21,8 @@ public plugin_init()
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
 	for(new i; i < sizeof commandSkins; i++) register_clcmd(commandSkins[i], "skins_menu");
+
+	register_event("SetFOV", "set_fov" , "be");
 }
 
 public plugin_precache() 
@@ -126,7 +128,7 @@ public client_putinserver(id)
 {
 	rem_bit(id, loaded);
 	
-	for(new i = 1; i < CSW_P90 + 1; i++) playerData[id][i] = NONE;
+	for(new i = 0; i <= CSW_P90; i++) playerData[id][ACTIVE][i] = NONE;
 
 	ArrayClear(playerSkins[id]);
 
@@ -389,16 +391,44 @@ public buy_weapon_skin_handle(id, menu, item)
 	return PLUGIN_HANDLED;
 }
 
-public cod_weapon_deploy(id, weapon, ent)
+public cod_weapon_deploy(id, weaponId, ent)
 {
-	if(weapon == CSW_HEGRENADE || weapon == CSW_SMOKEGRENADE || weapon == CSW_FLASHBANG || weapon == CSW_C4) return;
+	if(weaponId == CSW_HEGRENADE || weaponId == CSW_SMOKEGRENADE || weaponId == CSW_FLASHBANG || weaponId == CSW_C4) return;
 
-	if(playerData[id][weapon] > NONE) {
+	change_skin(id, weaponId);
+
+	playerData[id][WEAPON] = weaponId;
+}
+
+public set_fov(id)
+{
+	if(playerData[id][SKIN] > -1 && (playerData[id][WEAPON] == CSW_AWP || playerData[id][WEAPON] == CSW_SCOUT))
+	{
+		switch(read_data(1))
+		{
+			case 10..55: 
+			{
+				if(playerData[id][WEAPON] == CSW_AWP) set_pev(id, pev_viewmodel2, "models/v_awp.mdl");
+				else set_pev(id, pev_viewmodel2, "models/v_scout.mdl");
+			}
+			case 90: change_skin(id, playerData[id][WEAPON]);
+		}
+	}
+}
+
+public change_skin(id, weapon)
+{
+	if(!is_user_alive(id)) return;
+
+	if(playerData[id][ACTIVE][weapon] > NONE) {
+		log_amx("Weapon: %i | Skin: %i", weapon, playerData[id][ACTIVE][weapon]);
 		static skin[skinsInfo];
 		
-		ArrayGetArray(skins, playerData[id][weapon], skin);
+		ArrayGetArray(skins, playerData[id][ACTIVE][weapon], skin);
 		
 		set_pev(id, pev_viewmodel2, skin[SKIN_MODEL]);
+
+		playerData[id][SKIN] = playerData[id][ACTIVE][weapon];
 	}
 }
 
@@ -468,7 +498,7 @@ stock set_skin(id, weapon[], skin)
 {
 	if(skin >= ArraySize(skins)) return;
 
-	playerData[id][get_weapon_id(weapon)] = skin;
+	playerData[id][ACTIVE][get_weapon_id(weapon)] = skin;
 }
 
 stock get_skin_id(const name[], const weapon[])
