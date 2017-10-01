@@ -31,4 +31,4 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if(weapon == CSW_AWP && damageBits & DMG_BULLET) damage *= ((itemValue[attacker] + (cod_get_user_intelligence(attacker) * 0.1)) / 100.0);
+	if(weapon == CSW_AWP && damageBits & DMG_BULLET) damage *= (1.0 + ((itemValue[attacker] + (cod_get_user_intelligence(attacker) * 0.1)) / 100.0));

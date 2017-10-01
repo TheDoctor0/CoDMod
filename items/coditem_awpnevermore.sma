@@ -6,11 +6,12 @@
 #define AUTHOR "O'Zone"
 
 #define NAME        "AWP Nevermore"
-#define DESCRIPTION "Masz 1/2 szansy na zabicie z AWP i 20 procent widocznosci z nim. Dostajesz +%s zycia"
+#define DESCRIPTION "Masz 1/2 szansy na zabicie z AWP i 20 procent widocznosci z nim. Dostajesz +%s zdrowia"
 #define RANDOM_MIN  20
 #define RANDOM_MAX  25
 #define UPGRADE_MIN -2
 #define UPGRADE_MAX 4
+#define VALUE_MAX   100
 
 new itemValue[MAX_PLAYERS + 1];
 
@@ -43,7 +44,7 @@ public cod_item_upgrade(id)
 {
 	cod_add_user_bonus_health(id, -itemValue[id]);
 
-	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
+	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, _, VALUE_MAX);
 
 	cod_add_user_bonus_health(id, itemValue[id]);
 }

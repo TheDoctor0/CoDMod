@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Speedhack"
-#define VERSION "1.0.12"
+#define VERSION "1.0.13"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Speedhack"
@@ -11,6 +11,7 @@
 #define RANDOM_MAX  100
 #define UPGRADE_MIN -5
 #define UPGRADE_MAX 7
+#define VALUE_MAX   150
 
 new itemValue[MAX_PLAYERS + 1];
 
@@ -29,13 +30,13 @@ public cod_item_enabled(id, value)
 }
 
 public cod_item_disabled(id)
-	cod_add_user_bonus_health(id, -itemValue[id]);
+	cod_add_user_bonus_condition(id, -itemValue[id]);
 
 public cod_item_upgrade(id)
 {
-	cod_add_user_bonus_health(id, -itemValue[id]);
+	cod_add_user_bonus_condition(id, -itemValue[id]);
 
-	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
+	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, _, VALUE_MAX);
 
-	cod_add_user_bonus_health(id, itemValue[id]);
+	cod_add_user_bonus_condition(id, itemValue[id]);
 }

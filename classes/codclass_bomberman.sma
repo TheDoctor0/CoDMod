@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Bomberman"
-#define DESCRIPTION  "Ma 2 dynamity, ktore moze podkladac i detonowac. Ma i polowe mniejsza grawitacje"
+#define DESCRIPTION  "Ma 50 procent grawitacji i 2 dynamity, ktore moze podkladac i detonowac."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_UMP45)|(1<<CSW_FIVESEVEN)
 #define HEALTH       10

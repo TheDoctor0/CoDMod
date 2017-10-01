@@ -16,4 +16,4 @@ public plugin_init()
 }
 
 public cod_item_enabled(id, value)
-	cod_set_user_bunnyhop(id, 1, ITEM);
+	cod_set_user_bunnyhop(id, true, ITEM);

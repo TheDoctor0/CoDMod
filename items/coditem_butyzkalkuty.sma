@@ -11,6 +11,7 @@
 #define RANDOM_MAX  35
 #define UPGRADE_MIN -2
 #define UPGRADE_MAX 4
+#define VALUE_MAX 100
 
 new itemValue[MAX_PLAYERS + 1];
 
@@ -27,7 +28,7 @@ public cod_item_enabled(id, value)
 
 	cod_add_user_bonus_condition(id, itemValue[id]);
 
-	cod_set_user_footsteps(id, 1, ITEM);
+	cod_set_user_footsteps(id, true, ITEM);
 }
 
 public cod_item_disabled(id)
@@ -37,7 +38,7 @@ public cod_item_upgrade(id)
 {
 	cod_add_user_bonus_condition(id, -itemValue[id]);
 
-	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
+	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, _, VALUE_MAX);
 
 	cod_add_user_bonus_condition(id, itemValue[id]);
 }

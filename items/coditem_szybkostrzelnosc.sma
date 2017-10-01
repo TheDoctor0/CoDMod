@@ -28,7 +28,7 @@ public plugin_init()
 
 	cod_register_item(NAME, DESCRIPTION, RANDOM_MIN, RANDOM_MAX);
 
-	register_event("CurWeapon", "cur_weapon","be", "1=1");
+	register_event("CurWeapon", "cur_weapon", "be", "1=1");
 }
 
 public cod_item_enabled(id, value)

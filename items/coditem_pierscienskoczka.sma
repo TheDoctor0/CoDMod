@@ -7,10 +7,10 @@
 
 #define NAME        "Pierscien Skoczka"
 #define DESCRIPTION "Masz %s dodatkowe skoki w powietrzu"
-#define RANDOM_MIN  2
-#define RANDOM_MAX  3
+#define VALUE       2
 #define UPGRADE_MIN -1
 #define UPGRADE_MAX 1
+#define VALUE_MAX   4
 
 new itemValue[MAX_PLAYERS + 1];
 
@@ -18,7 +18,7 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
-	cod_register_item(NAME, DESCRIPTION, RANDOM_MIN, RANDOM_MAX);
+	cod_register_item(NAME, DESCRIPTION, VALUE);
 }
 
 public cod_item_enabled(id, value)
@@ -33,7 +33,7 @@ public cod_item_value(id)
 
 public cod_item_upgrade(id)
 {
-	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
+	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, _, VALUE_MAX);
 
 	cod_set_user_multijumps(id, itemValue[id], ITEM);
 }

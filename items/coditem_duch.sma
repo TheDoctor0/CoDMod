@@ -23,7 +23,7 @@ public cod_item_enabled(id, value)
 {
 	cod_set_user_render(id, 0, ITEM);
 
-	cod_set_user_footsteps(id, 1, ITEM);
+	cod_set_user_footsteps(id, true, ITEM);
 
 	cod_set_user_health(id, 1);
 
