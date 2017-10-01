@@ -1,3 +1,4 @@
 Do zrobienia:
 - Klasy i itemy
 - Menu bindowania (o ile beda chcieli tego gracze)
+- Crash i Jackpot
