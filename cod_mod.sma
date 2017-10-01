@@ -3,7 +3,6 @@
 #include <fakemeta>
 #include <engine>
 #include <hamsandwich>
-#include <stripweapons>
 #include <fun>
 #include <xs>
 #include <csx>
@@ -11,7 +10,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.52"
+#define VERSION "1.0.94"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -41,7 +40,7 @@ new const commandBinds[][] = { "bindy", "say /bind", "say_team /bind", "say /bin
 new const commandTop[][] = { "top", "say /toplvl", "say_team /toplvl", "say /toplevel", "say_team /toplevel", "say /toppoziom", "say_team /toppoziom", "say /ltop15", "say_team /ltop15", "say /ptop15", "say_team /ptop15" };
 new const commandBlock[][] = { "fullupdate", "cl_autobuy", "cl_rebuy", "cl_setautobuy", "rebuy", "autobuy", "hegren", "sgren", "flash", "-rocket", "-mine", "-dynamite", "-medkit", "-teleport" };
 
-new const weapons[][] = { "weapon_p228", "weapon_scout", "weapon_hegrenade", "weapon_xm1014", "weapon_c4", "weapon_mac10", 
+new const weapons[][] = { "", "weapon_p228", "", "weapon_scout", "weapon_hegrenade", "weapon_xm1014", "weapon_c4", "weapon_mac10", 
 		"weapon_aug", "weapon_smokegrenade", "weapon_elite", "weapon_fiveseven", "weapon_ump45", "weapon_sg550", "weapon_galil", 
 		"weapon_famas", "weapon_usp", "weapon_glock18", "weapon_awp", "weapon_mp5navy", "weapon_m249", "weapon_m3", "weapon_m4a1", 
 		"weapon_tmp", "weapon_g3sg1", "weapon_flashbang", "weapon_deagle", "weapon_sg552", "weapon_ak47", "weapon_knife", "weapon_p90" };
@@ -80,6 +79,8 @@ enum _:save { NORMAL, FINAL, MAP_END };
 
 enum _:repeatingData { ATTACKER, VICTIM, DAMAGE, COUNTER, FLAGS };
 
+enum _:weaponSlots { PRIMARY = 1, SECONDARY, KNIFE, GRENADES, C4 };
+
 enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, SPEED_CHANGED, DAMAGE_PRE, DAMAGE_POST, WEAPON_DEPLOY, KILLED, 
 	SPAWNED, CMD_START, PRETHINK, NEW_ROUND, START_ROUND, END_ROUND, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH };
 
@@ -96,11 +97,11 @@ enum _:renderInfo { RENDER_TYPE, RENDER_VALUE, RENDER_STATUS, RENDER_WEAPON };
 
 enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL, PLAYER_INT, 
 	PLAYER_STAM, PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTRA_HEAL, PLAYER_EXTRA_INT, PLAYER_EXTRA_STAM, PLAYER_EXTRA_STR, PLAYER_EXTRA_COND, PLAYER_EXTRA_WEAPONS, 
-	PLAYER_WEAPON, PLAYER_WEAPONS, PLAYER_FORCED_WEAPON, PLAYER_STATUS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_KS, PLAYER_TIME_KS, PLAYER_RESISTANCE, 
-	Float:PLAYER_LAST_ROCKET, Float:PLAYER_LAST_MINE, Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_TYPE, PLAYER_HUD_RED, 
-	PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1], 
-	PLAYER_TELEPORTS[ALL + 1], PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1], PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1], 
-	PLAYER_ELIMINATOR[ALL + 1], PLAYER_ELIMINATOR_WEAPONS[ALL + 1], PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_NAME] };
+	PLAYER_WEAPON, PLAYER_WEAPONS, PLAYER_STATUS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_KS, PLAYER_TIME_KS, PLAYER_RESISTANCE, Float:PLAYER_LAST_ROCKET, 
+	Float:PLAYER_LAST_MINE, Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_TYPE, PLAYER_HUD_RED, PLAYER_HUD_GREEN, 
+	PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], 
+	PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1], PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1], PLAYER_ELIMINATOR[ALL + 1], 
+	PLAYER_ELIMINATOR_WEAPONS[ALL + 1], PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_NAME] };
 
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 
@@ -176,7 +177,9 @@ public plugin_init()
 	RegisterHam(Ham_CS_Player_ResetMaxSpeed, "player", "speed_change", 1);
 	RegisterHam(Ham_Spawn, "func_buyzone", "block_buyzone");
 	
-	for (new i = 0; i < sizeof weapons; i++) RegisterHam(Ham_Item_Deploy, weapons[i], "weapon_deploy_post", 1);
+	for(new i = 1; i < sizeof weapons; i++) {
+		if(weapons[i][0]) RegisterHam(Ham_Item_Deploy, weapons[i], "weapon_deploy_post", 1);
+	}
 	
 	register_logevent("round_start", 2, "1=Round_Start");
 	register_logevent("round_end", 2, "1=Round_End");   
@@ -349,7 +352,6 @@ public plugin_natives()
 	
 	register_native("cod_give_weapon", "_cod_give_weapon", 1);
 	register_native("cod_take_weapon", "_cod_take_weapon", 1);
-	register_native("cod_force_weapon", "_cod_force_weapon", 1);
 
 	register_native("cod_get_user_render", "_cod_get_user_render", 1);
 	register_native("cod_set_user_render", "_cod_set_user_render", 1);
@@ -1995,7 +1997,7 @@ public touch_weapon(weapon, id)
 	
 	new weaponType = ((modelName[0] == 'a') ? cs_get_armoury_type(weapon): cs_get_weaponbox_type(weapon));
 
-	if((1 << weaponType) & (codPlayer[id][PLAYER_WEAPONS] | codPlayer[id][PLAYER_EXTRA_WEAPONS] | allowedWeapons)) return HAM_IGNORED;
+	if((1<<weaponType) & (codPlayer[id][PLAYER_WEAPONS] | codPlayer[id][PLAYER_EXTRA_WEAPONS] | allowedWeapons)) return HAM_IGNORED;
 
 	return HAM_SUPERCEDE;
 }
@@ -2025,15 +2027,6 @@ public weapon_deploy_post(ent)
 	if(!is_user_alive(id)) return HAM_IGNORED;
 
 	new ret, weapon = codPlayer[id][PLAYER_WEAPON] = cs_get_weapon_id(ent);
-
-	if(codPlayer[id][PLAYER_FORCED_WEAPON] && codPlayer[id][PLAYER_FORCED_WEAPON] != weapon) {
-		engclient_cmd(id, weapons[codPlayer[id][PLAYER_FORCED_WEAPON]]);
-
-		//set_pdata_cbase (id, 373, weapons[codPlayer[id][PLAYER_FORCED_WEAPON]);
-		//ExecuteHam(Ham_Item_Deploy, weapons[codPlayer[id][PLAYER_FORCED_WEAPON]);
-
-		return HAM_IGNORED; 
-	}
 
 	ExecuteForward(codForwards[WEAPON_DEPLOY], ret, id, weapon, ent);
 
@@ -2102,7 +2095,9 @@ public message_health(id)
 
 public cur_weapon(id)
 {
-	if(!is_user_connected(id) || !codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] || (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] && !(codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] & codPlayer[id][PLAYER_WEAPON]))) return;
+	if(!is_user_alive(id)) return;
+
+	if(!codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] || (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] && !(codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] & codPlayer[id][PLAYER_WEAPON]))) return;
 	
 	set_user_clip(id);
 }
@@ -2778,12 +2773,12 @@ public set_attributes(id)
 
 	render_change(id);
 
-	StripWeapons(id, Primary);
-	StripWeapons(id, Secondary);
+	strip_weapons(id, PRIMARY);
+	strip_weapons(id, SECONDARY);
 	
 	new weaponName[22];
 	
-	for(new i = 1; i < 32; i++) {
+	for(new i = 1; i < sizeof weapons; i++) {
 		if((1<<i) & (codPlayer[id][PLAYER_WEAPONS] | codPlayer[id][PLAYER_EXTRA_WEAPONS])) {
 			get_weaponname(i, weaponName, charsmax(weaponName));
 			give_item(id, weaponName);
@@ -2794,7 +2789,9 @@ public set_attributes(id)
 	
 	get_user_weapons(id, playerWeapons, weaponsNum);
 	
-	for(new i = 0; i < weaponsNum; i++) if(maxBpAmmo[playerWeapons[i]] > 0) cs_set_user_bpammo(id, playerWeapons[i], maxBpAmmo[playerWeapons[i]]);
+	for(new i = 0; i < weaponsNum; i++) {
+		if(maxBpAmmo[playerWeapons[i]] > 0) cs_set_user_bpammo(id, playerWeapons[i], maxBpAmmo[playerWeapons[i]]);
+	}
 }
 
 public gravity_change(id)
@@ -3840,13 +3837,6 @@ public _cod_take_weapon(id, weapon)
 	if(!((1<<weapon) & (1<<CSW_HEGRENADE | 1<<CSW_SMOKEGRENADE | 1<<CSW_FLASHBANG))) engclient_cmd(id, "drop", weaponName);
 }
 
-public _cod_force_weapon(id, weapon)
-{
-	if(!((allowedWeapons | codPlayer[id][PLAYER_EXTRA_WEAPONS] | codPlayer[id][PLAYER_WEAPONS]) & weapon)) return;
-
-	codPlayer[id][PLAYER_FORCED_WEAPON] = weapon;
-}
-
 public _cod_get_user_render(id, type)
 	return render_count(id, type);
 
@@ -4675,6 +4665,59 @@ stock cs_get_weaponbox_type(weaponTypeBox)
 		if(weaponType > 0) return cs_get_weapon_id(weaponType);
 	}
 	
+	return 0;
+}
+
+stock strip_weapons(id, type, bool:switchIfActive = true)
+{
+	if(is_user_alive(id))
+	{
+		new ent, weapon;
+
+		while((weapon = get_weapon_from_slot(id, type, ent)) > 0) ham_strip_user_weapon(id, weapon, type, switchIfActive);
+	}
+}
+
+stock get_weapon_from_slot(id, slot, &ent)
+{
+	if(!(1 <= slot <= 5)) return 0;
+
+	ent = get_pdata_cbase(id, 367 + slot , 5);
+	
+	return (ent > 0) ? get_pdata_int(ent, 43 , 4) : 0;
+}
+
+stock ham_strip_user_weapon(id, weaponId, slot = 0, bool:switchIfActive = true)
+{
+	static const weaponsSlots[] = { -1, 2, -1, 1, 4, 1, 5, 1, 1, 4, 2, 2, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 4, 2, 1, 1, 3, 1 };
+
+	new weapon;
+
+	if(!slot) slot = weaponsSlots[weaponId];
+
+	weapon = get_pdata_cbase(id, 367 + slot, 5);
+
+	while(weapon > 0)
+	{
+		if(get_pdata_int(weapon, 43, 4) == weaponId) break;
+
+		weapon = get_pdata_cbase(weapon, 42, 4);
+	}
+
+	if(weapon > 0)
+	{
+		if(switchIfActive && get_pdata_cbase(id, 373, 5) == weapon) ExecuteHamB(Ham_Weapon_RetireWeapon, weapon);
+
+		if(ExecuteHamB(Ham_RemovePlayerItem, id, weapon))
+		{
+			user_has_weapon(id, weaponId, 0);
+
+			ExecuteHamB(Ham_Item_Kill, weapon);
+
+			return 1;
+		}
+	}
+
 	return 0;
 }
 

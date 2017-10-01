@@ -744,12 +744,6 @@ Remove player a weapon and disallows player to own it.
 native cod_take_weapon(id, weapon);
 
 /*------------------------------
-Force use of specified weapon/weapons.
-0 will remove restriction.
-------------------------------*/
-native cod_force_weapon(id, weapon = 0);
-
-/*------------------------------
 Return player's render amount.
 Type can be NONE - at this moment (with status and weapon rules applied), ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
