@@ -28,14 +28,12 @@ public cod_item_skill_used(id)
 	if(get_bit(id, itemUsed)) {
 		cod_print_chat(id, "Apteczke mozesz uzyc tylko raz na runde.");
 
-		return COD_CONTINUE;
+		return;
 	}
 
-	if(cod_get_user_health(id, 1) == cod_get_user_max_health(id)) return COD_CONTINUE;
+	if(cod_get_user_health(id, 1) == cod_get_user_max_health(id)) return;
 
 	cod_set_user_health(id, cod_get_user_max_health(id));
 		
 	set_bit(id, itemUsed);
-
-	return COD_CONTINUE;
 }

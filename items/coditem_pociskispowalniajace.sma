@@ -2,15 +2,13 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Pociski Spowalniajace"
-#define VERSION "1.0.9"
+#define VERSION "1.0.10"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Pociski Spowalniajace"
 #define DESCRIPTION "Masz 1/%s szansy na spowolnienia przeciwnika na 3 sekundy przy trafieniu"
 #define RANDOM_MIN  7
 #define RANDOM_MAX  9
-#define UPGRADE_MIN -1
-#define UPGRADE_MAX 1
 #define VALUE_MIN   2
 
 #define TASK_SLOW 34921
@@ -31,7 +29,7 @@ public cod_item_value(id)
 	return itemValue[id];
 
 public cod_item_upgrade(id)
-	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, VALUE_MIN);
+	cod_random_upgrade(itemValue[id], .valueMin = VALUE_MIN);
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {

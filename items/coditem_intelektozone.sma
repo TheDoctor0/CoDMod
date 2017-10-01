@@ -3,16 +3,14 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Intelekt O'Zone"
-#define VERSION "1.0.11"
+#define VERSION "1.0.12"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Intelekt O'Zone"
 #define DESCRIPTION "Masz 1/%s szansy na zmiane trajektorii lotu kuli na glowe przy trafieniu"
 #define RANDOM_MIN  4
 #define RANDOM_MAX  5
-#define UPGRADE_MIN -1
-#define UPGRADE_MAX 1
-#define VALUE_MIN   3
+#define VALUE_MIN   2
 
 new itemValue[MAX_PLAYERS + 1], itemActive;
 
@@ -37,7 +35,7 @@ public cod_item_disabled(id)
 	rem_bit(id, itemActive);
 
 public cod_item_upgrade(id)
-	return cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, VALUE_MIN);
+	return cod_random_upgrade(itemValue[id], .valueMin = VALUE_MIN);
 
 public cod_item_value(id)
 	return itemValue[id];

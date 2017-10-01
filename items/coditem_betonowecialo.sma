@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Betonowe Cialo"
-#define VERSION "1.0.4"
+#define VERSION "1.0.5"
 #define AUTHOR "O'Zone"
 
 #define TASK_ITEM 90342
@@ -52,6 +52,12 @@ public cod_item_spawned(id)
 
 public cod_item_skill_used(id)
 {
+	if(get_bit(id, itemUsed)) {
+		cod_print_chat(id, "Betonowego Ciala mozesz uzyc tylko raz na runde.");
+
+		return;
+	}
+
 	set_bit(id, itemActive);
 	set_bit(id, itemUsed);
 

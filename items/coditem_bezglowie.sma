@@ -52,6 +52,12 @@ public cod_item_value(id)
 
 public cod_item_skill_used(id)
 {
+	if(get_bit(id, itemUsed)) {
+		cod_print_chat(id, "Bezglowia mozesz uzyc tylko raz na runde.");
+
+		return;
+	}
+
 	set_bit(id, itemActive);
 	set_bit(id, itemUsed);
 

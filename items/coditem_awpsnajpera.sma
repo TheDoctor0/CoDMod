@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME        "AWP Snajpera"
-#define DESCRIPTION "Zadajesz %s (+int) procent obrazen z AWP."
+#define DESCRIPTION "Zadajesz %s (+int) procent obrazen z AWP"
 #define RANDOM_MIN  140
 #define RANDOM_MAX  160
 #define UPGRADE_MIN -4
