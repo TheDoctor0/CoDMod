@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item AWP Snajpera"
-#define VERSION "1.0.17"
+#define VERSION "1.0.18"
 #define AUTHOR "O'Zone"
 
 #define NAME        "AWP Snajpera"
@@ -30,5 +30,5 @@ public cod_item_value(id)
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
 
-public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
-	if(weapon == CSW_AWP) damage *= ((itemValue[attacker] + (cod_get_user_intelligence(attacker) * 0.1)) / 100.0);
+public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
+	if(weapon == CSW_AWP && damageBits & DMG_BULLET) damage *= ((itemValue[attacker] + (cod_get_user_intelligence(attacker) * 0.1)) / 100.0);

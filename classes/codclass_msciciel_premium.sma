@@ -6,7 +6,7 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-#define NAME         "Bomberman"
+#define NAME         "Msciciel"
 #define DESCRIPTION  "1/2 z AWP, 1/2 z noza (PPM), mniejsza widocznosc podczas kucania, zmniejszona grawitacja"
 #define FRACTION     "Premium"
 #define WEAPONS      (1<<CSW_AWP)|(1<<CSW_USP)
@@ -30,5 +30,5 @@ public cod_class_enabled(id)
 	cod_set_user_render(id, 120, CLASS, RENDER_DUCK);
 }
 
-public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
+public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 	if((weapon == CSW_AWP && damageBits & DMG_BULLET && random_num(1, 2)) || (weapon == CSW_KNIFE && random_num(1, 2) && !(pev(attacker, pev_button) & IN_ATTACK))) damage = cod_kill_player(attacker, victim, damageBits);

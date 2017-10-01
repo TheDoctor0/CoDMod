@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Agent 007"
-#define VERSION "1.0.5"
+#define VERSION "1.0.6"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Agent 007"
@@ -38,9 +38,9 @@ public cod_item_value(id)
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, VALUE_MIN);
 
-public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
+public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if(weapon == CSW_P228) {
+	if(weapon == CSW_P228 && damageBits & DMG_BULLET) {
 		if(random_num(1, itemValue[attacker]) == 1) damage = cod_kill_player(attacker, victim, damageBits);
 		else damage += 10.0;
 	}

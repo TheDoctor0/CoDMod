@@ -27,5 +27,5 @@ public plugin_init()
 public cod_class_enabled(id, promotion)
 	cod_set_user_render(id, 60, CLASS, RENDER_ALWAYS, CSW_KNIFE);
 
-public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
-	if(weapon == CSW_M249) cod_inflict_damage(attacker, victim, (100 - cs_get_weapon_ammo(get_pdata_cbase(attacker, 373))) * 0.2, 0.0, damageBits);
+public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
+	if(weapon == CSW_M249 && damageBits & DMG_BULLET) cod_inflict_damage(attacker, victim, (100 - cs_get_weapon_ammo(get_pdata_cbase(attacker, 373))) * 0.2, 0.0, damageBits);

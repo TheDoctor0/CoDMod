@@ -11,7 +11,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.38"
+#define VERSION "1.0.44"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -206,10 +206,10 @@ public plugin_init()
 	codForwards[RENDER_CHANGED] = CreateMultiForward("cod_render_changed", ET_IGNORE, FP_CELL, FP_CELL);
 	codForwards[GRAVITY_CHANGED] = CreateMultiForward("cod_gravity_changed", ET_IGNORE, FP_CELL, FP_FLOAT);
 	codForwards[SPEED_CHANGED] = CreateMultiForward("cod_speed_changed", ET_IGNORE, FP_CELL, FP_FLOAT);
-	codForwards[DAMAGE_PRE] = CreateMultiForward ("cod_damage_pre", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL);
-	codForwards[DAMAGE_POST] = CreateMultiForward ("cod_damage_post", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL);
+	codForwards[DAMAGE_PRE] = CreateMultiForward ("cod_damage_pre", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL, FP_CELL);
+	codForwards[DAMAGE_POST] = CreateMultiForward ("cod_damage_post", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL, FP_CELL);
 	codForwards[WEAPON_DEPLOY] = CreateMultiForward("cod_weapon_deploy", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL);
-	codForwards[KILLED] = CreateMultiForward("cod_killed", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_CELL);
+	codForwards[KILLED] = CreateMultiForward("cod_killed", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[SPAWNED] = CreateMultiForward("cod_spawned", ET_IGNORE, FP_CELL);
 	codForwards[CMD_START] = CreateMultiForward("cod_cmd_start", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[PRETHINK] = CreateMultiForward("cod_player_prethink", ET_IGNORE, FP_CELL);
@@ -800,8 +800,6 @@ public classes_description_handle(id, menu, item)
 	menu_destroy(menu);
 
 	if(containi(itemData, "#") != NONE) {
-		log_amx(itemData);
-
 		new classId[5], promotionId[5];
 
 		strtok(itemData, classId, charsmax(classId), promotionId, charsmax(promotionId), '#');
@@ -1800,11 +1798,13 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 {
 	if(!is_user_connected(attacker) || !is_user_connected(victim) || get_user_team(attacker) == get_user_team(victim)) return HAM_IGNORED;
 
-	static function, weapon;
+	static function, weapon, hitPlace;
 
 	weapon = codPlayer[attacker][PLAYER_WEAPON];
 	
 	if(!(0 < inflictor <= MAX_PLAYERS)) weapon = CSW_HEGRENADE;
+
+	hitPlace = get_pdata_int(victim, 75, 5);
 
 	if(codPlayer[victim][PLAYER_CLASS]) {
 		damage -= damage * (get_stamina(victim) / 4.0) / 100.0;
@@ -1818,6 +1818,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 			callfunc_push_int(weapon);
 			callfunc_push_floatrf(damage);
 			callfunc_push_int(damageBits);
+			callfunc_push_int(hitPlace);
 			callfunc_end();
 
 			if(damage == COD_BLOCK) return HAM_SUPERCEDE;
@@ -1836,6 +1837,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 			callfunc_push_int(weapon);
 			callfunc_push_floatrf(damage);
 			callfunc_push_int(damageBits);
+			callfunc_push_int(hitPlace);
 			callfunc_end();
 
 			if(damage == COD_BLOCK) return HAM_SUPERCEDE;
@@ -1852,6 +1854,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 			callfunc_push_int(weapon);
 			callfunc_push_floatrf(damage);
 			callfunc_push_int(damageBits);
+			callfunc_push_int(hitPlace);
 			callfunc_end();
 
 			if(damage == COD_BLOCK) return HAM_SUPERCEDE;
@@ -1868,6 +1871,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 			callfunc_push_int(weapon);
 			callfunc_push_floatrf(damage);
 			callfunc_push_int(damageBits);
+			callfunc_push_int(hitPlace);
 			callfunc_end();
 
 			if(damage == COD_BLOCK) return HAM_SUPERCEDE;
@@ -1876,7 +1880,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 
 	static ret;
 
-	ExecuteForward(codForwards[DAMAGE_PRE], ret, attacker, victim, weapon, damage, damageBits);
+	ExecuteForward(codForwards[DAMAGE_PRE], ret, attacker, victim, weapon, damage, damageBits, hitPlace);
 
 	if(damage <= 0.0 || ret == COD_BLOCK) return HAM_SUPERCEDE;
 
@@ -1889,13 +1893,15 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 {
 	if(!is_user_connected(attacker) || !is_user_connected(victim) || !codPlayer[attacker][PLAYER_CLASS] || get_user_team(victim) == get_user_team(attacker)) return HAM_IGNORED;
 	
-	static ret, weapon;
+	static ret, weapon, hitPlace;
 
 	weapon = codPlayer[attacker][PLAYER_WEAPON];
 	
 	if(!(0 < inflictor <= MAX_PLAYERS)) weapon = CSW_HEGRENADE;
 
-	ExecuteForward(codForwards[DAMAGE_POST], ret, attacker, victim, weapon, damage, damageBits);
+	hitPlace = get_pdata_int(victim, 75, 5);
+
+	ExecuteForward(codForwards[DAMAGE_POST], ret, attacker, victim, weapon, damage, damageBits, hitPlace);
 
 	while(damage > 20) {
 		damage -= 20;
@@ -1947,12 +1953,12 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 
 	cod_print_chat(victim, "Zostales zabity przez^x03 %s^x04 (%s - %i)^x01, ktoremu zostalo^x04 %i^x01 HP.", playerName, className, codPlayer[killer][PLAYER_LEVEL], get_user_health(killer));
 
-	if(codPlayer[killer][PLAYER_CLASS]) execute_forward_ignore_two_params(get_class_info(codPlayer[killer][PLAYER_CLASS], CLASS_KILL), killer, victim);
-	if(codPlayer[killer][PLAYER_ITEM]) execute_forward_ignore_two_params(get_item_info(codPlayer[killer][PLAYER_ITEM], ITEM_KILL), killer, victim);
-	if(codPlayer[victim][PLAYER_CLASS]) execute_forward_ignore_two_params(get_class_info(codPlayer[victim][PLAYER_CLASS], CLASS_KILLED), killer, victim);
+	if(codPlayer[killer][PLAYER_CLASS]) execute_forward_ignore_three_params(get_class_info(codPlayer[killer][PLAYER_CLASS], CLASS_KILL), killer, victim, hitPlace);
+	if(codPlayer[killer][PLAYER_ITEM]) execute_forward_ignore_three_params(get_item_info(codPlayer[killer][PLAYER_ITEM], ITEM_KILL), killer, victim, hitPlace);
+	if(codPlayer[victim][PLAYER_CLASS]) execute_forward_ignore_three_params(get_class_info(codPlayer[victim][PLAYER_CLASS], CLASS_KILLED), killer, victim, hitPlace);
 	
 	if(codPlayer[victim][PLAYER_ITEM]) {
-		execute_forward_ignore_two_params(get_item_info(codPlayer[victim][PLAYER_ITEM], ITEM_KILLED), killer, victim);
+		execute_forward_ignore_three_params(get_item_info(codPlayer[victim][PLAYER_ITEM], ITEM_KILLED), killer, victim, hitPlace);
 		
 		codPlayer[victim][PLAYER_ITEM_DURA] -= random_num(cvarMinDamageDurability, cvarMaxDamageDurability);
 		
@@ -4087,8 +4093,8 @@ public _cod_register_item(plugin, params)
 	codItem[ITEM_GIVE] = CreateOneForward(plugin, "cod_item_enabled", FP_CELL, FP_CELL);
 	codItem[ITEM_DROP] = CreateOneForward(plugin, "cod_item_disabled", FP_CELL);
 	codItem[ITEM_SPAWNED] = CreateOneForward(plugin, "cod_item_spawned", FP_CELL);
-	codItem[ITEM_KILL] = CreateOneForward(plugin, "cod_item_kill", FP_CELL, FP_CELL);
-	codItem[ITEM_KILLED] = CreateOneForward(plugin, "cod_item_killed", FP_CELL, FP_CELL);
+	codItem[ITEM_KILL] = CreateOneForward(plugin, "cod_item_kill", FP_CELL, FP_CELL, FP_CELL);
+	codItem[ITEM_KILLED] = CreateOneForward(plugin, "cod_item_killed", FP_CELL, FP_CELL, FP_CELL);
 	codItem[ITEM_SKILL_USED] = CreateOneForward(plugin, "cod_item_skill_used", FP_CELL);
 	codItem[ITEM_UPGRADE] = CreateOneForward(plugin, "cod_item_upgrade", FP_CELL);
 	codItem[ITEM_VALUE] = CreateOneForward(plugin, "cod_item_value", FP_CELL);
@@ -4125,8 +4131,8 @@ public _cod_register_class(plugin, params)
 	codClass[CLASS_ENABLED] = CreateOneForward(plugin, "cod_class_enabled", FP_CELL, FP_CELL);
 	codClass[CLASS_DISABLED] = CreateOneForward(plugin, "cod_class_disabled", FP_CELL, FP_CELL);
 	codClass[CLASS_SPAWNED] = CreateOneForward(plugin, "cod_class_spawned", FP_CELL);
-	codClass[CLASS_KILL] = CreateOneForward(plugin, "cod_class_kill", FP_CELL, FP_CELL);
-	codClass[CLASS_KILLED] = CreateOneForward(plugin, "cod_class_killed", FP_CELL, FP_CELL);
+	codClass[CLASS_KILL] = CreateOneForward(plugin, "cod_class_kill", FP_CELL, FP_CELL, FP_CELL);
+	codClass[CLASS_KILLED] = CreateOneForward(plugin, "cod_class_killed", FP_CELL, FP_CELL, FP_CELL);
 	codClass[CLASS_SKILL_USED] = CreateOneForward(plugin, "cod_class_skill_used", FP_CELL);
 	codClass[CLASS_DAMAGE_VICTIM] = get_func_id("cod_class_damage_victim", plugin);
 	codClass[CLASS_DAMAGE_ATTACKER] = get_func_id("cod_class_damage_attacker", plugin);
@@ -4368,6 +4374,13 @@ stock execute_forward_ignore_two_params(forwardHandle, paramOne, paramTwo)
 	static ret;
 	
 	return ExecuteForward(forwardHandle, ret, paramOne, paramTwo);
+}
+
+stock execute_forward_ignore_three_params(forwardHandle, paramOne, paramTwo, paramThree)
+{
+	static ret;
+	
+	return ExecuteForward(forwardHandle, ret, paramOne, paramTwo, paramThree);
 }
 
 stock get_class_info(class, info, dataReturn[] = "", dataLength = 0)

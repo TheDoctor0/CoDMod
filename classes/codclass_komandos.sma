@@ -26,5 +26,5 @@ public plugin_init()
 public cod_class_enabled(id, promotion)
 	cod_set_user_multijumps(id, 1, CLASS);
 
-public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
+public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 	if((weapon == CSW_KNIFE && !(pev(attacker, pev_button) & IN_ATTACK)) || (weapon == CSW_DEAGLE && damageBits & DMG_BULLET && random_num(1, 10) == 1)) damage = cod_kill_player(attacker, victim, damageBits);

@@ -30,5 +30,5 @@ public cod_item_value(id)
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
 
-public cod_item_killed(id)
-	cod_make_explosion(id, 250, 1, 250.0, float(itemValue[id]), 0.5);
+public cod_item_killed(victim, killer, hitPlace)
+	cod_make_explosion(victim, 250, 1, 250.0, float(itemValue[victim]), 0.5);

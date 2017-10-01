@@ -54,5 +54,5 @@ public cod_class_enabled(id, promotion)
 public cod_class_skill_used(id)
 	cod_use_user_thunder(id);
 
-public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
-	if(weapon == CSW_USP && random_num(1, 10)) cod_repeat_damage(attacker, victim, 2.0, 0.2, 10, DMG_BURN, FIRE);
+public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
+	if(weapon == CSW_USP && damageBits & DMG_BULLET && random_num(1, 10)) cod_repeat_damage(attacker, victim, 2.0, 0.2, 10, DMG_BURN, FIRE);

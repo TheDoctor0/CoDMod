@@ -32,7 +32,7 @@ public cod_item_value(id)
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, _, VALUE_MAX);
 
-public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
+public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
 	new entList[32], player, numFound = find_sphere_class(attacker, "player", 100.0, entList, charsmax(entList));
 	
@@ -41,7 +41,7 @@ public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageB
 
 		if(!is_user_alive(player) || attacker == player || get_user_team(player) != get_user_team(attacker)) continue;
 
-		damage *= (itemValue[attacker] / 100.0);
+		damage *= (1.0 + (itemValue[attacker] / 100.0));
 
 		break;
 	}

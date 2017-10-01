@@ -32,7 +32,7 @@ public cod_item_value(id)
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, _, VALUE_MAX);
 
-public cod_damage_pre(attacker, victim, weapon, Float:damage, damageBits)
+public cod_damage_pre(attacker, victim, weapon, Float:damage, damageBits, damageBits)
 {
 	new entList[32], player, numFound = find_sphere_class(attacker, "player", 100.0, entList, charsmax(entList));
 	

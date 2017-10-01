@@ -574,7 +574,7 @@ public cod_new_round()
 	}
 }
 
-public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
+public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
 	playerDamage[attacker][victim] += floatround(damage);
 
 public cod_killed(killer, victim, weaponId, hitPlace)

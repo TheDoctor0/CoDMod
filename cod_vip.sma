@@ -141,7 +141,7 @@ public cod_spawned(id)
 	}
 }
 
-public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
+public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
 {
 	if(!get_bit(attacker, vip)) return PLUGIN_CONTINUE;
 

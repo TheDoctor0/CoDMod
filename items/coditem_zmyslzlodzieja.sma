@@ -30,7 +30,7 @@ public cod_item_value(id)
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
 
-public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
+public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
 	if(random_num(1, 5) == 1 && cod_get_user_money(attacker) < MAX_MONEY) {
 		new money = min(cod_get_user_money(victim), itemValue[attacker]), neededMoney = MAX_MONEY - cod_get_user_money(attacker);

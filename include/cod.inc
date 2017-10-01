@@ -933,12 +933,12 @@ forward cod_speed_changed(id, Float:speed);
 /*------------------------------
 Multiforward executed on damage event before armor reduce.
 ------------------------------*/
-forward cod_damage_pre(attacker, victim, weapon, Float:damage, damageBits);
+forward cod_damage_pre(attacker, victim, weapon, Float:damage, damageBits, hitPlace);
 
 /*------------------------------
 Multiforward executed on damage event after armor reduce.
 ------------------------------*/
-forward cod_damage_post(attacker, victim, weapon, Float:damage, damageBits);
+forward cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace);
 
 /*------------------------------
 Multiforward executed on weapon deploy event.
@@ -1042,12 +1042,12 @@ forward cod_item_spawned(id);
 /*------------------------------
 Item forward executed on kill event.
 ------------------------------*/
-forward cod_item_kill(killer, victim);
+forward cod_item_kill(killer, victim, hitPlace);
 
 /*------------------------------
 Item forward executed on death event.
 ------------------------------*/
-forward cod_item_killed(id);
+forward cod_item_killed(victim, killer, hitPlace);
 
 /*------------------------------
 Item forward executed on skill use.
@@ -1067,12 +1067,12 @@ forward cod_item_value(id);
 /*------------------------------
 Item function for attacker damage change.
 ------------------------------*/
-forward cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits);
+forward cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace);
 
 /*------------------------------
 Item function for victim damage change.
 ------------------------------*/
-forward cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits);
+forward cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace);
 
 /*------------------------------
 Class forward executed on class set.
@@ -1092,12 +1092,12 @@ forward cod_class_spawned(id);
 /*------------------------------
 Class forward executed on kill event.
 ------------------------------*/
-forward cod_class_kill(killer, victim);
+forward cod_class_kill(killer, victim, hitPlace);
 
 /*------------------------------
 Class forward executed on death event.
 ------------------------------*/
-forward cod_class_killed(id);
+forward cod_class_killed(victim, killer, hitPlace);
 
 /*------------------------------
 Class forward executed on skill use.
@@ -1107,12 +1107,12 @@ forward cod_class_skill_used(id);
 /*------------------------------
 Class function for attacker damage change.
 ------------------------------*/
-forward cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits);
+forward cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace);
 
 /*------------------------------
 Class function for victim damage change.
 ------------------------------*/
-forward cod_class_damage_victim(attacker, victim, weapon, &Float:damage, damageBits);
+forward cod_class_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace);
 
 /*------------------------------
 Print message to player with [CoD] prefix.

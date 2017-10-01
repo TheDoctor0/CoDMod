@@ -95,7 +95,7 @@ public cod_spawned(id)
 	return PLUGIN_CONTINUE;
 }
 
-public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
+public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
 {
 	if(!clan[attacker]) return PLUGIN_CONTINUE;
 	

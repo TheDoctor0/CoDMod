@@ -430,7 +430,7 @@ public buy_honor_handle(id)
 	return PLUGIN_HANDLED;
 }
 
-public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
+public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
 	if(get_bit(attacker, damageBonus)) cod_inflict_damage(attacker, victim, float(cvarDamageAmount), 0.0, damageBits);
 
 public cod_new_round()

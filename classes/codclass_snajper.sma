@@ -23,7 +23,7 @@ public plugin_init()
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
-public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
+public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
 	if(weapon == CSW_KNIFE && pev(attacker, pev_button) & IN_ATTACK2 && random_num(1, 2) == 1) damage = cod_kill_player(attacker, victim, damageBits);
 

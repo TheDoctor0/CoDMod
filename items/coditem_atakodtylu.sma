@@ -32,7 +32,7 @@ public cod_item_value(id)
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, VALUE_MIN);
 
-public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
+public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
 	if(damageBits & DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
 		new Float:origin[3], Float:oldOrigin[3], Float:vector[3];

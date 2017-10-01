@@ -378,7 +378,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 public cod_item_changed(id, item)
 	if(playerData[id][PLAYER_TYPE] == TYPE_ITEM && item == playerData[id][PLAYER_ADDITIONAL]) add_progress(id);
 
-public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits)
+public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
 	if(playerData[attacker][PLAYER_TYPE] == TYPE_DAMAGE) add_progress(attacker, floatround(damage));
 
 public log_event_mission()

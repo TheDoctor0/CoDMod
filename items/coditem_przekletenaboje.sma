@@ -32,7 +32,7 @@ public cod_item_upgrade(id)
 public cod_item_value(id)
 	return itemValue[id];
 
-public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
+public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
 	if(damageBits == DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
 		new Float:velocity[3];

@@ -34,5 +34,5 @@ public cod_class_skill_used(id)
 	else cod_use_user_medkit(id);
 }
 
-public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
+public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 	if(weapon == CSW_DEAGLE && damageBits & DMG_BULLET && random_num(1, 8) == 1) damage = cod_kill_player(attacker, victim, damageBits);

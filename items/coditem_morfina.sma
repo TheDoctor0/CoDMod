@@ -31,5 +31,5 @@ public cod_item_value(id)
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, VALUE_MIN);
 
-public cod_item_killed(id)
-	cod_respawn_player(id);
+public cod_item_killed(victim, killer, hitPlace)
+	cod_respawn_player(victim);

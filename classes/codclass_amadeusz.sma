@@ -25,5 +25,5 @@ public plugin_init()
 public cod_class_enabled(id, promotion)
 	cod_set_user_multijumps(id, 1, CLASS);
 
-public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
+public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 	if(weapon == CSW_MP5NAVY && damageBits & DMG_BULLET) damage += (3.0 + 0.1 * cod_get_user_intelligence(attacker));

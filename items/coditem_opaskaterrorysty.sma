@@ -37,7 +37,7 @@ public cod_item_value(id)
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
 
-public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits)
+public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
 	if(damageBits & DMG_HEGRENADE && random_num(1, 2) == 1) damage = cod_kill_player(attacker, victim, damageBits);
 	else damage += itemValue[attacker];
