@@ -753,7 +753,7 @@ native cod_get_user_render(id, type = NONE);
 Set player's render.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 There can be only one render for CLASS, ITEM, ADDITIONAL, but multiple for ROUND - every set adds new render record.
-Value is number from -255 to 255, but for CLASS type must be 0 or more (negative numbers substract it from player's current render value, positive and 0 sets it to this value).
+Value is number from -255 to 255 (256 to disable), but for CLASS type must be 0 or more (negative numbers substract it from player's current render value, positive and 0 sets it to this value).
 Status is player state for render. It can be a bitsum of RENDER_ALWAYS, RENDER_STAND, RENDER_MOVE, RENDER_DUCK, RENDER_SHIFT.
 Weapon is weapon id (CSW_) or FULL for all weapons.
 Timer sets render value for certain amount of time - it ignores type, status and weapon.
@@ -873,7 +873,7 @@ ValueMin is minimum item value. If reached function will return COD_STOP.
 ValueMax is maximum item value. If reached function will return COD_STOP.
 Returned item value will always be at least 0.
 ------------------------------*/
-native cod_random_upgrade(&value, upgradeMin, upgradeMax, valueMin = NONE, valueMax = NONE);
+native cod_random_upgrade(&value, upgradeMin = -1, upgradeMax = 1, valueMin = NONE, valueMax = NONE);
 
 /*------------------------------
 Return true/false result for given percent chance.
