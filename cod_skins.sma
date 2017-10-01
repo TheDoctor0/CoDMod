@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Skins"
-#define VERSION "1.0.10"
+#define VERSION "1.0.11"
 #define AUTHOR "O'Zone"
 
 #define TASK_LOAD 3045
@@ -421,7 +421,6 @@ public change_skin(id, weapon)
 	if(!is_user_alive(id)) return;
 
 	if(playerData[id][ACTIVE][weapon] > NONE) {
-		log_amx("Weapon: %i | Skin: %i", weapon, playerData[id][ACTIVE][weapon]);
 		static skin[skinsInfo];
 		
 		ArrayGetArray(skins, playerData[id][ACTIVE][weapon], skin);
