@@ -10,7 +10,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.94"
+#define VERSION "1.0.96"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -98,8 +98,8 @@ enum _:renderInfo { RENDER_TYPE, RENDER_VALUE, RENDER_STATUS, RENDER_WEAPON };
 enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL, PLAYER_INT, 
 	PLAYER_STAM, PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTRA_HEAL, PLAYER_EXTRA_INT, PLAYER_EXTRA_STAM, PLAYER_EXTRA_STR, PLAYER_EXTRA_COND, PLAYER_EXTRA_WEAPONS, 
 	PLAYER_WEAPON, PLAYER_WEAPONS, PLAYER_STATUS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_KS, PLAYER_TIME_KS, PLAYER_RESISTANCE, Float:PLAYER_LAST_ROCKET, 
-	Float:PLAYER_LAST_MINE, Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_TYPE, PLAYER_HUD_RED, PLAYER_HUD_GREEN, 
-	PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], 
+	Float:PLAYER_LAST_MINE, Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, 
+	PLAYER_HUD_POSX, PLAYER_HUD_POSY, PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], 
 	PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1], PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1], PLAYER_ELIMINATOR[ALL + 1], 
 	PLAYER_ELIMINATOR_WEAPONS[ALL + 1], PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_NAME] };
 
@@ -1116,9 +1116,6 @@ public change_hud(id, sound)
 	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
 	new menuData[128], menu = menu_create("\yKonfiguracja \rHUD\w", "change_hud_handle");
-
-	format(menuData, charsmax(menuData), "\wSposob \yWyswietlania: \r%s", codPlayer[id][PLAYER_HUD_TYPE] > TYPE_HUD ? "DHUD" : "HUD");
-	menu_additem(menu, menuData);
 	
 	format(menuData, charsmax(menuData), "\wKolor \yCzerwony: \r%i", codPlayer[id][PLAYER_HUD_RED]);
 	menu_additem(menu, menuData);
@@ -1160,13 +1157,12 @@ public change_hud_handle(id, menu, item)
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	switch(item) {
-		case 0: if(++codPlayer[id][PLAYER_HUD_TYPE] > TYPE_DHUD) codPlayer[id][PLAYER_HUD_TYPE] = TYPE_HUD;
-		case 1: if((codPlayer[id][PLAYER_HUD_RED] += 15) > 255) codPlayer[id][PLAYER_HUD_RED] = 0;
-		case 2: if((codPlayer[id][PLAYER_HUD_GREEN] += 15) > 255) codPlayer[id][PLAYER_HUD_GREEN] = 0;
-		case 3: if((codPlayer[id][PLAYER_HUD_BLUE] += 15) > 255) codPlayer[id][PLAYER_HUD_BLUE] = 0;
-		case 4: if((codPlayer[id][PLAYER_HUD_POSX] += 3) > 100) codPlayer[id][PLAYER_HUD_POSX] = 0;
-		case 5: if((codPlayer[id][PLAYER_HUD_POSY] += 3) > 100) codPlayer[id][PLAYER_HUD_POSY] = 0;
-		case 6: {
+		case 0: if((codPlayer[id][PLAYER_HUD_RED] += 15) > 255) codPlayer[id][PLAYER_HUD_RED] = 0;
+		case 1: if((codPlayer[id][PLAYER_HUD_GREEN] += 15) > 255) codPlayer[id][PLAYER_HUD_GREEN] = 0;
+		case 2: if((codPlayer[id][PLAYER_HUD_BLUE] += 15) > 255) codPlayer[id][PLAYER_HUD_BLUE] = 0;
+		case 3: if((codPlayer[id][PLAYER_HUD_POSX] += 3) > 100) codPlayer[id][PLAYER_HUD_POSX] = 0;
+		case 4: if((codPlayer[id][PLAYER_HUD_POSY] += 3) > 100) codPlayer[id][PLAYER_HUD_POSY] = 0;
+		case 5: {
 			codPlayer[id][PLAYER_HUD_RED] = 0;
 			codPlayer[id][PLAYER_HUD_GREEN] = 255;
 			codPlayer[id][PLAYER_HUD_BLUE] = 0;
@@ -1189,12 +1185,12 @@ public save_hud(id)
 	new tempData[256];
 
 	if(!get_bit(id, hudLoaded)) {
-		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`, `level`, `exp`, `intelligence`, `health`, `stamina`, `strength`) VALUES ('%s', 'hud', '%i', '%i', '%i', '%i', '%i', '%i')", 
-			codPlayer[id][PLAYER_NAME], codPlayer[id][PLAYER_HUD_TYPE], codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], codPlayer[id][PLAYER_HUD_POSX], codPlayer[id][PLAYER_HUD_POSY]);
+		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`, `level`, `exp`, `intelligence`, `health`, `stamina`) VALUES ('%s', 'hud', '%i', '%i', '%i', '%i', '%i')", 
+			codPlayer[id][PLAYER_NAME], codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], codPlayer[id][PLAYER_HUD_POSX], codPlayer[id][PLAYER_HUD_POSY]);
 	}
 	else {
-		formatex(tempData, charsmax(tempData), "UPDATE `cod_mod` SET `level` = '%i', `exp` = '%i', `intelligence` = '%i', `health` = '%i', `stamina` = '%i', `strength` = '%i' WHERE class = 'hud' AND name = '%s'", 
-			codPlayer[id][PLAYER_HUD_TYPE], codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], codPlayer[id][PLAYER_HUD_POSX], codPlayer[id][PLAYER_HUD_POSY], codPlayer[id][PLAYER_NAME]);
+		formatex(tempData, charsmax(tempData), "UPDATE `cod_mod` SET `level` = '%i', `exp` = '%i', `intelligence` = '%i', `health` = '%i', `stamina` = '%i' WHERE class = 'hud' AND name = '%s'", 
+			codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], codPlayer[id][PLAYER_HUD_POSX], codPlayer[id][PLAYER_HUD_POSY], codPlayer[id][PLAYER_NAME]);
 	}
 
 	SQL_ThreadQuery(sql, "ignore_handle", tempData);
@@ -2421,13 +2417,9 @@ public show_info(id)
 	if(!is_user_alive(id)) {
 		target = pev(id, pev_iuser2);
 		
-		if(!codPlayer[id][PLAYER_HUD_TYPE]) set_hudmessage(255, 255, 255, 0.7, -1.0, 0, 0.0, 0.3, 0.0, 0.0, 4);
-		else set_dhudmessage(255, 255, 255, 0.7, -1.0, 0, 0.0, 0.3, 0.0, 0.0);
+		set_hudmessage(255, 255, 255, 0.7, -1.0, 0, 0.0, 0.3, 0.0, 0.0, 4);
 	}
-	else {
-		if(!codPlayer[id][PLAYER_HUD_TYPE]) set_hudmessage(codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], float(codPlayer[id][PLAYER_HUD_POSX]) / 100.0, float(codPlayer[id][PLAYER_HUD_POSY]) / 100.0, 0, 0.0, 0.3, 0.0, 0.0, 4);
-		else set_dhudmessage(codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], float(codPlayer[id][PLAYER_HUD_POSX]) / 100.0, float(codPlayer[id][PLAYER_HUD_POSY]) / 100.0, 0, 0.0, 0.3, 0.0, 0.0);
-	}
+	else set_hudmessage(codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], float(codPlayer[id][PLAYER_HUD_POSX]) / 100.0, float(codPlayer[id][PLAYER_HUD_POSY]) / 100.0, 0, 0.0, 0.3, 0.0, 0.0, 4);
 	
 	if(!target) return PLUGIN_CONTINUE;
 	
@@ -2455,11 +2447,7 @@ public show_info(id)
 
 	if(codPlayer[target][PLAYER_KS]) format(hudData, charsmax(hudData), "%s^n[KillStreak : %i (%i s)]", hudData, codPlayer[target][PLAYER_KS], codPlayer[target][PLAYER_TIME_KS]);
 
-	switch(codPlayer[id][PLAYER_HUD_TYPE])
-	{
-		case TYPE_HUD: ShowSyncHudMsg(id, hudInfo, hudData);
-		case TYPE_DHUD: show_dhudmessage(id, hudData);
-	}
+	ShowSyncHudMsg(id, hudInfo, hudData);
 	
 	return PLUGIN_CONTINUE;
 } 
@@ -2894,7 +2882,6 @@ public reset_player(id)
 		codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i] = 0;
 	}
 
-	codPlayer[id][PLAYER_HUD_TYPE] = TYPE_HUD;
 	codPlayer[id][PLAYER_HUD_RED] = 0;
 	codPlayer[id][PLAYER_HUD_GREEN] = 255;
 	codPlayer[id][PLAYER_HUD_BLUE] = 0;
@@ -3077,12 +3064,11 @@ public load_data_handle(failState, Handle:query, error[], errorNum, playerId[], 
 		SQL_ReadResult(query, SQL_FieldNameToNum(query, "class"), className, charsmax(className));
 
 		if(equal(className, "hud")) {
-			codPlayer[id][PLAYER_HUD_TYPE] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "level"));
-			codPlayer[id][PLAYER_HUD_RED] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "exp"));
-			codPlayer[id][PLAYER_HUD_GREEN] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "intelligence"));
-			codPlayer[id][PLAYER_HUD_BLUE] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "health"));
-			codPlayer[id][PLAYER_HUD_POSX] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stamina"));
-			codPlayer[id][PLAYER_HUD_POSY] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "strength"));
+			codPlayer[id][PLAYER_HUD_RED] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "level"));
+			codPlayer[id][PLAYER_HUD_GREEN] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "exp"));
+			codPlayer[id][PLAYER_HUD_BLUE] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "intelligence"));
+			codPlayer[id][PLAYER_HUD_POSX] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "health"));
+			codPlayer[id][PLAYER_HUD_POSY] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stamina"));
 
 			set_bit(id, hudLoaded);
 		}
