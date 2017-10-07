@@ -2045,7 +2045,7 @@ public touch_weapon(weapon, id)
 	
 	if (playerTeam > 2) return HAM_IGNORED;
 
-	pev(weapon, pev_classname, modelName, 2);
+	pev(weapon, pev_classname, modelName, charsmax(modelName));
 	
 	new weaponType = ((modelName[0] == 'a') ? cs_get_armoury_type(weapon): cs_get_weaponbox_type(weapon));
 
