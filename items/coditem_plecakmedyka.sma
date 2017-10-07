@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Plecak Medyka"
-#define VERSION "1.0.22"
+#define VERSION "1.0.23"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Plecak Medyka"

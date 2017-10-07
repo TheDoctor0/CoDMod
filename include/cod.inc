@@ -810,7 +810,7 @@ Display bartimer.
 Duration is time in seconds.
 Start is value from 0-100 and specifies from what percent of bar it starts.
 ------------------------------*/
-native cod_make_bartimer(id, duration, start = 0);
+native cod_make_bartimer(id, duration = 0, start = 0);
 
 /*------------------------------
 Shake player's screen.
@@ -894,7 +894,6 @@ native cod_percent_chance(percent);
 Return if player is not in passage.
 */
 native cod_is_enough_space(id);
-
 
 /*------------------------------
 Register new item and return its id.

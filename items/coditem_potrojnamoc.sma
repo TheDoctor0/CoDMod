@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Potrojna Moc"
-#define VERSION "1.0.15"
+#define VERSION "1.0.17"
 #define AUTHOR "O'Zone"
 
 #define TASK_ITEM 87432
@@ -34,8 +34,6 @@ public cod_item_disabled(id)
 
 public cod_item_spawned(id, respawn)
 {
-	cod_make_bartimer(id, 0);
-
 	remove_task(id + TASK_ITEM);
 
 	rem_bit(id, itemActive);

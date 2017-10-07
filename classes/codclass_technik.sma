@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Technik"
-#define DESCRIPTION  "Posiada 1 rakiete, 1 apteczke, wszystkie granaty i 1/8 szansy na natychmiastowe zabicie z Deagle."
+#define DESCRIPTION  "Posiada 1 rakiete, 1 apteczke, wszystkie granaty i 1/8 szansy na zabicie z Deagle."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_AUG)|(1<<CSW_DEAGLE)|(1<<CSW_SMOKEGRENADE)|(1<<CSW_FLASHBANG)|(1<<CSW_FLASHBANG)|(1<<CSW_HEGRENADE)
 #define HEALTH       10

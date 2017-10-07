@@ -1,6 +1,6 @@
 #include <amxmodx>
 #include <hamsandwich>
-#include <codmod>
+#include <cod>
 #include <nvault>
 #include <csx>
 #include <fakemeta>
@@ -145,7 +145,7 @@ public plugin_cfg()
             nvault_prune(vault, 0, get_systime() - (86400 * VAULT_EXPIREDAYS));
 }
 
-public client_disconnect(id)
+public client_disconnected(id)
 {
       if(!bZrobilWszystkie[id])
             SaveAktQuest(id);
@@ -281,7 +281,7 @@ public Menu_Questow(id)
 			client_print_color(id, print_team_red, "%s Ukonczyles wszystkie misje!", prefix)
 			client_print_color(id, print_team_red, "%s Dostales 30 000 expa!", prefix)
 
-                  cod_add_user_xp(id, 30000)
+                  cod_set_user_exp(id, 30000)
                   remove_task(id+TASKID_HUD)
                   bZrobilWszystkie[id] = true
                   set_task(1.0, "HudInfobZrobilWszystkie", id+TASKID_HUD, _, _, "b");
@@ -303,7 +303,7 @@ public Menu_Questow(id)
 		client_print_color(id, print_team_red, "%s Ukonczyles poziom %s i awansowales na %s", prefix, QuestRozdzial[iPlayerPrzedzial[id]], QuestRozdzial[iPlayerPrzedzial[id]+1])
 		client_print_color(id, print_team_red, "%s Dostales 10 000 expa!", prefix)
 
-            cod_add_user_xp(id, 10000)
+            cod_set_user_exp(id, 10000)
             
             menu_destroy(menu);
             
@@ -350,7 +350,7 @@ Nagroda(id)
       client_cmd(id, "spk QTM_CodMod/missiondone");
 
       new award = ArrayGetCell(gNagroda, iPlayerQuestID[id]);
-      cod_add_user_xp(id, award)
+      cod_set_user_exp(id, award)
 	client_print_color(id, print_team_red, "%s Ukonczyles misje! Nagroda %i expa", prefix, award)
 
       SaveQuest(id);

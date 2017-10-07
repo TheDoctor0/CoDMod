@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Bezglowie"
-#define VERSION "1.0.11"
+#define VERSION "1.0.13"
 #define AUTHOR "O'Zone"
 
 #define TASK_ITEM 783426
@@ -38,8 +38,6 @@ public cod_item_disabled(id)
 
 public cod_item_spawned(id, respawn)
 {
-	cod_make_bartimer(id, 0);
-
 	remove_task(id + TASK_ITEM);
 
 	rem_bit(id, itemActive);

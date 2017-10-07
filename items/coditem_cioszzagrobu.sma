@@ -1,11 +1,11 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Item Cios zza grobu"
-#define VERSION "1.0.3"
+#define PLUGIN "CoD Item Cios zza Grobu"
+#define VERSION "1.0.5"
 #define AUTHOR "O'Zone"
 
-#define NAME        "Cios zza grobu"
+#define NAME        "Cios zza Grobu"
 #define DESCRIPTION "Po smierci wybuchasz zadajac %s (+int) obrazen wrogom w poblizu"
 #define RANDOM_MIN  75
 #define RANDOM_MAX  100

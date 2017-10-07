@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Rusher"
-#define DESCRIPTION  "Posiada podwojny skok i zadaje +5 obrazen. Ma 1/8 na natychmiastowe zabicie z M3 i 1/12 z XM1014."
+#define DESCRIPTION  "Posiada podwojny skok i zadaje +5 obrazen. Ma 1/8 na zabicie z M3 i 1/12 z XM1014."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_M3)|(1<<CSW_XM1014)
 #define HEALTH       10

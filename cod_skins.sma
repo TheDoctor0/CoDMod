@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Skins"
-#define VERSION "1.0.12"
+#define VERSION "1.0.13"
 #define AUTHOR "O'Zone"
 
 #define TASK_LOAD 3045
@@ -44,8 +44,7 @@ public plugin_precache()
 		
 		if (lineData[0] == ';' || lineData[0] == '^0' || lineData[0] == '/') continue;
 		
-		if (lineData[0] == '[') 
-		{
+		if (lineData[0] == '[') {
 			parse(lineData, skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]));
 			
 			replace_all(skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]), "[", "");

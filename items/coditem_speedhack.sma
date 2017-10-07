@@ -2,11 +2,11 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Speedhack"
-#define VERSION "1.0.14"
+#define VERSION "1.0.15"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Speedhack"
-#define DESCRIPTION "Dostajesz +%s kondycji"
+#define DESCRIPTION "Dostajesz %s kondycji"
 #define RANDOM_MIN  75
 #define RANDOM_MAX  100
 #define UPGRADE_MIN -5

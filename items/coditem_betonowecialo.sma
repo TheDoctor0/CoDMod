@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Betonowe Cialo"
-#define VERSION "1.0.8"
+#define VERSION "1.0.11"
 #define AUTHOR "O'Zone"
 
 #define TASK_ITEM 90342
@@ -44,8 +44,6 @@ public cod_item_value(id)
 
 public cod_item_spawned(id, respawn)
 {
-	cod_make_bartimer(id, 0);
-
 	remove_task(id + TASK_ITEM);
 
 	rem_bit(id, itemActive);

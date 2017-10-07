@@ -34,7 +34,9 @@ public plugin_init()
 
 public cod_class_enabled(id, promotion)
 {
-	cod_set_user_gravity(id, -0.4, CLASS);
+	cod_set_user_gravity(id, -0.3, CLASS);
+
+	cod_set_user_multijumps(id, 1, CLASS);
 
 	itemUse[id] = REPLICAS;
 }
@@ -58,16 +60,12 @@ public cod_class_skill_used(id)
 
 		return;
 	}
-	
-	new Float:playerOrigin[3], Float:entOrigin[3], Float:velocity[3];
 
-	entity_get_vector(id, EV_VEC_origin, playerOrigin);
+	if (!(pev(id, pev_flags) & FL_ONGROUND)) {
+		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Musisz stac na podlozu, zeby postawic replike!");
 
-	VelocityByAim(id, 50, velocity);
-	
-	velocity[2] = 0.0;
-	
-	for (new i = 0; i < 3; i++) entOrigin[i] = playerOrigin[i] + velocity[i];
+		return;
+	}
 		
 	if (!cod_is_enough_space(id)) {
 		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Nie mozesz postawic repliki w przejsciu!");
@@ -78,7 +76,7 @@ public cod_class_skill_used(id)
 	itemLastUse[id] = floatround(get_gametime());
 	itemUse[id]--;
 	
-	new entModel[64], playerModel[32], Float:entAngles[3], entSequence = entity_get_int(id, EV_INT_gaitsequence);
+	new entModel[64], playerModel[32], Float:entOrigin[3], Float:entAngles[3], entSequence = entity_get_int(id, EV_INT_gaitsequence);
 
 	entSequence = (entSequence == 3 || entSequence == 4) ? 1 : entSequence;
 
@@ -87,6 +85,7 @@ public cod_class_skill_used(id)
 	format(entModel, charsmax(playerModel), "models/player/%s/%s.mdl", playerModel, playerModel);
 
 	entity_get_vector(id, EV_VEC_angles, entAngles);
+	entity_get_vector(id, EV_VEC_origin, entOrigin);
 	
 	entAngles[0] = 0.0;
 	

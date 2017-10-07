@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Morderca"
-#define DESCRIPTION  "Ma 20 procent szansy na natychmiastowe zabicie z AK47/M4A1, posiada 2 miny, niemal niewidoczny podczas kucania."
+#define DESCRIPTION  "Ma 1/5 zabicie z AK47/M4A1, posiada 2 miny, niemal niewidoczny podczas kucania."
 #define FRACTION     "SuperPremium"
 #define WEAPONS      (1<<CSW_AK47)|(1<<CSW_M4A1)|(1<<CSW_DEAGLE)
 #define HEALTH       30

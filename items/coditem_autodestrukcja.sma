@@ -1,11 +1,11 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Item Samobojca"
-#define VERSION "1.0.10"
+#define PLUGIN "CoD Item Autodestrukcja"
+#define VERSION "1.0.12"
 #define AUTHOR "O'Zone"
 
-#define NAME        "Samobojca"
+#define NAME        "Autodestrukcja"
 #define DESCRIPTION "Natychmiastowa smierc twoja i wrogow w twoim bliskim otoczeniu"
 
 public plugin_init()
@@ -16,4 +16,4 @@ public plugin_init()
 }
 
 public cod_item_skill_used(id)
-	cod_make_explosion(id, 250, 1, 250.0, 500.0, 0.0, 1);
+	cod_make_explosion(id, 250, 1, 250.0, 999.9, 0.0, 1);

@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Krolicza Lapka"
-#define VERSION "1.0.8"
+#define VERSION "1.0.14"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Krolicza Lapka"
@@ -16,4 +16,4 @@ public plugin_init()
 }
 
 public cod_item_enabled(id, value)
-	cod_set_user_bunnyhop(id, true, ITEM);
+	cod_set_user_bunnyhop(id, true, CLASS);

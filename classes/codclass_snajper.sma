@@ -7,7 +7,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Snajper"
-#define DESCRIPTION  "Ma 130 procent obrazen z AWP (+int) i 50 procent szansy na natychmiastowe zabicie z noza (PPM)."
+#define DESCRIPTION  "Ma 130 procent obrazen z AWP (+int) i 1/2 na natychmiastowe zabicie z noza (PPM)."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_AWP)|(1<<CSW_DEAGLE)
 #define HEALTH       10

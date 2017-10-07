@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Ciemne Okulary"
-#define VERSION "1.0.15"
+#define VERSION "1.0.17"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Ciemne Okulary"
@@ -20,7 +20,7 @@ public plugin_init()
 }
 
 public cod_item_enabled(id, value)
-	rem_bit(id, itemActive);
+	set_bit(id, itemActive);
 
 public cod_item_disabled(id)
 	rem_bit(id, itemActive);
