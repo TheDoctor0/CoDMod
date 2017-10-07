@@ -6,7 +6,7 @@
 #include <cod>
 
 #define PLUGIN  "CoD Icons"
-#define VERSION "1.0.5"
+#define VERSION "1.0.6"
 #define AUTHOR  "O'Zone"
 
 #define TASK_PLANT 6583
@@ -42,11 +42,10 @@ public plugin_init()
 
 	get_mapname(mapName, charsmax(mapName));
 	
-	if(equal(mapName, "de_chateau") || equal(mapName, "de_dust2") || equal(mapName, "de_train")) {
+	if (equal(mapName, "de_chateau") || equal(mapName, "de_dust2") || equal(mapName, "de_train")) {
 		bsBombSiteA = BOMBSITE_B;
 		bsBombSiteB = BOMBSITE_A;
-	}
-	else {
+	} else {
 		bsBombSiteA = BOMBSITE_A;
 		bsBombSiteB = BOMBSITE_B;	
 	}
@@ -54,19 +53,19 @@ public plugin_init()
 	bombEntity[bsBombSiteA] = find_ent_by_class(NONE, "func_bomb_target");
 	bombEntity[bsBombSiteB] = find_ent_by_class(bombEntity[bsBombSiteA], "func_bomb_target");
 
-	if(!is_valid_ent(bombEntity[bsBombSiteA])) {
+	if (!is_valid_ent(bombEntity[bsBombSiteA])) {
 		bombEntity[bsBombSiteA] = find_ent_by_class(NONE, "info_bomb_target");
 		bombEntity[bsBombSiteB] = find_ent_by_class(bombEntity[bsBombSiteA], "info_bomb_target");
 	}
 
 	icons = nvault_open("cod_icons");
 	
-	if(icons == INVALID_HANDLE) set_fail_state("[COD] Nie mozna otworzyc pliku cod_icons.vault");
+	if (icons == INVALID_HANDLE) set_fail_state("[COD] Nie mozna otworzyc pliku cod_icons.vault");
 
 	spawn_sprite(bombEntity[bsBombSiteA], bsBombSiteA);
 	spawn_sprite(bombEntity[bsBombSiteB], bsBombSiteB);
 
-	for(new i; i < sizeof commandIcons; i++) register_clcmd(commandIcons[i], "change_icons");
+	for (new i; i < sizeof commandIcons; i++) register_clcmd(commandIcons[i], "change_icons");
 
 	cvarC4 = get_cvar_pointer("mp_c4timer");
 
@@ -87,7 +86,7 @@ public plugin_natives()
 }
 
 public plugin_precache()
-	for(new i = 0; i < sizeof iconSprite; i++) precache_model(iconSprite[i]);
+	for (new i = 0; i < sizeof iconSprite; i++) precache_model(iconSprite[i]);
 
 public client_disconnected(id)
 {
@@ -99,13 +98,12 @@ public client_disconnected(id)
 
 public client_putinserver(id)
 {
-	if(is_user_bot(id) || is_user_hltv(id)) {
+	if (is_user_bot(id) || is_user_hltv(id)) {
 		rem_bit(id, iconBombSites);
 		rem_bit(id, iconDropped);
 		rem_bit(id, iconPlanted);
 		rem_bit(id, iconBox);
-	}
-	else {
+	} else {
 		set_bit(id, iconBombSites);
 		set_bit(id, iconDropped);
 		set_bit(id, iconPlanted);
@@ -121,10 +119,10 @@ public team_assign()
 
 	read_data(2, teamName, charsmax(teamName));
 
-	if(equal(teamName, "UNASSIGNED")) playerTeam[id] = 0;
-	else if(equal(teamName, "TERRORIST")) playerTeam[id] = 1;
-	else if(equal(teamName, "CT")) playerTeam[id] = 2;
-	else if(equal(teamName, "SPECTATOR")) playerTeam[id] = 3;
+	if (equal(teamName, "UNASSIGNED")) playerTeam[id] = 0;
+	else if (equal(teamName, "TERRORIST")) playerTeam[id] = 1;
+	else if (equal(teamName, "CT")) playerTeam[id] = 2;
+	else if (equal(teamName, "SPECTATOR")) playerTeam[id] = 3;
 }
 
 public bomb_drop()
@@ -136,7 +134,7 @@ public bomb_dropped()
 
 	new bombEnt;
 
-	if((bombEnt = fm_find_ent_by_model(NONE, "weaponbox", "models/w_backpack.mdl"))) spawn_sprite(bombEnt, BOMB_DROPPED);
+	if ((bombEnt = fm_find_ent_by_model(NONE, "weaponbox", "models/w_backpack.mdl"))) spawn_sprite(bombEnt, BOMB_DROPPED);
 }
 
 public bomb_picked()
@@ -161,18 +159,18 @@ public bomb_planted()
 
 	new bombEnt;
 
-	if((bombEnt = fm_find_ent_by_model(NONE, "grenade", "models/w_c4.mdl"))) spawn_sprite(bombEnt, BOMB_PLANTED);
+	if ((bombEnt = fm_find_ent_by_model(NONE, "grenade", "models/w_c4.mdl"))) spawn_sprite(bombEnt, BOMB_PLANTED);
 }
 
 public bomb_timer()
 {
-	if(bombTimer < 0) {
+	if (bombTimer < 0) {
 		remove_task(TASK_PLANTED);
 
 		return;
 	}
 
-	if(--bombTimer == 10) {
+	if (--bombTimer == 10) {
 		remove_icon(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
 
 		spawn_sprite(bombEntity[BOMB_PLANTED], BOMB_EXPLODE);
@@ -210,18 +208,18 @@ public spawn_sprite(entity, sprite)
 {
 	static ent, Float:origin[3];
 
-	if(sprite == BOMBSITE_A || sprite == BOMBSITE_B) get_brush_entity_origin(entity, origin);
+	if (sprite == BOMBSITE_A || sprite == BOMBSITE_B) get_brush_entity_origin(entity, origin);
 	else pev(entity, pev_origin, origin);
 
 	ent = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "info_target"));
 
-	if(!pev_valid(ent)) return;
+	if (!pev_valid(ent)) return;
 
 	iconEntity[sprite] = ent;
 
-	if(sprite == BOMB_PLANTED) bombEntity[sprite] = entity;
+	if (sprite == BOMB_PLANTED) bombEntity[sprite] = entity;
 
-	if(sprite != BOMBSITE_A && sprite != BOMBSITE_B) origin[2] += sprite == BOX ? 35.0 : 25.0;
+	if (sprite != BOMBSITE_A && sprite != BOMBSITE_B) origin[2] += sprite == BOX ? 35.0 : 25.0;
 
 	set_pev(ent, pev_classname, iconSprite[sprite]);
 	set_pev(ent, pev_origin, origin);
@@ -238,15 +236,15 @@ public spawn_sprite(entity, sprite)
 
 public check_visible(ent, pSet)
 {
-	if(!pev_valid(ent)) return FMRES_IGNORED;
+	if (!pev_valid(ent)) return FMRES_IGNORED;
 	
 	static className[32];
 
 	pev(ent, pev_classname, className, charsmax(className));
 
-	if(!check_classname(className)) return FMRES_IGNORED;
+	if (!check_classname(className)) return FMRES_IGNORED;
 
-	if(!roundStarted) return FMRES_IGNORED;
+	if (!roundStarted) return FMRES_IGNORED;
 	
 	forward_return(FMV_CELL, 1);
 	
@@ -255,25 +253,25 @@ public check_visible(ent, pSet)
 
 public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 {
-	if(!is_user_connected(host) || !pev_valid(ent) || !pev_valid(pev(ent, pev_iuser1))) return FMRES_IGNORED;
+	if (!is_user_connected(host) || !pev_valid(ent) || !pev_valid(pev(ent, pev_iuser1))) return FMRES_IGNORED;
 	
 	static className[32];
 
 	pev(ent, pev_classname, className, charsmax(className));
 
-	if(!check_classname(className)) return FMRES_IGNORED;
+	if (!check_classname(className)) return FMRES_IGNORED;
 
 	set_es(es, ES_Effects, get_es(es, ES_Effects) | EF_NODRAW);
 
-	if(!roundStarted || !is_user_alive(host)) return FMRES_IGNORED;
+	if (!roundStarted || !is_user_alive(host)) return FMRES_IGNORED;
 
-	if((equal(className, iconSprite[BOMBSITE_A]) || equal(className, iconSprite[BOMBSITE_B])) && (!get_bit(host, iconBombSites) || is_valid_ent(bombEntity[BOMB_PLANTED]))) return FMRES_IGNORED;
+	if ((equal(className, iconSprite[BOMBSITE_A]) || equal(className, iconSprite[BOMBSITE_B])) && (!get_bit(host, iconBombSites) || is_valid_ent(bombEntity[BOMB_PLANTED]))) return FMRES_IGNORED;
 
-	if((equal(className, iconSprite[BOMB_PLANTED]) || equal(className, iconSprite[BOMB_EXPLODE])) && !get_bit(host, iconPlanted)) return FMRES_IGNORED;
+	if ((equal(className, iconSprite[BOMB_PLANTED]) || equal(className, iconSprite[BOMB_EXPLODE])) && !get_bit(host, iconPlanted)) return FMRES_IGNORED;
 
-	if(equal(className, iconSprite[BOMB_DROPPED]) && (!get_bit(host, iconDropped) || playerTeam[host] != 1)) return FMRES_IGNORED;
+	if (equal(className, iconSprite[BOMB_DROPPED]) && (!get_bit(host, iconDropped) || playerTeam[host] != 1)) return FMRES_IGNORED;
 
-	if(equal(className, iconSprite[BOX]) && !get_bit(host, iconBox)) return FMRES_IGNORED;
+	if (equal(className, iconSprite[BOX]) && !get_bit(host, iconBox)) return FMRES_IGNORED;
 
 	set_es(es, ES_Effects, get_es(es, ES_Effects) & ~EF_NODRAW);
 
@@ -284,10 +282,10 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 	
 	distance = get_distance_f(hostOrigin, targetOrigin) / UNITS_METER;
 
-	if(distance > 1.0 && distance <= 100.0) set_es(es, ES_Frame, 100.0 - floatround(distance));
+	if (distance > 1.0 && distance <= 100.0) set_es(es, ES_Frame, 100.0 - floatround(distance));
 	else set_es(es, ES_Frame, 100.0);
 	
-	if(!is_in_viewcone(host, targetOrigin)) {
+	if (!is_in_viewcone(host, targetOrigin)) {
 		set_es(es, ES_Effects, get_es(es, ES_Effects) | EF_NODRAW);
 
 		return FMRES_IGNORED;
@@ -301,9 +299,9 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 	
 	xs_vec_add(wallOffset, hostOrigin, spriteOffset);
 
-	if(equal(className, iconSprite[BOMB_DROPPED]) || equal(className, iconSprite[BOMB_PLANTED]) || equal(className, iconSprite[BOMB_EXPLODE])) spriteOffset[2] += 25.0;
+	if (equal(className, iconSprite[BOMB_DROPPED]) || equal(className, iconSprite[BOMB_PLANTED]) || equal(className, iconSprite[BOMB_EXPLODE])) spriteOffset[2] += 25.0;
 
-	if(equal(className, iconSprite[BOX])) spriteOffset[2] += 35.0;
+	if (equal(className, iconSprite[BOX])) spriteOffset[2] += 35.0;
 
 	set_es(es, ES_Origin, spriteOffset);
 	
@@ -314,9 +312,9 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 
 public change_icons(id, sound)
 {
-	if(!cod_check_account(id)) return PLUGIN_HANDLED;
+	if (!cod_check_account(id)) return PLUGIN_HANDLED;
 
-	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
 	new menuData[64], menu = menu_create("\yUstawienia \rIkon\w:", "change_icons_handle");
 
@@ -341,9 +339,9 @@ public change_icons(id, sound)
 
 public change_icons_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT) {
+	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -353,7 +351,7 @@ public change_icons_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	switch(item) {
+	switch (item) {
 		case 0: get_bit(id, iconBombSites) ? rem_bit(id, iconBombSites) : set_bit(id, iconBombSites);
 		case 1: get_bit(id, iconDropped) ? rem_bit(id, iconDropped) : set_bit(id, iconDropped);
 		case 2: get_bit(id, iconPlanted) ? rem_bit(id, iconPlanted) : set_bit(id, iconPlanted);
@@ -389,13 +387,13 @@ public load_icons(id)
 	
 	formatex(vaultKey, charsmax(vaultKey), "%s-cod_icons", playerName[id]);
 	
-	if(nvault_get(icons, vaultKey, vaultData, charsmax(vaultData))) {
+	if (nvault_get(icons, vaultKey, vaultData, charsmax(vaultData))) {
 		parse(vaultData, iconsData[0], charsmax(iconsData), iconsData[1], charsmax(iconsData), iconsData[2], charsmax(iconsData), iconsData[3], charsmax(iconsData));
 
-		if(!str_to_num(iconsData[0])) rem_bit(id, iconBombSites);
-		if(!str_to_num(iconsData[1])) rem_bit(id, iconDropped);
-		if(!str_to_num(iconsData[2])) rem_bit(id, iconPlanted);
-		if(!str_to_num(iconsData[3])) rem_bit(id, iconBox);
+		if (!str_to_num(iconsData[0])) rem_bit(id, iconBombSites);
+		if (!str_to_num(iconsData[1])) rem_bit(id, iconDropped);
+		if (!str_to_num(iconsData[2])) rem_bit(id, iconPlanted);
+		if (!str_to_num(iconsData[3])) rem_bit(id, iconBox);
 	}
 
 	return PLUGIN_CONTINUE;
@@ -406,10 +404,10 @@ public _cod_spawn_box_icon(ent)
 
 public _cod_remove_box_icon(ent)
 {
-	if(pev_valid(ent)) {
+	if (pev_valid(ent)) {
 		new icon = pev(ent, pev_iuser1);
 
-		if(pev_valid(icon)) remove_entity(icon);
+		if (pev_valid(icon)) remove_entity(icon);
 		
 		remove_icon(ent, BOX);
 	}
@@ -427,14 +425,14 @@ stock normalize(Float:originIn[3], Float:originOut[3], Float:multiplier)
 
 stock check_classname(const className[])
 {
-	for(new i = 0; i < sizeof iconSprite; i++) if(equal(className, iconSprite[i])) return true;
+	for (new i = 0; i < sizeof iconSprite; i++) if (equal(className, iconSprite[i])) return true;
 
 	return false;
 }
 
 stock remove_icon(ent, sprite)
 {
-	if(pev_valid(ent)) {
+	if (pev_valid(ent)) {
 		remove_entity(ent);
 
 		iconEntity[sprite] = 0;

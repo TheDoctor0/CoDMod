@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Shop"
-#define VERSION "1.0.4"
+#define VERSION "1.0.5"
 #define AUTHOR "O'Zone"
 
 new const commandShopMenu[][] = { "say /shop", "say_team /shop", "say /sklep", "say_team /sklep", "sklep" };
@@ -22,7 +22,7 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	for(new i; i < sizeof commandShopMenu; i++) register_clcmd(commandShopMenu[i], "shop_menu");
+	for (new i; i < sizeof commandShopMenu; i++) register_clcmd(commandShopMenu[i], "shop_menu");
 
 	register_clcmd("KUPNO_HONORU", "buy_honor_handle");
 
@@ -62,7 +62,7 @@ public plugin_init()
 	
 public shop_menu(id)
 {
-	if(!cod_check_account(id)) return PLUGIN_HANDLED;
+	if (!cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
@@ -162,9 +162,9 @@ public shop_menu(id)
 
 public shop_menu_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT) {
+	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -174,7 +174,7 @@ public shop_menu_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	if(item == EXCHANGE) {
+	if (item == EXCHANGE) {
 		client_print(id, print_center, "Wpisz ile Honoru chcesz kupic.");
 
 		cod_print_chat(id, "Wpisz ile^x03 Honoru^x01 chcesz kupic.");
@@ -184,68 +184,68 @@ public shop_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == REPAIR && cod_get_item_durability(id) >= cod_max_item_durability()) {
+	if (item == REPAIR && cod_get_item_durability(id) >= cod_max_item_durability()) {
 		cod_print_chat(id, "Twoj przedmiot jest juz w pelni^x03 naprawiony^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if((item == SMALL_BANDAGE || item == BIG_BANDAGE) && cod_get_user_health(id, 1) == cod_get_user_max_health(id)) {
+	if ((item == SMALL_BANDAGE || item == BIG_BANDAGE) && cod_get_user_health(id, 1) == cod_get_user_max_health(id)) {
 		cod_print_chat(id, "Jestes juz w pelni^x03 uzdrowiony^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == SILENT && cod_get_user_footsteps(id)) {
+	if (item == SILENT && cod_get_user_footsteps(id)) {
 		cod_print_chat(id, "Masz juz ^x03 Ciche Chodzenie^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == BUNNY_HOP && cod_get_user_bunnyhop(id)) {
+	if (item == BUNNY_HOP && cod_get_user_bunnyhop(id)) {
 		cod_print_chat(id, "Masz juz ^x03 Bunny Hop^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == TELEPORT && cod_get_user_teleports(id) == FULL) {
+	if (item == TELEPORT && cod_get_user_teleports(id) == FULL) {
 		cod_print_chat(id, "Masz juz nielimitowany^x03 Teleport^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == JUMP && cod_get_user_multijumps(id) >= 3) {
+	if (item == JUMP && cod_get_user_multijumps(id) >= 3) {
 		cod_print_chat(id, "Mozesz miec maksymalnie^x03 3 Dodatkowe Skoki^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == ARMOR && cod_get_user_armor(id) >= 300) {
+	if (item == ARMOR && cod_get_user_armor(id) >= 300) {
 		cod_print_chat(id, "Mozesz miec maksymalnie^x03 300 Pancerza^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == DAMAGE && get_bit(id, damageBonus)) {
+	if (item == DAMAGE && get_bit(id, damageBonus)) {
 		cod_print_chat(id, "W tej rundzie juz kupiles^x03 Wieksze Obrazenia^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(item == INVISIBLE && !cod_get_user_render(id)) {
+	if (item == INVISIBLE && !cod_get_user_render(id)) {
 		cod_print_chat(id, "Masz juz^x03 Pelna Niewidzialnosc^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 	
-	if(item == UPGRADE) {
-		if(!cod_get_user_item(id)) {
+	if (item == UPGRADE) {
+		if (!cod_get_user_item(id)) {
 			cod_print_chat(id, "Nie masz zadnego przedmiotu!");
 
 			return PLUGIN_HANDLED;
 		}
 
-		if(!cod_upgrade_user_item(id, 1)) {
+		if (!cod_upgrade_user_item(id, 1)) {
 			cod_print_chat(id, "Ulepszenie twojego przedmiotu nie jest mozliwe!");
 
 			return PLUGIN_HANDLED;
@@ -258,22 +258,21 @@ public shop_menu_handle(id, menu, item)
 	
 	new price = str_to_num(itemPrice);
 	
-	if(cod_get_user_honor(id) < price) {
+	if (cod_get_user_honor(id) < price) {
 		cod_print_chat(id, "Nie masz wystarczajaco duzo^x03 Honoru^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 	
-	switch(item) {
+	switch (item) {
 		case REPAIR: {
 			cod_print_chat(id, "Kupiles^x03 +%i^x01 wytrzymalosci przedmiotu!", cvarDurabilityAmount);
 			
-			if(cod_get_item_durability(id) + cvarDurabilityAmount >= cod_max_item_durability()) {
+			if (cod_get_item_durability(id) + cvarDurabilityAmount >= cod_max_item_durability()) {
 				cod_set_item_durability(id, cod_max_item_durability());
 
 				cod_print_chat(id, "Twoj przedmiot jest teraz w pelni naprawiony!");
-			}
-			else {
+			} else {
 				cod_set_item_durability(id, cod_get_item_durability(id) + cvarDurabilityAmount);
 
 				cod_print_chat(id, "Wytrzymalosc twojego przedmiotu wynosi^x03 %i^x01!", cod_get_item_durability(id));
@@ -287,7 +286,7 @@ public shop_menu_handle(id, menu, item)
 		case UPGRADE: {
 			cod_print_chat(id, "Kupiles^x03 Ulepszenie Przedmiotu^x01!");
 
-			if(!cod_upgrade_user_item(id)) {
+			if (!cod_upgrade_user_item(id)) {
 				cod_print_chat(id, "Twoj przedmiot nie moze juz zostac^x03 ulepszony^x01. Honor nie zostal pobrany z konta.");
 
 				return PLUGIN_HANDLED;
@@ -399,7 +398,7 @@ public shop_menu_handle(id, menu, item)
 
 public buy_honor_handle(id)
 {
-	if(!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 	
@@ -410,13 +409,13 @@ public buy_honor_handle(id)
 
 	honorAmount = str_to_num(honorData);
 	
-	if(honorAmount <= 0) { 
+	if (honorAmount <= 0) { 
 		cod_print_chat(id, "Nie mozesz kupic mniej niz^x03 1 Honoru^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 	
-	if(cs_get_user_money(id) < honorAmount * cvarExchangeRatio) { 
+	if (cs_get_user_money(id) < honorAmount * cvarExchangeRatio) { 
 		cod_print_chat(id, "Nie masz wystarczajaco^x03 kasy^x01, aby kupic tyle^x03 Honoru^x01!");
 
 		return PLUGIN_HANDLED;
@@ -431,7 +430,7 @@ public buy_honor_handle(id)
 }
 
 public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
-	if(get_bit(attacker, damageBonus)) cod_inflict_damage(attacker, victim, float(cvarDamageAmount), 0.0, damageBits);
+	if (get_bit(attacker, damageBonus)) cod_inflict_damage(attacker, victim, float(cvarDamageAmount), 0.0, damageBits);
 
 public cod_new_round()
-	for(new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, damageBonus);
+	for (new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, damageBonus);

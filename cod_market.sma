@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Market"
-#define VERSION "1.0.4"
+#define VERSION "1.0.5"
 #define AUTHOR "O'Zone"
 
 #define MAX_ITEMS 5
@@ -21,10 +21,10 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	for(new i; i < sizeof commandMarket; i++) register_clcmd(commandMarket[i], "market_menu");
-	for(new i; i < sizeof commandSell; i++) register_clcmd(commandSell[i], "sell_item");
-	for(new i; i < sizeof commandBuy; i++) register_clcmd(commandBuy[i], "buy_item");
-	for(new i; i < sizeof commandWithdraw; i++) register_clcmd(commandWithdraw[i], "withdraw_item");
+	for (new i; i < sizeof commandMarket; i++) register_clcmd(commandMarket[i], "market_menu");
+	for (new i; i < sizeof commandSell; i++) register_clcmd(commandSell[i], "sell_item");
+	for (new i; i < sizeof commandBuy; i++) register_clcmd(commandBuy[i], "buy_item");
+	for (new i; i < sizeof commandWithdraw; i++) register_clcmd(commandWithdraw[i], "withdraw_item");
 
 	register_concmd("CENA_PRZEDMIOTU", "set_item_price");
 	
@@ -39,7 +39,7 @@ public client_putinserver(id)
 
 public market_menu(id)
 {
-	if(!cod_check_account(id)) return PLUGIN_HANDLED;
+	if (!cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
@@ -58,11 +58,11 @@ public market_menu(id)
 
 public market_menu_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 		
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	if(item == MENU_EXIT) {
+	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -70,7 +70,7 @@ public market_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 	
-	switch(item) {
+	switch (item) {
 		case 0: sell_item(id, 1);	
 		case 1: buy_item(id, 1);
 		case 2: withdraw_item(id, 1);
@@ -81,10 +81,10 @@ public market_menu_handle(id, menu, item)
 
 public market_menu_callback(id, menu, item)
 {
-	switch(item) {
-		case 0: if(!cod_get_user_class(id) || !cod_get_user_item(id) || get_items_amount(id) >= MAX_ITEMS) return ITEM_DISABLED;
-		case 1: if(!ArraySize(marketItems)) return ITEM_DISABLED;
-		case 2: if(!get_items_amount(id)) return ITEM_DISABLED;
+	switch (item) {
+		case 0: if (!cod_get_user_class(id) || !cod_get_user_item(id) || get_items_amount(id) >= MAX_ITEMS) return ITEM_DISABLED;
+		case 1: if (!ArraySize(marketItems)) return ITEM_DISABLED;
+		case 2: if (!get_items_amount(id)) return ITEM_DISABLED;
 	}
 
 	return ITEM_ENABLED;
@@ -92,19 +92,17 @@ public market_menu_callback(id, menu, item)
 
 public sell_item(id, sound)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
 		
-	if(!cod_check_account(id)) return PLUGIN_HANDLED;
-		
-	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	if(!cod_get_user_item(id)) {
+	if (!cod_get_user_item(id)) {
 		cod_print_chat(id, "Nie masz zadnego itemu!");
 
 		return PLUGIN_HANDLED;
 	}
 	
-	if(get_items_amount(id) >= MAX_ITEMS) {
+	if (get_items_amount(id) >= MAX_ITEMS) {
 		cod_print_chat(id, "Wystawiles juz maksymalne^x03 %i^x01 przedmiotow!", MAX_ITEMS);
 
 		return PLUGIN_HANDLED;
@@ -121,17 +119,17 @@ public sell_item(id, sound)
 
 public set_item_price(id)
 {
-	if(!cod_check_account(id)) return PLUGIN_HANDLED;
+	if (!cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
-	if(!cod_get_user_item(id)) {
+	if (!cod_get_user_item(id)) {
 		cod_print_chat(id, "Nie masz zadnego itemu!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(get_items_amount(id) >= MAX_ITEMS) {
+	if (get_items_amount(id) >= MAX_ITEMS) {
 		cod_print_chat(id, "Wystawiles juz maksymalne^x03 %i^x01 przedmiotow!", MAX_ITEMS);
 
 		return PLUGIN_HANDLED;
@@ -144,7 +142,7 @@ public set_item_price(id)
 
 	price = str_to_num(priceData);
 	
-	if(price  <= 0 || price >= 100000) { 
+	if (price  <= 0 || price >= 100000) { 
 		cod_print_chat(id, "Cena musi nalezec do przedzialu^x03 1 - 99999^x01!");
 
 		return PLUGIN_HANDLED;
@@ -171,18 +169,16 @@ public set_item_price(id)
 
 public buy_item(id, sound)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-	
-	if(!cod_check_account(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
 
-	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new marketItem[itemInfo], itemData[128], itemId[5], itemsCounts = 0, menu = menu_create("\yKup \rPrzedmiot", "buy_item_handle");
 	
-	for(new i = 0; i < ArraySize(marketItems); i++) {
+	for (new i = 0; i < ArraySize(marketItems); i++) {
 		ArrayGetArray(marketItems, i, marketItem);
 		
-		if(marketItem[OWNER] == id) continue;
+		if (marketItem[OWNER] == id) continue;
 
 		num_to_str(marketItem[ID], itemId, charsmax(itemId));
 		
@@ -197,22 +193,21 @@ public buy_item(id, sound)
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 
-	if(!itemsCounts)
+	if (!itemsCounts)
 	{
 		menu_destroy(menu);
 
 		cod_print_chat(id, "Na rynku nie ma zadnych przedmiotow, ktore moglbys kupic!");
-	}
-	else menu_display(id, menu);
+	} else menu_display(id, menu);
 	
 	return PLUGIN_HANDLED;
 }
 
 public buy_item_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT) {
+	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -228,7 +223,7 @@ public buy_item_handle(id, menu, item)
 
 	new item = check_item_id(str_to_num(itemId));
 
-	if(item < 0) {
+	if (item < 0) {
 		buy_item(id, 1);
 
 		cod_print_chat(id, "Przedmiot zostal juz kupiony lub wycofany z rynku!");
@@ -263,9 +258,9 @@ public buy_item_handle(id, menu, item)
 
 public buy_question_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT || item) {
+	if (item == MENU_EXIT || item) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -281,7 +276,7 @@ public buy_question_handle(id, menu, item)
 
 	new item = check_item_id(str_to_num(itemId));
 
-	if(item < 0) {
+	if (item < 0) {
 		buy_item(id, 1);
 
 		cod_print_chat(id, "Przedmiot zostal juz kupiony lub wycofany z rynku!");
@@ -293,12 +288,11 @@ public buy_question_handle(id, menu, item)
 
 	ArrayGetArray(marketItems, item, marketItem);
 	
-	if(cod_get_user_honor(id) < marketItem[PRICE]) {
+	if (cod_get_user_honor(id) < marketItem[PRICE]) {
 		cod_print_chat(id, "Nie masz wystarczajacej ilosci Honoru!");
 
 		return PLUGIN_HANDLED;
-	}
-	else {
+	} else {
 		cod_set_user_honor(marketItem[OWNER], cod_get_user_honor(marketItem[OWNER]) + marketItem[PRICE]);
 		cod_set_user_honor(id, cod_get_user_honor(id) - marketItem[PRICE]);
 	}
@@ -316,18 +310,16 @@ public buy_question_handle(id, menu, item)
 
 public withdraw_item(id, sound)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
-	
-	if(!cod_check_account(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
 
-	if(!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new marketItem[itemInfo], itemData[128], itemId[5], itemsCounts = 0, menu = menu_create("\yWycofaj \rPrzedmiot", "withdraw_item_handle");
 	
-	for(new i = 0; i < ArraySize(marketItems); i++) {
+	for (new i = 0; i < ArraySize(marketItems); i++) {
 		ArrayGetArray(marketItems, i, marketItem);
 		
-		if(marketItem[OWNER] != id) continue;
+		if (marketItem[OWNER] != id) continue;
 
 		num_to_str(marketItem[ID], itemId, charsmax(itemId));
 		
@@ -342,21 +334,20 @@ public withdraw_item(id, sound)
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 
-	if(!itemsCounts) {
+	if (!itemsCounts) {
 		menu_destroy(menu);
 
 		cod_print_chat(id, "Na rynku nie ma zadnych twoich przedmiotow!");
-	}
-	else menu_display(id, menu);
+	} else menu_display(id, menu);
 	
 	return PLUGIN_CONTINUE;
 }
 
 public withdraw_item_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT || item) {
+	if (item == MENU_EXIT || item) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -372,7 +363,7 @@ public withdraw_item_handle(id, menu, item)
 
 	new item = check_item_id(str_to_num(itemId));
 
-	if(item < 0) {
+	if (item < 0) {
 		buy_item(id, 1);
 
 		cod_print_chat(id, "Przedmiot zostal juz kupiony!");
@@ -407,9 +398,9 @@ public withdraw_item_handle(id, menu, item)
 
 public withdraw_question_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT || item) {
+	if (item == MENU_EXIT || item) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -425,7 +416,7 @@ public withdraw_question_handle(id, menu, item)
 
 	new item = check_item_id(str_to_num(itemId));
 
-	if(item < 0) {
+	if (item < 0) {
 		withdraw_item(id, 1);
 
 		cod_print_chat(id, "Przedmiot zostal juz kupiony!");
@@ -448,14 +439,14 @@ public withdraw_question_handle(id, menu, item)
 
 stock get_items_amount(id) 
 {
-	if(!is_user_connected(id)) return 0;
+	if (!is_user_connected(id)) return 0;
 
 	new amount = 0, marketItem[itemInfo];
 	
-	for(new i = 0; i < ArraySize(marketItems); i++) {
+	for (new i = 0; i < ArraySize(marketItems); i++) {
 		ArrayGetArray(marketItems, i, marketItem);
 
-		if(marketItem[OWNER] == id) amount++;
+		if (marketItem[OWNER] == id) amount++;
 	}
 	
 	return amount;
@@ -465,10 +456,10 @@ stock check_item_id(item)
 {
 	new marketItem[itemInfo];
 	
-	for(new i = 0; i < ArraySize(marketItems); i++) {
+	for (new i = 0; i < ArraySize(marketItems); i++) {
 		ArrayGetArray(marketItems, i, marketItem);
 
-		if(marketItem[ID] == item) return i;
+		if (marketItem[ID] == item) return i;
 	}
 	
 	return NONE;
@@ -478,10 +469,10 @@ stock remove_seller(id)
 {
 	new marketItem[itemInfo];
 	
-	for(new i = 0; i < ArraySize(marketItems); i++) {
+	for (new i = 0; i < ArraySize(marketItems); i++) {
 		ArrayGetArray(marketItems, i, marketItem);
 
-		if(marketItem[OWNER] == id) {
+		if (marketItem[OWNER] == id) {
 			ArrayDeleteItem(marketItems, i);
 
 			i -= 1;

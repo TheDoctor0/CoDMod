@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Accounts System"
-#define VERSION "1.0.4"
+#define VERSION "1.0.7"
 #define AUTHOR "O'Zone"
 
 #define SETINFO "_csrpass"
@@ -29,7 +29,7 @@ public plugin_init()
 
 	bind_pcvar_num(create_cvar("cod_accounts_enabled", "1"), cvarAccountsEnabled);
 
-	for(new i; i < sizeof commandAccount; i++) register_clcmd(commandAccount[i], "account_menu");
+	for (new i; i < sizeof commandAccount; i++) register_clcmd(commandAccount[i], "account_menu");
 
 	register_clcmd("WPROWADZ_SWOJE_HASLO", "login_account");
 	register_clcmd("WPROWADZ_WYBRANE_HASLO", "register_step_one");
@@ -60,7 +60,7 @@ public plugin_end()
 
 public client_connect(id)
 {
-	if(is_user_bot(id) || is_user_hltv(id)) return;
+	if (is_user_bot(id) || is_user_hltv(id)) return;
 
 	playerPassword[id] = "";
 	
@@ -83,7 +83,7 @@ public client_disconnected(id)
 
 public message_team(id) 
 {
-	if(is_user_connected(id) && !is_user_bot(id) && !is_user_hltv(id) && playerStatus[id] < LOGGED) {
+	if (is_user_connected(id) && !is_user_bot(id) && !is_user_hltv(id) && playerStatus[id] < LOGGED) {
 		account_menu(id, true);
 
 		return PLUGIN_HANDLED;
@@ -99,7 +99,7 @@ public message_show_menu(msgId, dest, id)
     
 	get_msg_arg_string(4, menuData, charsmax(menuData));
 
-	if(equal(menuData, Team_Select) && playerStatus[id] < LOGGED)
+	if (equal(menuData, Team_Select) && playerStatus[id] < LOGGED)
 	{
 		set_pdata_int(id, 205, 0, 5);
 
@@ -113,7 +113,7 @@ public message_show_menu(msgId, dest, id)
 
 public message_vgui_menu(msgId, dest, id)
 {
-	if(get_msg_arg_int(1) == 2 && playerStatus[id] < LOGGED) {
+	if (get_msg_arg_int(1) == 2 && playerStatus[id] < LOGGED) {
 		set_task(0.1, "account_menu", id);
 
 		return PLUGIN_HANDLED;
@@ -124,10 +124,10 @@ public message_vgui_menu(msgId, dest, id)
 
 public player_prethink(id) 
 {
-	if(get_bit(id, dataLoaded) && !is_user_bot(id) && !is_user_hltv(id) && is_user_connected(id) && playerStatus[id] < LOGGED) {
+	if (get_bit(id, dataLoaded) && !is_user_bot(id) && !is_user_hltv(id) && is_user_connected(id) && playerStatus[id] < LOGGED) {
 		static msgScreenFade;
 	
-		if(!msgScreenFade) msgScreenFade = get_user_msgid("ScreenFade");
+		if (!msgScreenFade) msgScreenFade = get_user_msgid("ScreenFade");
 
 		message_begin(MSG_ONE, msgScreenFade, {0, 0, 0}, id);
 		write_short(1<<12);
@@ -143,7 +143,7 @@ public player_prethink(id)
 
 public check_account(id)
 {
-	if(playerStatus[id] < LOGGED) {
+	if (playerStatus[id] < LOGGED) {
 		account_menu(id, true);
 		
 		return PLUGIN_HANDLED;
@@ -156,13 +156,13 @@ public kick_player(id)
 {
 	id -= TASK_PASSWORD;
 	
-	if(is_user_connected(id)) server_cmd("kick #%d ^"Nie zalogowales sie w ciagu 60s!^"", get_user_userid(id));
+	if (is_user_connected(id)) server_cmd("kick #%d ^"Nie zalogowales sie w ciagu 60s!^"", get_user_userid(id));
 }
 public account_menu(id, sound)
 {
-	if(!is_user_connected(id) || !is_user_valid(id) || !cvarAccountsEnabled) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || !is_user_valid(id) || !cvarAccountsEnabled) return PLUGIN_HANDLED;
 
-	if(!get_bit(id, dataLoaded)) {
+	if (!get_bit(id, dataLoaded)) {
 		remove_task(id);
 
 		set_task(0.1, "account_menu", id);
@@ -170,21 +170,21 @@ public account_menu(id, sound)
 		return PLUGIN_HANDLED;
 	}
 
-	if(!get_user_team(id) && playerStatus[id] == LOGGED) {
+	if (!get_user_team(id) && playerStatus[id] == LOGGED) {
 		engclient_cmd(id, "chooseteam");
 
 		return PLUGIN_HANDLED;
 	}
 
-	if(playerStatus[id] <= NOT_LOGGED) if(!task_exists(id + TASK_PASSWORD)) set_task(60.0, "kick_player", id + TASK_PASSWORD);
+	if (playerStatus[id] <= NOT_LOGGED) if (!task_exists(id + TASK_PASSWORD)) set_task(60.0, "kick_player", id + TASK_PASSWORD);
 
-	if(sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	static menuData[192];
 
 	formatex(menuData, charsmax(menuData), "\rSYSTEM REJESTRACJI^n^n\rNick: \w[\y%s\w]^n\rStatus: \w[\y%s\w]", playerName[id], accountStatus[playerStatus[id]]);
 	
-	if((playerStatus[id] == NOT_LOGGED || playerStatus[id] == LOGGED) && !get_bit(id, autoLogin)) format(menuData, charsmax(menuData),"%s^n\wWpisz w konsoli \ysetinfo ^"%s^" ^"twojehaslo^"^n\wSprawi to, ze twoje haslo bedzie ladowane \rautomatycznie\w.", menuData, SETINFO);
+	if ((playerStatus[id] == NOT_LOGGED || playerStatus[id] == LOGGED) && !get_bit(id, autoLogin)) format(menuData, charsmax(menuData),"%s^n\wWpisz w konsoli \ysetinfo ^"%s^" ^"twojehaslo^"^n\wSprawi to, ze twoje haslo bedzie ladowane \rautomatycznie\w.", menuData, SETINFO);
 
 	new menu = menu_create(menuData, "account_menu_handle"), callback = menu_makecallback("account_menu_callback");
 	
@@ -193,7 +193,7 @@ public account_menu(id, sound)
 	menu_additem(menu, "\yZmien \wHaslo", _, _, callback);
 	menu_additem(menu, "\ySkasuj \wKonto^n", _, _, callback);
 	menu_additem(menu, "\yZaloguj jako \wGosc \r(NIEZALECANE)^n", _, _, callback);
-	if(playerStatus[id] == LOGGED) menu_additem(menu, "\wWyjdz", _, _, callback);
+	if (playerStatus[id] == LOGGED) menu_additem(menu, "\wWyjdz", _, _, callback);
  
 	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
 
@@ -204,7 +204,7 @@ public account_menu(id, sound)
 
 public account_menu_callback(id, menu, item)
 {
-	switch(item) {
+	switch (item) {
 		case 0: return playerStatus[id] == NOT_LOGGED ? ITEM_ENABLED : ITEM_DISABLED;
 		case 1: return (playerStatus[id] == NOT_REGISTERED || playerStatus[id] == GUEST) ? ITEM_ENABLED : ITEM_DISABLED;
 		case 2, 3: return playerStatus[id] == LOGGED ? ITEM_ENABLED : ITEM_DISABLED;
@@ -216,9 +216,9 @@ public account_menu_callback(id, menu, item)
 
 public account_menu_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 		
-	if(item == MENU_EXIT || item == 5) {
+	if (item == MENU_EXIT || item == 5) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -228,7 +228,7 @@ public account_menu_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	switch(item) {
+	switch (item) {
 		case 0: {
 			cod_print_chat(id, "Wprowadz swoje^x04 haslo^x01, aby sie^x04 zalogowac.");
 
@@ -279,7 +279,7 @@ public account_menu_handle(id, menu, item)
 
 public login_account(id)
 {
-	if(playerStatus[id] != NOT_LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
+	if (playerStatus[id] != NOT_LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 	
 	new password[33];
 	
@@ -287,8 +287,8 @@ public login_account(id)
 	
 	remove_quotes(password);
 
-	if(!equal(playerPassword[id], password)) {
-		if(++playerFails[id] >= 3) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
+	if (!equal(playerPassword[id], password)) {
+		if (++playerFails[id] >= 3) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
 		
 		cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01. (Bledne haslo^x04 %i/3^x01)", playerFails[id]);
 
@@ -318,14 +318,14 @@ public login_account(id)
 
 public register_step_one(id)
 {
-	if((playerStatus[id] != NOT_REGISTERED && playerStatus[id] != GUEST) || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
+	if ((playerStatus[id] != NOT_REGISTERED && playerStatus[id] != GUEST) || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 
 	new password[33];
 	
 	read_args(password, charsmax(password));
 	remove_quotes(password);
 	
-	if(strlen(password) < 5) {
+	if (strlen(password) < 5) {
 		cod_print_chat(id, "Haslo musi miec co najmniej^x04 5 znakow^x01.");
 
 		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Haslo musi miec co najmniej 5 znakow.");
@@ -350,14 +350,14 @@ public register_step_one(id)
 	
 public register_step_two(id)
 {
-	if((playerStatus[id] != NOT_REGISTERED && playerStatus[id] != GUEST) || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
+	if ((playerStatus[id] != NOT_REGISTERED && playerStatus[id] != GUEST) || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 	
 	new password[33];
 	
 	read_args(password, charsmax(password));
 	remove_quotes(password);
 	
-	if(!equal(password, playerTempPassword[id])) {
+	if (!equal(password, playerTempPassword[id])) {
 		cod_print_chat(id, "Podane hasla^x04 roznia sie^x01 od siebie.");
 
 		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Podane hasla roznia sie od siebie.");
@@ -388,11 +388,11 @@ public register_step_two(id)
 
 public register_confirmation_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 		
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	if(item == MENU_EXIT) {
+	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -402,7 +402,7 @@ public register_confirmation_handle(id, menu, item)
 
 	menu_destroy(menu);
 
-	switch(item) {
+	switch (item) {
 		case 0: {
 			playerStatus[id] = LOGGED;
 			
@@ -439,15 +439,15 @@ public register_confirmation_handle(id, menu, item)
 
 public change_step_one(id)
 {
-	if(playerStatus[id] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
+	if (playerStatus[id] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 
 	new password[33];
 	
 	read_args(password, charsmax(password));
 	remove_quotes(password);
 	
-	if(!equal(playerPassword[id], password)) {
-		if(++playerFails[id] >= 3) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
+	if (!equal(playerPassword[id], password)) {
+		if (++playerFails[id] >= 3) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
 		
 		cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01. (Bledne haslo^x04 %i/3^x01)", playerFails[id]);
 
@@ -471,14 +471,14 @@ public change_step_one(id)
 
 public change_step_two(id)
 {
-	if(playerStatus[id] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
+	if (playerStatus[id] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 
 	new password[33];
 	
 	read_args(password, charsmax(password));
 	remove_quotes(password);
 	
-	if(equal(playerPassword[id], password)) {
+	if (equal(playerPassword[id], password)) {
 		cod_print_chat(id, "Nowe haslo jest^x04 takie samo^x01 jak aktualne.");
 
 		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Nowe haslo jest takie samo jak aktualne.");
@@ -488,7 +488,7 @@ public change_step_two(id)
 		return PLUGIN_HANDLED;
 	}
 	
-	if(strlen(password) < 5) {
+	if (strlen(password) < 5) {
 		cod_print_chat(id, "Nowe haslo musi miec co najmniej^x04 5 znakow^x01.");
 
 		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Nowe haslo musi miec co najmniej 5 znakow.");
@@ -513,14 +513,14 @@ public change_step_two(id)
 
 public change_step_three(id)
 {
-	if(playerStatus[id] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
+	if (playerStatus[id] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 	
 	new password[33];
 	
 	read_args(password, charsmax(password));
 	remove_quotes(password);
 	
-	if(!equal(password, playerTempPassword[id])) {
+	if (!equal(password, playerTempPassword[id])) {
 		cod_print_chat(id, "Podane hasla^x04 roznia sie^x01 od siebie.");
 
 		cod_show_hud(id, TYPE_HUD, 255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Podane hasla roznia sie od siebie.");
@@ -549,15 +549,15 @@ public change_step_three(id)
 
 public delete_account(id)
 {
-	if(playerStatus[id] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
+	if (playerStatus[id] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 		
 	new password[33];
 	
 	read_args(password, charsmax(password));
 	remove_quotes(password);
 	
-	if(!equal(playerPassword[id], password)) {
-		if(++playerFails[id] >= 3) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
+	if (!equal(playerPassword[id], password)) {
+		if (++playerFails[id] >= 3) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
 		
 		cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01. (Bledne haslo^x04 %i/3^x01)", playerFails[id]);
 
@@ -589,7 +589,7 @@ public delete_account(id)
 
 public delete_account_handle(id, menu, item)
 {
-	if(item == 0) {
+	if (item == 0) {
 		account_query(id, DELETE);
 		
 		console_print(id, "==================================");
@@ -618,7 +618,7 @@ public sql_init()
 
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
-	if(errorNum) {
+	if (errorNum) {
 		log_to_file("cod_mod.log", "Error: %s", error);
 		
 		return;
@@ -646,7 +646,7 @@ public load_account(id)
 
 public load_account_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
-	if(failState) {
+	if (failState) {
 		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
 		
 		return;
@@ -654,10 +654,10 @@ public load_account_handle(failState, Handle:query, error[], errorNum, tempId[],
 	
 	new id = tempId[0];
 	
-	if(SQL_MoreResults(query)) {
+	if (SQL_MoreResults(query)) {
 		SQL_ReadResult(query, SQL_FieldNameToNum(query, "pass"), playerPassword[id], charsmax(playerPassword[]));
 		
-		if(playerPassword[id][0]) {
+		if (playerPassword[id][0]) {
 			new password[33], info[32];
 
 			get_user_info(id, "name", info, charsmax(info));
@@ -666,12 +666,11 @@ public load_account_handle(failState, Handle:query, error[], errorNum, tempId[],
 		
 			get_user_info(id, SETINFO, password, charsmax(password));
 
-			if(equal(playerPassword[id], password)) {
+			if (equal(playerPassword[id], password)) {
 				playerStatus[id] = LOGGED;
 				
 				set_bit(id, autoLogin);
-			}
-			else playerStatus[id] = NOT_LOGGED;
+			} else playerStatus[id] = NOT_LOGGED;
 
 			cod_cmd_execute(id, "exec config.cfg");
 		}
@@ -682,13 +681,13 @@ public load_account_handle(failState, Handle:query, error[], errorNum, tempId[],
 
 public account_query(id, type)
 {
-	if(!is_user_connected(id)) return;
+	if (!is_user_connected(id)) return;
 
 	new queryData[128], password[33];
 
 	cod_sql_string(playerPassword[id], password, charsmax(password));
 
-	switch(type) {
+	switch (type) {
 		case INSERT: formatex(queryData, charsmax(queryData), "INSERT INTO `cod_accounts` VALUES ('%s', '%s')", playerSafeName[id], password);
 		case UPDATE: formatex(queryData, charsmax(queryData), "UPDATE `cod_accounts` SET pass = '%s' WHERE name = '%s'", password, playerSafeName[id]);
 		case DELETE: formatex(queryData, charsmax(queryData), "DELETE FROM `cod_accounts` WHERE name = '%s'", playerSafeName[id]);
@@ -700,7 +699,7 @@ public account_query(id, type)
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
 	if (failState) {
-		if(failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
+		if (failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
 		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "Query failed. [%d] %s", errorNum, error);
 	}
 	
@@ -709,17 +708,17 @@ public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSiz
 
 public _cod_check_account(plugin_id, num_params)
 {
-	if(!cvarAccountsEnabled) return true;
+	if (!cvarAccountsEnabled) return true;
 
 	new id = get_param(1);
 	
-	if(!is_user_valid(id)) {
+	if (!is_user_valid(id)) {
 		log_error(AMX_ERR_NATIVE, "[CoD] Invalid Player (%d)", id);
 		
 		return false;
 	}
 	
-	if(playerStatus[id] < LOGGED) {
+	if (playerStatus[id] < LOGGED) {
 		cod_print_chat(id, "Musisz sie^x03 zalogowac^x01, aby miec dostep do glownych funkcji!");
 		
 		account_menu(id, true);

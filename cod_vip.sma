@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD VIP"
-#define VERSION "1.0.3"
+#define VERSION "1.0.4"
 #define AUTHOR "O'Zone"
 
 new Array:listVIPs, vip;
@@ -17,8 +17,8 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	for(new i; i < sizeof commandVIP; i++) register_clcmd(commandVIP[i], "show_vip_motd");
-	for(new i; i < sizeof commandVIPs; i++) register_clcmd(commandVIPs[i], "show_vips");
+	for (new i; i < sizeof commandVIP; i++) register_clcmd(commandVIP[i], "show_vip_motd");
+	for (new i; i < sizeof commandVIPs; i++) register_clcmd(commandVIPs[i], "show_vips");
 
 	register_message(get_user_msgid("SayText"), "say_text");
 	register_message(get_user_msgid("ScoreAttrib"), "vip_status");
@@ -37,17 +37,17 @@ public plugin_end()
 
 public client_authorized(id)
 {
-	if(get_user_flags(id) & ADMIN_LEVEL_H) {
+	if (get_user_flags(id) & ADMIN_LEVEL_H) {
 		set_bit(id, vip);
 		
 		new name[32], tempName[32], size = ArraySize(listVIPs);
 
 		get_user_name(id, name, charsmax(name));
 	
-		for(new i = 0; i < size; i++) {
+		for (new i = 0; i < size; i++) {
 			ArrayGetString(listVIPs, i, tempName, charsmax(tempName));
 		
-			if(equal(name, tempName)) return PLUGIN_CONTINUE;
+			if (equal(name, tempName)) return PLUGIN_CONTINUE;
 		}
 		
 		ArrayPushString(listVIPs, name);
@@ -58,17 +58,17 @@ public client_authorized(id)
 
 public client_disconnected(id)
 {
-	if(get_bit(id, vip)) {
+	if (get_bit(id, vip)) {
 		rem_bit(id, vip);
 		
 		new name[32], tempName[32], size = ArraySize(listVIPs);
 
 		get_user_name(id, name,charsmax(name));
 	
-		for(new i = 0; i < size; i++) {
+		for (new i = 0; i < size; i++) {
 			ArrayGetString(listVIPs, i, tempName, charsmax(tempName));
 		
-			if(equal(tempName, name)) {
+			if (equal(tempName, name)) {
 				ArrayDeleteItem(listVIPs, i);
 
 				break;
@@ -81,22 +81,22 @@ public client_disconnected(id)
 
 public client_infochanged(id)
 {
-	if(get_bit(id, vip)) {
+	if (get_bit(id, vip)) {
 		new name[64], newName[64];
 
 		get_user_info(id, "name", name, charsmax(name));
 		
 		get_user_name(id, newName,charsmax(newName));
 		
-		if(!equal(name, newName)) {
+		if (!equal(name, newName)) {
 			ArrayPushString(listVIPs, name);
 			
 			new tempName[64], size = ArraySize(listVIPs);
 
-			for(new i = 0; i < size; i++) {
+			for (new i = 0; i < size; i++) {
 				ArrayGetString(listVIPs, i, tempName, charsmax(tempName));
 				
-				if(equal(tempName, newName)) {
+				if (equal(tempName, newName)) {
 					ArrayDeleteItem(listVIPs,i);
 
 					break;
@@ -115,12 +115,12 @@ public show_vips(id)
 {
 	new message[192], name[64], size = ArraySize(listVIPs);
 	
-	for(new i = 0; i < size; i++) {
+	for (new i = 0; i < size; i++) {
 		ArrayGetString(listVIPs, i, name, charsmax(name));
 		
 		add(message, charsmax(message), name);
 		
-		if(i == size - 1) add(message, charsmax(message), ".");
+		if (i == size - 1) add(message, charsmax(message), ".");
 		else add(message, charsmax(message), ", ");
 	}
 	
@@ -131,7 +131,7 @@ public show_vips(id)
 
 public cod_spawned(id)
 {
-	if(get_bit(id, vip) && is_user_alive(id)) {
+	if (get_bit(id, vip) && is_user_alive(id)) {
 		cod_give_weapon(id, CSW_HEGRENADE);
 	
 		cod_give_weapon(id, CSW_FLASHBANG);
@@ -143,7 +143,7 @@ public cod_spawned(id)
 
 public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
 {
-	if(!get_bit(attacker, vip)) return PLUGIN_CONTINUE;
+	if (!get_bit(attacker, vip)) return PLUGIN_CONTINUE;
 
 	cod_inflict_damage(attacker, victim, damage * 0.05, 0.0, damageBits);
 
@@ -152,7 +152,7 @@ public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPl
 
 public cod_killed(killer, victim, weaponId, hitPlace)
 {
-	if(!get_bit(killer, vip)) return PLUGIN_CONTINUE;
+	if (!get_bit(killer, vip)) return PLUGIN_CONTINUE;
 
 	new bool:hs = hitPlace == HIT_HEAD;
 
@@ -160,44 +160,43 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 	cs_set_user_money(killer, cs_get_user_money(killer) + (hs ? 1000 : 500));
 	
-	if(hs) cod_show_hud(killer, TYPE_DHUD, 38, 218, 116, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0, "HeadShot! +15HP");
+	if (hs) cod_show_hud(killer, TYPE_DHUD, 38, 218, 116, 0.50, 0.35, 0, 0.0, 1.0, 0.0, 0.0, "HeadShot! +15HP");
 	else cod_show_hud(killer, TYPE_DHUD, 255, 212, 0, 0.50, 0.31, 0, 0.0, 1.0, 0.0, 0.0, "Zabiles! +10HP");
 
 	return PLUGIN_CONTINUE;
 }
 
 public bomb_planted(id)
-	if(get_bit(id, vip)) cs_set_user_money(id, cs_get_user_money(id) + 500);
+	if (get_bit(id, vip)) cs_set_user_money(id, cs_get_user_money(id) + 500);
 
 public bomb_defused(id)
-	if(get_bit(id, vip)) cs_set_user_money(id, cs_get_user_money(id) + 500);
+	if (get_bit(id, vip)) cs_set_user_money(id, cs_get_user_money(id) + 500);
 
 public vip_status()
 {
 	new id = get_msg_arg_int(1);
 	
-	if(is_user_alive(id) && get_bit(id, vip)) set_msg_arg_int(2, ARG_BYTE, get_msg_arg_int(2) | 4);
+	if (is_user_alive(id) && get_bit(id, vip)) set_msg_arg_int(2, ARG_BYTE, get_msg_arg_int(2) | 4);
 }
 
 public say_text(msgId, msgDest, msgEnt)
 {
 	new id = get_msg_arg_int(1);
 	
-	if(is_user_connected(id) && get_bit(id, vip)) {
+	if (is_user_connected(id) && get_bit(id, vip)) {
 		new tempMessage[192], message[192], chatPrefix[64], steamId[33], playerName[32];
 		
 		get_msg_arg_string(2, tempMessage, charsmax(tempMessage));
 		get_user_authid(id, steamId, charsmax(steamId)); 
 
-		if(equali(steamId, "STEAM_0:1:55664") || equali(steamId, "STEAM_0:1:6389510")) formatex(chatPrefix, charsmax(chatPrefix), "^x04[WLASCICIEL]");
+		if (equali(steamId, "STEAM_0:1:55664") || equali(steamId, "STEAM_0:1:6389510")) formatex(chatPrefix, charsmax(chatPrefix), "^x04[WLASCICIEL]");
 		else formatex(chatPrefix, charsmax(chatPrefix), "^x04[VIP]");
 		
-		if(!equal(tempMessage, "#Cstrike_Chat_All")) {
+		if (!equal(tempMessage, "#Cstrike_Chat_All")) {
 			add(message, charsmax(message), chatPrefix);
 			add(message, charsmax(message), " ");
 			add(message, charsmax(message), tempMessage);
-		}
-		else {
+		} else {
 	        get_user_name(id, playerName, charsmax(playerName));
 	        
 	        get_msg_arg_string(4, tempMessage, charsmax(tempMessage)); 

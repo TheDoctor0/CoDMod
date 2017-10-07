@@ -2,7 +2,7 @@
 #include <cod>
  
 #define PLUGIN "CoD Menu"
-#define VERSION "1.0.10"
+#define VERSION "1.0.11"
 #define AUTHOR "O'Zone" 
 
 new const commandMenu[][] = { "say /help", "say_team /help", "say /pomoc", "say_team /pomoc", "say /komendy", "say_team /komendy", "say /menu", "say_team /menu", "menu" };
@@ -13,7 +13,7 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	for(new i; i < sizeof commandMenu; i++) register_clcmd(commandMenu[i], "display_menu");
+	for (new i; i < sizeof commandMenu; i++) register_clcmd(commandMenu[i], "display_menu");
 }
 
 public plugin_cfg()
@@ -26,14 +26,14 @@ public plugin_cfg()
 	get_localinfo("amxx_configsdir", menuFile, charsmax(menuFile));
 	format(menuFile, charsmax(menuFile), "%s/cod_menu.ini", menuFile);
 	
-	if(!file_exists(menuFile)) set_fail_state("[CoD] Brak pliku cod_menu.ini z zawartoscia glownego menu!");
+	if (!file_exists(menuFile)) set_fail_state("[CoD] Brak pliku cod_menu.ini z zawartoscia glownego menu!");
 	
 	new lineContent[128], menuTitle[64], menuCommand[64], file = fopen(menuFile, "r");
 	
-	while(!feof(file)) {
+	while (!feof(file)) {
 		fgets(file, lineContent, charsmax(lineContent)); trim(lineContent);
 		
-		if(lineContent[0] == ';' || lineContent[0] == '^0') continue;
+		if (lineContent[0] == ';' || lineContent[0] == '^0') continue;
 
 		parse(lineContent, menuTitle, charsmax(menuTitle), menuCommand, charsmax(menuCommand));
 		
@@ -53,13 +53,13 @@ public client_putinserver(id)
 
 public display_menu(id)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 		
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
 	new menuTitle[64], menu = menu_create("\yMenu \rCoD Mod\w", "display_menu_handle");
 	
-	for(new i; i < ArraySize(menuTitles); i++) {
+	for (new i; i < ArraySize(menuTitles); i++) {
 		ArrayGetString(menuTitles, i, menuTitle, charsmax(menuTitle));
 
 		menu_additem(menu, menuTitle);
@@ -76,9 +76,9 @@ public display_menu(id)
  
 public display_menu_handle(id, menu, item)
 {
-	if(!is_user_connected(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 	
-	if(item == MENU_EXIT) {
+	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -86,7 +86,7 @@ public display_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	if(!item) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!item) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
 	new menuCommand[64];
     

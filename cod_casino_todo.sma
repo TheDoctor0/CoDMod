@@ -1,11 +1,14 @@
 #include <amxmodx>
 #include <amxmisc>
 #include <cstrike>
+#include <fakemeta>
+#include <engine>
 #include <nvault>
+#include <xs>
 
 #define PLUGIN "CS1.6Bet.com"
-#define VERSION "1.6"
-#define AUTHOR "EFFx"
+#define VERSION "1.7"
+#define AUTHOR "EFFx" // Coinflip and jackpot roll system code by Natsheh - https://forums.alliedmods.net/member.php?u=198418
 
 #if AMXX_VERSION_NUM < 183
 #define MAX_PLAYERS 32
@@ -18,8 +21,12 @@ const TASK_DICE =			3134
 const TASK_CRASH =			3135
 const TASK_CRASH_MENU =			3136
 const TASK_LIST =			3137
+const TASK_COUNTDOWN =			3138
 const MAX_MONEY =			16000
 const g_iOneDayInSeconds =		86400
+
+new const g_szCoinModel[] =		"models/coin.mdl"
+new const g_szCoinClassName[] =		"coin"
 
 enum Positions
 {
@@ -33,13 +40,18 @@ enum hSyncs
 	Numbers,
 	BestPredictor,
 	CrashTime,
-	Crashed
+	Crashed,
+	Won,
+	Lost,
+	Tails,
+	Heads
 }
 
 enum dPlayerDatas
 {
 	bool:bIsBetting,
 	bool:bCanUseDailyWheel,
+	bool:bIsJackpotGambler,
 	iMoneyBetted,
 	iDayWins,
 	iTimes,
@@ -51,14 +63,16 @@ enum dPlayerDatas
 	iDiceBets,
 	iCrashBets,
 	iJackpotsBets,
+	iCoinflipBets,
 	iAutoCrashout,
 	iMostWonValue,
 	iMostLoseValue,
 	iDailyWheelTimesUsed,
+	iCoinSide,
 	Float:fRouletteTime,
 	Float:fCrashTimes,
-	szMostWonGame[10],
-	szMostLostGame[10]
+	szMostWonGame[MAX_PLAYERS],
+	szMostLostGame[MAX_PLAYERS]
 }
 
 enum cPcvars
@@ -73,12 +87,21 @@ enum cPcvars
 	pCvarSponsorAdmin,
 	pCvarMinPlayersToStart,
 	pCvarMinBet, 
-	pCvarMaxBet
+	pCvarMaxBet,
+	pCvarCoinflip,
+	pCvarRollType,
+	pCvarRollTime
 }
 
-new g_dPlayerData[MAX_PLAYERS + 1][dPlayerDatas], g_iGamblers[MAX_PLAYERS + 1], pCvars[cPcvars]
+new g_dPlayerData[MAX_PLAYERS + 1][dPlayerDatas], pCvars[cPcvars]
 new g_iSequence[Positions], g_iBestPredictor, g_iPredictorWins, g_hSync[hSyncs], g_szPredictorName[MAX_PLAYERS]
 new g_nVaultBet, gMsgSayText
+
+const MAX_CHANCES = 100
+new chances_reserved[MAX_CHANCES][MAX_PLAYERS], g_iJackpotMoney
+
+new g_fwPreThinkPost, Trie:g_tUserChance
+new g_iEntity[MAX_PLAYERS + 1]
 
 new g_iValueBetted, bool:g_bIsRolling, g_iCount
 
@@ -94,6 +117,7 @@ public plugin_init()
 		set_fail_state("Nvault save file was not opened, failing the plugin..")
 	}
 	
+	g_tUserChance = TrieCreate()
 	gMsgSayText = get_user_msgid("SayText")
 	
 	pCvars[pCvarMinTimesToUseDailyWheel] = register_cvar("bet_minbets_to_daily", "50")
@@ -101,6 +125,9 @@ public plugin_init()
 	pCvars[pCvarDiceMultiplier] = register_cvar("bet_dice_multiplier", "2")
 	pCvars[pCvarRoulette] = register_cvar("bet_roulette", "1")
 	pCvars[pCvarJackpot] = register_cvar("bet_jackpot", "1")
+	pCvars[pCvarCoinflip] = register_cvar("bet_coinflip", "1")
+	pCvars[pCvarRollTime] = register_cvar("bet_roll_time_seconds", "60")
+	pCvars[pCvarRollType] = register_cvar("bet_roll_type", "1")
 	pCvars[pCvarMinPlayersToStart] = register_cvar("bet_jp_minplayers_to_roll", "15")
 	pCvars[pCvarMinBet] = register_cvar("bet_jp_minbet", "1000")
 	pCvars[pCvarMaxBet] = register_cvar("bet_jp_maxbet", "16000")
@@ -119,13 +146,20 @@ public plugin_init()
 	register_clcmd("say", "cmdSay")
 	register_clcmd("AutoCrashoutValue", "cmdCrashOutValue")
 	register_clcmd("jackpot_bet", "cmdBetValue")
+	register_clcmd("enter_coin_bet", "clcmd_coinbet")
 	
 	set_task(1.0, "showBestWinner", .flags = "b")
+}
+
+public plugin_precache()
+{
+	precache_model(g_szCoinModel)
 }
 
 public plugin_end()
 {
 	nvault_close(g_nVaultBet)
+	TrieDestroy(g_tUserChance)
 }
 
 public client_disconnect(id)
@@ -137,18 +171,6 @@ public client_disconnect(id)
 public client_putinserver(id)
 {
 	loadPlayerBets(id)
-	
-	if(g_dPlayerData[id][iDailyWheelTimesUsed] > 0)
-	{	
-		if((get_systime() - g_dPlayerData[id][iLastBet]) > g_iOneDayInSeconds)
-		{
-			g_dPlayerData[id][bCanUseDailyWheel] = true
-		}
-	}
-	else
-	{
-		g_dPlayerData[id][bCanUseDailyWheel] = true
-	}
 }
 
 public cmdAllowDaily(id, level, cid)
@@ -205,6 +227,7 @@ public cmdResetData(id, level, cid)
 		g_dPlayerData[iPlayer][iDiceBets] = 0
 		g_dPlayerData[iPlayer][iCrashBets] = 0
 		g_dPlayerData[iPlayer][iJackpotsBets] = 0
+		g_dPlayerData[iPlayer][iCoinflipBets] = 0
 		g_dPlayerData[iPlayer][iDayWins] = 0
 		g_dPlayerData[iPlayer][iRouletteBets] = 0
 		g_dPlayerData[iPlayer][iTimesLose] = 0
@@ -223,9 +246,9 @@ public cmdCrashOutValue(id)
 	new szValue[5]
 	read_argv(1, szValue, charsmax(szValue))
 	remove_quotes(szValue)
-	new iValue = str_to_num(szValue)
 	
-	if(iValue <= 1)
+	new iValue = str_to_num(szValue)
+	if(!iValue || iValue == 1)
 	{
 		client_cmd(id, "messagemode AutoCrashoutValue")
 		ChatColor(id, "You must set a value that's more than 1!")
@@ -249,10 +272,10 @@ public cmdSay(id)
 		new szCommand[15], szValue[MAX_PLAYERS]
 		strbreak(szSay, szCommand, charsmax(szCommand), szValue, charsmax(szValue))
 		new iMoneyBet = str_to_num(szValue)
-		
+
 		if(equal(szCommand, "/roulette"))
 		{
-			if(canBet(id, iMoneyBet, .iCvarCheck = get_pcvar_num(pCvars[pCvarRoulette])))
+			if(canBet(id, iMoneyBet, false, true, get_pcvar_num(pCvars[pCvarRoulette])))
 			{	
 				g_dPlayerData[id][iBetTimes]++
 				g_dPlayerData[id][iRouletteBets]++
@@ -263,7 +286,7 @@ public cmdSay(id)
 		}
 		else if(equal(szCommand, "/dice"))
 		{
-			if(canBet(id, iMoneyBet, .iCvarCheck = get_pcvar_num(pCvars[pCvarDice])))
+			if(canBet(id, iMoneyBet, false, true, get_pcvar_num(pCvars[pCvarDice])))
 			{
 				g_dPlayerData[id][iBetTimes]++
 				g_dPlayerData[id][iDiceBets]++
@@ -274,7 +297,7 @@ public cmdSay(id)
 		}
 		else if(equal(szCommand, "/crash"))
 		{
-			if(canBet(id, iMoneyBet, true, get_pcvar_num(pCvars[pCvarCrash])))
+			if(canBet(id, iMoneyBet, true, .iCvarCheck = get_pcvar_num(pCvars[pCvarCrash])))
 			{
 				set_task(2.1, "cmdCrashMenu", id + TASK_CRASH_MENU)
 			}
@@ -287,7 +310,27 @@ public cmdSay(id)
 				ChatColor(id, "This game is currently disabled!")
 				return PLUGIN_HANDLED
 			}
+			else if(!is_user_alive(id))
+			{
+				ChatColor(id, "You must be alive!")
+				return PLUGIN_HANDLED
+			}
 			cmdJackpot(id)
+			return PLUGIN_HANDLED
+		}
+		else if(equal(szCommand, "/coinflip"))
+		{
+			if(!get_pcvar_num(pCvars[pCvarCoinflip]))
+			{
+				ChatColor(id, "This game is currently disabled!")
+				return PLUGIN_HANDLED
+			}
+			else if(!is_user_alive(id))
+			{
+				ChatColor(id, "You must be alive!")
+				return PLUGIN_HANDLED
+			}
+			clcmd_stack_menu(id)
 			return PLUGIN_HANDLED
 		}
 		else if(equal(szCommand, "/betstatus"))
@@ -314,11 +357,6 @@ public cmdSay(id)
 				return PLUGIN_HANDLED
 			}
 		}
-		else if(equal(szCommand, "/topbets"))
-		{
-			show_Top15(id)
-			return PLUGIN_HANDLED
-		}
 		else if(equal(szCommand, "/dailywheel"))
 		{
 			CheckIfIsTimeToWheel(id)
@@ -331,11 +369,12 @@ public cmdSay(id)
 public cmdJackpot(id)
 {	
 	new szFormat[75]
-	formatex(szFormat, charsmax(szFormat), "Jackpot Menu^n\d - Current jackpot: %d", g_iValueBetted)
+	formatex(szFormat, charsmax(szFormat), "Jackpot Menu^n\d- Current jackpot: %d", g_iValueBetted)
 	new iMenu = menu_create(szFormat, "jackpot_handler")
 	
-	menu_additem(iMenu, "Join Jackpot^n\d - After join, you can't get out!")
+	menu_additem(iMenu, "Join Jackpot^n\d - Bet a value to join!")
 	menu_additem(iMenu, "Gamblers' Chance^n\d - Check gamblers' chance!")
+	menu_additem(iMenu, "Get out the pot^n\d- Get outta this round!")
 	menu_display(id, iMenu)
 	return PLUGIN_HANDLED
 }
@@ -352,14 +391,16 @@ public jackpot_handler(id, iMenu, iItem)
 	{
 		case 0:
 		{
-			if(g_dPlayerData[id][bIsBetting])
+			if(g_dPlayerData[id][bIsJackpotGambler])
 			{
 				ChatColor(id, "You have already joined!")
+				menu_display(id, iMenu)
 				return PLUGIN_HANDLED
 			}
 			else if(g_bIsRolling)
 			{
 				ChatColor(id, "The jackpot is rolling, you cannot now.")
+				menu_display(id, iMenu)
 				return PLUGIN_HANDLED
 			}
 			client_cmd(id, "messagemode jackpot_bet")
@@ -375,6 +416,34 @@ public jackpot_handler(id, iMenu, iItem)
 			}
 			showPlayersChanceMenu(id)
 		}
+		case 2:
+		{
+			if(!g_dPlayerData[id][bIsJackpotGambler])
+			{
+				ChatColor(id, "You haven't joined!")
+				menu_display(id, iMenu)
+				return PLUGIN_HANDLED
+			}
+			else if(g_bIsRolling)
+			{
+				ChatColor(id, "The jackpot is rolling, you cannot now.")
+				menu_display(id, iMenu)
+				return PLUGIN_HANDLED
+			}
+
+			cs_set_user_money(id, cs_get_user_money(id) + g_dPlayerData[id][iMoneyBetted])
+
+			g_dPlayerData[id][iBetTimes]--
+			g_dPlayerData[id][iJackpotsBets]--
+			g_dPlayerData[id][bIsJackpotGambler] = false
+
+			g_iCount--
+			g_iValueBetted -= g_dPlayerData[id][iMoneyBetted]
+
+			new szName[MAX_PLAYERS]
+			get_user_name(id, szName, charsmax(szName))
+			ChatColor(0, "^x03%s^x01 has abandoned the pot!", szName)
+		}
 	}
 	menu_destroy(iMenu)
 	return PLUGIN_HANDLED
@@ -382,18 +451,21 @@ public jackpot_handler(id, iMenu, iItem)
 
 public showPlayersChanceMenu(id)
 {
-	new szFormat[100], iMenu = menu_create("Players Chance", "chance_handler")
+	new szFormat[100], iMenu = menu_create("Players Chance^n\d- Check player's chance here!", "chance_handler")
 	
 	new iPlayers[MAX_PLAYERS], iNum, tempid
 	get_players(iPlayers, iNum)
-	for(new i, szName[MAX_PLAYERS];i < iNum; i++)
+	for(new i, iChance, szAuthid[35], szName[MAX_PLAYERS];i < iNum; i++)
 	{
 		tempid = iPlayers[i]
 	
-		if(g_dPlayerData[tempid][bIsBetting])
+		if(g_dPlayerData[tempid][bIsJackpotGambler])
 		{
+			get_user_authid(tempid, szAuthid, charsmax(szAuthid))
+			TrieGetCell(g_tUserChance, szAuthid, iChance)
+			
 			get_user_name(tempid, szName, charsmax(szName))
-			formatex(szFormat, charsmax(szFormat), "\r%s\w with\y %.1f%%", szName, getJackpotChance(tempid))
+			formatex(szFormat, charsmax(szFormat), "\r%s\w with\y %d%%", szName, iChance)
 		
 			menu_additem(iMenu, szFormat)
 		}
@@ -439,15 +511,42 @@ public cmdBetValue(id)
 	{
 		cs_set_user_money(id, (iUserMoney - iValue))
 		
-		g_iGamblers[g_iCount] = id
 		g_iCount++
+		g_iValueBetted += iValue
 		
+		new Float:fTempMoney = float(g_iJackpotMoney)
+		fTempMoney += float(iValue)
+		
+		g_dPlayerData[id][iMoneyBetted] += iValue
 		g_dPlayerData[id][iBetTimes]++
 		g_dPlayerData[id][iJackpotsBets]++
-		g_dPlayerData[id][bIsBetting] = true
-		g_dPlayerData[id][iMoneyBetted] = iValue
+		g_dPlayerData[id][bIsJackpotGambler] = true
 
-		g_iValueBetted += iValue
+		new szAuthid[MAX_PLAYERS], szName[MAX_PLAYERS]
+		get_user_authid(id, szAuthid, charsmax(szAuthid))
+		get_user_name(id, szName, charsmax(szName))
+	
+		new iChance
+		for(new i, start, iChances, j; i < g_iCount; i++)
+		{
+			iChance = floatround((iValue / fTempMoney) * MAX_CHANCES)
+			iChances += iChance
+			TrieSetCell(g_tUserChance, szAuthid, iChance)
+			
+			if(iChances > MAX_CHANCES) 
+			{
+				iChances = MAX_CHANCES
+			}
+			
+			for(j = start; j < iChances <= MAX_CHANCES; j++)
+			{
+				chances_reserved[j] = szAuthid
+			}
+			
+			start = iChances
+		}
+		
+		ChatColor(0, "Player^x04 %s^x01 has joined the jackpot betting^x04 %d$^x01 with^x04 %d%%^x01 chance!", szName, iValue, iChance)
 		
 		if(checkPlayersInJackpot() == 1)
 		{
@@ -455,77 +554,100 @@ public cmdBetValue(id)
 			{
 				set_task(1.0, "showPlayersList", TASK_LIST, .flags = "b")
 			}
-		}
-		
-		new szName[MAX_PLAYERS]
-		get_user_name(id, szName, charsmax(szName))
-		
-		ChatColor(0, "Player^x04 %s^x01 has joined the jackpot betting^x04 %d$^x01 with^x04 %.1f%%^x01 chance!", szName, iValue, getJackpotChance(id))
+		}		
 	}
 	return PLUGIN_HANDLED
 }
 
 public showPlayersList()
 {
+	static iRollTime
+	
 	if(!checkPlayersInJackpot())
 	{
-		resetData()
+		iRollTime = 0
+		ChatColor(0, "There's no jackpot gamblers, ending this round...")
+		resetData(0)
 		return
 	}
 
-	new szHud[75], iPlayersNeeded = get_pcvar_num(pCvars[pCvarMinPlayersToStart])
-	if(checkPlayersInJackpot() >= iPlayersNeeded)
+	new szHud[75]
+
+	switch(get_pcvar_num(pCvars[pCvarRollType]))
 	{
-		static iTime
-		if(!iTime)
+		case 0:
 		{
-			iTime = 4
-			g_bIsRolling = true
-			
-			ChatColor(0, "Rolling...")
-			set_task(3.8, "roll")
+			new iPlayersNeeded = get_pcvar_num(pCvars[pCvarMinPlayersToStart])
+			if(checkPlayersInJackpot() >= iPlayersNeeded)
+			{
+				set_task(1.0, "rollMsg", .flags = "a", .repeat = 4)
+				remove_task(TASK_LIST)
+			}
+			else
+			{
+				formatex(szHud, charsmax(szHud), "%d of %d players needed^nto roll!", checkPlayersInJackpot(), iPlayersNeeded)
+			}
 		}
-		formatex(szHud, charsmax(szHud), "Rolling in %d...", iTime--)
-	}
-	else
-	{
-		formatex(szHud, charsmax(szHud), "%d of %d players needed^n to roll!", checkPlayersInJackpot(), iPlayersNeeded)
+		default:
+		{
+			new szTime[10]
+
+			if(!iRollTime)
+			{
+				iRollTime = get_pcvar_num(pCvars[pCvarRollTime])
+			}
+			
+			if(--iRollTime == 1)
+			{
+				if(checkPlayersInJackpot() != 1)
+				{
+					ChatColor(0, "The jackpot needs more than 1 gambler to roll. Ending that round...")
+					resetData(1)
+				}
+				else
+				{
+					set_task(1.0, "rollMsg", .flags = "a", .repeat = 4)
+				}
+				
+				remove_task(TASK_LIST)
+			}
+
+			format_time(szTime, charsmax(szTime), "%M:%S", iRollTime)
+			formatex(szHud, charsmax(szHud), "Jackpot will roll in^n        %s^nPot value: %d", szTime, g_iValueBetted)
+			
+		}
 	}
 	
 	set_hudmessage(0, 200, 0, 0.75, 0.10, 0, 1.0, 1.0)
 	show_hudmessage(0, szHud)
 }
 
+public rollMsg()
+{
+	static iTime
+	if(!iTime)
+	{
+		iTime = 4
+		g_bIsRolling = true
+				
+		ChatColor(0, "Rolling...")
+		set_task(3.8, "roll")
+	}
+	set_hudmessage(0, 200, 0, 0.75, 0.10, 0, 1.0, 1.0)
+	show_hudmessage(0, "Rolling in %d...", iTime--)
+}
+
 public roll()
 {
-	new iRandomPlayer
-	for(new i, iPlayer, Float:iRandomValue;i < g_iCount;i++)
-	{
-		iRandomValue = random_float(0.1, 100.0), iPlayer = getBestChance()
-		if(iRandomValue >= getJackpotChance(iPlayer))
-		{
-			iRandomPlayer = iPlayer
-		}
-		else
-		{
-			iRandomPlayer = g_iGamblers[random(g_iCount)] 
-		}
-	}
+	new iRand = random(MAX_CHANCES), iRandomPlayer = is_user_connected_byauthid(chances_reserved[iRand])
 	
-	if(!is_user_connected(iRandomPlayer))
+	if(!is_user_connected(iRandomPlayer) || !g_dPlayerData[iRandomPlayer][bIsJackpotGambler])
 	{
 		roll()
 		return
 	}
 	
-	cs_set_user_money(iRandomPlayer, clamp(cs_get_user_money(iRandomPlayer) + g_iValueBetted, 0, MAX_MONEY))
-
-	if(g_iValueBetted > g_dPlayerData[iRandomPlayer][iMostWonValue])
-	{
-		g_dPlayerData[iRandomPlayer][iMostWonValue] = g_iValueBetted
-		formatex(g_dPlayerData[iRandomPlayer][szMostWonGame], charsmax(g_dPlayerData[]), "Jackpot")
-	}
-	g_dPlayerData[iRandomPlayer][iTimesWon]++
+	setUserMoney(iRandomPlayer, g_iValueBetted, "Jackpot")
 	
 	new iPlayers[MAX_PLAYERS], iNum, id
 	get_players(iPlayers, iNum)
@@ -533,22 +655,362 @@ public roll()
 	{
 		id = iPlayers[i]
 		
-		if(id != iRandomPlayer)
+		if(id != iRandomPlayer && g_dPlayerData[id][bIsJackpotGambler])
 		{
-			if(g_dPlayerData[id][iMoneyBetted] > g_dPlayerData[id][iMostLoseValue])
+			setSett(id, 0, "Jackpot")
+		}
+	}
+
+	resetData(0)
+}
+
+public clcmd_coinbet(id)
+{
+	if(g_dPlayerData[id][bIsBetting]) 
+	{
+		ChatColor(id, "You're already betting!")
+		return PLUGIN_HANDLED
+	}
+	
+	new szArgs[30]
+	read_args(szArgs, charsmax(szArgs))
+	remove_quotes(szArgs)
+	
+	new iAmount = str_to_num(szArgs)
+	if(iAmount <= 0)
+	{
+		ChatColor(id, "You must use a value that's more than 0")
+		return PLUGIN_HANDLED
+	}
+	else if(iAmount > cs_get_user_money(id)) 
+	{
+		ChatColor(id, "You do not have enough money!")
+		return PLUGIN_HANDLED
+	}
+	else 
+	{
+		g_dPlayerData[id][iMoneyBetted] = iAmount
+		clcmd_stack_menu(id)
+	}
+	return PLUGIN_HANDLED
+}
+
+public clcmd_stack_menu(id)
+{
+	if(g_dPlayerData[id][bIsBetting]) 
+	{
+		ChatColor(id, "You're already betting!")
+		return PLUGIN_HANDLED
+	}
+	
+	new menu = menu_create("\rCoin Challenge^n\d- Choose your stack!", "coin_menu_handle")
+	
+	new szText[60]
+	formatex(szText, charsmax(szText), "\wChoose your Stack: \r%d$^n\d- How much do ya wanna bet?", g_dPlayerData[id][iMoneyBetted])
+	menu_additem(menu, szText, "STACK")
+	menu_additem(menu, "\rReady!^n\d- Lets challenge someone?!", "STACK")
+	
+	menu_display(id, menu)
+	return PLUGIN_HANDLED
+}
+
+public clclmd_coin_menu(id)
+{
+	if(!g_dPlayerData[id][iMoneyBetted])
+	{
+		ChatColor(id, "Choose your stack!")
+		return PLUGIN_HANDLED
+	}
+	
+	new iMenu = menu_create("\rCoin Challenge^n\yChoose your opponent!", "coin_menu_handle")
+	
+	new iPlayers[MAX_PLAYERS], iNum
+	get_players(iPlayers, iNum)
+	
+	for(new i, szName[MAX_PLAYERS], player, szInfo[3]; i < iNum; i++)
+	{
+		player = iPlayers[i]
+		
+		if(player == id || g_dPlayerData[player][bIsBetting]) 
+		{
+			continue
+		}
+		
+		get_user_name(player, szName, charsmax(szName))
+		num_to_str(player, szInfo, charsmax(szInfo))
+		menu_additem(iMenu, szName, szInfo)
+	}
+	
+	menu_display(id, iMenu)
+	return PLUGIN_HANDLED
+}
+
+public coin_menu_handle(id, iMenu, iItem)
+{
+	if(iItem == MENU_EXIT || g_dPlayerData[id][bIsBetting])
+	{
+		menu_destroy(iMenu)
+		return PLUGIN_HANDLED
+	}
+	
+	new sData[12], iAccess, iCallback
+	menu_item_getinfo(iMenu, iItem, iAccess, sData, charsmax(sData), "", 0, iCallback)
+	menu_destroy(iMenu)
+	
+	if(equal(sData, "STACK"))
+	{
+		switch(iItem)
+		{
+			case 0:
 			{
-				g_dPlayerData[id][iMostLoseValue] = g_dPlayerData[id][iMoneyBetted]
-				formatex(g_dPlayerData[id][szMostLostGame], charsmax(g_dPlayerData[]), "Jackpot")
+				client_print(id, print_center, "Choose an amount of money above than zero!")
+				client_cmd(id, "messagemode enter_coin_bet")
 			}
-			g_dPlayerData[id][iTimesLose]++
+			case 1: 
+			{
+				clclmd_coin_menu(id)
+			}
+		}
+		
+		return PLUGIN_HANDLED
+	}
+	
+	if(equal(sData, "DUEL", 4))
+	{	
+		strtok(sData, "", 0, sData, charsmax(sData), '|')
+		
+		new player = str_to_num(sData)
+		if(!player || g_dPlayerData[player][bIsBetting]) 
+		{
+			clclmd_coin_menu(id)
+			return PLUGIN_HANDLED
+		}
+		
+		new szPlayerName[MAX_PLAYERS], szTargetName[MAX_PLAYERS]
+		get_user_name(player, szTargetName, charsmax(szTargetName))
+		get_user_name(id, szPlayerName, charsmax(szPlayerName))
+		
+		switch(iItem)
+		{
+			case 0:
+			{
+				ChatColor(0, "^x03%s^x01 vs.^x03 %s^x01 in coin flip challenge!", szTargetName, szPlayerName)
+				
+				new iRandomValue = random_num(1, 2), bool:bChanceX = bool:(iRandomValue == 1)
+				
+				set_hudmessage(101, 236, 38, -1.0, 0.34, 0, 6.0, 4.0)
+				show_hudmessage(bChanceX ? id : player, g_hSync[Tails], "You are Tails!")
+				
+				set_hudmessage(101, 236, 38, -1.0, 0.34, 0, 6.0, 4.0)
+				show_hudmessage(bChanceX ? player : id, g_hSync[Heads], "You are Heads!")
+				
+				if(!get_challengers_num() && !g_fwPreThinkPost)
+				{
+					g_fwPreThinkPost = register_forward(FM_PlayerPreThink, "fw_client_prethink_post", 1)
+				}
+				
+				g_dPlayerData[id][bIsBetting] = true
+				g_dPlayerData[id][iBetTimes]++
+				g_dPlayerData[id][iCoinflipBets]++
+				
+				setData(id, g_dPlayerData[id][iMoneyBetted], false)
+				setData(player, g_dPlayerData[id][iMoneyBetted], false)
+				
+				g_dPlayerData[player][iCoinflipBets]++
+				g_dPlayerData[player][bIsBetting] = true
+				g_dPlayerData[player][iBetTimes]++
+				
+				new iOppositeValue[2]
+				iOppositeValue[0] = bChanceX ? 2 : 1
+				iOppositeValue[1] = bChanceX ? 1 : 2
+				
+				remove_task(TASK_COUNTDOWN)
+				
+				g_dPlayerData[id][iCoinSide] = iOppositeValue[0]
+				g_dPlayerData[player][iCoinSide] = iOppositeValue[1]
+				
+				display_coin(id, iOppositeValue[0])
+				display_coin(player, iOppositeValue[1])
+				
+				ChatColor(0, "^x03%s^x01 is^x04 tails^x01 &^x03 %s^x01 is^x04 heads!", bChanceX ? szPlayerName : szTargetName, bChanceX ? szTargetName : szPlayerName)
+			}
+			case 1:
+			{
+				remove_task(TASK_COUNTDOWN)
+				ChatColor(player, "^x03%s^x01 has denied your coin challenge!", szPlayerName)
+			}
+		}
+		return PLUGIN_HANDLED
+	}
+		
+	new player = str_to_num(sData)
+	if(!player || g_dPlayerData[player][bIsBetting]) 
+	{
+		clclmd_coin_menu(id)
+		return PLUGIN_HANDLED
+	}
+		
+	ChatColor(id, "Waiting the target to accept!")
+	
+	coin_menu_duel(id, player)
+	return PLUGIN_HANDLED
+}
+
+public countdown(iData[3])
+{
+	new id = iData[0]
+	new iTarget = iData[1]
+	new iMenu = iData[2]
+
+	static iTime
+	
+	new szTargetName[MAX_PLAYERS]
+	get_user_name(iTarget, szTargetName, charsmax(szTargetName))
+	
+	if(!is_user_connected(iTarget))
+	{
+		ChatColor(id, "%s has disconnected!", szTargetName)
+		
+		iTime = 0
+		g_dPlayerData[id][bIsBetting] = false
+
+		remove_task(TASK_COUNTDOWN)
+		return
+	}
+	
+	if(!iTime)
+	{
+		iTime = 8
+	}
+	set_hudmessage(0, 255, 0, -1.0, 0.30, 0, 1.0, 1.0)
+	show_hudmessage(iTarget, "%d second%s to auto-deny the challenge!", iTime--, (iTime > 1) ? "s" : "")
+	
+	if(!iTime)
+	{
+		menu_destroy(iMenu)
+		
+		remove_task(TASK_COUNTDOWN)	
+		g_dPlayerData[id][bIsBetting] = false
+		g_dPlayerData[iTarget][bIsBetting] = false
+		
+		ChatColor(id, "^x03%s^x01 has denied your coin challenge!", szTargetName)
+		ChatColor(iTarget, "You didn't select any option, menu destroyed.")
+	}
+}
+
+public coin_menu_duel(id, target)
+{	
+	new szText[MAX_PLAYERS * 2], szName[MAX_PLAYERS]
+	get_user_name(id, szName, charsmax(szName))
+	
+	formatex(szText, charsmax(szText), "\w%s has Challenged you for \r%d$^n\yIn a coin flip game!^n", szName, g_dPlayerData[id][iMoneyBetted])
+	new iMenu = menu_create(szText, "coin_menu_handle")
+	
+	formatex(szText, charsmax(szText), "DUEL|%d", id)
+	menu_additem(iMenu, "Accept the Challenge!", szText)
+	menu_additem(iMenu, "Deny the Challenge!", szText)
+	
+	menu_setprop(iMenu, MPROP_EXIT, MEXIT_NEVER)
+	
+	menu_display(target, iMenu)
+	
+	new iData[3]
+	iData[0] = id
+	iData[1] = target
+	iData[2] = iMenu
+	
+	set_task(1.0, "countdown", TASK_COUNTDOWN, iData, sizeof iData, "b")
+}
+
+public task_chosen_side(const ent)
+{
+	new classname[6]
+	pev(ent, pev_classname, classname ,charsmax(classname))
+	
+	if(!pev_valid(ent) || !equal(classname, g_szCoinClassName)) 
+	{
+		return
+	}
+	
+	set_pev(ent, pev_sequence, 0)
+	set_pev(ent, pev_frame, 1.0)
+	set_pev(ent, pev_framerate, 1.0)
+	if(pev(ent, pev_iuser4) == 2) 
+	{
+		set_pev(ent, pev_iuser3, 1)
+	}
+
+	new iOwner = pev(ent, pev_iuser2)
+	
+	switch(g_dPlayerData[iOwner][iCoinSide] == pev(ent, pev_iuser4)) 
+	{
+		case true:
+		{
+			setUserMoney(iOwner, g_dPlayerData[iOwner][iMoneyBetted], "Coinflip")
+			
+			setSett(iOwner, 1, "Coinflip")
+		}
+		case false: 
+		{
+			setSett(iOwner, 0, "Coinflip")
 		}
 	}
 	
-	new szWinnerName[MAX_PLAYERS]
-	get_user_name(iRandomPlayer, szWinnerName, charsmax(szWinnerName))
-	ChatColor(0, "^x03%s^x01 won^x04 %d$^x01 with^x04 %.1f%%^x01 chance!", szWinnerName, g_iValueBetted, getJackpotChance(iRandomPlayer))
+	set_task(3.0, "removeCoin", iOwner)
+}
 
-	resetData()
+public removeCoin(id)
+{	
+	g_dPlayerData[id][iCoinSide] = 0
+	g_dPlayerData[id][iMoneyBetted] = 0
+	g_dPlayerData[id][bIsBetting] = false
+
+	new iEnt = -1
+	while((iEnt = find_ent_by_class(iEnt, g_szCoinClassName)))
+	{
+		engfunc(EngFunc_RemoveEntity, iEnt)
+	}
+	
+	g_iEntity[id] = 0
+
+	if(!get_challengers_num() && g_fwPreThinkPost)
+	{
+		unregister_forward(FM_PlayerPreThink, g_fwPreThinkPost, 1)
+		g_fwPreThinkPost = 0
+	}
+}
+
+public fw_client_prethink_post(target)
+{
+	static iEnt
+	if((iEnt = g_iEntity[target]) > 0)
+	{
+		static Float:fOrigin[3], Float:fAim[3]
+		pev(target, pev_origin, fOrigin)
+		pev(target, pev_view_ofs, fAim)
+		
+		xs_vec_add(fOrigin, fAim, fOrigin)
+		pev(target, pev_v_angle, fAim)
+		
+		angle_vector(fAim, ANGLEVECTOR_FORWARD, fAim)
+		xs_vec_mul_scalar(fAim, 10.0, fAim)
+		xs_vec_add(fOrigin, fAim, fOrigin)
+		pev(target, pev_v_angle, fAim)
+		
+		set_pev(iEnt, pev_origin, fOrigin)
+		pev(iEnt, pev_angles, fOrigin)
+	
+		fAim[0] = fOrigin[0]
+		fAim[2] = fOrigin[2]
+		fAim[1] += 180.0
+	
+		if(pev(iEnt, pev_iuser3) == 1)
+		{
+			fAim[1] += 180.0
+		}
+		
+		set_pev(iEnt, pev_angles, fAim)
+	}
 }
 
 public cmdCrashMenu(id)
@@ -582,14 +1044,14 @@ public crash_menu_handler(id, menu, item)
 			if(!g_dPlayerData[id][bIsBetting])
 			{
 				set_task(2.0, "cmdCrash", id + TASK_CRASH)
-				setData(id, g_dPlayerData[id][iMoneyBetted])
+				setData(id, g_dPlayerData[id][iMoneyBetted], true)
 				
 				g_dPlayerData[id][iBetTimes]++
 				g_dPlayerData[id][iCrashBets]++
 				
 				g_dPlayerData[id][bIsBetting] = true
 				
-				g_dPlayerData[id][fCrashTimes] = 1.0
+				g_dPlayerData[id][fCrashTimes] = _:1.0
 			}			
 			else
 			{
@@ -641,6 +1103,8 @@ public cmdCrash(id)
 		RGB = {0, 255, 0}
 	}
 	
+	g_dPlayerData[id][fCrashTimes] += 0.1
+	
 	set_hudmessage(RGB[0], RGB[1], RGB[2], -1.0, 0.40, 0, 1.0, 0.2)
 	ShowSyncHudMsg(id, g_hSync[CrashTime], "%.2f", g_dPlayerData[id][fCrashTimes])
 	
@@ -652,22 +1116,19 @@ public cmdCrash(id)
 		{
 			crashSetMoney(id)
 			crashMessage(id)
+
+			setSett(id, 1, "Crash")
 			return
 		}
 	}
 	
-	if(iRandomNumber < getChance(id, "Crash"))
-	{	
+	if(getChance(id, "Crash") >= iRandomNumber)
+	{
 		crashMessage(id)
-
-		if(g_dPlayerData[id][iMoneyBetted] > g_dPlayerData[id][iMostLoseValue])
-		{
-			g_dPlayerData[id][iMostLoseValue] = g_dPlayerData[id][iMoneyBetted]
-			formatex(g_dPlayerData[id][szMostLostGame], charsmax(g_dPlayerData[]), "Crash")
-		}
+		
+		setSett(id, 0, "Crash")
 		return
 	}
-	g_dPlayerData[id][fCrashTimes] += 0.1
 }
 
 public showBestWinner()
@@ -677,7 +1138,7 @@ public showBestWinner()
 	get_time("%M", szMinutes, charsmax(szMinutes))
 	
 	new iHour = str_to_num(szHour), iMinutes = str_to_num(szMinutes)
-	if(iHour == 00 && iMinutes == 0)
+	if(iHour == 00 && iMinutes == 00)
 	{
 		g_iBestPredictor = 0
 		g_iPredictorWins = 0
@@ -689,7 +1150,7 @@ public showBestWinner()
 		return
 			
 	set_hudmessage(0, 255, 0, 0.70, 0.50, 0, 1.0, 1.0)
-	ShowSyncHudMsg(0, g_hSync[BestPredictor], "BEST PREDICTOR OF THE DAY^n%s with %d wins", g_szPredictorName, g_iPredictorWins)
+	ShowSyncHudMsg(0, g_hSync[BestPredictor], "BEST PREDICTOR OF THE DAY^n%s with %d win%s", g_szPredictorName, g_iPredictorWins, (g_iPredictorWins > 1) ? "s" : "")
 }
 
 public cmdStartRolling(id)
@@ -705,15 +1166,15 @@ public cmdStartRolling(id)
 	g_dPlayerData[id][iTimes]++
 	switch(g_dPlayerData[id][iTimes])
 	{
-		case 12..22:	g_dPlayerData[id][fRouletteTime] = 0.2
-		case 23..26:	g_dPlayerData[id][fRouletteTime] = 0.4
-		case 27..33:	g_dPlayerData[id][fRouletteTime] = 0.6
-		case 34..37:	g_dPlayerData[id][fRouletteTime] = 0.8
-		case 38..41:	g_dPlayerData[id][fRouletteTime] = 1.0
+		case 12..22:	g_dPlayerData[id][fRouletteTime] = _:0.2
+		case 23..26:	g_dPlayerData[id][fRouletteTime] = _:0.4
+		case 27..33:	g_dPlayerData[id][fRouletteTime] = _:0.6
+		case 34..37:	g_dPlayerData[id][fRouletteTime] = _:0.8
+		case 38..41:	g_dPlayerData[id][fRouletteTime] = _:1.0
 		case 42:
 		{
 			g_dPlayerData[id][iTimes] = 0
-			g_dPlayerData[id][fRouletteTime] = 0.1
+			g_dPlayerData[id][fRouletteTime] = _:0.1
 			
 			g_dPlayerData[id][bIsBetting] = false
 			
@@ -728,13 +1189,7 @@ public cmdStartRolling(id)
 			{
 				if(iRandomNumber != 0)
 				{
-					g_dPlayerData[id][iTimesLose]++
-					
-					if(g_dPlayerData[id][iMoneyBetted] > g_dPlayerData[id][iMostLoseValue])
-					{
-						g_dPlayerData[id][iMostLoseValue] = g_dPlayerData[id][iMoneyBetted]
-						formatex(g_dPlayerData[id][szMostLostGame], charsmax(g_dPlayerData[]), "Roulette")
-					}
+					setSett(id, 0, "Roulette")
 
 					ChatColor(id, "You lost^x04 %d$^x01 betting on roulette. Try again...", g_dPlayerData[id][iMoneyBetted])
 					return
@@ -762,65 +1217,10 @@ public cmdDice(id)
 	}
 	else
 	{
-		g_dPlayerData[id][iTimesLose]++
-		
-		if(g_dPlayerData[id][iMoneyBetted] > g_dPlayerData[id][iMostLoseValue])
-		{
-			g_dPlayerData[id][iMostLoseValue] = g_dPlayerData[id][iMoneyBetted]
-			formatex(g_dPlayerData[id][szMostLostGame], charsmax(g_dPlayerData[]), "Dice")
-		}
+		setSett(id, 0, "Dice")
 		
 		ChatColor(id, "You lost^x04 %d$^x01 betting on dice. Try again...", g_dPlayerData[id][iMoneyBetted])
 	}
-}
-
-public show_Top15(id)
-{
-	new iSort[MAX_PLAYERS + 1][4]
-	
-	new iPlayers[MAX_PLAYERS], iPlayersNum, iCount, iPlayer
-	get_players(iPlayers, iPlayersNum)
-	for(new i;i < iPlayersNum;i++)
-	{
-		iPlayer = iPlayers[i]
-		
-		iSort[iCount][0] = iPlayer
-		iSort[iCount][1] = g_dPlayerData[iPlayer][iTimesWon]
-		iSort[iCount][2] = g_dPlayerData[iPlayer][iMostWonValue]
-		iSort[iCount][3] = g_dPlayerData[iPlayer][iMostLoseValue]
-		iCount++
-	}
-	
-	SortCustom2D(iSort, iCount, "stats_custom_compare")
-	
-	new szMotd[1024], iLen	
-	
-	iLen = format(szMotd, charsmax(szMotd),"<body bgcolor=#000000><font color=#FFB000><pre>")
-	iLen += format(szMotd[iLen], charsmax(szMotd) - iLen,"%s %-22.22s %s %s %s^n", "#", "Name", "Times Won", "Most won", "Most lost")
-
-	new b = clamp(iCount, 0, 15)
-	
-	for(new szName[MAX_PLAYERS][MAX_PLAYERS + 1], a; a < b; a++)
-	{
-		iPlayer = iSort[a][0]
-		
-		get_user_name(iPlayer, szName[iPlayer], charsmax(szName[]))		
-		iLen += format(szMotd[iLen], charsmax(szMotd) - iLen,"%d %-22.22s %d %d %d^n", a + 1, szName, iSort[a][1], iSort[a][2], iSort[a][3])
-	}
-	
-	iLen += format(szMotd[iLen], charsmax(szMotd) - iLen,"</body></font></pre>")
-	show_motd(id, szMotd, "Best Gamblers")
-}
-
-public stats_custom_compare(elem1[],elem2[])
-{
-	if(elem1[1] > elem2[1]) 
-		return -1
-		
-	else if(elem1[1] < elem2[1]) 
-		return 1
-		
-	return 0
 }
 
 showStatus(id, target)
@@ -843,7 +1243,7 @@ showStatus(id, target)
 	console_print(id, "============= %s's status =============", szTargetName)
 	console_print(id, "Times bet: %d, TimesWon: %d, TimesLose: %d, Daily wheels: %d", g_dPlayerData[target][iBetTimes], g_dPlayerData[target][iTimesWon], g_dPlayerData[target][iTimesLose], g_dPlayerData[target][iDailyWheelTimesUsed])
 	console_print(id, "Most won value: %d$ on %s, Most lose value: %d$ on %s", g_dPlayerData[target][iMostWonValue], g_dPlayerData[target][szMostWonGame], g_dPlayerData[target][iMostLoseValue], g_dPlayerData[target][szMostLostGame])
-	console_print(id, "Bets on roulette: %d, Bets on dice: %d, Bets on crash: %d, Bets on Jackpot: %d", g_dPlayerData[target][iRouletteBets], g_dPlayerData[target][iDiceBets], g_dPlayerData[target][iCrashBets], g_dPlayerData[target][iJackpotsBets])
+	console_print(id, "Bets on roulette: %d, Bets on dice: %d, Bets on crash: %d, Bets on Jackpot: %d, Bets on Coinflip: %d", g_dPlayerData[target][iRouletteBets], g_dPlayerData[target][iDiceBets], g_dPlayerData[target][iCrashBets], g_dPlayerData[target][iJackpotsBets], g_dPlayerData[target][iCoinflipBets])
 	console_print(id, "==================================================")
 }
 
@@ -851,6 +1251,7 @@ crashMessage(id)
 {
 	set_hudmessage(220, 0, 0, -1.0, 0.30, 0, 1.0, 1.0)
 	ShowSyncHudMsg(id, g_hSync[Crashed], "CRASHED!")
+
 	remove_task(id + TASK_CRASH)
 	
 	show_menu(id, 0, "^n")
@@ -859,22 +1260,24 @@ crashMessage(id)
 
 setUserMoney(id, iWonValue, szGameName[])
 {
-	new szWinnerName[MAX_PLAYERS], bool:bIsMostWon = false
+	new szWinnerName[MAX_PLAYERS], szMsg[150]
 	get_user_name(id, szWinnerName, charsmax(szWinnerName))
-	ChatColor(0, "Player^x04 %s^x01 won^x04 %d$^x01 betting^x04 %d$^x01 on^x04 %s^x01.", szWinnerName, iWonValue, g_dPlayerData[id][iMoneyBetted], szGameName)
+	
+	if(szGameName[0] == 'J')
+	{
+		new szAuthid[35], iChance
+		get_user_authid(id, szAuthid, charsmax(szAuthid))
+		TrieGetCell(g_tUserChance, szAuthid, iChance)
+	
+		formatex(szMsg, charsmax(szMsg), "^x03%s^x01 won^x04 %d$^x01 with^x04 %d percent^x01 chance!", szWinnerName, g_iValueBetted, iChance)
+	}
+	else
+	{
+		formatex(szMsg, charsmax(szMsg), "Player^x04 %s^x01 won^x04 %d$^x01 betting^x04 %d$^x01 on^x04 %s^x01.", szWinnerName, iWonValue, g_dPlayerData[id][iMoneyBetted], szGameName)
+	}
+	ChatColor(0, szMsg)
 			
 	cs_set_user_money(id, clamp((cs_get_user_money(id) + iWonValue), 0, MAX_MONEY), 1)
-	
-	if(iWonValue > g_dPlayerData[id][iMostWonValue])
-	{
-		g_dPlayerData[id][iMostWonValue] = iWonValue
-		bIsMostWon = true
-	}
-
-	if(bIsMostWon)
-	{
-		formatex(g_dPlayerData[id][szMostWonGame], charsmax(g_dPlayerData[]), szGameName)
-	}
 	
 	if(szGameName[0] == 'R')
 	{
@@ -884,8 +1287,14 @@ setUserMoney(id, iWonValue, szGameName[])
 		g_iPredictorWins = g_dPlayerData[g_iBestPredictor][iDayWins]
 		get_user_name(g_iBestPredictor, g_szPredictorName, charsmax(g_szPredictorName))
 	}
+	
+	if(!(equal(szGameName, "Crash")))
+	{
+		set_hudmessage(0, 250, 0, -1.0, 0.30, 0, 1.0, 1.0)
+		ShowSyncHudMsg(id, g_hSync[Won], "YOU WON!")
+	}
 
-	g_dPlayerData[id][iTimesWon]++
+	setSett(id, 1, szGameName)
 }
 
 get_best()
@@ -978,7 +1387,7 @@ Float:selectRandomYPosition()
 	return fReturnValue
 }
 
-bool:canBet(id, iMoneyBet, bool:bIsCrash = false, iCvarCheck)
+bool:canBet(id, iMoneyBet, bool:bIsCrash = false, bool:bMessage = false, iCvarCheck)
 {
 	if(!iCvarCheck)
 	{
@@ -1011,7 +1420,7 @@ bool:canBet(id, iMoneyBet, bool:bIsCrash = false, iCvarCheck)
 
 	if(!bIsCrash)
 	{
-		setData(id, iMoneyBet)
+		setData(id, iMoneyBet, bMessage ? true : false)
 	}
 	return true
 }
@@ -1021,21 +1430,25 @@ crashSetMoney(id)
 	setUserMoney(id, floatround(g_dPlayerData[id][iMoneyBetted] * g_dPlayerData[id][fCrashTimes]), "Crash")
 }
 
-setData(id, iMoneyBet)
+setData(id, iMoneyBet, bool:bHud)
 {
-	ChatColor(id, "Rolling...")
-						
-	set_hudmessage(0, 255, 0, -1.0, 0.40, 0, 1.0, 1.8)
-	ShowSyncHudMsg(id, g_hSync[Roulling], "ROLLING...")
-				
+	if(bHud)
+	{
+		ChatColor(id, "Rolling...")
+								
+		set_hudmessage(0, 255, 0, -1.0, 0.40, 0, 1.0, 1.8)
+		ShowSyncHudMsg(id, g_hSync[Roulling], "ROLLING...")
+	}
+	
 	cs_set_user_money(id, (cs_get_user_money(id) - iMoneyBet), 1)
 }
 
-resetData()
+resetData(setTheChange)
 {
 	g_bIsRolling = false
 	g_iValueBetted = 0
 	g_iCount = 0
+	g_iJackpotMoney = 0
 
 	remove_task(TASK_LIST)
 	
@@ -1044,21 +1457,29 @@ resetData()
 	for(new i;i < iNum; i++)
 	{
 		id = iPlayers[i]
+		
+		if(setTheChange)
+		{
+			if(g_dPlayerData[id][bIsJackpotGambler])
+			{
+				cs_set_user_money(id, cs_get_user_money(id) + g_dPlayerData[id][iMoneyBetted])
+			}
+		}
 
-		g_dPlayerData[id][bIsBetting] = false
+		g_dPlayerData[id][bIsJackpotGambler] = false
 		g_dPlayerData[id][iMoneyBetted] = 0
 	}
 	
-	arrayset(g_iGamblers, 0, sizeof g_iGamblers)
+	TrieClear(g_tUserChance)
 }
 
 checkPlayersInJackpot()
 {
-	new iPlayers[MAX_PLAYERS], iNum, iPlayersNum = 0
+	new iPlayers[MAX_PLAYERS], iNum, iPlayersNum
 	get_players(iPlayers, iNum)
 	for(new i;i < iNum; i++)
 	{
-		if(g_dPlayerData[iPlayers[i]][bIsBetting])
+		if(g_dPlayerData[iPlayers[i]][bIsJackpotGambler])
 		{
 			iPlayersNum++
 		}
@@ -1098,13 +1519,14 @@ savePlayerBets(id)
 	formatex(szVaultKey, charsmax(szVaultKey), "Bet-%s-Save", szAuthID)
 	formatex
 	(
-		szVaultData, charsmax(szVaultData), "%d %d %d %d %d %d %d %d %d %d %d %s %s", 
+		szVaultData, charsmax(szVaultData), " %d %d %d %d %d %d %d %d %d %d %d %d %s %s", 
 		g_dPlayerData[id][iBetTimes], 
 		g_dPlayerData[id][iTimesLose], 
 		g_dPlayerData[id][iTimesWon],
 		g_dPlayerData[id][iRouletteBets], 
 		g_dPlayerData[id][iDiceBets],
 		g_dPlayerData[id][iJackpotsBets],
+		g_dPlayerData[id][iCoinflipBets],
 		g_dPlayerData[id][iMostWonValue], 
 		g_dPlayerData[id][iMostLoseValue],
 		g_dPlayerData[id][iLastBet],
@@ -1126,13 +1548,14 @@ loadPlayerBets(id)
 	formatex(szVaultKey, charsmax(szVaultKey), "Bet-%s-Save", szAuthID)
 	formatex
 	(
-		szVaultData, charsmax(szVaultData), "%d %d %d %d %d %d %d %d %d %d %d %s %s" , 
+		szVaultData, charsmax(szVaultData), " %d %d %d %d %d %d %d %d %d %d %d %d %s %s" , 
 		g_dPlayerData[id][iBetTimes], 
 		g_dPlayerData[id][iTimesLose], 
 		g_dPlayerData[id][iTimesWon],
 		g_dPlayerData[id][iRouletteBets], 
 		g_dPlayerData[id][iDiceBets],
 		g_dPlayerData[id][iJackpotsBets],
+		g_dPlayerData[id][iCoinflipBets],
 		g_dPlayerData[id][iMostWonValue], 
 		g_dPlayerData[id][iMostLoseValue],
 		g_dPlayerData[id][iLastBet],
@@ -1143,17 +1566,22 @@ loadPlayerBets(id)
 	)		
 	nvault_get(g_nVaultBet, szVaultKey, szVaultData, charsmax(szVaultData))
 			
-	new szTimesBet[MAX_PLAYERS], szTimesWin[MAX_PLAYERS], szTimesLose[MAX_PLAYERS], szRouletteBets[MAX_PLAYERS], 
-	szDiceBets[MAX_PLAYERS], szMostWon[MAX_PLAYERS], szMostLose[MAX_PLAYERS], szLastBet[MAX_PLAYERS], 
-	szDailyWheelBets[MAX_PLAYERS], szCrashBets[MAX_PLAYERS], szMostLostGamee[10], szMostWonGamee[10]
+	new szTimesBet[MAX_PLAYERS], szTimesWin[MAX_PLAYERS], szTimesLose[MAX_PLAYERS], 
+	szRouletteBets[MAX_PLAYERS], szDiceBets[MAX_PLAYERS], szMostWon[MAX_PLAYERS], 
+	szMostLose[MAX_PLAYERS], szLastBet[MAX_PLAYERS], szDailyWheelBets[MAX_PLAYERS], 
+	szCrashBets[MAX_PLAYERS], szMostLostGamee[MAX_PLAYERS], szMostWonGamee[MAX_PLAYERS],
+	szCoinflipBets[MAX_PLAYERS], szJackpotBets[MAX_PLAYERS]
+	
 	parse
 	(
 		szVaultData, 
-		szTimesBet, charsmax(szTimesBet), 
-		szTimesWin, charsmax(szTimesWin),
+		szTimesBet, charsmax(szTimesBet),
 		szTimesLose, charsmax(szTimesLose),
+		szTimesWin, charsmax(szTimesWin),
 		szRouletteBets, charsmax(szRouletteBets),
 		szDiceBets, charsmax(szDiceBets),
+		szJackpotBets, charsmax(szJackpotBets),
+		szCoinflipBets, charsmax(szCoinflipBets),
 		szMostWon, charsmax(szMostWon),
 		szMostLose, charsmax(szMostLose),
 		szLastBet, charsmax(szLastBet),
@@ -1173,9 +1601,23 @@ loadPlayerBets(id)
 	g_dPlayerData[id][iLastBet] = str_to_num(szLastBet)
 	g_dPlayerData[id][iDailyWheelTimesUsed] = str_to_num(szDailyWheelBets)
 	g_dPlayerData[id][iCrashBets] = str_to_num(szCrashBets)
+	g_dPlayerData[id][iCoinflipBets] = str_to_num(szCoinflipBets)
+	g_dPlayerData[id][iJackpotsBets] = str_to_num(szJackpotBets)
 	
 	g_dPlayerData[id][szMostLostGame] = szMostLostGamee
 	g_dPlayerData[id][szMostWonGame] = szMostWonGamee
+	
+	if(g_dPlayerData[id][iDailyWheelTimesUsed] > 0)
+	{	
+		if((get_systime() - g_dPlayerData[id][iLastBet]) > g_iOneDayInSeconds)
+		{
+			g_dPlayerData[id][bCanUseDailyWheel] = true
+		}
+	}
+	else
+	{
+		g_dPlayerData[id][bCanUseDailyWheel] = true
+	}
 }
 
 CheckIfIsTimeToWheel(id)
@@ -1234,35 +1676,117 @@ CheckIfIsTimeToWheel(id)
 	new bool:bIsBestReward = bool:(iRandomNumber == 100), szName[MAX_PLAYERS]
 	get_user_name(id, szName, charsmax(szName))
 	
-	ChatColor((bIsBestReward) ? 0 : id, "^x03%s^x01 got^x04 %s^x01 on daily wheel!", (bIsBestReward) ? szName : "You", szReward)
+	ChatColor((bIsBestReward) ? 0 : id, "%s^x01 got^x04 %s^x01 on daily wheel!", (bIsBestReward) ? szName : "You", szReward)
 	replace(szReward, charsmax(szReward), "$", "")
 	
 	cs_set_user_money(id, clamp((iUserMoney + str_to_num(szReward)), 0, MAX_MONEY), 1)
 }
 
-getBestChance()
+is_user_connected_byauthid(const sAuthid[])
 {
 	new iPlayers[MAX_PLAYERS], iNum
 	get_players(iPlayers, iNum)
-	SortCustom1D(iPlayers, iNum, "get_best_chance")
 	
-	return iPlayers[0]
-}
-
-public get_best_chance(id1, id2)
-{
-	if(getJackpotChance(id1) > getJackpotChance(id2))  
-		return -1
+	for(new i, szAuthid[MAX_PLAYERS], iPlayer; i < iNum; i++)
+	{
+		iPlayer = iPlayers[i]
 		
-	else if(getJackpotChance(id1) < getJackpotChance(id2))  
-		return 1  
-
+		get_user_authid(iPlayer, szAuthid, charsmax(szAuthid))
+		if(equal(sAuthid, szAuthid))
+		{
+			return iPlayer
+		}
+	}
 	return 0
 }
 
-Float:getJackpotChance(id)
+setSett(id, iType, szGameName[])
 {
-	return (100.0 * g_dPlayerData[id][iMoneyBetted] / g_iValueBetted)
+	new bool:bIsCrash = bool:(equal(szGameName, "Crash"))
+	switch(iType)
+	{
+		case 0:
+		{
+			if(g_dPlayerData[id][iMoneyBetted] > g_dPlayerData[id][iMostLoseValue])
+			{
+				g_dPlayerData[id][iMostLoseValue] = g_dPlayerData[id][iMoneyBetted]
+				formatex(g_dPlayerData[id][szMostLostGame], charsmax(g_dPlayerData[]), szGameName)
+			}
+			g_dPlayerData[id][iTimesLose]++
+			
+			if(!bIsCrash)
+			{
+				set_hudmessage(255, 20, 0, -1.0, 0.30, 0, 1.0, 1.0)
+				ShowSyncHudMsg(id, g_hSync[Lost], "YOU LOST!")
+			}
+		}
+		case 1:
+		{
+			if(g_dPlayerData[id][iMoneyBetted] > g_dPlayerData[id][iMostWonValue])
+			{
+				g_dPlayerData[id][iMostWonValue] = g_dPlayerData[id][iMoneyBetted]
+				formatex(g_dPlayerData[id][szMostWonGame], charsmax(g_dPlayerData[]), szGameName)
+			}
+			g_dPlayerData[id][iTimesWon]++
+			
+			if(!bIsCrash)
+			{
+				set_hudmessage(0, 250, 0, -1.0, 0.30, 0, 1.0, 1.0)
+				ShowSyncHudMsg(id, g_hSync[Lost], "YOU WON!")
+			}
+		}
+	}
+}
+
+display_coin(target, chosen)
+{
+	new iEnt = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "info_target"))
+	if(!iEnt) 
+	{
+		return
+	}
+
+	g_iEntity[target] = iEnt
+	
+	static Float:fOrigin[3], Float:fAim[3]
+	pev(target, pev_origin, fOrigin)
+	pev(target, pev_view_ofs, fAim)
+	xs_vec_add(fOrigin, fAim, fOrigin)
+	pev(target, pev_v_angle, fAim)
+	angle_vector(fAim, ANGLEVECTOR_FORWARD, fAim)
+	xs_vec_mul_scalar(fAim, 10.0, fAim)
+	xs_vec_add(fOrigin, fAim, fOrigin)
+	pev(target, pev_v_angle, fAim)
+	
+	set_pev(iEnt, pev_classname, g_szCoinClassName)
+	set_pev(iEnt, pev_movetype, MOVETYPE_NOCLIP)
+	set_pev(iEnt, pev_solid, SOLID_NOT)
+	set_pev(iEnt, pev_origin, fOrigin)
+	set_pev(iEnt, pev_v_angle, fAim)
+	engfunc(EngFunc_SetModel, iEnt, g_szCoinModel)
+
+	set_pev(iEnt, pev_animtime, get_gametime() + 0.3)
+	set_pev(iEnt, pev_sequence, 1)
+	set_pev(iEnt, pev_frame, 2.0)
+	set_pev(iEnt, pev_framerate, 1.0)
+	set_pev(iEnt, pev_iuser4, chosen)
+	set_pev(iEnt, pev_iuser2, target)
+	
+	set_task(6.0, "task_chosen_side", iEnt)
+}
+
+get_challengers_num()
+{
+	new iPlayers[MAX_PLAYERS], iNum, iCount
+	get_players(iPlayers, iNum)
+	for(new i; i < iNum; i++)
+	{
+		if(g_dPlayerData[iPlayers[i]][iCoinSide])
+		{
+			iCount++
+		}
+	}
+	return iCount
 }
 
 getChance(id, szGameName[])
@@ -1332,10 +1856,10 @@ ChatColor(id, szMessage[], any:...)
 	}
 	else 
 	{
-		get_players(iPlayers, iCount, "ch")
+		get_players(iPlayers, iCount)
 	}
 		
-	for(new i = 0; i < iCount; i++)
+	for(new i; i < iCount; i++)
 	{
 		Player = iPlayers[i]
 

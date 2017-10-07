@@ -238,6 +238,16 @@ Return item and assigns value of item to variable.
 native cod_get_user_item(id, &value = 0);
 
 /*------------------------------
+Return value of user item.
+------------------------------*/
+native cod_get_user_item_value(id);
+
+/*------------------------------
+Return user item name.
+------------------------------*/
+native cod_get_user_item_name(id, dataReturn[], dataLength);
+
+/*------------------------------
 Set player's item. 
 If item = RANDOM (-3) an item will be random.
 If value = RANDOM (-3) item value will be random.
@@ -256,7 +266,7 @@ Return item id using item name.
 native cod_get_item_id(szItem[]);
 
 /*------------------------------
-Zwraca nazwe itemu.
+Return item name.
 ------------------------------*/
 native cod_get_item_name(item, dataReturn[], dataLength);
 
@@ -680,14 +690,14 @@ Return if player have recoil eliminator.
 Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 Weapon defines if defined weapons condition has to be checked.
 ------------------------------*/
-native cod_get_user_recoil_eliminator(id, type = ALL);
+native cod_get_user_recoil_eliminator(id, type = ALL, weapon = 0);
 
 /*------------------------------
 Return if player have recoil reducer.
 Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 Weapon defines if defined weapons condition has to be checked.
 ------------------------------*/
-native cod_get_user_recoil_reducer(id, type = ALL);
+native cod_get_user_recoil_reducer(id, type = ALL, weapon = 0);
 
 /*------------------------------
 Set player's bunnyhop.
@@ -881,6 +891,12 @@ Return true/false result for given percent chance.
 native cod_percent_chance(percent);
 
 /*------------------------------
+Return if player is not in passage.
+*/
+native cod_is_enough_space(id);
+
+
+/*------------------------------
 Register new item and return its id.
 ValueMin is normal item value or random min value.
 ValueMax is random max value.
@@ -956,8 +972,9 @@ forward cod_killed(killer, victim, weapon, hitPlace);
 
 /*------------------------------
 Multiforward executed on player spawn event.
+Respawn is true if it's not first spawn of this player in this round.
 ------------------------------*/
-forward cod_spawned(id);
+forward cod_spawned(id, respawn);
 
 /*------------------------------
 Multiforward executed on cmd start event.
@@ -1037,8 +1054,9 @@ forward cod_item_disabled(id);
 
 /*------------------------------
 Item forward executed on spawn event.
+Respawn is true if it's not first spawn of this player in this round.
 ------------------------------*/
-forward cod_item_spawned(id);
+forward cod_item_spawned(id, respawn);
 
 /*------------------------------
 Item forward executed on kill event.
@@ -1087,8 +1105,9 @@ forward cod_class_disabled(id, promotion);
 
 /*------------------------------
 Class forward executed on spawn event.
+Respawn is true if it's not first spawn of this player in this round.
 ------------------------------*/
-forward cod_class_spawned(id);
+forward cod_class_spawned(id, respawn);
 
 /*------------------------------
 Class forward executed on kill event.

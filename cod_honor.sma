@@ -5,7 +5,7 @@
 
 #define PLUGIN	"CoD Honor System"
 #define AUTHOR	"O'Zone"
-#define VERSION	"1.0.3"
+#define VERSION	"1.0.4"
 
 new cvarMinPlayers, cvarKill, cvarKillHS, cvarWinRound, cvarBombPlanted, cvarBombDefused, cvarRescueHostage, cvarKillHostage;
 
@@ -52,7 +52,7 @@ public client_putinserver(id)
 	
 	rem_bit(id, dataLoaded);
 
-	if(is_user_bot(id) || is_user_hltv(id)) return;
+	if (is_user_bot(id) || is_user_hltv(id)) return;
 
 	get_user_name(id, playerName[id], charsmax(playerName[]));
 
@@ -66,11 +66,11 @@ public client_disconnected(id)
 
 public cod_killed(killer, victim, weaponId, hitPlace)
 {
-	if(get_playersnum() < cvarMinPlayers) return;
+	if (get_playersnum() < cvarMinPlayers) return;
 		
 	playerHonor[killer] += cod_get_user_vip(killer) ? cvarKill * 2 : cvarKill;
 	
-	if(hitPlace == HIT_HEAD) playerHonor[killer] += cod_get_user_vip(killer) ? cvarKillHS * 2 : cvarKillHS;
+	if (hitPlace == HIT_HEAD) playerHonor[killer] += cod_get_user_vip(killer) ? cvarKillHS * 2 : cvarKillHS;
 	
 	save_honor(killer);
 }
@@ -83,10 +83,10 @@ public ct_win_round()
 
 public round_winner(team)
 {
-	if(get_playersnum() < cvarMinPlayers) return;
+	if (get_playersnum() < cvarMinPlayers) return;
 
-	for(new id = 1; id < MAX_PLAYERS; id++) {
-		if(!cod_get_user_class(id) || get_user_team(id) != team) continue;
+	for (new id = 1; id < MAX_PLAYERS; id++) {
+		if (!cod_get_user_class(id) || get_user_team(id) != team) continue;
 
 		playerHonor[id] += cod_get_user_vip(id) ? cvarWinRound * 2 : cvarWinRound;
 
@@ -96,7 +96,7 @@ public round_winner(team)
 
 public bomb_planted(id)
 {
-	if(get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) return;
+	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) return;
 
 	playerHonor[id] += cod_get_user_vip(id) ? cvarBombPlanted * 2 : cvarBombPlanted;
 
@@ -105,7 +105,7 @@ public bomb_planted(id)
 
 public bomb_defused(id)
 {
-	if(get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) return;
+	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) return;
 
 	playerHonor[id] += cod_get_user_vip(id) ? cvarBombDefused * 2 : cvarBombDefused;
 
@@ -114,11 +114,11 @@ public bomb_defused(id)
 
 public hostage_rescued()
 {
-	if(get_playersnum() < cvarMinPlayers) return;
+	if (get_playersnum() < cvarMinPlayers) return;
 
 	new id = get_loguser_index();
 
-	if(!cod_get_user_class(id)) return;
+	if (!cod_get_user_class(id)) return;
 	
 	playerHonor[id] += cod_get_user_vip(id) ? cvarRescueHostage * 2 : cvarRescueHostage;
 
@@ -127,11 +127,11 @@ public hostage_rescued()
 
 public hostage_killed() 
 {
-	if(get_playersnum() < cvarMinPlayers) return;
+	if (get_playersnum() < cvarMinPlayers) return;
 
 	new id = get_loguser_index();
 
-	if(!cod_get_user_class(id)) return;
+	if (!cod_get_user_class(id)) return;
 	
 	playerHonor[id] -= cod_get_user_vip(id) ? cvarKillHostage / 2 : cvarKillHostage;
 
@@ -140,8 +140,8 @@ public hostage_killed()
 
 public message_intermission() 
 {
-	for(new id = 1; id < MAX_PLAYERS; id++) {
-		if(!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
+	for (new id = 1; id < MAX_PLAYERS; id++) {
+		if (!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
 		
 		save_honor(id, 1);
 	}
@@ -162,7 +162,7 @@ public sql_init()
 
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
-	if(errorNum) {
+	if (errorNum) {
 		log_to_file("cod_mod.log", "Error: %s", error);
 		
 		return;
@@ -190,7 +190,7 @@ public load_honor(id)
 
 public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
-	if(failState) {
+	if (failState) {
 		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
 		
 		return;
@@ -198,7 +198,7 @@ public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], d
 	
 	new id = tempId[0];
 	
-	if(SQL_MoreResults(query)) playerHonor[id] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
+	if (SQL_MoreResults(query)) playerHonor[id] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
 	else {
 		new queryData[128];
 		
@@ -216,20 +216,20 @@ public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], d
 
 stock save_honor(id, end = 0)
 {
-	if(!get_bit(id, dataLoaded)) return;
+	if (!get_bit(id, dataLoaded)) return;
 
 	new queryData[128];
 		
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_honor` SET honor = '%i' WHERE name = '%s'", playerHonor[id], playerName[id]);
 		
-	switch(end) {
+	switch (end) {
 		case 0: SQL_ThreadQuery(sql, "ignore_handle", queryData);
 		case 1: {
 			new error[128], errorNum, Handle:sqlConnection, Handle:query;
 			
 			sqlConnection = SQL_Connect(sql, errorNum, error, charsmax(error));
 
-			if(!sqlConnection) {
+			if (!sqlConnection) {
 				log_to_file("cod_mod.log", "Save - Could not connect to SQL database. [%d] %s", error, error);
 				
 				SQL_FreeHandle(sqlConnection);
@@ -239,7 +239,7 @@ stock save_honor(id, end = 0)
 			
 			query = SQL_PrepareQuery(sqlConnection, queryData);
 			
-			if(!SQL_Execute(query)) {
+			if (!SQL_Execute(query)) {
 				errorNum = SQL_QueryError(query, error, charsmax(error));
 				
 				log_to_file("cod_mod.log", "Save Query Nonthreaded failed. [%d] %s", errorNum, error);
@@ -255,13 +255,13 @@ stock save_honor(id, end = 0)
 		}
 	}
 	
-	if(end) rem_bit(id, dataLoaded);
+	if (end) rem_bit(id, dataLoaded);
 }
 
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
 	if (failState) {
-		if(failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
+		if (failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
 		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "Query failed. [%d] %s", errorNum, error);
 	}
 	

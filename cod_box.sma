@@ -6,7 +6,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Box"
-#define VERSION "1.0.6"
+#define VERSION "1.0.7"
 #define AUTHOR "O'Zone"
 
 new const boxClass[] = "cod_box", boxModel[] = "models/CoDMod/box.mdl";
@@ -31,7 +31,7 @@ public plugin_precache()
 }
 
 public cod_killed(killer, victim, weaponId, hitPlace)
-	if(random_num(1, cvarBoxChance) == 1) create_box(victim);
+	if (random_num(1, cvarBoxChance) == 1) create_box(victim);
 
 public cod_new_round()
 	set_task(0.1, "remove_ents");
@@ -40,7 +40,7 @@ public remove_ents()
 {
 	new ent = find_ent_by_class(NONE, boxClass);
 	
-	while(ent > 0) {
+	while (ent > 0) {
 		cod_remove_box_icon(ent);
 		
 		ent = find_ent_by_class(ent, boxClass);
@@ -79,7 +79,7 @@ public create_box(id)
 
 public touch_box(ent, id)
 {
-	if(!is_user_alive(id)) return PLUGIN_CONTINUE;
+	if (!is_user_alive(id)) return PLUGIN_CONTINUE;
 
 	cod_remove_box_icon(ent);
 
@@ -122,7 +122,7 @@ public touch_box(ent, id)
 
 public get_box(id) 
 {
-	switch(random_num(1, 10)) {
+	switch (random_num(1, 10)) {
 		case 1: {
 			new frags = random_num(1, 3);
 			
@@ -133,14 +133,14 @@ public get_box(id)
 		case 2: {
 			new deaths = random_num(1, 2), frags = deaths - cs_get_user_deaths(id);
 
-			if(frags > 0) set_user_frags(id, get_user_frags(id) + frags);
+			if (frags > 0) set_user_frags(id, get_user_frags(id) + frags);
 			
 			cs_set_user_deaths(id, min(0, cs_get_user_deaths(id) - deaths));
 			
 			cod_print_chat(id, "Masz o^x04 %i zgon%s^x01 mniej!", deaths, deaths == 1 ? "" : "y");
 		}
 		case 3: {
-			if(cod_get_user_item(id)) {
+			if (cod_get_user_item(id)) {
 				get_box(id);
 
 				return PLUGIN_CONTINUE;
