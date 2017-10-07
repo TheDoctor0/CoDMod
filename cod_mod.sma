@@ -10,7 +10,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.136"
+#define VERSION "1.0.138"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -1728,7 +1728,7 @@ public use_item(id)
 	
 	execute_forward_ignore_one_param(get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_SKILL_USED), id);
 	
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public use_skill(id)
@@ -2323,7 +2323,7 @@ public player_prethink(id)
 	if (entity_get_int(id, EV_INT_button) & 2) {
 		new flags = entity_get_int(id , EV_INT_flags);
 
-		if (flags & FL_WATERJUMP || entity_get_int(id, EV_INT_waterlevel) >= 2 || !(flags & FL_ONGROUND)) return PLUGIN_CONTINUE;
+		if (flags & FL_WATERJUMP || entity_get_int(id, EV_INT_waterlevel) >= 2 || !(flags & FL_ONGROUND)) return FMRES_IGNORED;
 
 		new Float:velocity[3];
 		
@@ -4041,6 +4041,8 @@ public respawn_player_enemy_spawn(id)
 	ExecuteHam(Ham_CS_RoundRespawn, id);
 	
 	cs_set_user_team(id, team);
+
+	check_if_player_stuck(id);
 }
 
 public _cod_teleport_to_spawn(id, enemy)
@@ -4051,6 +4053,8 @@ public _cod_teleport_to_spawn(id, enemy)
 
 	set_pev(id, pev_origin, spawnOrigin);
 	set_pev(id, pev_angles, spawnAngle);
+
+	check_if_player_stuck(id);
 }
 
 public _cod_random_upgrade(&value, upgradeMin, upgradeMax, valueMin, valueMax)
