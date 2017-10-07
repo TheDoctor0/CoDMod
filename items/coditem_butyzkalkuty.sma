@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Buty z Kalkuty"
-#define VERSION "1.0.5"
+#define VERSION "1.0.6"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Buty z Kalkuty"
@@ -38,7 +38,7 @@ public cod_item_upgrade(id)
 {
 	cod_add_user_bonus_condition(id, -itemValue[id]);
 
-	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, _, VALUE_MAX);
+	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, .valueMax = VALUE_MAX);
 
 	cod_add_user_bonus_condition(id, itemValue[id]);
 }

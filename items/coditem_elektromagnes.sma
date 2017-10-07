@@ -3,7 +3,7 @@
 #include <engine>
 
 #define PLUGIN "CoD Item Elektromagnes"
-#define VERSION "1.0.9"
+#define VERSION "1.0.10"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Elektromagnes"
@@ -28,8 +28,8 @@ public plugin_precache()
 public cod_item_enabled(id, value)
 	rem_bit(id, itemUsed);
 
-public cod_item_spawned(id)
-	rem_bit(id, itemUsed);
+public cod_item_spawned(id, respawn)
+	if(!respawn) rem_bit(id, itemUsed);
 
 public client_disconnected(id)
 	remove_ents(id);

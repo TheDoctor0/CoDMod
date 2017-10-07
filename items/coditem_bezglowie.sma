@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Bezglowie"
-#define VERSION "1.0.6"
+#define VERSION "1.0.10"
 #define AUTHOR "O'Zone"
 
 #define TASK_ITEM 783426
@@ -36,12 +36,15 @@ public cod_item_enabled(id, value)
 public cod_item_disabled(id)
 	rem_bit(id, itemActive);
 
-public cod_item_spawned(id)
+public cod_item_spawned(id, respawn)
 {
+	cod_make_bartimer(id, 0);
+
 	remove_task(id + TASK_ITEM);
 
 	rem_bit(id, itemActive);
-	rem_bit(id, itemUsed);
+
+	if(!respawn) rem_bit(id, itemUsed);
 }
 
 public cod_item_upgrade(id)
@@ -53,13 +56,15 @@ public cod_item_value(id)
 public cod_item_skill_used(id)
 {
 	if(get_bit(id, itemUsed)) {
-		cod_print_chat(id, "Bezglowia mozesz uzyc tylko raz na runde.");
+		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Bezglowia mozesz uzyc tylko raz na runde!");
 
 		return;
 	}
 
 	set_bit(id, itemActive);
 	set_bit(id, itemUsed);
+
+	cod_make_bartimer(id, itemValue[id]);
 
 	set_task(float(itemValue[id]), "deactivate_item", id + TASK_ITEM);
 }

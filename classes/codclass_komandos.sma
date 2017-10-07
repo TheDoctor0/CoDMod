@@ -7,7 +7,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Komandos"
-#define DESCRIPTION  "Natychmiastowe zabicie z noza (PPM), 1/10 z Deagle, podwojny skok"
+#define DESCRIPTION  "Natychmiastowe zabicie z noza (PPM), 1/10 z Deagle, mniejsza widocznosc na nozu."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_DEAGLE)
 #define HEALTH       30
@@ -24,7 +24,7 @@ public plugin_init()
 }
 
 public cod_class_enabled(id, promotion)
-	cod_set_user_multijumps(id, 1, CLASS);
+	cod_set_user_render(id, 80, CLASS, RENDER_ALWAYS, CSW_KNIFE);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 	if((weapon == CSW_KNIFE && !(pev(attacker, pev_button) & IN_ATTACK)) || (weapon == CSW_DEAGLE && damageBits & DMG_BULLET && random_num(1, 10) == 1)) damage = cod_kill_player(attacker, victim, damageBits);

@@ -1,17 +1,17 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Item Ksiega Doswiadczenia"
-#define VERSION "1.0.11"
+#define PLUGIN "CoD Item Pierscien Doswiadczenia"
+#define VERSION "1.0.13"
 #define AUTHOR "O'Zone"
 
-#define NAME        "Ksiega Doswiadczenia"
+#define NAME        "Pierscien Doswiadczenia"
 #define DESCRIPTION "Za kazdego fraga dostajesz dodatkowe +%s expa"
-#define RANDOM_MIN  80
-#define RANDOM_MAX  100
-#define UPGRADE_MIN -4
-#define UPGRADE_MAX 7
-#define VALUE_MAX   200
+#define RANDOM_MIN  30
+#define RANDOM_MAX  50
+#define UPGRADE_MIN -3
+#define UPGRADE_MAX 6
+#define VALUE_MAX   100
 
 new itemValue[MAX_PLAYERS + 1];
 

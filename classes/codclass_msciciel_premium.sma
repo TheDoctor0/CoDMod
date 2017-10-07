@@ -7,7 +7,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Msciciel"
-#define DESCRIPTION  "1/2 z AWP, 1/2 z noza (PPM), mniejsza widocznosc podczas kucania, zmniejszona grawitacja"
+#define DESCRIPTION  "1/2 z AWP, 1/2 z noza (PPM), mniej widoczny podczas kucania, mniejsza grawitacja."
 #define FRACTION     "Premium"
 #define WEAPONS      (1<<CSW_AWP)|(1<<CSW_USP)
 #define HEALTH       20

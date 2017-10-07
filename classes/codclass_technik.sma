@@ -8,7 +8,7 @@
 #define NAME         "Technik"
 #define DESCRIPTION  "Posiada 1 rakiete, 1 apteczke, 1/8 z Deagle i wszystkie granaty."
 #define FRACTION     "Podstawowe"
-#define WEAPONS      (1<<CSW_MP5NAVY)|(1<<CSW_DEAGLE)|(1<<CSW_SMOKEGRENADE)|(1<<CSW_FLASHBANG)|(1<<CSW_FLASHBANG)|(1<<CSW_HEGRENADE)
+#define WEAPONS      (1<<CSW_AUG)|(1<<CSW_DEAGLE)|(1<<CSW_SMOKEGRENADE)|(1<<CSW_FLASHBANG)|(1<<CSW_FLASHBANG)|(1<<CSW_HEGRENADE)
 #define HEALTH       10
 #define INTELLIGENCE 10
 #define STRENGTH     0

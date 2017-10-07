@@ -9,7 +9,7 @@
 #define TASK_STOP 89431
 
 #define NAME         "Telegrafista"
-#define DESCRIPTION  "Moze aktywowac na 60s radar pokazujacy pozycje przeciwnikow."
+#define DESCRIPTION  "Moze aktywowac na 60s radar pokazujacy pozycje przeciwnikow. Ma ubranie wroga."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_AK47)|(1<<CSW_GLOCK18)
 #define HEALTH       20
@@ -28,7 +28,11 @@ public plugin_init()
 }
 
 public cod_class_enabled(id)
+{
 	rem_bit(id, classUsed);
+
+	cod_set_user_model(id, true, CLASS);
+}
 
 public cod_class_disabled(id)
 {
@@ -36,12 +40,12 @@ public cod_class_disabled(id)
 	remove_task(id + TASK_STOP);
 }
 
-public cod_class_spawned(id)
+public cod_class_spawned(id, respawn)
 {
 	remove_task(id + TASK_RADAR);
 	remove_task(id + TASK_STOP);
 
-	rem_bit(id, classUsed);
+	if(!respawn) rem_bit(id, classUsed);
 }
 
 public cod_class_skill_used(id)

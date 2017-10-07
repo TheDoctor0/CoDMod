@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item AWP Nevermore"
-#define VERSION "1.0.14"
+#define VERSION "1.0.15"
 #define AUTHOR "O'Zone"
 
 #define NAME        "AWP Nevermore"
@@ -44,7 +44,7 @@ public cod_item_upgrade(id)
 {
 	cod_add_user_bonus_health(id, -itemValue[id]);
 
-	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, _, VALUE_MAX);
+	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, .valueMax = VALUE_MAX);
 
 	cod_add_user_bonus_health(id, itemValue[id]);
 }

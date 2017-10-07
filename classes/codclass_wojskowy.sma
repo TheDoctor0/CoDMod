@@ -1,18 +1,18 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Class Amadeusz"
+#define PLUGIN "CoD Class Wojskowy"
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-#define NAME         "Amadeusz"
-#define DESCRIPTION  "Dodatkowe 4 (+inteligencja) obrazenia z MP5. Posiada jedna rakiete."
+#define NAME         "Wojskowy"
+#define DESCRIPTION  "Ma 1/7 na oslepienie przeciwnika przy trafieniu. Posiada 3 rakiety."
 #define FRACTION     "Podstawowe"
-#define WEAPONS      (1<<CSW_MP5NAVY)|(1<<CSW_USP)
-#define HEALTH       10
+#define WEAPONS      (1<<CSW_FAMAS)|(1<<CSW_XM1014)|(1<<CSW_P228)
+#define HEALTH       20
 #define INTELLIGENCE 0
-#define STRENGTH     0
-#define STAMINA      10
+#define STRENGTH     10
+#define STAMINA      0
 #define CONDITION    10
 
 public plugin_init() 
@@ -23,10 +23,10 @@ public plugin_init()
 }
 
 public cod_class_enabled(id, promotion)
-	cod_set_user_rockets(id, 1, CLASS);
+	cod_set_user_rockets(id, 3, CLASS);
 
 public cod_class_skill_used(id)
 	cod_use_user_rocket(id);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if(weapon == CSW_MP5NAVY && damageBits & DMG_BULLET) damage += (3.0 + 0.1 * cod_get_user_intelligence(attacker));
+	if(damageBits & DMG_BULLET && random_num(1, 7) == 1) cod_display_fade(victim, 2, 2, 0x0000, 255, 155, 50, 230);

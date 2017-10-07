@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Peleryna Niewidka"
-#define VERSION "1.0.11"
+#define VERSION "1.0.13"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Peleryna Niewidka"
@@ -20,13 +20,13 @@ public plugin_init()
 public cod_item_enabled(id, value)
 	rem_bit(id, itemUsed);
 
-public cod_item_spawned(id)
-	rem_bit(id, itemUsed);
+public cod_item_spawned(id, respawn)
+	if(!respawn) rem_bit(id, itemUsed);
 	
 public cod_item_skill_used(id)
 {
 	if(get_bit(id, itemUsed)) {
-		cod_print_chat(id, "Peleryne mozesz uzyc tylko raz na runde.");
+		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Peleryny mozesz uzyc tylko raz na runde!");
 
 		return COD_CONTINUE;
 	}
