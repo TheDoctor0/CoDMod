@@ -1370,6 +1370,8 @@ public use_rocket(id)
 	get_velocity_by_aim(id, 1000, velocity);
 	
 	entity_set_vector(ent, EV_VEC_velocity, velocity);
+
+	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_DEPLOY], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	
 	return PLUGIN_HANDLED;
 }
@@ -1436,7 +1438,7 @@ public use_mine(id)
 
 	set_rendering(ent, kRenderFxNone, 0, 0, 0, kRenderTransTexture, 50);
 
-	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_DEPLOY], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 	return PLUGIN_HANDLED;
 }
@@ -1510,7 +1512,7 @@ public use_dynamite(id)
 	
 	drop_to_floor(ent);
 
-	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_DEPLOY], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	
 	return PLUGIN_HANDLED;
 }
@@ -1553,7 +1555,7 @@ public use_medkit(id)
 
 	entity_set_float(ent, EV_FL_nextthink, halflife_time() + 0.1);
 
-	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_DEPLOY], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 	return PLUGIN_HANDLED;
 }

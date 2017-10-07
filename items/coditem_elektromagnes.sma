@@ -3,7 +3,7 @@
 #include <engine>
 
 #define PLUGIN "CoD Item Elektromagnes"
-#define VERSION "1.0.11"
+#define VERSION "1.0.12"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Elektromagnes"
@@ -61,7 +61,7 @@ public cod_item_skill_used(id)
 	drop_to_floor(ent);
 	
 	emit_sound(ent, CHAN_VOICE, codSounds[SOUND_CHARGE], 0.5, ATTN_NORM, 0, PITCH_NORM);
-	emit_sound(ent, CHAN_ITEM, codSounds[SOUND_DEPLOY], 0.5, ATTN_NORM, 0, PITCH_NORM);
+	emit_sound(ent, CHAN_ITEM, codSounds[SOUND_ACTIVATE], 0.5, ATTN_NORM, 0, PITCH_NORM);
 	
 	entity_set_float(ent, EV_FL_nextthink, halflife_time() + 3.5);
 	
