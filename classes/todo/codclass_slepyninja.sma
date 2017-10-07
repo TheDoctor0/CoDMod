@@ -49,10 +49,10 @@ public cod_class_disabled(id)
 
 public eventKnife_Niewidzialnosc(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 
-	if( read_data(2) == CSW_KNIFE )
+	if ( read_data(2) == CSW_KNIFE )
 	{
 		set_rendering(id,kRenderFxNone, 0, 0, 0, kRenderTransAlpha, 25);
 	}
@@ -64,18 +64,18 @@ public eventKnife_Niewidzialnosc(id)
 
 public fwSpawn_Grawitacja(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 		entity_set_float(id, EV_FL_gravity, 300.0/800.0);
 }
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-        if(!is_user_connected(idattacker))
+        if (!is_user_connected(idattacker))
                 return HAM_IGNORED;
         
-        if(!ma_klase[idattacker])
+        if (!ma_klase[idattacker])
                 return HAM_IGNORED;
         
-        if(!(damagebits & (1<<1)))
+        if (!(damagebits & (1<<1)))
                 return HAM_IGNORED;
         
         new hp_ofiary = get_user_health(this)

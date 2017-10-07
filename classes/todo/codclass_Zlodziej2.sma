@@ -27,7 +27,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	if(!(cod_get_user_status(id) & STATUS_PREMIUM))
+	if (!(cod_get_user_status(id) & STATUS_PREMIUM))
 	{
 		client_print(id, print_chat, "[%s] Nie masz premium, zeby grac ta klasa!", nazwa)
 		return COD_STOP;
@@ -44,13 +44,13 @@ public DeathMsg()
 {
 	new killer = read_data(1);
  
-	if(!is_user_connected(killer)) return;
-	if(!ma_klase[killer]) return;
-	if(random(13)) return;
+	if (!is_user_connected(killer)) return;
+	if (!ma_klase[killer]) return;
+	if (random(13)) return;
 	
  	new victim = read_data(2);
 
-	if(!(perk_ofiary[killer] = cod_get_user_perk(victim, wartosc_perku_ofiary[killer])))
+	if (!(perk_ofiary[killer] = cod_get_user_perk(victim, wartosc_perku_ofiary[killer])))
             return;
 	  
 	ofiara[killer] = victim;
@@ -74,9 +74,9 @@ public Zapytaj(id)
 
 public Zapytaj_Handle(id, menu, item)
 {
-	if(item) return;
+	if (item) return;
  
-	if(cod_get_user_perk(ofiara[id]) != perk_ofiary[id]) return;
+	if (cod_get_user_perk(ofiara[id]) != perk_ofiary[id]) return;
  
 	new nick_zlodzieja[33];
 	get_user_name(id, nick_zlodzieja, 32);
@@ -87,24 +87,24 @@ public Zapytaj_Handle(id, menu, item)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker) || get_user_team(this) == get_user_team(idattacker))
+	if (!is_user_connected(idattacker) || get_user_team(this) == get_user_team(idattacker))
 		return HAM_IGNORED;
 	
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
 		
-      if(damagebits & DMG_BULLET)
+      if (damagebits & DMG_BULLET)
       {
             switch(get_user_weapon(idattacker))
             {
                   case CSW_KNIFE:
                   {
-                        if(get_pdata_float(get_pdata_cbase(idattacker, 373, 5), 47, 4) > 1.0)
+                        if (get_pdata_float(get_pdata_cbase(idattacker, 373, 5), 47, 4) > 1.0)
                               KillPlayer(this, idinflictor, idattacker, (1<<1), CSW_KNIFE)
                   }
                   case CSW_FIVESEVEN:
                   {
-                        if(!random(7))
+                        if (!random(7))
                               KillPlayer(this, idinflictor, idattacker, (1<<1), CSW_FIVESEVEN)
                   }
             }
@@ -131,7 +131,7 @@ KillPlayer(id, inflictor, attacker, damagebits, weapon)
 	set_pev(id, pev_dmg_inflictor, inflictor)
 	
 	effect = pev(id, pev_effects)
-	if(effect & 128)	set_pev(id, pev_effects, effect-128)
+	if (effect & 128)	set_pev(id, pev_effects, effect-128)
 	
 	set_msg_block(DeathMsgId, msgblock)
 	

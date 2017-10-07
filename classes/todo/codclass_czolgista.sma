@@ -68,7 +68,7 @@ public cod_class_disabled(id)
 
 public Odrodzenie(id)
 {
-	if(is_user_alive(id) && ma_klase[id])
+	if (is_user_alive(id) && ma_klase[id])
 	{
 		has_weapon[id] = true;
 		rockets[id] = get_cvar_num("cod_law_rockets");
@@ -77,23 +77,23 @@ public Odrodzenie(id)
 	
 public CmdStart(id, uc)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return FMRES_IGNORED;
 	
 	new weapon = get_user_weapon(id);
-	if(weapon == 1 && has_weapon[id])
+	if (weapon == 1 && has_weapon[id])
 	{ 
 		new button = get_uc(uc, UC_Buttons);
 		new ent = fm_find_ent_by_owner(-1, "weapon_p228", id);
 		
-		if(button & IN_ATTACK)
+		if (button & IN_ATTACK)
 		{
 			button &= ~IN_ATTACK;
 			set_uc(uc, UC_Buttons, button);
 			
-			if(!rockets[id] || reloading[id] || !idle[id]) 
+			if (!rockets[id] || reloading[id] || !idle[id]) 
 				return FMRES_IGNORED;
-			if(idle[id] && (get_gametime()-idle[id]<=0.4)) 
+			if (idle[id] && (get_gametime()-idle[id]<=0.4)) 
 				return FMRES_IGNORED;
 		
 			new Float:Origin[3], Float:Angle[3], Float:Velocity[3];
@@ -132,35 +132,35 @@ public CmdStart(id, uc)
 			
 			set_pev(id, pev_weaponanim, 7);
 			new entwpn = fm_find_ent_by_owner(-1, "weapon_p228", id)
-			if(entwpn)
+			if (entwpn)
 				set_pdata_float(entwpn, 48, 1.5+3.0, 4)
 			set_pdata_float(id, 83, 1.5, 4)
 			
 			reloading[id] = true;
 			emit_sound(id, CHAN_WEAPON, "weapons/law_shoot1.wav", 1.0, ATTN_NORM, 0, PITCH_NORM)
 			
-			if(task_exists(id+3512)) 
+			if (task_exists(id+3512)) 
 				remove_task(id+3512)
 			
 			set_task(1.5, "task_launcher_reload", id+3512)
 			rockets[id]--;
 		}
-		else if(button & IN_RELOAD)
+		else if (button & IN_RELOAD)
 		{
 			button &= ~IN_RELOAD;
 			set_uc(uc, UC_Buttons, button);
 			
 			set_pev(id, pev_weaponanim, 0);
 			set_pdata_float(id, 83, 0.5, 4);
-			if(ent)
+			if (ent)
 				set_pdata_float(ent, 48, 0.5+3.0, 4);
 		}
 		
-		if(ent)
+		if (ent)
 			cs_set_weapon_ammo(ent, -1);
 		cs_set_user_bpammo(id, 1, rockets[id]);		
 	}
-	else if(weapon != 1 && has_weapon[id])
+	else if (weapon != 1 && has_weapon[id])
 		idle[id] = 0.0;
 		
 	return FMRES_IGNORED;
@@ -169,7 +169,7 @@ public CmdStart(id, uc)
 public Weapon_Deploy(ent)
 {
 	new id = get_pdata_cbase(ent, 41, 4);
-	if(has_weapon[id])
+	if (has_weapon[id])
 	{
 		set_pev(id, pev_viewmodel2, "models/v_law.mdl");
 		set_pev(id, pev_weaponmodel2, "models/p_law.mdl");
@@ -180,23 +180,23 @@ public Weapon_Deploy(ent)
 public Weapon_WeaponIdle(ent)
 {
 	new id = get_pdata_cbase(ent, 41, 4);
-	if(get_user_weapon(id) == 1 && has_weapon[id])
+	if (get_user_weapon(id) == 1 && has_weapon[id])
 	{
-		if(!idle[id]) 
+		if (!idle[id]) 
 			idle[id] = get_gametime();
 	}
 }
 
 public SetModel(ent, model[])
 {
-	if(!pev_valid(ent))
+	if (!pev_valid(ent))
 		return FMRES_IGNORED
 	
-	if(!equal(model, "models/w_p228.mdl")) 
+	if (!equal(model, "models/w_p228.mdl")) 
 		return FMRES_IGNORED;
 
 	new id = pev(ent, pev_owner);
-	if(!has_weapon[id])
+	if (!has_weapon[id])
 		return FMRES_IGNORED;
 
 	engfunc(EngFunc_SetModel, ent, "models/w_law.mdl");
@@ -214,13 +214,13 @@ public task_launcher_reload(id)
 
 public fw_Touch(ent, id)
 {
-	if(!pev_valid(ent))
+	if (!pev_valid(ent))
 		return FMRES_IGNORED
 	
 	new class[32]
 	pev(ent, pev_classname, class, charsmax(class))
 
-	if(!equal(class, "rocket"))
+	if (!equal(class, "rocket"))
 		return FMRES_IGNORED
 		
 	new attacker = pev(ent, pev_owner);
@@ -234,13 +234,13 @@ public fw_Touch(ent, id)
 	new victim = -1
 	while((victim = engfunc(EngFunc_FindEntityInSphere, victim, entOrigin, g_radius)) != 0)
 	{		
-		if(!is_user_alive(victim) || get_user_team(attacker) == get_user_team(victim))
+		if (!is_user_alive(victim) || get_user_team(attacker) == get_user_team(victim))
 			continue;
 		
 		pev(victim, pev_origin, Origin);
 		fDamage = g_damage - floatmul(g_damage, floatdiv(get_distance_f(Origin, entOrigin), g_radius));
 		fDamage *= estimate_take_hurt(entOrigin, victim);
-		if(fDamage>0.0)
+		if (fDamage>0.0)
 			UTIL_Kill(attacker, victim, fDamage, DMG_BULLET);
 	}
 	message_begin(MSG_BROADCAST,SVC_TEMPENTITY); 
@@ -284,7 +284,7 @@ public message_DeathMsg()
 	killer = get_msg_arg_int(1);
 	victim = get_msg_arg_int(2);
         
-	if(wystrzelony[killer][victim])
+	if (wystrzelony[killer][victim])
 	{
 		wystrzelony[killer][victim] = false;
 		set_msg_arg_string(4, "grenade");
@@ -299,14 +299,14 @@ stock Float:estimate_take_hurt(Float:fPoint[3], ent)
 	pev(ent, pev_origin, fOrigin);
 	engfunc(EngFunc_TraceLine, fPoint, fOrigin, DONT_IGNORE_MONSTERS, 0, tr);
 	get_tr2(tr, TR_flFraction, fFraction);
-	if(fFraction == 1.0 || get_tr2(tr, TR_pHit) == ent)
+	if (fFraction == 1.0 || get_tr2(tr, TR_pHit) == ent)
 		return 1.0;
 	return 0.6;
 }
 
 stock UTIL_Kill(atakujacy, obrywajacy, Float:damage, damagebits)
 {
-	if(get_user_health(obrywajacy) <= floatround(damage))
+	if (get_user_health(obrywajacy) <= floatround(damage))
 		wystrzelony[atakujacy][obrywajacy] = true;
 	
 	cod_inflict_damage(atakujacy, obrywajacy, damage, 1.0, atakujacy, damagebits);

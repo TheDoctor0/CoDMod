@@ -3,7 +3,7 @@
 #include <fakemeta>
 
 #define PLUGIN "CoD Item Przeklete Naboje"
-#define VERSION "1.0.7"
+#define VERSION "1.0.9"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Przeklete Naboje"
@@ -32,7 +32,7 @@ public cod_item_value(id)
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if(damageBits == DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
+	if (damageBits == DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
 		new Float:velocity[3];
 
 		velocity[0] = 0.0;

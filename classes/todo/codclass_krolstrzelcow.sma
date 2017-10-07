@@ -28,7 +28,7 @@ public cod_class_disabled(id)
         ma_klase[id] = false;
 	public CmdStart(id, uc_handle)
 {
-        if(ma_klase[id] && get_uc(uc_handle, UC_Buttons) & IN_ATTACK)
+        if (ma_klase[id] && get_uc(uc_handle, UC_Buttons) & IN_ATTACK)
         {
                 new Float:punchangle[3]
                 pev(id, pev_punchangle, punchangle)

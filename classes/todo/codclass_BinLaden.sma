@@ -34,7 +34,7 @@ public plugin_precache()
 
 public cod_class_enabled(id)
 {
-	if(!(cod_get_user_status(id) & STATUS_PREMIUM))
+	if (!(cod_get_user_status(id) & STATUS_PREMIUM))
 	{
 		client_print(id, print_chat, "[%s] Nie masz premium, zeby grac ta klasa!", nazwa)
 		return COD_STOP;
@@ -51,13 +51,13 @@ public cod_class_disabled(id)
 
 public cod_class_skill_used(id)
 {
-		if(!ilosc_dynamitow_gracza[id])
+		if (!ilosc_dynamitow_gracza[id])
 			client_print(id, print_center, "Wykorzystales juz wszystkie dynamity!");
 
 		else
 		{
 			static dynamit_gracza[33];
-			if(is_valid_ent(dynamit_gracza[id]))
+			if (is_valid_ent(dynamit_gracza[id]))
 			{
 				ilosc_dynamitow_gracza[id]--;
 				
@@ -135,7 +135,7 @@ public DeathMsg()
 {
 	new id = read_data(2);
 
-	if(!is_user_connected(id) || !ma_klase[id])
+	if (!is_user_connected(id) || !ma_klase[id])
 		return PLUGIN_CONTINUE;
 	
 	new Float:fOrigin[3];

@@ -32,9 +32,9 @@ public cod_class_enabled(id, promotion)
 
 public cod_class_skill_used(id)
 {
-	if(cod_get_user_mines(id)) cod_use_user_mine(id);
+	if (cod_get_user_mines(id)) cod_use_user_mine(id);
 	else cod_use_user_rocket(id);
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if(weapon == CSW_M249 && damageBits & DMG_BULLET) cod_inflict_damage(attacker, victim, (100 - cs_get_weapon_ammo(get_pdata_cbase(attacker, 373))) * 0.2, 0.0, damageBits);
+	if (weapon == CSW_M249 && damageBits & DMG_BULLET) cod_inflict_damage(attacker, victim, (100 - cs_get_weapon_ammo(get_pdata_cbase(attacker, 373))) * 0.2, 0.0, damageBits);

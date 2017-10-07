@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Rusher"
-#define DESCRIPTION  "Posiada podwojny skok i zadaje +5 obrazen. Ma 1/8 na zabicie wroga z M3 i 1/12 z XM1014."
+#define DESCRIPTION  "Posiada podwojny skok i zadaje +5 obrazen. Ma 1/8 na natychmiastowe zabicie z M3 i 1/12 z XM1014."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_M3)|(1<<CSW_XM1014)
 #define HEALTH       10
@@ -23,14 +23,12 @@ public plugin_init()
 }
 
 public cod_class_enabled(id)
-{
 	cod_set_user_multijumps(id, 1, CLASS);
-}
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if(damageBits & DMG_BULLET) {
-		if((weapon == CSW_M3 && random_num(1, 8) == 1) || (weapon == CSW_XM1014 && random_num(1, 10) == 1)) damage = cod_kill_player(attacker, victim, damageBits);
+	if (damageBits & DMG_BULLET) {
+		if ((weapon == CSW_M3 && random_num(1, 8) == 1) || (weapon == CSW_XM1014 && random_num(1, 10) == 1)) damage = cod_kill_player(attacker, victim, damageBits);
 		else damage += 5.0;
 	}
 }

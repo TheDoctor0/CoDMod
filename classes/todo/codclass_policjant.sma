@@ -35,13 +35,13 @@ public cod_class_enabled(id)
 }
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits) 
 { 
-	if(!is_user_connected(idattacker)) 
+	if (!is_user_connected(idattacker)) 
 		return HAM_IGNORED; 
 	
-	if(!ma_klase[idattacker]) 
+	if (!ma_klase[idattacker]) 
 		return HAM_IGNORED; 
 	
-	if(!(damagebits & (1<<1))) 
+	if (!(damagebits & (1<<1))) 
 		return HAM_IGNORED; 
 	
 	new hp_ofiary = get_user_health(this) 
@@ -51,7 +51,7 @@ public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 	{ 
 		if (random_num(1,oneonone[idattacker][bron_atakujacego]) == 1) cod_inflict_damage(idattacker, this, float(hp_ofiary), 0.0, idinflictor, damagebits); 
 	}
-	if(get_user_weapon(idattacker) == CSW_DEAGLE)
+	if (get_user_weapon(idattacker) == CSW_DEAGLE)
 	{
 		damage*=15.0;
 	}

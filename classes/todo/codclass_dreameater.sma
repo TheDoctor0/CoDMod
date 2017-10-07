@@ -34,7 +34,7 @@ public client_disconnect(id)
 }
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_H))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_H))
 	{
 		client_print(id, print_chat, "[Nazwa] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -49,10 +49,10 @@ public cod_class_disabled(id)
 
 public cod_class_skill_used(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return COD_STOP;
 		
-	if(poprzedni_skan[id] + 45.0 > get_gametime())
+	if (poprzedni_skan[id] + 45.0 > get_gametime())
 	{
 		client_print(id,print_chat,"Skanowac mozesz za %i",licznik[id]);	
 		return PLUGIN_CONTINUE;
@@ -67,27 +67,27 @@ public cod_class_skill_used(id)
 	{
 		pid = entlist[i];
 		
-		if(pid == id || !is_user_alive(pid)) continue;
+		if (pid == id || !is_user_alive(pid)) continue;
 		
 		zdrowie = get_user_health(id);
 		new zdrowiePid = 0;
 		zdrowiePid = get_user_health(pid);
 		
-		if(is_user_connected(pid) && zdrowiePid > zdrowie && !znalazl_pierwszego[id])	
+		if (is_user_connected(pid) && zdrowiePid > zdrowie && !znalazl_pierwszego[id])	
 		{	
 			znalazl_pierwszego[id] = true;
 			best_zdrowie = zdrowiePid
 			best_id = pid;
 			
 		}
-		else if(is_user_connected(pid) && zdrowiePid > best_zdrowie && znalazl_pierwszego[id])	
+		else if (is_user_connected(pid) && zdrowiePid > best_zdrowie && znalazl_pierwszego[id])	
 		{	
 			best_zdrowie = zdrowiePid
 			best_id = pid;
 			
 		}
 		
-		if(znalazl_pierwszego[id])
+		if (znalazl_pierwszego[id])
 		{
 			
 			poprzedni_skan[id] = floatround(get_gametime());
@@ -104,7 +104,7 @@ public cod_class_skill_used(id)
 			set_user_origin(best_id,origin);
 		}
 		
-		if(!znalazl_pierwszego[id])
+		if (!znalazl_pierwszego[id])
 			client_print(id,print_chat,"Nie znaleziono odpowiedniej ofiary !!")
 	}
 	
@@ -112,7 +112,7 @@ public cod_class_skill_used(id)
 }
 public Licznik(id)
 {
-	if(licznik[id] < 1)
+	if (licznik[id] < 1)
 	{
 		znalazl_pierwszego[id] = false;
 		return COD_STOP;

@@ -46,10 +46,10 @@ public cod_class_disabled(id)
 
 public fw_TakeDamage(victim, inflictor, attacker, Float:damage, damage_type)
 {
-	if(!is_user_connected(attacker) || !is_user_connected(victim) || attacker == victim || !attacker)
+	if (!is_user_connected(attacker) || !is_user_connected(victim) || attacker == victim || !attacker)
 	return HAM_IGNORED
 	
-	if(!ma_klase[attacker])
+	if (!ma_klase[attacker])
 	return HAM_IGNORED;
 	
 	static Float:originF[3]
@@ -57,7 +57,7 @@ public fw_TakeDamage(victim, inflictor, attacker, Float:damage, damage_type)
 		
 	if (g_NitrogenGalil[attacker] && get_user_weapon(attacker) == CSW_GALIL &&  random_num(1,2) == 1)
 	{	
-		if(cs_get_user_team(attacker) == cs_get_user_team(victim))
+		if (cs_get_user_team(attacker) == cs_get_user_team(victim))
 		return HAM_IGNORED
 		
 		set_pev(victim, pev_velocity, Float:{0.0,0.0,0.0}) // stop motion

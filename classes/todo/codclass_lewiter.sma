@@ -38,13 +38,13 @@ public cod_class_disabled(id)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 	return HAM_IGNORED;
 	
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 	return HAM_IGNORED;
 
-	if(random_num(1,6) == 1)
+	if (random_num(1,6) == 1)
 	{
 		new Float: polozenie[3];
 		polozenie[0]= 0.0;
@@ -54,7 +54,7 @@ public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 		polozenie[2] = random_float( 800.0 , 1000.0 );
 		set_pev(this, pev_velocity, polozenie);
 	}
-	if(is_user_in_air(this))
+	if (is_user_in_air(this))
 	cod_inflict_damage(idattacker, this, damage*2, 0.0, idinflictor, damagebits);
 
 	return HAM_IGNORED;
@@ -62,7 +62,7 @@ public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 
 stock bool:is_user_in_air(id) 
 { 
-	if( !(pev(id, pev_flags) & FL_ONGROUND2) ) 
+	if ( !(pev(id, pev_flags) & FL_ONGROUND2) ) 
 	return true 
 	else 
 	return false 

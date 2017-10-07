@@ -40,20 +40,20 @@ public cod_class_enabled(id, promotion)
 }
 
 public cod_class_spawned(id, respawn)
-	if(!respawn) itemUse[id] = REPLICAS;
+	if (!respawn) itemUse[id] = REPLICAS;
 
 public cod_new_round()
 	remove_entity_name("replica");
 
 public cod_class_skill_used(id)
 {
-	if(!itemUse[id]) {
+	if (!itemUse[id]) {
 		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Juz wykorzystales wszystkie repliki!");
 
 		return;
 	}
 	
-	if(itemLastUse[id] + 5.0 > get_gametime()) {
+	if (itemLastUse[id] + 5.0 > get_gametime()) {
 		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Replike mozesz postawic raz na 5 sekund!");
 
 		return;
@@ -67,9 +67,9 @@ public cod_class_skill_used(id)
 	
 	velocity[2] = 0.0;
 	
-	for(new i = 0; i < 3; i++) entOrigin[i] = playerOrigin[i] + velocity[i];
+	for (new i = 0; i < 3; i++) entOrigin[i] = playerOrigin[i] + velocity[i];
 		
-	if(!cod_is_enough_space(id)) {
+	if (!cod_is_enough_space(id)) {
 		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Nie mozesz postawic repliki w przejsciu!");
 
 		return;
@@ -107,29 +107,28 @@ public cod_class_skill_used(id)
 
 public take_damage(victim, inflictor, attacker, Float:damage, damageBits)
 {
-	if(!is_user_alive(attacker)) return HAM_IGNORED;
+	if (!is_user_alive(attacker)) return HAM_IGNORED;
 		
 	new className[32];
 
 	entity_get_string(victim, EV_SZ_classname, className, charsmax(className));
 	
-	if(!equal(className, "replica")) return HAM_IGNORED;
+	if (!equal(className, "replica")) return HAM_IGNORED;
 	
 	new owner = entity_get_int(victim, EV_INT_iuser1);
 	
-	if(get_user_team(owner) == get_user_team(attacker)) return HAM_SUPERCEDE;
+	if (get_user_team(owner) == get_user_team(attacker)) return HAM_SUPERCEDE;
 		
 	new itemName[32], bool:knifeUsed = get_user_weapon(attacker) == CSW_KNIFE;
 
 	cod_get_user_item_name(attacker, itemName, charsmax(itemName));
 
-	if(equal(itemName, "Pogromca Replik")) damage *= 2;
+	if (equal(itemName, "Pogromca Replik")) damage *= 2;
 	
-	if(!knifeUsed && !(equal(itemName, "Pogromca Replik"))) cod_inflict_damage(owner, attacker, damage * 0.5, 0.0, damageBits);
+	if (!knifeUsed && !(equal(itemName, "Pogromca Replik"))) cod_inflict_damage(owner, attacker, damage * 0.5, 0.0, damageBits);
 	
-	if(damage > entity_get_float(victim, EV_FL_health))
-	{
-		if(!knifeUsed) cod_make_explosion(victim, 190, 1);
+	if (damage > entity_get_float(victim, EV_FL_health)) {
+		if (!knifeUsed) cod_make_explosion(victim, 190, 1);
 		else cod_make_explosion(victim, 190, 1, 190.0, 50.0, 0.0);
 	}
 	

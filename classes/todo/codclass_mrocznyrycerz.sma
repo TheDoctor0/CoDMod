@@ -29,7 +29,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_H))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_H))
 	{
 		client_print(id, print_chat, "[Mroczny Rycerz(premium)] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -51,14 +51,14 @@ public cod_class_disabled(id)
 
 public fwSpawn_Grawitacja(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 		entity_set_float(id, EV_FL_gravity, 400.0/800.0);
 }
 
 
 public fwTakeDamage_JedenCios(id, ent, attacker)
 {
-	if(is_user_alive(attacker) && ma_klase[attacker] && get_user_weapon(attacker) == CSW_KNIFE)
+	if (is_user_alive(attacker) && ma_klase[attacker] && get_user_weapon(attacker) == CSW_KNIFE)
 	{
 		cs_set_user_armor(id, 0, CS_ARMOR_NONE);
 		SetHamParamFloat(4, float(get_user_health(id) + 1));

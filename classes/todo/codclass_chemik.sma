@@ -45,7 +45,7 @@ public plugin_precache()
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_H))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_H))
 	{
 		client_print(id, print_chat, "[Klasa: Chemik [Premium] Nie masz uprawnien, aby uzywac tej klasy. Jesli chcesz je miec to kup klase")
 		return COD_STOP;
@@ -64,7 +64,7 @@ public cod_class_disabled(id)
 
 public cod_class_skill_used(id)
 {
-	if(!ilosc[id])
+	if (!ilosc[id])
 	{
 		client_print(id, print_center, "Broni chemicznej mozesz uzyc raz na mapke!");
 		return PLUGIN_CONTINUE;
@@ -90,10 +90,10 @@ public UzyjChemi(id)
 	for(new a = 0; a < num; a++)
 	{
 		new i = players[a];
-		if(is_user_alive(i))
+		if (is_user_alive(i))
 			Display_Fade(i,(10<<12),(10<<12),(1<<16),255, 42, 42,171);
 		
-		if(get_user_team(id) != get_user_team(i))
+		if (get_user_team(id) != get_user_team(i))
 			client_cmd(i, "spk sound/mw/nuke_enemy.wav");
 		else
 			client_cmd(i, "spk sound/mw/nuke_friend.wav");
@@ -111,7 +111,7 @@ public shakehud()
 	for(new a = 0; a < num; a++)
 	{
 		new i = players[a];
-		if(is_user_alive(i))
+		if (is_user_alive(i))
 		{
 			Display_Fade(i,(3<<12),(3<<12),(1<<16),255, 85, 42,215);
 			message_begin(MSG_ONE, get_user_msgid("ScreenShake"), {0,0,0}, i);
@@ -130,9 +130,9 @@ public del_nuke(id)
 	for(new a = 0; a < num; a++)
 	{
 		new i = players[a];
-		if(is_user_alive(i))
+		if (is_user_alive(i))
 		{
-			if(get_user_team(id) != get_user_team(i))
+			if (get_user_team(id) != get_user_team(i))
 			{
 				cs_set_user_armor(i, 0, CS_ARMOR_NONE);
 				UTIL_Kill(id, i, float(get_user_health(i)), DMG_BULLET)
@@ -181,7 +181,7 @@ public client_putinserver(id)
 public message_DeathMsg()
 {
 	new killer = get_msg_arg_int(1);
-	if(ZmienKilla[0] & (1<<killer))
+	if (ZmienKilla[0] & (1<<killer))
 	{
 		set_msg_arg_string(4, "grenade");
 		return PLUGIN_CONTINUE;
@@ -191,10 +191,10 @@ public message_DeathMsg()
 
 public Spawn(id)
 {
-	if(!is_user_alive(id) || !is_user_connected(id))
+	if (!is_user_alive(id) || !is_user_connected(id))
 		return PLUGIN_CONTINUE;
 	
-	if(ma_klase[id])
+	if (ma_klase[id])
 		ilosc[id] = 1;
 	
 	return PLUGIN_CONTINUE;

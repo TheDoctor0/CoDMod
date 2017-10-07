@@ -63,13 +63,13 @@ stock Create_TE_BEAMENTS(startEntity, endEntity, iSprite, startFrame, frameRate,
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
 	new ent = create_entity("info_target");
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 	return HAM_IGNORED; 
 	
-	if(!ma_klase[idattacker] && get_user_team(idattacker) == get_user_team(this))
+	if (!ma_klase[idattacker] && get_user_team(idattacker) == get_user_team(this))
 	return HAM_IGNORED;
 	
-	if(damagebits & DMG_BULLET)
+	if (damagebits & DMG_BULLET)
 	{
 		
 		

@@ -38,10 +38,10 @@ public cod_class_disabled(id)
 
 public FwdAddToFullPack(es_handle, e, ent, host, hostflags, player, pSet)
 {
-	if(!is_user_connected(host) || !is_user_connected(ent))
+	if (!is_user_connected(host) || !is_user_connected(ent))
 		return;
 		
-	if(!ma_klase[host])
+	if (!ma_klase[host])
 		return;
 		
 	set_es(es_handle, ES_RenderAmt, 255.0);
@@ -50,13 +50,13 @@ public Damage_Wyrzucenie(id)
 {
 	new idattacker = get_user_attacker(id);
 
-	if(!is_user_alive(idattacker))
+	if (!is_user_alive(idattacker))
 		return;
 
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return;
 
-	if(random_num(1, 25) != 1)
+	if (random_num(1, 25) != 1)
 		return;
 
 	client_cmd(id, "drop");

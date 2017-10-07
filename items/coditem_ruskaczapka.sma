@@ -2,12 +2,12 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Ruska Czapka"
-#define VERSION "1.0.5"
+#define VERSION "1.0.9"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Ruska Czapka"
 #define DESCRIPTION "Masz 1/%s na natychmiastowe zabicie z AK47. Dostajesz +25 zdrowia"
-#define RANDOM_MIN  9
+#define RANDOM_MIN  7
 #define RANDOM_MAX  11
 #define VALUE_MIN   3
 
@@ -44,7 +44,7 @@ public cod_item_upgrade(id)
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if(weapon == CSW_AK47 && random_num(1, itemValue[attacker]) == 1) {
+	if (weapon == CSW_AK47 && random_num(1, itemValue[attacker]) == 1) {
 		damage = COD_BLOCK;
 
 		cod_kill_player(attacker, victim, damageBits);

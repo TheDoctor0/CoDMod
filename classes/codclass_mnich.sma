@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Mnich"
-#define DESCRIPTION  "Posiada teleport, ktorego moze uzyc co 15 sekund"
+#define DESCRIPTION  "Posiada teleport, ktorego moze uzyc co 15 sekund."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_AK47)|(1<<CSW_P228)
 #define HEALTH       15

@@ -40,7 +40,7 @@ public plugin_precache()
 
 public cod_class_enabled(id)
 {
-	if(!(cod_get_user_status(id) & STATUS_SPREMIUM))
+	if (!(cod_get_user_status(id) & STATUS_SPREMIUM))
 	{
 		client_print(id, print_chat, "[%s] Nie masz super premium, zeby grac ta klasa!", nazwa)
 		return COD_STOP;
@@ -58,10 +58,10 @@ public Death()
 {
 	new attacker = read_data(1);
 	
-	if(!is_user_connected(attacker))
+	if (!is_user_connected(attacker))
 		return PLUGIN_CONTINUE;
 		
-	if(!ma_klase[attacker])
+	if (!ma_klase[attacker])
 		return PLUGIN_CONTINUE;
 		
 	new cur_health = get_user_health(attacker);
@@ -103,7 +103,7 @@ public cod_class_skill_used(id)
 
 public fwSpawn_Apteczki(id)
 {
-      if(ma_klase[id])
+      if (ma_klase[id])
       {
             ilosc_apteczek_gracza[id] = 2;
             cs_set_user_bpammo(id, CSW_FLASHBANG, 2)
@@ -112,7 +112,7 @@ public fwSpawn_Apteczki(id)
 
 public Think_Apteczki(ent)
 {
-	if(!is_valid_ent(ent))
+	if (!is_valid_ent(ent))
 		return PLUGIN_CONTINUE;
 
 	new id = entity_get_edict(ent, EV_ENT_owner);
@@ -193,14 +193,14 @@ public WyszkolenieSanitarne(id)
 {
 	id -= TASK_WYSZKOLENIE_SANITARNE;
 	
-	if(!is_user_connected(id))
+	if (!is_user_connected(id))
 		return PLUGIN_CONTINUE;
 		
-	if(ma_klase[id])
+	if (ma_klase[id])
 	{
 		set_task(5.0, "WyszkolenieSanitarne", id+TASK_WYSZKOLENIE_SANITARNE);
 		
-		if(is_user_alive(id))
+		if (is_user_alive(id))
 		{
 			new cur_health = get_user_health(id);
 			new max_health = 100+cod_get_user_health(id);

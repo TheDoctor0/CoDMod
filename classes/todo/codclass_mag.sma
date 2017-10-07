@@ -41,10 +41,10 @@ public cod_class_disabled(id)
 
 public PreThink(id)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return FMRES_IGNORED;
 
-	if(flashlight[id] && flashbattery[id] && ma_klase[id]) 
+	if (flashlight[id] && flashbattery[id] && ma_klase[id]) 
 	{
 		static flashlight_r, flashlight_g, flashlight_b;
 		flashlight_r+= 1+random_num(0,2)
@@ -79,13 +79,13 @@ public PreThink(id)
 		
 		new traget, bodypart;
 		get_user_aiming(id, traget, bodypart) 
-		if(get_user_team(id) != get_user_team(traget) && traget)
+		if (get_user_team(id) != get_user_team(traget) && traget)
 		{
 			new data[2];
 			data[0] = traget;
 			data[1] = pev(traget, pev_renderamt);
 			
-			if(data[1] < 255.0)
+			if (data[1] < 255.0)
 			{
 				fm_set_rendering(traget, kRenderFxGlowShell, flashlight_r, flashlight_g, flashlight_b, kRenderNormal, 4)	
 
@@ -99,18 +99,18 @@ public PreThink(id)
 
 public wylacz_rander(data[2])
 {
-	if(is_user_connected(data[0]) && is_user_alive(data[0]))
+	if (is_user_connected(data[0]) && is_user_alive(data[0]))
 		fm_set_rendering(data[0], kRenderFxNone, 0, 0, 0, kRenderTransAlpha, data[1])	
 }
 
 public Flashlight(id)
 {
-	if(flashlight[id])
+	if (flashlight[id])
 		flashlight[id] = 0;
-	else if(flashbattery[id] > 0)
+	else if (flashbattery[id] > 0)
 		flashlight[id] = 1;
 
-	if(!task_exists(2071+id))
+	if (!task_exists(2071+id))
 		set_task(flashlight[id]? 0.5: 1.0, "charge", 2071+id);
 
 	message_begin(MSG_ONE,get_user_msgid("Flashlight"),{0,0,0},id);
@@ -124,7 +124,7 @@ public Flashlight(id)
 public charge(id) 
 {
 	id -= 2071
-	if(flashlight[id])
+	if (flashlight[id])
 		flashbattery[id]--;
 	else 
 		flashbattery[id]++;
@@ -133,7 +133,7 @@ public charge(id)
 	write_byte(flashbattery[id]);
 	message_end();
 
-	if(flashbattery[id] <= 0)
+	if (flashbattery[id] <= 0)
 	{
 		flashbattery[id] = 0;
 		flashlight[id] = 0;
@@ -143,7 +143,7 @@ public charge(id)
 		write_byte(flashbattery[id]);
 		message_end();
 	}
-	else if(flashbattery[id] >= get_cvar_num("cod_mag_render")) 
+	else if (flashbattery[id] >= get_cvar_num("cod_mag_render")) 
 	{
 		flashbattery[id] = get_cvar_num("cod_mag_render");
 		return;

@@ -37,20 +37,20 @@ public cod_class_enabled(id)
 
 public cod_class_disabled(id)
 {
-	if(is_user_connected(id)) cs_reset_user_model(id);
+	if (is_user_connected(id)) cs_reset_user_model(id);
 	ma_klase[id] = false;
 }
 
 public client_PostThink(id)
 {	
-	if(ma_klase[id])
+	if (ma_klase[id])
 	{
 		new button = pev(id,pev_button)
             new oldbuttons = pev(id,pev_oldbuttons)
 
-		if(button & IN_USE && oldbuttons & IN_USE && pev(id,pev_watertype) == -1)
+		if (button & IN_USE && oldbuttons & IN_USE && pev(id,pev_watertype) == -1)
 		{
-			if(pev(id,pev_flags) & FL_ONGROUND)
+			if (pev(id,pev_flags) & FL_ONGROUND)
 			{		
 				engfunc(EngFunc_DropToFloor,id)
 				
@@ -59,7 +59,7 @@ public client_PostThink(id)
 				moze[id] = true;		
 			}
 			
-			if(button & IN_JUMP && moze[id])
+			if (button & IN_JUMP && moze[id])
 			{				
 				new Float:vVelocity[3] 				
 				pev(id,pev_velocity,vVelocity)
@@ -70,7 +70,7 @@ public client_PostThink(id)
 		}
 		else
 		{
-			if(moze[id])
+			if (moze[id])
 			{
 				client_cmd(id,"-duck")
 				set_pev(id,pev_waterlevel,0)
@@ -82,24 +82,24 @@ public client_PostThink(id)
 
 public EmitSound(entity, channel, const sound[])
 {
-	if(equal(sound,"common/wpn_denyselect.wav")) return FMRES_SUPERCEDE
+	if (equal(sound,"common/wpn_denyselect.wav")) return FMRES_SUPERCEDE
 	
 	return FMRES_IGNORED
 }
 
 public Spawn(id)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return;
 		
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 		
       moze[id] = false
 
       client_cmd(id,"-duck")
       
-	if(!random(8))
+	if (!random(8))
 	{
 		new CsTeams:team = cs_get_user_team(id);
 		

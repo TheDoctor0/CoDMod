@@ -50,13 +50,13 @@ public Spawn(id)
 }
 public cod_class_used(id)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return;
 	
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 	
-	if(random_num(1,1) == 1)
+	if (random_num(1,1) == 1)
 	{
 		new CsTeams:team = cs_get_user_team(id);
 		
@@ -69,10 +69,10 @@ public cod_class_used(id)
 
 public eventKnife_Niewidzialnosc(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 
-	if( read_data(2) == CSW_KNIFE )
+	if ( read_data(2) == CSW_KNIFE )
 	{
 		set_rendering(id,kRenderFxNone, 0, 0, 0, kRenderTransAlpha, 200);
 	}
@@ -83,13 +83,13 @@ public eventKnife_Niewidzialnosc(id)
 }
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-        if(!is_user_connected(idattacker))
+        if (!is_user_connected(idattacker))
                 return HAM_IGNORED;
 
-        if(!ma_klase[idattacker])
+        if (!ma_klase[idattacker])
                 return HAM_IGNORED;
 
-        if(get_user_team(this) != get_user_team(idattacker) && get_user_weapon(idattacker) == CSW_HEGRENADE && damagebits & DMG_HEGRENADE)
+        if (get_user_team(this) != get_user_team(idattacker) && get_user_weapon(idattacker) == CSW_HEGRENADE && damagebits & DMG_HEGRENADE)
                 cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor, damagebits);
         
         return HAM_IGNORED;

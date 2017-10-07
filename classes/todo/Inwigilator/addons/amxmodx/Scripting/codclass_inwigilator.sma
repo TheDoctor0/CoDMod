@@ -63,9 +63,9 @@ public cod_class_disabled(id)
 	
 public PreThink(id)
 {
-	if(!ma_klase[id]) return;
+	if (!ma_klase[id]) return;
 	
-	if(!pev_valid(kamera_gracza[id])) return;
+	if (!pev_valid(kamera_gracza[id])) return;
 	
 	set_pev(id, pev_button, 0);
 	set_pev(id, pev_velocity , Float:{0.0, 0.0, 0.0});
@@ -117,9 +117,9 @@ public DotykKamery(ent, id)
 {
 	new attacker = pev(ent, pev_owner);
 	
-	if(is_user_alive(id))
+	if (is_user_alive(id))
 		cod_inflict_damage(attacker, id, 10.0, 1.0, ent, (1<<24));
-	else if(!pev_valid(id))
+	else if (!pev_valid(id))
 	{
 		set_pev(ent, pev_movetype, MOVETYPE_NONE);
 		
@@ -142,7 +142,7 @@ public DotykKamery(ent, id)
 public Aktywuj(ent)
 {
 	ent -= ZADANIE_AKTYWUJ;
-	if(pev_valid(ent))
+	if (pev_valid(ent))
 		emit_sound(ent, CHAN_VOICE, "weapons/mine_activate.wav", 0.045, ATTN_NORM, 0, PITCH_NORM );
 }
 
@@ -164,9 +164,9 @@ public NowaRunda()
 
 public UpdateData(id, sw, cd_handle)
 {
-	if(!ma_klase[id]) return;
+	if (!ma_klase[id]) return;
 	
-	if(!pev_valid(kamera_gracza[id]) || pev(kamera_gracza[id], pev_movetype) != MOVETYPE_NONE || task_exists(kamera_gracza[id]+ZADANIE_AKTYWUJ))
+	if (!pev_valid(kamera_gracza[id]) || pev(kamera_gracza[id], pev_movetype) != MOVETYPE_NONE || task_exists(kamera_gracza[id]+ZADANIE_AKTYWUJ))
 		return;
 	
 	new Float:CameraOrigin[3], Float:vAngle[3];
@@ -184,7 +184,7 @@ public UpdateData(id, sw, cd_handle)
 
 public ZmienKamere(id)
 {
-	if(!ma_klase[id]) return PLUGIN_CONTINUE;
+	if (!ma_klase[id]) return PLUGIN_CONTINUE;
 	
 	kamera_gracza[id] = find_ent_by_owner(kamera_gracza[id], "camera", id);
 	return PLUGIN_HANDLED;
@@ -199,15 +199,15 @@ public TraceAttack(this, idattacker, Float:damage, Float:direction[3], tracehand
 	new entlist[2];
 	new numfound = find_sphere_class(0, "camera", 15.0, entlist, 1, Origin);
 	
-	if(numfound)
+	if (numfound)
 	{
 		new owner = pev(entlist[0], pev_owner);
 		
-		if(get_user_team(idattacker) == get_user_team(owner))
+		if (get_user_team(idattacker) == get_user_team(owner))
 			return;
 			
 		new Health = pev(entlist[0], pev_health);
-		if(Health < damage)
+		if (Health < damage)
 		{
 			new iOrigin[3];
 			FVecIVec(Origin, iOrigin);

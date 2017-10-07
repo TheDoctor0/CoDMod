@@ -24,7 +24,7 @@ public plugin_init() {
 
 public cod_class_enabled(id)
 {
-   if(!(get_user_flags(id) & ADMIN_LEVEL_B))
+   if (!(get_user_flags(id) & ADMIN_LEVEL_B))
 	{
 		client_print(id, print_chat, "[Mnich] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -45,7 +45,7 @@ if (!uzyl[id]==false)
 		return PLUGIN_CONTINUE;
 	}
 
-    if(uzyl[id] || !is_user_alive(id))
+    if (uzyl[id] || !is_user_alive(id))
         return PLUGIN_CONTINUE;
     
     new Float:start[3], Float:view_ofs[3];
@@ -65,7 +65,7 @@ if (!uzyl[id]==false)
     new Float:fDstOrigin[3];
     get_tr2(0, TR_vecEndPos, fDstOrigin);
     
-    if(engfunc(EngFunc_PointContents, fDstOrigin) == CONTENTS_SKY)
+    if (engfunc(EngFunc_PointContents, fDstOrigin) == CONTENTS_SKY)
         return PLUGIN_CONTINUE;
 
     new Float:fNormal[3];

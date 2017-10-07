@@ -41,7 +41,7 @@ public cod_class_disabled(id)
 }
 public eventCurWeapon(id)
 {
-        if(!ma_klase[id])
+        if (!ma_klase[id])
                 return PLUGIN_HANDLED;
         
         new iWeapon = get_user_weapon(id);
@@ -55,7 +55,7 @@ public eventCurWeapon(id)
  			  
 			fSpeedMultiplier = 1.0-(cod_get_user_intelligence(id)/400.0);
              	  		    
-		if(iWeapon == CSW_M4A1)
+		if (iWeapon == CSW_M4A1)
         {
                 iEnt = fm_find_ent_by_owner(-1, "weapon_m4a1", id)
                 set_pdata_float( iEnt, 46, ( get_pdata_float(iEnt, 46, 4) * fSpeedMultiplier), 4 );

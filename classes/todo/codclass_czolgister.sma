@@ -81,7 +81,7 @@ public fm_startFrame(){
 
 public UpdateClientData_Post(id, sendweapons, cd_handle) 
 {
-	if(get_user_weapon(id) != CSW_KNIFE || !ma_klase[id])
+	if (get_user_weapon(id) != CSW_KNIFE || !ma_klase[id])
 		return FMRES_IGNORED
 		
 	set_cd(cd_handle, CD_ID, 0)
@@ -98,11 +98,11 @@ public jp_forward(player) {
 	new clip,ammo
 	new wpnid = get_user_weapon(player,clip,ammo)
 	if (wpnid == CSW_KNIFE){
-		if((pev(player, pev_button)&IN_ATTACK)){
+		if ((pev(player, pev_button)&IN_ATTACK)){
 			set_pev(player, pev_button, pev(player,pev_button) & ~IN_ATTACK)
 			return FMRES_HANDLED 
 		}
-		if((pev(player,pev_button)&IN_ATTACK2)){
+		if ((pev(player,pev_button)&IN_ATTACK2)){
 				attack2(player)	
 			}	
 	}
@@ -116,7 +116,7 @@ public attack2(player) {
 	{
  
 		new rocket = create_entity("info_target")
-		if(rocket == 0) return PLUGIN_CONTINUE
+		if (rocket == 0) return PLUGIN_CONTINUE
  
 		entity_set_string(rocket, EV_SZ_classname, "rakieta")
 		entity_set_model(rocket, ROCKET_MDL)
@@ -168,7 +168,7 @@ public attack2(player) {
  
 public check_models(id) {
  
-	if(ma_klase[id]) {
+	if (ma_klase[id]) {
 		new clip,ammo
 		new wpnid = get_user_weapon(id,clip,ammo)
  
@@ -186,23 +186,23 @@ public switchmodel(id) {
 }
  
 public emitsound(entity, channel, const sample[]) {
-	if(is_user_alive(entity)) {
+	if (is_user_alive(entity)) {
 		new clip,ammo
 		new weapon = get_user_weapon(entity,clip,ammo)
  
-		if(ma_klase[entity] && weapon == CSW_KNIFE) {
-			if(equal(sample,"weapons/knife_slash1.wav")) return FMRES_SUPERCEDE
-			if(equal(sample,"weapons/knife_slash2.wav")) return FMRES_SUPERCEDE
+		if (ma_klase[entity] && weapon == CSW_KNIFE) {
+			if (equal(sample,"weapons/knife_slash1.wav")) return FMRES_SUPERCEDE
+			if (equal(sample,"weapons/knife_slash2.wav")) return FMRES_SUPERCEDE
  
-			if(equal(sample,"weapons/knife_deploy1.wav")) return FMRES_SUPERCEDE
-			if(equal(sample,"weapons/knife_hitwall1.wav")) return FMRES_SUPERCEDE
+			if (equal(sample,"weapons/knife_deploy1.wav")) return FMRES_SUPERCEDE
+			if (equal(sample,"weapons/knife_hitwall1.wav")) return FMRES_SUPERCEDE
  
-			if(equal(sample,"weapons/knife_hit1.wav")) return FMRES_SUPERCEDE
-			if(equal(sample,"weapons/knife_hit2.wav")) return FMRES_SUPERCEDE
-			if(equal(sample,"weapons/knife_hit3.wav")) return FMRES_SUPERCEDE
-			if(equal(sample,"weapons/knife_hit4.wav")) return FMRES_SUPERCEDE
+			if (equal(sample,"weapons/knife_hit1.wav")) return FMRES_SUPERCEDE
+			if (equal(sample,"weapons/knife_hit2.wav")) return FMRES_SUPERCEDE
+			if (equal(sample,"weapons/knife_hit3.wav")) return FMRES_SUPERCEDE
+			if (equal(sample,"weapons/knife_hit4.wav")) return FMRES_SUPERCEDE
  
-			if(equal(sample,"weapons/knife_stab.wav")) return FMRES_SUPERCEDE
+			if (equal(sample,"weapons/knife_stab.wav")) return FMRES_SUPERCEDE
 		}
 	}
 	return FMRES_IGNORED
@@ -256,15 +256,15 @@ public rk_sound(player) {
 }
  
 public pfn_touch(ptr, ptd) {
-	if(is_valid_ent(ptr)) {
+	if (is_valid_ent(ptr)) {
 		new classname[32]
 		entity_get_string(ptr,EV_SZ_classname,classname,31)
  
-		if(equal(classname, "bazooka")) {
-			if(is_valid_ent(ptd)) {
+		if (equal(classname, "bazooka")) {
+			if (is_valid_ent(ptd)) {
 				new id = ptd
-				if(id > 0 && id < 34) {
-					if(!ma_bazooke[id] && is_user_alive(id)) {
+				if (id > 0 && id < 34) {
+					if (!ma_bazooke[id] && is_user_alive(id)) {
  
 						ma_bazooke[id] = true
 						rocket[id] = true
@@ -274,7 +274,7 @@ public pfn_touch(ptr, ptd) {
 					}
 				}
 			}
-		}else if(equal(classname, "rakieta")) {
+		}else if (equal(classname, "rakieta")) {
 			new Float:fOrigin[3]
 			new iOrigin[3]
 			entity_get_vector(ptr, EV_VEC_origin, fOrigin)
@@ -313,11 +313,11 @@ public pfn_touch(ptr, ptd) {
 			write_byte(5)
 			message_end()
  
-			if(is_valid_ent(ptd)) {
+			if (is_valid_ent(ptd)) {
 				new classname2[32]
 				entity_get_string(ptd,EV_SZ_classname,classname2,31)
  
-				if(equal(classname2,"func_breakable"))
+				if (equal(classname2,"func_breakable"))
 					force_use(ptr,ptd)
 			}
 		}
@@ -328,18 +328,18 @@ public pfn_touch(ptr, ptd) {
 stock jp_radius_damage(entity) {
 	new id = entity_get_edict(entity,EV_ENT_owner) 
 	for(new i = 1; i < 33; i++) {
-		if(is_user_alive(i)) {
+		if (is_user_alive(i)) {
 			new dist = floatround(entity_range(entity,i))
  
-			if(dist <= 350) {
+			if (dist <= 350) {
 				new hp = get_user_health(i)
 				new Float:damage = 100.0
  
 				new Origin[3]
 				get_user_origin(i,Origin)
  
-				if(get_user_team(id) != get_user_team(i)) {
-						if(hp > damage)
+				if (get_user_team(id) != get_user_team(i)) {
+						if (hp > damage)
 							ExecuteHam(Ham_TakeDamage, i, id, id, damage, DMG_BLAST);
 						else
 							log_kill(id,i,"Rakiety",0)
@@ -364,9 +364,9 @@ stock log_kill(killer, victim, weapon[], headshot)
 	message_end()
 //
  
-	if(get_user_team(killer)!=get_user_team(victim))
+	if (get_user_team(killer)!=get_user_team(victim))
 		set_user_frags(killer,get_user_frags(killer) +1)
-	if(get_user_team(killer)==get_user_team(victim))
+	if (get_user_team(killer)==get_user_team(victim))
 		set_user_frags(killer,get_user_frags(killer) -1)
  
 	new kname[32], vname[32], kauthid[32], vauthid[32], kteam[10], vteam[10]

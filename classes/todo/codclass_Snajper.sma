@@ -33,13 +33,13 @@ public cod_class_disabled(id)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker) || get_user_team(this) == get_user_team(idattacker))
+	if (!is_user_connected(idattacker) || get_user_team(this) == get_user_team(idattacker))
 		return HAM_IGNORED;
 
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
 
-      if(damagebits & DMG_BULLET)
+      if (damagebits & DMG_BULLET)
       {
             switch(get_user_weapon(idattacker))
             {
@@ -50,7 +50,7 @@ public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
                   }
                   case CSW_KNIFE:
                   {
-                        if(!random(3)) KillPlayer(this, idinflictor, idattacker, (1<<1))
+                        if (!random(3)) KillPlayer(this, idinflictor, idattacker, (1<<1))
                   }
             }
       }
@@ -75,7 +75,7 @@ KillPlayer(id, inflictor, attacker, damagebits)
 	set_pev(id, pev_dmg_inflictor, inflictor)
 	
 	effect = pev(id, pev_effects)
-	if(effect & 128)	set_pev(id, pev_effects, effect-128)
+	if (effect & 128)	set_pev(id, pev_effects, effect-128)
 	
 	set_msg_block(DeathMsgId, msgblock)
 

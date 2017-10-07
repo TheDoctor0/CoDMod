@@ -47,7 +47,7 @@ public client_disconnect(id)
 	new entRakiety = find_ent_by_class(0, "rocket");
 	while(entRakiety > 0)
 	{
-		if(entity_get_edict(entRakiety, EV_ENT_owner) == id)
+		if (entity_get_edict(entRakiety, EV_ENT_owner) == id)
 			remove_entity(entRakiety);
 		entRakiety = find_ent_by_class(entRakiety, "rocket");
 	}
@@ -56,7 +56,7 @@ public client_disconnect(id)
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_D))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_D))
 	{
 		client_print(id, print_chat, "[Terrorysta] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -68,13 +68,13 @@ public cod_class_enabled(id)
 }
 public Spawn(id)
 {
-        if(!is_user_alive(id))
+        if (!is_user_alive(id))
                 return;
                 
-        if(!ma_klase[id])
+        if (!ma_klase[id])
                 return;
                 
-        if(random_num(1,2) == 1)
+        if (random_num(1,2) == 1)
         {
                 new CsTeams:team = cs_get_user_team(id);
                 
@@ -91,7 +91,7 @@ public ZmienUbranie(id, reset)
         if (!is_user_connected(id))
                 return PLUGIN_CONTINUE;
         
-        if(reset)
+        if (reset)
                 cs_reset_user_model(id);
         else
         {
@@ -111,7 +111,7 @@ public cod_class_skill_used(id)
 	}
 	else
 	{
-		if(poprzednia_rakieta_gracza[id] + 2.0 > get_gametime())
+		if (poprzednia_rakieta_gracza[id] + 2.0 > get_gametime())
 		{
 			client_print(id, print_center, "Rakiet mozesz uzywac co 2 sekundy!");
 		}
@@ -153,7 +153,7 @@ public cod_class_skill_used(id)
 
 public fwSpawn_Rakiety(id)
 {
-	if(is_user_alive(id))
+	if (is_user_alive(id))
 		ilosc_rakiet_gracza[id] = 1;
 }
 

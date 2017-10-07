@@ -50,7 +50,7 @@ public client_disconnect(id)
 	new entDynamit = find_ent_by_class(0, "dynamite");
 	while(entDynamit > 0)
 	{
-		if(entity_get_edict(entDynamit, EV_ENT_owner) == id)
+		if (entity_get_edict(entDynamit, EV_ENT_owner) == id)
 			remove_entity(entDynamit);
 		entDynamit = find_ent_by_class(entDynamit, "dynamite");
 	}
@@ -59,7 +59,7 @@ public client_disconnect(id)
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_C))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_C))
 	{
 		client_print(id, print_chat, "[] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -81,12 +81,12 @@ public cod_class_disabled(id)
 public cod_class_skill_used(id)
 {
 	
-	if(is_user_alive(id)){
-		if(!ilosc_dynamitow_gracza[id])
+	if (is_user_alive(id)){
+		if (!ilosc_dynamitow_gracza[id])
 		{
 			client_print(id, print_center, "Wykorzystales juz wszystkie dynamity!");
 		}
-		if(poprzedni_dynamit_gracza[id] + 2.0 > get_gametime()) 
+		if (poprzedni_dynamit_gracza[id] + 2.0 > get_gametime()) 
 		{
 			client_print(id, print_center, "Dynamitow mozesz uzywac co 2 sekundy!");
 			return PLUGIN_CONTINUE; 
@@ -94,7 +94,7 @@ public cod_class_skill_used(id)
 		else{
 			
 			static dynamit_gracza[33];
-			if(is_valid_ent(dynamit_gracza[id]))
+			if (is_valid_ent(dynamit_gracza[id]))
 			{
 				poprzedni_dynamit_gracza[id] = get_gametime();
 				ilosc_dynamitow_gracza[id]--;
@@ -175,10 +175,10 @@ public cod_class_skill_used(id)
 
 public eventKnife_Niewidzialnosc(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 	
-	if( read_data(2) == CSW_KNIFE )
+	if ( read_data(2) == CSW_KNIFE )
 	{
 		set_rendering(id,kRenderFxNone, 0, 0, 0, kRenderTransAlpha, 100);
 	}

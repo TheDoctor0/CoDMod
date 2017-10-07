@@ -50,20 +50,20 @@ public cod_class_disabled(id)
 }
 public cod_class_skill_used(id) {
 	
-	if(!is_user_alive(id)) return PLUGIN_HANDLED;
+	if (!is_user_alive(id)) return PLUGIN_HANDLED;
 	
-	if(!ilosc_blyskawic[id]) {
+	if (!ilosc_blyskawic[id]) {
 		return PLUGIN_HANDLED;
 	}
 	new ofiara, body;
 	get_user_aiming(id, ofiara, body);
 	
-	if(is_user_alive(ofiara)){
-		if(get_user_team(ofiara) == get_user_team(id)) {
+	if (is_user_alive(ofiara)){
+		if (get_user_team(ofiara) == get_user_team(id)) {
 			return PLUGIN_HANDLED;
 		}
 		
-		if(poprzednia_blyskawica[id]+5.0>get_gametime()) {
+		if (poprzednia_blyskawica[id]+5.0>get_gametime()) {
 			client_print(id,print_chat,"Blyskawicy mozesz uzyc raz na 5 sek.");
 			return PLUGIN_HANDLED;
 		}
@@ -111,7 +111,7 @@ puscBlyskawice(id, ofiara, Float:fObrazenia = 55.0, Float:fCzas = 1.0){
 
 
 public ResetHUD(id) {
-	if(ma_klase[id] == 1) { 
+	if (ma_klase[id] == 1) { 
 		ilosc_blyskawic[id] = 3;
 	}
 }

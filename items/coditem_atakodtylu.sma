@@ -3,12 +3,12 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Atak od tylu"
-#define VERSION "1.0.13"
+#define VERSION "1.0.14"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Atak od tylu"
 #define DESCRIPTION "Przy trafieniu masz 1/%s szansy na teleport za gracza"
-#define RANDOM_MIN  6
+#define RANDOM_MIN  5
 #define RANDOM_MAX  7
 #define VALUE_MIN 3
 
@@ -32,7 +32,7 @@ public cod_item_upgrade(id)
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if(damageBits & DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
+	if (damageBits & DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
 		new Float:origin[3], Float:oldOrigin[3], Float:vector[3];
 
 		pev(attacker, pev_origin, oldOrigin);
@@ -53,7 +53,7 @@ public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageB
 
 		set_pev(attacker, pev_origin, origin);
 
-		if(is_player_stuck(attacker)) set_pev(attacker, pev_origin, oldOrigin);
+		if (is_player_stuck(attacker)) set_pev(attacker, pev_origin, oldOrigin);
 	}
 }
 
@@ -65,7 +65,7 @@ stock bool:is_player_stuck(id)
 
 	engfunc(EngFunc_TraceHull, origin, origin, 0, (pev(id, pev_flags) & FL_DUCKING) ? HULL_HEAD : HULL_HUMAN, id, 0);
 
-	if(get_tr2(0, TR_StartSolid) || get_tr2(0, TR_AllSolid) || !get_tr2(0, TR_InOpen)) return true;
+	if (get_tr2(0, TR_StartSolid) || get_tr2(0, TR_AllSolid) || !get_tr2(0, TR_InOpen)) return true;
 
 	return false;
 }

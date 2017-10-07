@@ -88,19 +88,19 @@ public ResetHUD(id)
         
 public ResetHUDx(id)
 {
-        if(!is_user_connected(id)) return;
+        if (!is_user_connected(id)) return;
         
-        if(!ma_klase[id]) return;
+        if (!ma_klase[id]) return;
         
         cs_set_user_bpammo(id, CSW_SMOKEGRENADE, 10);
 }
 
 public FwdEmitSound( iOrigEnt, iChannel, const szSample[], Float:fVol, Float:fAttn, iFlags, iPitch ) {
 	new iCvar = get_pcvar_num( g_Cvar_Enabled );
-	if( iCvar > 0 ) {
+	if ( iCvar > 0 ) {
 		static const szSmokeSound[] = "weapons/sg_explode.wav";
 		
-		if( equal( szSample, szSmokeSound ) ) {
+		if ( equal( szSample, szSmokeSound ) ) {
 			// cache origin, angles and model
 			new Float:vOrigin[ 3 ], Float:vAngles[ 3 ], szModel[ 64 ], iOwner;
 			iOwner = entity_get_edict( iOrigEnt, EV_ENT_owner );
@@ -114,7 +114,7 @@ public FwdEmitSound( iOrigEnt, iChannel, const szSample[], Float:fVol, Float:fAt
 			
 			// create new entity
 			new iEntity = create_entity( "info_target" );
-			if( iEntity > 0 ) {
+			if ( iEntity > 0 ) {
 				
 				entity_set_origin( iEntity, vOrigin );
 				entity_set_vector( iEntity, EV_VEC_angles, vAngles );
@@ -139,7 +139,7 @@ public FwdEmitSound( iOrigEnt, iChannel, const szSample[], Float:fVol, Float:fAt
 				// Create fake smoke
 				new iSmoke;
 				
-				if( iCvar == 2 )
+				if ( iCvar == 2 )
 					iSmoke = get_user_team( iOwner ); // i did indexes as team, 1 - red, 2 - blue, 3 - green( spec oO )
 				else
 					iSmoke = random_num( 0, 5 );
@@ -176,7 +176,7 @@ public FwdEmitSound( iOrigEnt, iChannel, const szSample[], Float:fVol, Float:fAt
 }
 
 public FwdTouch_FakeSmoke( iEntity, iWorld ) {
-	if( !is_valid_ent( iEntity ) )
+	if ( !is_valid_ent( iEntity ) )
 		return PLUGIN_CONTINUE;
 	
 	// Bounce sound
@@ -185,7 +185,7 @@ public FwdTouch_FakeSmoke( iEntity, iWorld ) {
 	new Float:vVelocity[ 3 ];
 	entity_get_vector( iEntity, EV_VEC_velocity, vVelocity );
 	
-	if( vVelocity[ 1 ] <= 0.0 && vVelocity[ 2 ] <= 0.0 ) {
+	if ( vVelocity[ 1 ] <= 0.0 && vVelocity[ 2 ] <= 0.0 ) {
 		new Float:vOrigin[ 3 ];
 		new iSmoke = entity_get_int( iEntity, EV_INT_iuser4 );
 		entity_get_vector( iEntity, EV_VEC_origin, vOrigin );
@@ -208,7 +208,7 @@ public FwdTouch_FakeSmoke( iEntity, iWorld ) {
 }
 
 public FwdThink_FakeSmoke( iEntity ) {
-	if( !is_valid_ent( iEntity ) )
+	if ( !is_valid_ent( iEntity ) )
 		return PLUGIN_CONTINUE;
 	
 	remove_entity( iEntity );
@@ -218,16 +218,16 @@ public FwdThink_FakeSmoke( iEntity ) {
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-        if(!is_user_connected(idattacker))
+        if (!is_user_connected(idattacker))
                 return HAM_IGNORED;
         
-        if(!ma_klase[idattacker])
+        if (!ma_klase[idattacker])
                 return HAM_IGNORED;
         
-        if(!(damagebits & DMG_BULLET))
+        if (!(damagebits & DMG_BULLET))
                 return HAM_IGNORED;
         
-        if(get_user_weapon(idattacker) == CSW_KNIFE && random_num(1,2) == 1)
+        if (get_user_weapon(idattacker) == CSW_KNIFE && random_num(1,2) == 1)
                 cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor, damagebits);
         
         return HAM_IGNORED;

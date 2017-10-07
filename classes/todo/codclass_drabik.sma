@@ -35,13 +35,13 @@ public cod_class_disabled(id)
 }
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-        if(!is_user_connected(idattacker))
+        if (!is_user_connected(idattacker))
                 return HAM_IGNORED;
         
-        if(!ma_klase[idattacker])
+        if (!ma_klase[idattacker])
                 return HAM_IGNORED;
                 
-        if(get_user_weapon(idattacker) == CSW_MP5NAVY && damagebits & DMG_BULLET)               //Bron
+        if (get_user_weapon(idattacker) == CSW_MP5NAVY && damagebits & DMG_BULLET)               //Bron
                 cod_inflict_damage(idattacker, this, 10.0, 0.4, idinflictor, damagebits);
                 
         return HAM_IGNORED;
@@ -51,7 +51,7 @@ public cod_class_skill_used(id)
 	static Float:ostatni_skok[33];
 	new flags = pev(id, pev_flags);
 	
-	if(flags & FL_ONGROUND && get_gametime() > ostatni_skok[id]+4.0)
+	if (flags & FL_ONGROUND && get_gametime() > ostatni_skok[id]+4.0)
 	{
 		ostatni_skok[id] = get_gametime();
 		new Float:velocity[3];

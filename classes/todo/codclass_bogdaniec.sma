@@ -41,7 +41,7 @@ public client_disconnect(id)
 	new entApteczki = find_ent_by_class(0, "medkit");
 	while(entApteczki > 0)
 	{
-		if(entity_get_edict(entApteczki, EV_ENT_owner) == id)
+		if (entity_get_edict(entApteczki, EV_ENT_owner) == id)
 			remove_entity(entApteczki);
 		entApteczki = find_ent_by_class(entApteczki, "medkit");
 	}
@@ -89,14 +89,14 @@ public cod_class_skill_used(id)
 
 public fwSpawn_Apteczki(id)
 {
-	if(is_user_alive(id))
+	if (is_user_alive(id))
 		ilosc_apteczek_gracza[id] = 2;
 }
 
 
 public Think_Apteczki(ent)
 {
-	if(!is_valid_ent(ent))
+	if (!is_valid_ent(ent))
 		return PLUGIN_CONTINUE;
 
 	new id = entity_get_edict(ent, EV_ENT_owner);

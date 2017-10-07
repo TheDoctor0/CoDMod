@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Farbowany Lis"
-#define VERSION "1.0.9"
+#define VERSION "1.0.10"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Farbowany Lis"
@@ -30,4 +30,4 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], .valueMin = VALUE_MIN);
 
 public cod_item_spawned(id)
-	if(random_num(1, itemValue[id]) == 1) cod_respawn_player(id, 1);
+	if (random_num(1, itemValue[id]) == 1) cod_respawn_player(id, 1);

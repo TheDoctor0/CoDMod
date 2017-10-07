@@ -61,7 +61,7 @@ public plugin_precache()
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_H))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_H))
 	{
 		ColorChat(id, RED, "[General] Nie masz uprawnien, aby korzystac z tej klasy.");
 		return COD_STOP;
@@ -92,7 +92,7 @@ public touchWorld(Toucher, Touched)
 public Death()
 {
 	new id = read_data(2);
-	if(ma_klase[id])
+	if (ma_klase[id])
 		Eksploduj(id);
 }
 
@@ -153,14 +153,14 @@ public Eksploduj(id)
 public knife_touch(Toucher, Touched){
 	new kid = entity_get_edict(Toucher, EV_ENT_owner)
 	new vic = entity_get_edict(Toucher, EV_ENT_enemy)
-	if(is_user_alive(Touched)) 
+	if (is_user_alive(Touched)) 
 	{
 		new bool:zyje = true;
-		if(kid == Touched || vic == Touched)
+		if (kid == Touched || vic == Touched)
 		{
 			return ;
 		}
-		if(get_cvar_num("mp_friendlyfire") == 0 && get_user_team(Touched) == get_user_team(kid)) 
+		if (get_cvar_num("mp_friendlyfire") == 0 && get_user_team(Touched) == get_user_team(kid)) 
 		{
 			return ;
 		}
@@ -169,14 +169,14 @@ public knife_touch(Toucher, Touched){
 		for(new i = 0; i < 3; i++) Random_Float[i] = random_float(-50.0, 50.0)
 		Punch_View(Touched, Random_Float)
 		
-		if(get_cvar_num("amx_knifedamage_mw2") >= get_user_health(Touched)){
+		if (get_cvar_num("amx_knifedamage_mw2") >= get_user_health(Touched)){
 			zyje = false;
 		}
 		new origin[3];
 		get_user_origin(Touched,origin)
 		origin[2] += 25
-		if(zyje == true){
-			if(get_user_team(Touched) == get_user_team(kid)) 
+		if (zyje == true){
+			if (get_user_team(Touched) == get_user_team(kid)) 
 			{
 				new name[33]
 				get_user_name(kid,name,32)
@@ -198,7 +198,7 @@ public knife_touch(Toucher, Touched){
 		
 		else
 		{
-			if(get_user_team(Touched) == get_user_team(kid)) {
+			if (get_user_team(Touched) == get_user_team(kid)) {
 				set_user_frags(kid, get_user_frags(kid) - 1)
 				client_print(kid,print_center,"You killed a teammate")
 			}
@@ -264,7 +264,7 @@ public pusc_noz(id)
 	new ent = create_entity("info_target")
 	if (pev_valid(ent) && is_user_alive(id))
 	{
-		if(ile_nozy[id]-- < 1)
+		if (ile_nozy[id]-- < 1)
 		{
 			client_print(id, print_center, "Nie masz wiecej nozy!");
 			return 0;
@@ -316,26 +316,26 @@ public Zrespij()
 {
 	new attacker = read_data(1);
 	
-	if(!is_user_connected(attacker))
+	if (!is_user_connected(attacker))
 		return PLUGIN_CONTINUE;
 	
-	if(!ma_klase[attacker])
+	if (!ma_klase[attacker])
 		return PLUGIN_CONTINUE;
 	
-	if(random(2) == 1)
+	if (random(2) == 1)
 		return PLUGIN_CONTINUE;
 	
 	new id = read_data(2);
 	new attacker_team = get_user_team(attacker);
 	
-	if(get_user_team(id) == attacker_team)
+	if (get_user_team(id) == attacker_team)
 		return PLUGIN_CONTINUE;
 	
 	new Players[32], playersCount;	
 	
 	get_players(Players, playersCount, "beh", (attacker_team == 1)? "TERRORIST" : "CT");
 	
-	if(!playersCount)
+	if (!playersCount)
 		return PLUGIN_CONTINUE;
 	
 	new nick_zreanimowanego[33], nick_reanimujacego[33], zreanimowany = Players[random(playersCount)];
@@ -361,13 +361,13 @@ public Zresp(id)
 public DodajEXP(id)
 {
 	new attacker = read_data(1);
-	if(!is_user_connected(attacker))
+	if (!is_user_connected(attacker))
 		return PLUGIN_CONTINUE;
 	
-	if(!ma_klase[attacker])
+	if (!ma_klase[attacker])
 		return PLUGIN_CONTINUE;
 	
-	if(get_user_team(id) != get_user_team(attacker))
+	if (get_user_team(id) != get_user_team(attacker))
 		cod_set_user_xp(id, cod_get_user_xp(id)+15);
 	
 	return PLUGIN_CONTINUE;

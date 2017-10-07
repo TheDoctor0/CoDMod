@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Sokole Oko"
-#define VERSION "1.0.10"
+#define VERSION "1.0.11"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Sokole Oko"
@@ -28,7 +28,7 @@ public cod_item_disabled(id)
 
 public add_to_full_pack(handle, e, ent, host, hostFlags, player, pSet)
 {
-	if(!is_user_connected(host) || !is_user_connected(ent) || !get_bit(host, itemActive)) return FMRES_IGNORED;
+	if (!is_user_connected(host) || !is_user_connected(ent) || !get_bit(host, itemActive)) return FMRES_IGNORED;
 		
 	set_es(handle, ES_RenderAmt, 255.0);
 

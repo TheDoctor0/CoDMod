@@ -63,9 +63,9 @@ public cod_class_disabled(id)
 
 public Resp(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 	{
-		if(bron_gracza[id])
+		if (bron_gracza[id])
 			cod_take_weapon(id, bron_gracza[id]);
 		
 		cod_give_weapon(id, bron_gracza[id] = random_num(2, 29));
@@ -113,7 +113,7 @@ public Pulapeczka(id)
 
 public DotykPulapki(ent, id)
 {
-	if(!is_valid_ent(ent))
+	if (!is_valid_ent(ent))
 		return;
 		
 	new attacker = entity_get_edict(ent, EV_ENT_owner);
@@ -152,7 +152,7 @@ public client_disconnect(id)
 	new ent = find_ent_by_class(0, "trap");
 	while(ent > 0)
 	{
-		if(entity_get_edict(id, EV_ENT_owner) == id)
+		if (entity_get_edict(id, EV_ENT_owner) == id)
 			remove_entity(ent);
 		ent = find_ent_by_class(ent, "trap");
 	}
@@ -168,13 +168,13 @@ public Odkop(id)
 // SPECIAL	
 public class_special_used(id)
 {
-	if(!is_user_connected(id))
+	if (!is_user_connected(id))
 		return;
 	
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 
-		if(!ma_special[id]>0)
+		if (!ma_special[id]>0)
 	{
 		ColorChat(id, GREEN, "Wykorzystales juz speciale.");
 		return;

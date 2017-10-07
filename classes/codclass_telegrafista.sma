@@ -45,11 +45,19 @@ public cod_class_spawned(id, respawn)
 	remove_task(id + TASK_RADAR);
 	remove_task(id + TASK_STOP);
 
-	if(!respawn) rem_bit(id, classUsed);
+	if (!respawn) rem_bit(id, classUsed);
 }
 
 public cod_class_skill_used(id)
 {
+	if (get_bit(id, classUsed)) {
+		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Radar mozesz aktywowac tylko raz na runde!");
+
+		return;
+	}
+
+	set_bit(id, classUsed);
+
 	set_task(1.0, "radar_scan", id + TASK_RADAR, _, _, "b");
 	set_task(60.0, "radar_stop", id + TASK_STOP);
 }
@@ -58,14 +66,14 @@ public radar_stop(id)
 {
 	id -= TASK_STOP;
 
-	set_bit(id, classUsed);
+	remove_task(id + TASK_RADAR);
 }
 
 public radar_scan(id)
 {
 	id -= TASK_RADAR;
 
-	if(!is_user_alive(id) || get_bit(id, classUsed)) {
+	if (!is_user_alive(id)) {
 		remove_task(id + TASK_RADAR);
 
 		return;
@@ -73,11 +81,11 @@ public radar_scan(id)
 
 	static playerOrigin[3], msgHostageAdd, msgHostageDel;
 
-	if(!msgHostageAdd) msgHostageAdd = get_user_msgid("HostagePos");
-	if(!msgHostageDel) msgHostageDel = get_user_msgid("HostageK");
+	if (!msgHostageAdd) msgHostageAdd = get_user_msgid("HostagePos");
+	if (!msgHostageDel) msgHostageDel = get_user_msgid("HostageK");
 
-	for(new i = 1; i <= MAX_PLAYERS; i++) {       
-		if(!is_user_alive(i) || get_user_team(i) == get_user_team(id)) continue;
+	for (new i = 1; i <= MAX_PLAYERS; i++) {       
+		if (!is_user_alive(i) || get_user_team(i) == get_user_team(id)) continue;
 
 		get_user_origin(i, playerOrigin);
 		

@@ -79,11 +79,11 @@ public NowaRunda()
 	get_players(players, num, "gh");
 	for(new i = 0; i < num; i++)
 	{
-		if(task_exists(players[i]+997))
+		if (task_exists(players[i]+997))
 			remove_task(players[i]+997);
 	}
 	
-	if(get_cvar_num("usun_sentry"))
+	if (get_cvar_num("usun_sentry"))
 		remove_entity_name("sentryG")
 }
 
@@ -92,7 +92,7 @@ public client_disconnect(id)
 	new ent = -1
 	while((ent = find_ent_by_class(ent, "sentryG")))
 	{
-		if(entity_get_int(ent, EV_INT_iuser2) == id)
+		if (entity_get_int(ent, EV_INT_iuser2) == id)
 			remove_entity(ent);
 	}
 	return PLUGIN_CONTINUE;
@@ -101,7 +101,7 @@ public client_disconnect(id)
 public message_DeathMsg()
 {
 	new killer = get_msg_arg_int(1);
-	if(ZmienKilla[1] & (1<<killer))
+	if (ZmienKilla[1] & (1<<killer))
 	{
 		set_msg_arg_string(4, "m249");
 		return PLUGIN_CONTINUE;
@@ -111,10 +111,10 @@ public message_DeathMsg()
 
 public Spawn(id)
 {
-	if(!is_user_alive(id) || !is_user_connected(id))
+	if (!is_user_alive(id) || !is_user_connected(id))
 		return PLUGIN_CONTINUE;
 	
-	if(ma_klase[id])
+	if (ma_klase[id])
 		ilosc[id] = 1;
 	
 	return PLUGIN_CONTINUE;
@@ -122,7 +122,7 @@ public Spawn(id)
 
 public cod_class_skill_used(id)
 {
-	if(!ilosc[id])
+	if (!ilosc[id])
 	{
 		client_print(id, print_center, "Masz tylko jednego Sentry na runde!");
 		return PLUGIN_CONTINUE;
@@ -142,16 +142,16 @@ public cod_class_skill_used(id)
 
 public CreateSentry(id) 
 {
-	if(!(entity_get_int(id, EV_INT_flags) & FL_ONGROUND)) 
+	if (!(entity_get_int(id, EV_INT_flags) & FL_ONGROUND)) 
 		return;
 	
 	new entlist[3];
-	if(find_sphere_class(id, "func_bomb_target", 650.0, entlist, 2))
+	if (find_sphere_class(id, "func_bomb_target", 650.0, entlist, 2))
 	{
 		client_print(id, print_chat, "Jestes zbyt blisko BS'A");
 		return;
 	}
-	if(find_sphere_class(id, "func_buyzone", 650.0, entlist, 2))
+	if (find_sphere_class(id, "func_buyzone", 650.0, entlist, 2))
 	{
 		client_print(id, print_chat, "Jestes zbyt blisko Respa");
 		return;
@@ -161,7 +161,7 @@ public CreateSentry(id)
 	for(new a = 0; a < num; a++)
 	{
 		new i = players[a];
-		if(get_user_team(id) != get_user_team(i))
+		if (get_user_team(id) != get_user_team(i))
 			client_cmd(i, "spk sound/mw/sentrygun_enemy.wav");
 		else
 			client_cmd(i, "spk sound/mw/sentrygun_friend.wav");
@@ -199,7 +199,7 @@ public CreateSentry(id)
 
 public SentryThink(ent)
 {
-	if(!is_valid_ent(ent)) 
+	if (!is_valid_ent(ent)) 
 		return PLUGIN_CONTINUE;
 	
 	new Float:SentryOrigin[3], Float:closestOrigin[3];
@@ -209,11 +209,11 @@ public SentryThink(ent)
 	new target = entity_get_edict(ent, EV_ENT_euser1);
 	new firemods = entity_get_int(ent, EV_INT_iuser1);
 	
-	if(firemods)
+	if (firemods)
 	{ 
-		if(/*ExecuteHam(Ham_FVisible, target, ent)*/fm_is_ent_visible(target, ent) && is_user_alive(target)) 
+		if (/*ExecuteHam(Ham_FVisible, target, ent)*/fm_is_ent_visible(target, ent) && is_user_alive(target)) 
 		{
-			if(UTIL_In_FOV(target,ent))
+			if (UTIL_In_FOV(target,ent))
 			{
 				goto fireoff;
 			}
@@ -225,7 +225,7 @@ public SentryThink(ent)
 			sentry_turntotarget(ent, SentryOrigin, TargetOrigin);
 			
 			new Float:hitRatio = random_float(0.0, 1.0) - 0.2;
-			if(hitRatio <= 0.0)
+			if (hitRatio <= 0.0)
 			{
 				UTIL_Kill(id, target, random_float(5.0, 35.0), DMG_BULLET, 1);
 				
@@ -256,7 +256,7 @@ public SentryThink(ent)
 	}
 	
 	new closestTarget = getClosestPlayer(ent)
-	if(closestTarget)
+	if (closestTarget)
 	{
 		emit_sound(ent, CHAN_AUTO, "mw/sentrygun_starts.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
 		entity_get_vector(closestTarget, EV_VEC_origin, closestOrigin);
@@ -269,15 +269,15 @@ public SentryThink(ent)
 		return PLUGIN_CONTINUE;
 	}
 	
-	if(!firemods)
+	if (!firemods)
 	{
 		new controler1 = entity_get_byte(ent, EV_BYTE_controller1)+1;
-		if(controler1 > 255)
+		if (controler1 > 255)
 			controler1 = 0;
 		entity_set_byte(ent, EV_BYTE_controller1, controler1);
 		
 		new controler2 = entity_get_byte(ent, EV_BYTE_controller2);
-		if(controler2 > 127 || controler2 < 127)
+		if (controler2 > 127 || controler2 < 127)
 			entity_set_byte(ent, EV_BYTE_controller2, 127);
 		
 		entity_set_float(ent, EV_FL_nextthink, get_gametime()+0.05);
@@ -289,17 +289,17 @@ public sentry_turntotarget(ent, Float:sentryOrigin[3], Float:closestOrigin[3])
 {
 	new newTrip, Float:newAngle = floatatan(((closestOrigin[1]-sentryOrigin[1])/(closestOrigin[0]-sentryOrigin[0])), radian) * 57.2957795;
 	
-	if(closestOrigin[0] < sentryOrigin[0])
+	if (closestOrigin[0] < sentryOrigin[0])
 		newAngle += 180.0;
-	if(newAngle < 0.0)
+	if (newAngle < 0.0)
 		newAngle += 360.0;
 	
 	sentryOrigin[2] += 35.0
-	if(closestOrigin[2] > sentryOrigin[2])
+	if (closestOrigin[2] > sentryOrigin[2])
 		newTrip = 0;
-	if(closestOrigin[2] < sentryOrigin[2])
+	if (closestOrigin[2] < sentryOrigin[2])
 		newTrip = 255;
-	if(closestOrigin[2] == sentryOrigin[2])
+	if (closestOrigin[2] == sentryOrigin[2])
 		newTrip = 127;
 	
 	entity_set_byte(ent, EV_BYTE_controller1,floatround(newAngle*0.70833));
@@ -309,19 +309,19 @@ public sentry_turntotarget(ent, Float:sentryOrigin[3], Float:closestOrigin[3])
 
 public TakeDamage(ent, idinflictor, attacker, Float:damage, damagebits)
 {
-	if(!is_user_alive(attacker))
+	if (!is_user_alive(attacker))
 		return HAM_IGNORED;
 	
 	new classname[32];
 	entity_get_string(ent, EV_SZ_classname, classname, 31);
 	
-	if(equal(classname, "sentryG")) 
+	if (equal(classname, "sentryG")) 
 	{
 		new id = entity_get_int(ent, EV_INT_iuser2);
-		if(get_user_team(attacker) == get_user_team(id))
+		if (get_user_team(attacker) == get_user_team(id))
 			return HAM_SUPERCEDE;
 		
-		if(damage >= entity_get_float(ent, EV_FL_health))
+		if (damage >= entity_get_float(ent, EV_FL_health))
 		{
 			new Float:Origin[3];
 			entity_get_vector(ent, EV_VEC_origin, Origin);	
@@ -332,7 +332,7 @@ public TakeDamage(ent, idinflictor, attacker, Float:damage, damagebits)
 			{		
 				new pid = entlist[i];
 				
-				if(!is_user_alive(pid) || get_user_team(id) == get_user_team(pid))
+				if (!is_user_alive(pid) || get_user_team(id) == get_user_team(pid))
 					continue;
 				UTIL_Kill(id, pid, 70.0, (1<<24));
 			}
@@ -383,7 +383,7 @@ stock bool:fm_is_ent_visible(index, entity, ignoremonsters = 0)
 
 stock bool:UTIL_In_FOV(id,ent)
 {
-	if((get_pdata_int(id, 510) & (1<<16)) && (Find_Angle(id, ent) > 0.0))
+	if ((get_pdata_int(id, 510) & (1<<16)) && (Find_Angle(id, ent) > 0.0))
 		return true;
 	return false;
 }
@@ -396,10 +396,10 @@ stock getClosestPlayer(ent)
 	for(new a = 0; a < num; a++)
 	{
 		new i = players[a];
-		if(!is_user_connected(i) || !is_user_alive(i) || /*!ExecuteHam(Ham_FVisible, i, ent)*/!fm_is_ent_visible(i, ent) || get_user_team(i) == get_user_team(entity_get_int(ent, EV_INT_iuser2)))
+		if (!is_user_connected(i) || !is_user_alive(i) || /*!ExecuteHam(Ham_FVisible, i, ent)*/!fm_is_ent_visible(i, ent) || get_user_team(i) == get_user_team(entity_get_int(ent, EV_INT_iuser2)))
 			continue;
 		
-		if(UTIL_In_FOV(i, ent))
+		if (UTIL_In_FOV(i, ent))
 			continue;
 		
 		entity_get_vector(i, EV_VEC_origin, fOrigin[0]);
@@ -407,7 +407,7 @@ stock getClosestPlayer(ent)
 		
 		flDistanse = get_distance_f(fOrigin[0], fOrigin[1]);
 		
-		if(flDistanse <= flClosestDist)
+		if (flDistanse <= flClosestDist)
 		{
 			iClosestPlayer = i;
 			flClosestDist = flDistanse;
@@ -443,7 +443,7 @@ stock Float:Find_Angle(id, target)
 	get_global_vector(GL_v_forward, v_forward);
 	
 	new Float:flDot = vec2LOS[0]*v_forward[0]+vec2LOS[1]*v_forward[1];
-	if(flDot > 0.5)
+	if (flDot > 0.5)
 		return flDot;
 	
 	return 0.0;

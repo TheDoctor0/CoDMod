@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Skrzydla Archaniola"
-#define VERSION "1.0.14"
+#define VERSION "1.0.15"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Skrzydla Archaniola"
@@ -21,7 +21,7 @@ public cod_item_enabled(id, value)
 
 public cod_item_skill_used(id)
 {
-	if(!(pev(id, pev_flags) & FL_ONGROUND)) {
+	if (!(pev(id, pev_flags) & FL_ONGROUND)) {
 		new Float:velocity[3];
 
 		pev(id, pev_velocity, velocity);

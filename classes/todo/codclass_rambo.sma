@@ -44,7 +44,7 @@ public plugin_precache(){
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_A))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_A))
 	{
 		client_print(id, print_chat, "[%s] Nie masz uprawnien, aby uzywac tej klasy.",nazwa)
 		return COD_STOP;
@@ -58,12 +58,12 @@ public cod_class_disabled(id)
 
 public MultiJump(id, uc_handle)
 {
-	if(!is_user_alive(id) || !ma_klase[id])
+	if (!is_user_alive(id) || !ma_klase[id])
 		return FMRES_IGNORED;
 
 	new flags = pev(id, pev_flags);
 
-	if((get_uc(uc_handle, UC_Buttons) & IN_JUMP) && !(flags & FL_ONGROUND) && !(pev(id, pev_oldbuttons) & IN_JUMP) && skoki[id])
+	if ((get_uc(uc_handle, UC_Buttons) & IN_JUMP) && !(flags & FL_ONGROUND) && !(pev(id, pev_oldbuttons) & IN_JUMP) && skoki[id])
 	{
 		skoki[id]--;
 		new Float:velocity[3];
@@ -71,7 +71,7 @@ public MultiJump(id, uc_handle)
 		velocity[2] = random_float(265.0,285.0);
 		set_pev(id, pev_velocity,velocity);
 	}
-	else if(flags & FL_ONGROUND)
+	else if (flags & FL_ONGROUND)
 		skoki[id] = 1;
 
 	return FMRES_IGNORED;
@@ -82,10 +82,10 @@ public DeathMsg()
 	new killer = read_data(1);
 	new victim = read_data(2);
 	
-	if(!is_user_connected(killer) || !is_user_connected(victim))
+	if (!is_user_connected(killer) || !is_user_connected(victim))
 		return PLUGIN_CONTINUE;
 	
-	if(ma_klase[killer])
+	if (ma_klase[killer])
 	{
 		new cur_health = pev(killer, pev_health);
 		new Float:max_health = 100.0+cod_get_user_health(killer);
@@ -93,7 +93,7 @@ public DeathMsg()
 		set_pev(killer, pev_health, new_health);
 		
 		new weapon = get_user_weapon(killer);
-		if(maxClip[weapon] != -1)
+		if (maxClip[weapon] != -1)
 			set_user_clip(killer, maxClip[weapon]);
 	}
 	
@@ -103,13 +103,13 @@ public DeathMsg()
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 		return HAM_IGNORED;
 	
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
 	
-	if(get_user_team(this) != get_user_team(idattacker) && get_user_weapon(idattacker) == CSW_AWP && damagebits & DMG_BULLET && random_num(1,4) == 1)
+	if (get_user_team(this) != get_user_team(idattacker) && get_user_weapon(idattacker) == CSW_AWP && damagebits & DMG_BULLET && random_num(1,4) == 1)
 		cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor, damagebits);
 		
 	return HAM_IGNORED;
@@ -117,12 +117,12 @@ public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 	
 public CurWeapon(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return PLUGIN_CONTINUE;
 	
 	new bron = read_data(2)  
 
-	if(bron == CSW_AWP){
+	if (bron == CSW_AWP){
 		set_pev(id,pev_viewmodel2,"models/cod_slowexp/vip/v_goldawp.mdl")
 		set_pev(id,pev_weaponmodel2,"models/cod_slowexp/vip/p_goldawp.mdl")
 	}

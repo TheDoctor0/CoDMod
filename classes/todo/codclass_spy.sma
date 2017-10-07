@@ -38,7 +38,7 @@ HUD= CreateHudSyncObj()
 }
 public Pomoc(id)
 {
-if(is_spy[id])
+if (is_spy[id])
 {
 client_print(id,print_chat,"Prawym klawiszem myszki wlaczasz niewidzialnosc")
 client_print(id,print_chat,"Masz 10 sekund ale przy jakimkolwiek ataku jestes widzialny")
@@ -58,7 +58,7 @@ set_user_rendering(id, kRenderFxGlowShell, 0, 0, 0, kRenderTransColor, 255);
 }
 public Spawn(id)
 {
-if(is_spy[id])
+if (is_spy[id])
 {
 przez[id]=255
 remove_task(id + 9823)
@@ -71,10 +71,10 @@ client_print(id,print_chat,"Nie wiesz jak grac Super Szpiegiem? Wpisz /pomoc")
 
 public client_PreThink(id)
 {
-if(!is_user_alive(id) || !is_spy[id])
+if (!is_user_alive(id) || !is_spy[id])
 return PLUGIN_CONTINUE;
 
-if((pev(id,pev_button) & IN_ATTACK2) && (pev(id,pev_oldbuttons) & IN_ATTACK2) && czas[id] && jest_niewidzialny[id])
+if ((pev(id,pev_button) & IN_ATTACK2) && (pev(id,pev_oldbuttons) & IN_ATTACK2) && czas[id] && jest_niewidzialny[id])
 {
 
 remove_task(id + 9823)
@@ -83,46 +83,46 @@ remove_task(id+PASEK_LAD)
 set_user_rendering(id, kRenderFxGlowShell, 0, 0, 0, kRenderTransColor, 255);
 przez[id] = 255;
 
-if(czas[id]<10)
+if (czas[id]<10)
 set_task(2.0,"LadowaniePaska",id+PASEK_LAD)
 }
-if((pev(id,pev_button) & IN_ATTACK2) && (pev(id,pev_oldbuttons) & IN_ATTACK2) && czas[id] && !jest_niewidzialny[id])
+if ((pev(id,pev_button) & IN_ATTACK2) && (pev(id,pev_oldbuttons) & IN_ATTACK2) && czas[id] && !jest_niewidzialny[id])
 {
 remove_task(id+PASEK_LAD)
 remove_task(id+PASEK)
 remove_task(id + 9823)
 set_task(0.1,"niewidzialny",id + 9823)
 }
-if((pev(id,pev_button) & IN_ATTACK) && (jest_niewidzialny[id]))
+if ((pev(id,pev_button) & IN_ATTACK) && (jest_niewidzialny[id]))
 {
-if(task_exists(id + 9823))
+if (task_exists(id + 9823))
 remove_task(id + 9823)
 
 remove_task(id+PASEK)
 set_user_rendering(id, kRenderFxGlowShell, 0, 0, 0, kRenderTransColor, 255);
 przez[id] = 255;
 jest_niewidzialny[id]=false;
-if(czas[id]<10)
+if (czas[id]<10)
 set_task(1.0,"LadowaniePaska",id+PASEK_LAD)
 }
 return PLUGIN_CONTINUE;
 }
 public TakeDmg(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-if(!is_user_alive(this) || !is_user_connected(this) || !is_user_connected(idattacker) || get_user_team(this) == get_user_team(idattacker))
+if (!is_user_alive(this) || !is_user_connected(this) || !is_user_connected(idattacker) || get_user_team(this) == get_user_team(idattacker))
 return HAM_IGNORED;
 
-if(!is_spy[idattacker])
+if (!is_spy[idattacker])
 return HAM_IGNORED;
 
 new health = get_user_health(this);
 new weapon = get_user_weapon(idattacker);
 
-if(health < 2)
+if (health < 2)
 return HAM_IGNORED;
 
 
-if(weapon == CSW_KNIFE && !UTIL_In_FOV(this, idattacker) && UTIL_In_FOV(idattacker, this))
+if (weapon == CSW_KNIFE && !UTIL_In_FOV(this, idattacker) && UTIL_In_FOV(idattacker, this))
 damage=float(health);
 
 SetHamParamFloat(4, damage);
@@ -131,7 +131,7 @@ return HAM_IGNORED;
 public niewidzialny(id)
 {
 id-=9823;
-if(przez[id]>0)
+if (przez[id]>0)
 {
 przez[id]-=15;
 set_user_rendering(id, kRenderFxGlowShell, 0, 0, 0, kRenderTransColor, przez[id]);
@@ -151,7 +151,7 @@ public CzasFun(id)
 {
 id-=PASEK;
 
-if(czas[id]!=0)
+if (czas[id]!=0)
 {
 czas[id]-=1;
 set_task(1.0,"CzasFun",id+PASEK)
@@ -169,7 +169,7 @@ public LadowaniePaska(id)
 {
 id-=PASEK_LAD;
 jest_niewidzialny[id]=false;
-if(czas[id]<10)
+if (czas[id]<10)
 {
 czas[id]++
 set_task(1.0,"LadowaniePaska",id+PASEK_LAD)
@@ -179,10 +179,10 @@ remove_task(id+PASEK_LAD)
 }
 public PokazPasek(id)
 {
-if(!is_user_alive(id) || !is_spy[id])
+if (!is_user_alive(id) || !is_spy[id])
 return PLUGIN_CONTINUE;
 
-if(czas[id]<4)
+if (czas[id]<4)
 set_hudmessage(255, 0, 0, 0.03, 0.6, 0, 0.0, 0.3, 0.0, 0.0);
 else
 set_hudmessage(0, 255, 0, 0.03, 0.6, 0, 0.0, 0.3, 0.0, 0.0);

@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Bezglowie"
-#define VERSION "1.0.10"
+#define VERSION "1.0.11"
 #define AUTHOR "O'Zone"
 
 #define TASK_ITEM 783426
@@ -44,7 +44,7 @@ public cod_item_spawned(id, respawn)
 
 	rem_bit(id, itemActive);
 
-	if(!respawn) rem_bit(id, itemUsed);
+	if (!respawn) rem_bit(id, itemUsed);
 }
 
 public cod_item_upgrade(id)
@@ -55,7 +55,7 @@ public cod_item_value(id)
 
 public cod_item_skill_used(id)
 {
-	if(get_bit(id, itemUsed)) {
+	if (get_bit(id, itemUsed)) {
 		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Bezglowia mozesz uzyc tylko raz na runde!");
 
 		return;
@@ -74,11 +74,11 @@ public deactivate_item(id)
 
 public trace_line(Float:startVector[3], Float:endVector[3], conditions, id, trace)
 {
-	if(!is_user_alive(id) || !(get_bit(id, itemActive))) return FMRES_IGNORED;
+	if (!is_user_alive(id) || !(get_bit(id, itemActive))) return FMRES_IGNORED;
         
 	static ent; ent = get_tr(TR_pHit);
 
-	if(!is_user_alive(ent) || id == ent) return FMRES_IGNORED;
+	if (!is_user_alive(ent) || id == ent) return FMRES_IGNORED;
 
 	set_tr2(trace, TR_iHitgroup, 8);
 

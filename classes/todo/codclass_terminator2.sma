@@ -52,7 +52,7 @@ public cod_class_disabled(id)
 
 public HamTakeDamage(iVictim, iInflictor, iAttacker, Float:Damage, DmgBits) 
 { 
-	if(!ma_klase[iVictim])
+	if (!ma_klase[iVictim])
 		return HAM_IGNORED;
 		
 	const m_LastHitGroup = 75; 
@@ -67,11 +67,11 @@ public HamTakeDamage(iVictim, iInflictor, iAttacker, Float:Damage, DmgBits)
 
 public Niewidzialnosc(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 	return;
 
 	new render = cod_get_class_invisible(id);
-	if( read_data(2) == CSW_AWP )
+	if ( read_data(2) == CSW_AWP )
 	{
 		rendermode[id] = pev(id, pev_rendermode);
 		renderfx[id] = pev(id, pev_renderfx);

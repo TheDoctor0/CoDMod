@@ -51,10 +51,10 @@ public cod_class_disabled(id)
 
 public cod_class_skill_used(id)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return
 	
-	if(skorzystal[id])
+	if (skorzystal[id])
 	{
 		ColorChat(id, RED, "Swojej umiejetnosci mozesz wykorzystywac co %d sekund!", get_cvar_num("cod_jasnowidz_moc"))
 		return
@@ -68,7 +68,7 @@ public Gracze(id)
 	new menu = menu_create("Kogo przesledzic?", "Gracze_handler")
 	for(new i=0, n=0; i<=g_MaxPlayers; i++)
 	{
-		if(!is_user_alive(i) || get_user_team(i) == get_user_team(id) || i == id)
+		if (!is_user_alive(i) || get_user_team(i) == get_user_team(id) || i == id)
 			continue
 		
 		gracz_id[n++] = i
@@ -81,7 +81,7 @@ public Gracze(id)
 
 public Gracze_handler(id, menu, item)
 {
-	if(item == MENU_EXIT)
+	if (item == MENU_EXIT)
 	{
 		menu_destroy(menu)
 		return PLUGIN_CONTINUE
@@ -89,12 +89,12 @@ public Gracze_handler(id, menu, item)
 	wybrany[id] = gracz_id[item]
 	get_user_name(wybrany[id], name, 32)
 	
-	if(!is_user_alive(id)) {
+	if (!is_user_alive(id)) {
 		ColorChat(id, RED, "Za pozno.. juz nie zyjesz..")
 		return PLUGIN_HANDLED
 	}
 	
-	if(!is_user_alive(wybrany[id])) {
+	if (!is_user_alive(wybrany[id])) {
 		ColorChat(id, TEAM_COLOR, "Niestety ^x04 %s ^x03 juz nie zyje.", name)
 		return PLUGIN_HANDLED
 	}
@@ -134,7 +134,7 @@ public WejdzWCialo(id)
 	info[1] = wybrany[id]
 	info[2] = iEnt
 	
-	if(get_cvar_num("cod_jasnowidz_odglos") == 1) {
+	if (get_cvar_num("cod_jasnowidz_odglos") == 1) {
 		emit_sound(wybrany[id], CHAN_VOICE, "cod_jasnowidz/wchodzi.wav", 0.6, ATTN_NORM, 0, PITCH_NORM)
 		client_cmd(id, "spk cod_jasnowidz/wchodzi.wav")
 	}
@@ -151,15 +151,15 @@ public KoniecPodgladu(info[3])
 	engfunc(EngFunc_RemoveEntity, iEnt)
 	fm_set_rendering(id,kRenderFxNone, 0, 0, 0, kRenderTransAlpha, 255)
 	
-	if(get_cvar_num("cod_jasnowidz_radar") == 0) return
-	if(!is_user_alive(sledzony)) return
-	if(!is_user_alive(id) && is_user_connected(id))
+	if (get_cvar_num("cod_jasnowidz_radar") == 0) return
+	if (!is_user_alive(sledzony)) return
+	if (!is_user_alive(id) && is_user_connected(id))
 	{
 		ColorChat(id, RED, "Niestety nie dozyles. Nie udostepnisz namiarow na wroga swojej ^x03 druzynie.")
 		return
 	}
 	new radar = get_cvar_num("cod_jasnowidz_radar")
-	if(radar == 1) {
+	if (radar == 1) {
 		oznaczony[sledzony] = true
 		ColorChat(id, RED, "Ofiara jest oznaczona na radarze!")
 	} else {
@@ -174,13 +174,13 @@ public FM_KameraGracza(iEnt)
 	static szClassname[32]
 	pev(iEnt, pev_classname, szClassname, sizeof szClassname - 1)
 	
-	if(!equal(szClassname, "player_hat"))
+	if (!equal(szClassname, "player_hat"))
 		return FMRES_IGNORED
 	
 	static g_Owner
 	g_Owner = pev(iEnt, pev_owner)
 	
-	if(!is_user_alive(g_Owner))
+	if (!is_user_alive(g_Owner))
 		return FMRES_IGNORED
 	
 	static Float:g_Origin[3], Float:g_Angle[3]
@@ -202,13 +202,13 @@ public FM_KameraGracza(iEnt)
 
 public radar_scan()
 {
-	if(get_cvar_num("cod_jasnowidz_radar") == 0) return
+	if (get_cvar_num("cod_jasnowidz_radar") == 0) return
 	
 	new PlayerCoords[3]
 	
 	for(new i=1; i<=g_MaxPlayers; i++)
 	{
-		if(oznaczony[i])
+		if (oznaczony[i])
 		{
 			get_user_origin(i, PlayerCoords)
 			message_begin(MSG_ONE_UNRELIABLE, g_msgHostageAdd, {0,0,0}, oznaczony[i])
@@ -230,7 +230,7 @@ public AktywacjaMocy(id)
 {
 	id-=KAC_TASK
 	skorzystal[id] = false
-	if(is_user_alive(id))
+	if (is_user_alive(id))
 		ColorChat(id, RED, "Mozesz wkoncu wykorzystac swoja umiejetnosc!")
 }
 
@@ -243,13 +243,13 @@ public SledzOfiare(sledzony)
 public Death() {
 	new id = read_data(2)
 	
-	if(skorzystal[id])
+	if (skorzystal[id])
 	{
 		skorzystal[id] = false
 		remove_task(KAC_TASK+id, 0)
 	}
 	
-	if(oznaczony[id])
+	if (oznaczony[id])
 	{
 		oznaczony[id] = false
 		remove_task(541230+id, 0)
@@ -275,7 +275,7 @@ public client_disconnect(id) {
 stock Display_Fade(id,duration,holdtime,fadetype,red,green,blue,alpha) {
 	static msgScreenFade
 
-	if(!msgScreenFade) msgScreenFade = get_user_msgid("ScreenFade")
+	if (!msgScreenFade) msgScreenFade = get_user_msgid("ScreenFade")
 
 	message_begin(!id ? MSG_ALL : MSG_ONE, msgScreenFade,{0,0,0},id)
 	write_short((1<<12) * duration)  // Duration of fadeout

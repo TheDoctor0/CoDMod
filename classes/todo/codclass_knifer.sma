@@ -67,7 +67,7 @@ public plugin_precache(){
 }
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_H))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_H))
 	{
 		client_print(id, print_chat, "[Nozownik] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -87,7 +87,7 @@ public cod_class_enabled(id)
 public pokaz_informacje(id)
 {
 	id -= POKAZ_STATUS
-	if(is_user_alive(id))
+	if (is_user_alive(id))
 	{
 		set_hudmessage(0, 255, 0, 0.02, 0.5, 0, 0.1, 0.3, 0.0, 0.0);
 		ShowSyncHudMsg(id, SyncHudObj, "[Noze : %d / 20]", noze[id])
@@ -95,14 +95,14 @@ public pokaz_informacje(id)
 }
 public Spawn(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 	{
 		noze[id] = 20
 		new param[1]
 		param[0] = id
-		if(!task_exists(id + POKAZ_STATUS))
+		if (!task_exists(id + POKAZ_STATUS))
 			set_task(0.1, "pokaz_informacje", id+POKAZ_STATUS, _, _, "b");
-		if(!task_exists(4247545 + id))
+		if (!task_exists(4247545 + id))
 			set_task(0.2, "make_footsteps", 4247545+id, param, 1, "b")
 		strip_user_weapons(id)
 		give_item(id, "weapon_knife");
@@ -149,14 +149,14 @@ public touchWorld(Toucher, Touched){
 public knife_touch(Toucher, Touched){
 	new kid = entity_get_edict(Toucher, EV_ENT_owner)
 	new vic = entity_get_edict(Toucher, EV_ENT_enemy)
-	if(is_user_alive(Touched)) 
+	if (is_user_alive(Touched)) 
 	{
 		new bool:zyje = true;
-		if(kid == Touched || vic == Touched)
+		if (kid == Touched || vic == Touched)
 		{
 			return ;
 		}
-		if(get_cvar_num("mp_friendlyfire") == 0 && get_user_team(Touched) == get_user_team(kid)) 
+		if (get_cvar_num("mp_friendlyfire") == 0 && get_user_team(Touched) == get_user_team(kid)) 
 		{
 			return ;
 		}
@@ -165,14 +165,14 @@ public knife_touch(Toucher, Touched){
 		for(new i = 0; i < 3; i++) Random_Float[i] = random_float(-50.0, 50.0)
 		Punch_View(Touched, Random_Float)
 		
-		if(get_cvar_num("amx_knifedamage_mw2") >= get_user_health(Touched)){
+		if (get_cvar_num("amx_knifedamage_mw2") >= get_user_health(Touched)){
 			zyje = false;
 		}
 		new origin[3];
 		get_user_origin(Touched,origin)
 		origin[2] += 25
-		if(zyje == true){
-			if(get_user_team(Touched) == get_user_team(kid)) 
+		if (zyje == true){
+			if (get_user_team(Touched) == get_user_team(kid)) 
 			{
 				new name[33]
 				get_user_name(kid,name,32)
@@ -196,7 +196,7 @@ public knife_touch(Toucher, Touched){
 		
 		else
 		{
-			if(get_user_team(Touched) == get_user_team(kid)) {
+			if (get_user_team(Touched) == get_user_team(kid)) {
 				set_user_frags(kid, get_user_frags(kid) - 1)
 				client_print(kid,print_center,"You killed a teammate")
 			}
@@ -306,18 +306,18 @@ public Punch_View(id, Float:ViewAngle[3])
 public forward_touch(toucher, touched) // This function is called every time a player touches another player.
 {
 	// NOTE: The toucher is the player standing/falling on top of the other (touched) player's head.
-	if(!is_user_alive(toucher) || !is_user_alive(touched)) // The touching players can't be dead.
+	if (!is_user_alive(toucher) || !is_user_alive(touched)) // The touching players can't be dead.
 		return;
 	
-	if(!get_pcvar_num(amx_headsplash)) // If the plugin is disabled, stop messing with things.
+	if (!get_pcvar_num(amx_headsplash)) // If the plugin is disabled, stop messing with things.
 		return;
-	if(!ma_klase[toucher])
-		return;
-	
-	if(falling_speed[touched]) // Check if the touched player is falling. If he/she is, don't continue.
+	if (!ma_klase[toucher])
 		return;
 	
-	if(get_user_team(toucher) == get_user_team(touched) && !get_cvar_num("mp_friendlyfire")) // If the touchers are in the same team and friendly fire is off, don't continue.
+	if (falling_speed[touched]) // Check if the touched player is falling. If he/she is, don't continue.
+		return;
+	
+	if (get_user_team(toucher) == get_user_team(touched) && !get_cvar_num("mp_friendlyfire")) // If the touchers are in the same team and friendly fire is off, don't continue.
 		return;
 	
 	new touched_origin[3], toucher_origin[3];
@@ -328,30 +328,30 @@ public forward_touch(toucher, touched) // This function is called every time a p
 	pev(toucher,pev_mins,toucher_minsize);
 	pev(touched,pev_mins,touched_minsize); // If touche*_minsize is equal to -18.0, touche* is crouching.
 	
-	if(touched_minsize[2] != -18.0) // If the touched player IS NOT crouching, check if the toucher is on his/her head.
+	if (touched_minsize[2] != -18.0) // If the touched player IS NOT crouching, check if the toucher is on his/her head.
 	{
-		if(!(toucher_origin[2] == touched_origin[2]+72 && toucher_minsize[2] != -18.0) && !(toucher_origin[2] == touched_origin[2]+54 && toucher_minsize[2] == -18.0))
+		if (!(toucher_origin[2] == touched_origin[2]+72 && toucher_minsize[2] != -18.0) && !(toucher_origin[2] == touched_origin[2]+54 && toucher_minsize[2] == -18.0))
 		{
 			return;
 		}
 	}
 	else // If the touched player is crouching, check if the toucher is on his/her head
 	{
-		if(!(toucher_origin[2] == touched_origin[2]+68 && toucher_minsize[2] != -18.0) && !(toucher_origin[2] == touched_origin[2]+50 && toucher_minsize[2] == -18.0))
+		if (!(toucher_origin[2] == touched_origin[2]+68 && toucher_minsize[2] != -18.0) && !(toucher_origin[2] == touched_origin[2]+50 && toucher_minsize[2] == -18.0))
 		{
 			return;
 		}
 	}
 	
-	if(falling_speed[toucher] >= MINIMUM_FALL_SPEED) // If the toucher is falling in the required speed or faster, then landing on top of the touched's head, do some damage to the touched. MUHAHAHAHAHA!!!
+	if (falling_speed[toucher] >= MINIMUM_FALL_SPEED) // If the toucher is falling in the required speed or faster, then landing on top of the touched's head, do some damage to the touched. MUHAHAHAHAHA!!!
 	{
 		new Float:damage = ((falling_speed[toucher] - MINIMUM_FALL_SPEED + 30) * (falling_speed[toucher] - MINIMUM_FALL_SPEED + 30)) / 1300;
-		if(damage > MAXIMUM_DAMAGE_FROM_JUMP) // Make shure that the touched player don't take too much damage.
+		if (damage > MAXIMUM_DAMAGE_FROM_JUMP) // Make shure that the touched player don't take too much damage.
 			damage = MAXIMUM_DAMAGE_FROM_JUMP;
 		damage_player(touched, toucher, damage); // Damage or kill the touched player.
 		damage_after[toucher][touched] = 0.0; // Reset.
 	}
-	if(is_user_alive(touched) && damage_after[toucher][touched] <= get_gametime()) // This makes shure that you won't get damaged every frame you have some one on your head. It also makes shure that players won't get damaged faster on fast servers than laggy servers.
+	if (is_user_alive(touched) && damage_after[toucher][touched] <= get_gametime()) // This makes shure that you won't get damaged every frame you have some one on your head. It also makes shure that players won't get damaged faster on fast servers than laggy servers.
 	{
 		damage_after[toucher][touched] = get_gametime() + DELAY;
 		damage_player(touched, toucher, DAMAGE); // Damage or kill the touched player.
@@ -367,13 +367,13 @@ public forward_PlayerPreThink(id) // This is called every time before a player "
 public damage_player(pwned, pwnzor, Float:damage) // Damages or kills a player. Home made HAX
 {
 	new health = get_user_health(pwned);
-	if(get_user_team(pwned) == get_user_team(pwnzor)) // If both players are in the same team, reduce the damage.
+	if (get_user_team(pwned) == get_user_team(pwnzor)) // If both players are in the same team, reduce the damage.
 		damage /= 1.4;
 	new CsArmorType:armortype;
 	cs_get_user_armor(pwned, armortype);
-	if(armortype == CS_ARMOR_VESTHELM)
+	if (armortype == CS_ARMOR_VESTHELM)
 		damage *= 0.7;
-	if(health >  damage)
+	if (health >  damage)
 	{
 		new pwned_origin[3];
 		get_user_origin(pwned, pwned_origin);
@@ -389,7 +389,7 @@ public damage_player(pwned, pwnzor, Float:damage) // Damages or kills a player. 
 		message_end();
 		
 		new ent = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "trigger_hurt"));
-		if(!ent)
+		if (!ent)
 			return;
 		new value[16];
 		float_to_str(damage * 2, value, sizeof value - 1);
@@ -432,7 +432,7 @@ public damage_player(pwned, pwnzor, Float:damage) // Damages or kills a player. 
 		set_pev(pwned, pev_frags, float(get_user_frags(pwned) + 1));
 		user_silentkill(pwned);
 		make_deathmsg(pwnzor, pwned, 1, "his/her feet :)");
-		if(get_user_team(pwnzor) != get_user_team(pwned)) // If it was a team kill, the pwnzor's money should get reduced instead of increased.
+		if (get_user_team(pwnzor) != get_user_team(pwned)) // If it was a team kill, the pwnzor's money should get reduced instead of increased.
 		{
 			set_pev(pwnzor, pev_frags, float(get_user_frags(pwnzor) + 1));
 			cs_set_user_money(pwnzor, cs_get_user_money(pwnzor) + 300);
@@ -466,12 +466,12 @@ public death_event()
 {
 	new kid = read_data(1)
 	new id = read_data(2)
-	if(g_isDying[id])
+	if (g_isDying[id])
 	{
 		g_isDying[id] = false
 		remove_task(4247545+id)
 	}
-	if( kid != id && is_user_alive(kid) && ma_klase[id])
+	if ( kid != id && is_user_alive(kid) && ma_klase[id])
 	{
 		cod_set_user_xp(kid, cod_get_user_xp(kid) + 30)
 	}
@@ -479,10 +479,10 @@ public death_event()
 public make_footsteps(param[])
 {
 	new id = param[0]
-	if(!is_user_alive(id) || get_cvar_num("ftw_active") == 1 || get_speed(id) < 120) return
+	if (!is_user_alive(id) || get_cvar_num("ftw_active") == 1 || get_speed(id) < 120) return
 	new origin[3]
 	get_user_origin(id, origin)
-	if(entity_get_int(id, EV_INT_bInDuck) == 1)
+	if (entity_get_int(id, EV_INT_bInDuck) == 1)
 		origin[2] -= 18
 	else
 		origin[2] -= 36
@@ -495,10 +495,10 @@ public make_footsteps(param[])
 	entity_get_vector(id, EV_VEC_origin, ent_origin)
 	
 	ent = create_entity("info_target")
-	if(ent > 0)
+	if (ent > 0)
 	{
 		ent_angles[0] = 0.0
-		if(g_decalSwitch[id] == 0) ent_angles[1] -= 90
+		if (g_decalSwitch[id] == 0) ent_angles[1] -= 90
 		else ent_angles[1] += 90
 		entity_set_vector(ent, EV_VEC_origin, ent_origin)
 		entity_set_vector(ent, EV_VEC_v_angle, ent_angles)
@@ -517,14 +517,14 @@ public make_footsteps(param[])
 }
 public PlayerPreThink(id)
 {
-        if(!ma_klase[id])
+        if (!ma_klase[id])
                 return PLUGIN_CONTINUE;
         
         new button = pev(id, pev_button);
         new oldbutton = pev(id, pev_oldbuttons);
         new flags = pev(id, pev_flags);
         
-        if((button & IN_JUMP) && !(flags & FL_ONGROUND) && !(oldbutton & IN_JUMP) && skoki[id])
+        if ((button & IN_JUMP) && !(flags & FL_ONGROUND) && !(oldbutton & IN_JUMP) && skoki[id])
         {
                 skoki[id]--;
                 new Float:velocity[3];
@@ -532,7 +532,7 @@ public PlayerPreThink(id)
                 velocity[2] = random_float(265.0,285.0);
                 set_pev(id, pev_velocity, velocity);
         }
-        else if(flags & FL_ONGROUND)    
+        else if (flags & FL_ONGROUND)    
                 skoki[id] = 3;
         
         return PLUGIN_CONTINUE;

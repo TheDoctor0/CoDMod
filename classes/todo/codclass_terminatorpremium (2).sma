@@ -54,7 +54,7 @@ public client_disconnect(id)
 	new entRakiety = find_ent_by_class(0, "rocket");
 	while(entRakiety > 0)
 	{
-		if(entity_get_edict(entRakiety, EV_ENT_owner) == id)
+		if (entity_get_edict(entRakiety, EV_ENT_owner) == id)
 			remove_entity(entRakiety);
 		entRakiety = find_ent_by_class(entRakiety, "rocket");
 	}
@@ -63,7 +63,7 @@ public client_disconnect(id)
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_H))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_H))
 	{
 		client_print(id, print_chat, "[Terminator[Premium]] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -91,7 +91,7 @@ public cod_class_skill_used(id)
 	}
 	else
 	{
-		if(poprzednia_rakieta_gracza[id] + 2.0 > get_gametime())
+		if (poprzednia_rakieta_gracza[id] + 2.0 > get_gametime())
 		{
 			client_print(id, print_center, "Rakiet mozesz uzywac co 2 sekundy!");
 		}
@@ -135,11 +135,11 @@ public cod_class_skill_used(id)
 //Przy kucaniu
 public fwPrethink_Niewidzialnosc(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 	
 	new button = get_user_button(id);
-	if( button & IN_DUCK )
+	if ( button & IN_DUCK )
 	{
 		set_rendering(id,kRenderFxNone, 0, 0, 0, kRenderTransAlpha, 12);
 	}
@@ -151,7 +151,7 @@ public fwPrethink_Niewidzialnosc(id)
 
 public fwSpawn_Rakiety(id)
 {
-	if(is_user_alive(id))
+	if (is_user_alive(id))
 		ilosc_rakiet_gracza[id] = 2;
 }
 
@@ -197,12 +197,12 @@ public DotykRakiety(ent)
 
 public fwCmdStart_MultiJump(id, uc_handle)
 {
-	if(!is_user_alive(id) || !ma_klase[id])
+	if (!is_user_alive(id) || !ma_klase[id])
 		return FMRES_IGNORED;
 	
 	new flags = pev(id, pev_flags);
 	
-	if((get_uc(uc_handle, UC_Buttons) & IN_JUMP) && !(flags & FL_ONGROUND) && !(pev(id, pev_oldbuttons) & IN_JUMP) && skoki[id])
+	if ((get_uc(uc_handle, UC_Buttons) & IN_JUMP) && !(flags & FL_ONGROUND) && !(pev(id, pev_oldbuttons) & IN_JUMP) && skoki[id])
 	{
 		skoki[id]--;
 		new Float:velocity[3];
@@ -210,23 +210,23 @@ public fwCmdStart_MultiJump(id, uc_handle)
 		velocity[2] = random_float(265.0,285.0);
 		set_pev(id, pev_velocity,velocity);
 	}
-	else if(flags & FL_ONGROUND)
+	else if (flags & FL_ONGROUND)
 		skoki[id] = 6;
 	
 	return FMRES_IGNORED;
 }
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 		return HAM_IGNORED;
 	
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
 	
-	if(!(damagebits & DMG_BULLET))
+	if (!(damagebits & DMG_BULLET))
 		return HAM_IGNORED;
 	
-	if(get_user_weapon(idattacker) == CSW_AWP && random_num(1,1) == 1)
+	if (get_user_weapon(idattacker) == CSW_AWP && random_num(1,1) == 1)
 		cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor, damagebits);
 	
 	return HAM_IGNORED;

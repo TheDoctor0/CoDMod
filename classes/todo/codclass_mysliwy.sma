@@ -49,21 +49,21 @@ public cod_class_disabled(id)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 		return HAM_IGNORED;
 	
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
 		
-	if(!(damagebits & DMG_BULLET))
+	if (!(damagebits & DMG_BULLET))
 		return HAM_IGNORED;
 		
 	new weapon = get_user_weapon(idattacker);
 	
-	if((weapon == CSW_KNIFE && damage > 20.0) || (weapon == CSW_SCOUT && !random(4)))
+	if ((weapon == CSW_KNIFE && damage > 20.0) || (weapon == CSW_SCOUT && !random(4)))
 		damage = get_user_health(this)-damage+1.0;
 		
-	if(weapon == CSW_M3)
+	if (weapon == CSW_M3)
 		damage *= 0.2;
 		
 	cod_inflict_damage(idattacker, this, damage, 0.0, idinflictor, damagebits);
@@ -104,7 +104,7 @@ public cod_class_skill_used(id)
 
 public DotykPulapki(ent, id)
 {
-	if(!is_valid_ent(ent))
+	if (!is_valid_ent(ent))
 		return;
 		
 	new attacker = entity_get_edict(ent, EV_ENT_owner);
@@ -138,7 +138,7 @@ public client_disconnect(id)
 	new ent = find_ent_by_class(0, "trap");
 	while(ent > 0)
 	{
-		if(entity_get_edict(id, EV_ENT_owner) == id)
+		if (entity_get_edict(id, EV_ENT_owner) == id)
 			remove_entity(ent);
 		ent = find_ent_by_class(ent, "trap");
 	}

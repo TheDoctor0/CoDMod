@@ -1,11 +1,11 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Item Antyitem"
-#define VERSION "1.0.4"
+#define PLUGIN "CoD Item Anty Item"
+#define VERSION "1.0.6"
 #define AUTHOR "O'Zone"
 
-#define NAME        "Antyitem"
+#define NAME        "Anty Item"
 #define DESCRIPTION "Po uzyciu mozesz zniszczyc item dowolnego gracza i swoj"
 
 public plugin_init()
@@ -19,9 +19,8 @@ public cod_item_skill_used(id)
 {
 	new menuData[128], playerName[32], playerItem[64], playerId[3], playerItems, menu = menu_create("Wybierz \rGracza\w, ktoremu chcesz zniszczyc item:", "cod_item_skill_used_handle");
 
-	for(new i = 1; i <= MAX_PLAYERS; i++)
-	{
-	    if(!is_user_connected(i) || !cod_get_user_item(i) || get_user_team(i) == get_user_team(id)) continue;
+	for (new i = 1; i <= MAX_PLAYERS; i++) {
+	    if (!is_user_connected(i) || !cod_get_user_item(i) || get_user_team(i) == get_user_team(id)) continue;
 
 	    cod_get_item_name(cod_get_user_item(id), playerItem, charsmax(playerItem));
 	    get_user_name(i, playerName, charsmax(playerName));
@@ -38,9 +37,8 @@ public cod_item_skill_used(id)
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 
-	if(playerItems) menu_display(id, menu);
-	else
-	{
+	if (playerItems) menu_display(id, menu);
+	else {
 		menu_destroy(menu);
 
 		cod_print_chat(id, "Zaden z przeciwnikow nie posiada przedmiotu!");
@@ -49,8 +47,7 @@ public cod_item_skill_used(id)
 
 public cod_item_skill_used_handle(id, menu, item)
 {
-	if(item == MENU_EXIT)
-	{
+	if (item == MENU_EXIT) {
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;

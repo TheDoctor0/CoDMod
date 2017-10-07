@@ -32,7 +32,7 @@ public cod_class_enabled(id)
 }
 
 public cod_class_spawned(id)
-	if(random_num(1, 6) == 1) cod_teleport_to_spawn(id, 1);
+	if (random_num(1, 6) == 1) cod_teleport_to_spawn(id, 1);
 
 public cod_class_skill_used(id)
 	cod_use_user_rocket(id);

@@ -37,7 +37,7 @@ public plugin_precache()
 
 public cod_class_enabled(id)
 {
-	if(!(cod_get_user_status(id) & STATUS_PREMIUM))
+	if (!(cod_get_user_status(id) & STATUS_PREMIUM))
 	{
 		client_print(id, print_chat, "[%s] Nie masz premium, zeby grac ta klasa!", nazwa)
 		return COD_STOP;
@@ -58,12 +58,12 @@ public cod_class_disabled(id)
 
 public CmdStart(id, uc_handle)
 {
-        if(!is_user_alive(id) || !ma_klase[id])
+        if (!is_user_alive(id) || !ma_klase[id])
                 return FMRES_IGNORED;
         
         new flags = pev(id, pev_flags);
         
-        if((get_uc(uc_handle, UC_Buttons) & IN_JUMP) && !(flags & FL_ONGROUND) && !(pev(id, pev_oldbuttons) & IN_JUMP) && skoki[id])
+        if ((get_uc(uc_handle, UC_Buttons) & IN_JUMP) && !(flags & FL_ONGROUND) && !(pev(id, pev_oldbuttons) & IN_JUMP) && skoki[id])
         {
                 skoki[id]--;
                 new Float:velocity[3];
@@ -71,7 +71,7 @@ public CmdStart(id, uc_handle)
                 velocity[2] = random_float(265.0,285.0);
                 set_pev(id, pev_velocity,velocity);
         }
-        else if(flags & FL_ONGROUND)
+        else if (flags & FL_ONGROUND)
                 skoki[id] = 1; //tutaj podajemy iloœæ skokow w powietrzu
         
         return FMRES_IGNORED;
@@ -109,7 +109,7 @@ public fwSpawn_Miny(id)
 
 public DotykMiny(ent, id)
 {
-	if(!is_valid_ent(ent))
+	if (!is_valid_ent(ent))
 		return;
 
 	new attacker = entity_get_edict(ent, EV_ENT_owner);

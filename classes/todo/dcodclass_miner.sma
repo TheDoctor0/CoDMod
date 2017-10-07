@@ -85,7 +85,7 @@ public cod_class_skill_used(id)
 
 public DotykMiny(ent, id)
 {
-	if(!is_valid_ent(ent))
+	if (!is_valid_ent(ent))
 		return;
 		
 	new attacker = entity_get_edict(ent, EV_ENT_owner);
@@ -143,7 +143,7 @@ public client_disconnect(id)
 	new entMiny = find_ent_by_class(0, "mine");
 	while(entMiny > 0)
 	{
-		if(entity_get_edict(entMiny, EV_ENT_owner) == id)
+		if (entity_get_edict(entMiny, EV_ENT_owner) == id)
 			remove_entity(entMiny);
 		entMiny = find_ent_by_class(entMiny, "mine");
 	}
@@ -151,7 +151,7 @@ public client_disconnect(id)
 
 public client_death(killer, victim, wpnindex, hitplace, TK)
 {
-	if(!ma_klase[victim])
+	if (!ma_klase[victim])
 		return PLUGIN_CONTINUE;
 	
 	new Float:fOrigin[3];

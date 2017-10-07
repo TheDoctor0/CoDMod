@@ -58,7 +58,7 @@ public client_disconnect(id)
 	new entRakiety = find_ent_by_class(0, "rocket");
 	while(entRakiety > 0)
 	{
-		if(entity_get_edict(entRakiety, EV_ENT_owner) == id)
+		if (entity_get_edict(entRakiety, EV_ENT_owner) == id)
 			remove_entity(entRakiety);
 		entRakiety = find_ent_by_class(entRakiety, "rocket");
 	}
@@ -67,7 +67,7 @@ public client_disconnect(id)
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_H))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_H))
 	{
 		client_print(id, print_chat, "[TrusT XXL] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -96,7 +96,7 @@ public cod_class_skill_used(id)
 	}
 	else
 	{
-		if(poprzednia_rakieta_gracza[id] + 2.0 > get_gametime())
+		if (poprzednia_rakieta_gracza[id] + 2.0 > get_gametime())
 		{
 			client_print(id, print_center, "Rakiet mozesz uzywac co 2 sekundy!");
 		}
@@ -140,11 +140,11 @@ public cod_class_skill_used(id)
 //Przy kucaniu
 public fwPrethink_Niewidzialnosc(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 	
 	new button = get_user_button(id);
-	if( button & IN_DUCK && get_user_weapon(id) == CSW_KNIFE)
+	if ( button & IN_DUCK && get_user_weapon(id) == CSW_KNIFE)
 	{
 		set_rendering(id,kRenderFxNone, 0, 0, 0, kRenderTransAlpha, 15);
 	}
@@ -156,7 +156,7 @@ public fwPrethink_Niewidzialnosc(id)
 
 public fwSpawn_Rakiety(id)
 {
-	if(is_user_alive(id))
+	if (is_user_alive(id))
 		ilosc_rakiet_gracza[id] = 2;
 }
 
@@ -202,7 +202,7 @@ public DotykRakiety(ent)
 
 public fwTakeDamage_JedenCios(id, ent, attacker)
 {
-	if(is_user_alive(attacker) && ma_klase[attacker] && get_user_weapon(attacker) == CSW_KNIFE && ostatnio_prawym[id])
+	if (is_user_alive(attacker) && ma_klase[attacker] && get_user_weapon(attacker) == CSW_KNIFE && ostatnio_prawym[id])
 	{
 		cs_set_user_armor(id, 0, CS_ARMOR_NONE);
 		SetHamParamFloat(4, float(get_user_health(id) + 1));
@@ -224,16 +224,16 @@ public fwSecondaryAttack_JedenCios(ent)
 }
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 		return HAM_IGNORED;
 	
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
 	
-	if(get_user_team(this) != get_user_team(idattacker) && get_user_weapon(idattacker) == CSW_HEGRENADE && damagebits & DMG_HEGRENADE && random_num(1,2) == 1)
+	if (get_user_team(this) != get_user_team(idattacker) && get_user_weapon(idattacker) == CSW_HEGRENADE && damagebits & DMG_HEGRENADE && random_num(1,2) == 1)
 		cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor, damagebits);
 	
-	if(get_user_weapon(idattacker) == CSW_XM1014 && random_num(1,4) == 1)
+	if (get_user_weapon(idattacker) == CSW_XM1014 && random_num(1,4) == 1)
 		cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor, damagebits);
 	
 	return HAM_IGNORED;

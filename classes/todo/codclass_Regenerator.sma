@@ -33,7 +33,7 @@ public cod_class_disabled(id)
 
 public DodajHP(id)
 {
-        if(get_user_health(id) < 100+cod_get_user_health(id))
+        if (get_user_health(id) < 100+cod_get_user_health(id))
                 fm_set_user_health(id, get_user_health(id)+5);
 }
 

@@ -41,16 +41,16 @@ public DeathMsg()
 	new killer = read_data(1);
 	new victim = read_data(2);
 	
-	if(!is_user_connected(killer))
+	if (!is_user_connected(killer))
 		return;
 	
-	if(!ma_klase[killer])
+	if (!ma_klase[killer])
 		return;
 	
-	if(random(8))
+	if (random(8))
 		return;
 	
-	if(!(xp_ofiary[killer] = cod_get_user_xp(victim)))
+	if (!(xp_ofiary[killer] = cod_get_user_xp(victim)))
 		return;
 	
 	ofiara[killer] = victim;
@@ -60,7 +60,7 @@ public DeathMsg()
 
 public Kradziez(id)
 {
-	if(cod_get_user_xp(ofiara[id]) != xp_ofiary[id])
+	if (cod_get_user_xp(ofiara[id]) != xp_ofiary[id])
 		return;
 	
 	new nick_zlodzieja[33];
@@ -71,7 +71,7 @@ public Kradziez(id)
 	get_user_name(id, nick_zlodzieja, 32);
 	get_user_name(ofiara[id], nick_ofiary, 32);
 	
-	if(cod_get_user_xp(ofiara[id]) >= xpv)
+	if (cod_get_user_xp(ofiara[id]) >= xpv)
 	{
 		ColorChat(ofiara[id], RED, "Twoj EXP zostal skradziony przez %s.", nick_zlodzieja);
 		cod_set_user_xp(ofiara[id], (cod_get_user_xp(ofiara[id]) - (xpv + cod_get_user_intelligence(id)*2)));

@@ -66,16 +66,16 @@ public NowaRunda()
 }
 public PlayerPreThink(id)
 {
-	if(!is_user_alive(id) || !ma_klase[id])
+	if (!is_user_alive(id) || !ma_klase[id])
 		return FMRES_IGNORED 
 	
 	
 	
-	if((pev(id, pev_button) & IN_ATTACK2 && !(pev(id, pev_oldbuttons) & IN_ATTACK2)) && get_user_weapon(id) == CSW_MP5NAVY)
+	if ((pev(id, pev_button) & IN_ATTACK2 && !(pev(id, pev_oldbuttons) & IN_ATTACK2)) && get_user_weapon(id) == CSW_MP5NAVY)
 	{
 		Stworz(id)		
 	}
-	if(pev(id, pev_button) & IN_USE && !(pev(id, pev_oldbuttons) & IN_USE))
+	if (pev(id, pev_button) & IN_USE && !(pev(id, pev_oldbuttons) & IN_USE))
 	{
 		Bum(id)		
 	}
@@ -90,7 +90,7 @@ public plugin_precache()
 }
 public Odrodzenie(id)
 {
-	if(!ma_klase[id] || !is_user_alive(id))
+	if (!ma_klase[id] || !is_user_alive(id))
 		return PLUGIN_CONTINUE;
 	
 	ilosc_bomb[id] = 15;
@@ -98,7 +98,7 @@ public Odrodzenie(id)
 }
 public Stworz(id)
 {
-	if(!ilosc_bomb[id])
+	if (!ilosc_bomb[id])
 	{
 		client_print(id,print_center,"Nie masz juz bomb!")
 		return PLUGIN_CONTINUE;
@@ -164,7 +164,7 @@ public Bum(id)
 	while(iEnt > 0) 
 	{
 		owner = entity_get_edict(iEnt, EV_ENT_owner);
-		if(owner == id)
+		if (owner == id)
 		{
 			Wybuch(iEnt);
 			remove_entity(iEnt);

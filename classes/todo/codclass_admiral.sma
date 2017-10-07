@@ -30,7 +30,7 @@ public plugin_init() {
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_A))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_A))
 	{
 		client_print(id, print_chat, "[Admiral] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -44,13 +44,13 @@ public cod_class_disabled(id)
 
 public CmdStart(id, uc_handle)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return FMRES_IGNORED;
 	
 	new button = get_uc(uc_handle, UC_Buttons);
 	new oldbutton = pev(id, pev_oldbuttons);
 	new flags = pev(id, pev_flags);
-	if((button & IN_JUMP) && !(flags & FL_ONGROUND) && !(oldbutton & IN_JUMP) && moze_skoczyc[id])
+	if ((button & IN_JUMP) && !(flags & FL_ONGROUND) && !(oldbutton & IN_JUMP) && moze_skoczyc[id])
 	{
 		moze_skoczyc[id] = false;
 		new Float:velocity[3];
@@ -58,7 +58,7 @@ public CmdStart(id, uc_handle)
 		velocity[2] = random_float(265.0,285.0);
 		set_pev(id, pev_velocity, velocity);
 	}
-	else if(flags & FL_ONGROUND)	
+	else if (flags & FL_ONGROUND)	
 		moze_skoczyc[id] = true;
 		
 	return FMRES_IGNORED;
@@ -69,13 +69,13 @@ public DeathMsg()
 	new killer = read_data(1);
 	new victim = read_data(2);
 	
-	if(!is_user_connected(killer))
+	if (!is_user_connected(killer))
 		return PLUGIN_CONTINUE;
 	
-	if(ma_klase[victim] && !ma_klase[killer])
+	if (ma_klase[victim] && !ma_klase[killer])
 		cod_set_user_xp(killer, cod_get_user_xp(killer)+10);
 	
-	if(ma_klase[killer])
+	if (ma_klase[killer])
 	{
 		new cur_health = pev(killer, pev_health);
 		new Float:max_health = 100.0+cod_get_user_health(killer);
@@ -83,7 +83,7 @@ public DeathMsg()
 		set_pev(killer, pev_health, new_health);
 		
 		new weapon = get_user_weapon(killer);
-		if(maxClip[weapon] != -1)
+		if (maxClip[weapon] != -1)
 			set_user_clip(killer, maxClip[weapon]);
 	}
 	

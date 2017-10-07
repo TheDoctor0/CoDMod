@@ -37,10 +37,10 @@ public cod_class_enabled(id)
 	
 public cod_class_disabled(id)
 {	
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return PLUGIN_CONTINUE;
 		
-	if(uzyl[id])
+	if (uzyl[id])
 	{
 		ColorChat(id, RED, "Juz wykorzystales perk!");
 		return PLUGIN_CONTINUE;
@@ -59,7 +59,7 @@ public ResetHUD(id)
 		
 public WylaczNoclip(id)
 {
-	if(!is_user_connected(id))
+	if (!is_user_connected(id))
 		return;
 		
 	set_pev(id, pev_movetype, MOVETYPE_WALK);

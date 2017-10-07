@@ -44,7 +44,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_E))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_E))
 	{
 		client_print(id, print_chat, "[Slepy Ninja [Premium Gold]] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -65,10 +65,10 @@ public cod_class_disabled(id)
 
 public eventKnife_Niewidzialnosc(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 	
-	if( read_data(2) == CSW_KNIFE )
+	if ( read_data(2) == CSW_KNIFE )
 	{
 		set_rendering(id,kRenderFxNone, 0, 0, 0, kRenderTransAlpha, 40);
 	}
@@ -80,14 +80,14 @@ public eventKnife_Niewidzialnosc(id)
 
 public fwSpawn_Grawitacja(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 		entity_set_float(id, EV_FL_gravity, 300.0/800.0);
 }
 
 
 public fwTakeDamage_JedenCios(id, ent, attacker)
 {
-	if(is_user_alive(attacker) && ma_klase[attacker] && get_user_weapon(attacker) == CSW_KNIFE && random_num(1,2) == 1 && ostatnio_prawym[id])
+	if (is_user_alive(attacker) && ma_klase[attacker] && get_user_weapon(attacker) == CSW_KNIFE && random_num(1,2) == 1 && ostatnio_prawym[id])
 	{
 		cs_set_user_armor(id, 0, CS_ARMOR_NONE);
 		SetHamParamFloat(4, float(get_user_health(id) + 1));
@@ -109,23 +109,23 @@ public fwSecondaryAttack_JedenCios(ent)
 }
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 		return HAM_IGNORED;
 	
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
 	
-	if(!(damagebits & DMG_BULLET))
+	if (!(damagebits & DMG_BULLET))
 		return HAM_IGNORED;
 	
-	if(get_user_weapon(idattacker) == CSW_AWP && random_num(1,2) == 1)
+	if (get_user_weapon(idattacker) == CSW_AWP && random_num(1,2) == 1)
 		cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor, damagebits);
 	
 	return HAM_IGNORED;
 }
 public Killed(id)
 {
-	if(ma_klase[id] && random_num(1, 4) == 1)
+	if (ma_klase[id] && random_num(1, 4) == 1)
 		set_task(0.1, "Wskrzes", id+ZADANIE_WSKRZES);
 }
 

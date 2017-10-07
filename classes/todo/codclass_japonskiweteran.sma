@@ -24,37 +24,37 @@ public plugin_init() {
 }
 public fwd_touch(id, world)
 {
-    if(!is_user_alive(id) && ma_klase[id])
+    if (!is_user_alive(id) && ma_klase[id])
         return FMRES_IGNORED;
     
     new classname[32];
     entity_get_string(world, EV_SZ_classname, classname, 31);
     
-    if(equal(classname, "worldspawn") || equal(classname, "func_wall") || equal(classname, "func_breakable"))
+    if (equal(classname, "worldspawn") || equal(classname, "func_wall") || equal(classname, "func_breakable"))
         entity_get_vector(id, EV_VEC_origin, g_wallorigin[id]);
     return FMRES_IGNORED;
 }
 public client_PreThink(id)
 {
     new button = get_user_button(id);
-    if(button & IN_USE && ma_klase[id])
+    if (button & IN_USE && ma_klase[id])
     {
         static Float:origin[3];
         entity_get_vector(id, EV_VEC_origin, origin);
         
-        if(get_distance_f(origin, g_wallorigin[id]) > 25.0)    
+        if (get_distance_f(origin, g_wallorigin[id]) > 25.0)    
             return FMRES_IGNORED;
     
-        if(get_entity_flags(id) & FL_ONGROUND) 
+        if (get_entity_flags(id) & FL_ONGROUND) 
             return FMRES_IGNORED;
 
-        if(button & IN_FORWARD)
+        if (button & IN_FORWARD)
         {
             static Float:velocity[3];
             velocity_by_aim(id, 240, velocity);
             entity_set_vector(id, EV_VEC_velocity, velocity);
         }
-        else if(button & IN_BACK)
+        else if (button & IN_BACK)
         {
             static Float:velocity[3];
             velocity_by_aim(id, -240, velocity);

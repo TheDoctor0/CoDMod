@@ -26,7 +26,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	if(!(cod_get_user_status(id) & STATUS_PREMIUM))
+	if (!(cod_get_user_status(id) & STATUS_PREMIUM))
 	{
 		client_print(id, print_chat, "[%s] Nie masz premium, zeby grac ta klasa!", nazwa)
 		return COD_STOP;
@@ -38,19 +38,19 @@ public cod_class_enabled(id)
 
 public cod_class_disabled(id)
 {
-	if(is_user_connected(id)) cs_reset_user_model(id);
+	if (is_user_connected(id)) cs_reset_user_model(id);
 	ma_klase[id] = false;
 }
 
 public Spawn(id)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return;
 		
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 		
-	if(!random(4))
+	if (!random(4))
 	{
 		new CsTeams:team = cs_get_user_team(id);
 		

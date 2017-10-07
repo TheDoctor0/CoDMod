@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Betonowe Cialo"
-#define VERSION "1.0.7"
+#define VERSION "1.0.8"
 #define AUTHOR "O'Zone"
 
 #define TASK_ITEM 90342
@@ -50,12 +50,12 @@ public cod_item_spawned(id, respawn)
 
 	rem_bit(id, itemActive);
 
-	if(!respawn) rem_bit(id, itemUsed);
+	if (!respawn) rem_bit(id, itemUsed);
 }
 
 public cod_item_skill_used(id)
 {
-	if(get_bit(id, itemUsed)) {
+	if (get_bit(id, itemUsed)) {
 		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Betonowego Ciala mozesz uzyc tylko raz na runde!");
 
 		return;
@@ -74,13 +74,13 @@ public deactivate_item(id)
 
 public trace_line(Float:startVector[3], Float:endVector[3], conditions, id)
 {
-	if(!is_user_alive(id) || !(get_bit(id, itemActive))) return FMRES_IGNORED;
+	if (!is_user_alive(id) || !(get_bit(id, itemActive))) return FMRES_IGNORED;
         
 	static ent; ent = get_tr(TR_pHit);
 
-	if(!is_user_alive(ent) || id == ent) return FMRES_IGNORED;
+	if (!is_user_alive(ent) || id == ent) return FMRES_IGNORED;
 
-	if(get_tr(TR_iHitgroup) != 1) {
+	if (get_tr(TR_iHitgroup) != 1) {
 		set_tr(TR_flFraction, 1.0);
 
 		return FMRES_SUPERCEDE;

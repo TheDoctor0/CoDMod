@@ -57,12 +57,12 @@ public cod_class_disabled(id)
 
 public fwCmdStart_MultiJump(id, uc_handle)
 {
-	if(!is_user_alive(id) || !ma_klase[id])
+	if (!is_user_alive(id) || !ma_klase[id])
 		return FMRES_IGNORED;
 
 	new flags = pev(id, pev_flags);
 
-	if((get_uc(uc_handle, UC_Buttons) & IN_JUMP) && !(flags & FL_ONGROUND) && !(pev(id, pev_oldbuttons) & IN_JUMP) && skoki[id])
+	if ((get_uc(uc_handle, UC_Buttons) & IN_JUMP) && !(flags & FL_ONGROUND) && !(pev(id, pev_oldbuttons) & IN_JUMP) && skoki[id])
 	{
 		skoki[id]--;
 		new Float:velocity[3];
@@ -70,7 +70,7 @@ public fwCmdStart_MultiJump(id, uc_handle)
 		velocity[2] = random_float(265.0,285.0);
 		set_pev(id, pev_velocity,velocity);
 	}
-	else if(flags & FL_ONGROUND)
+	else if (flags & FL_ONGROUND)
 		skoki[id] = 1;
 
 	return FMRES_IGNORED;
@@ -78,7 +78,7 @@ public fwCmdStart_MultiJump(id, uc_handle)
 
 public fwTakeDamage_JedenCios(id, ent, attacker)
 {
-	if(is_user_alive(attacker) && ma_klase[attacker] && get_user_weapon(attacker) == CSW_KNIFE && ostatnio_prawym[id])
+	if (is_user_alive(attacker) && ma_klase[attacker] && get_user_weapon(attacker) == CSW_KNIFE && ostatnio_prawym[id])
 	{
 		cs_set_user_armor(id, 0, CS_ARMOR_NONE);
 		SetHamParamFloat(4, float(get_user_health(id) + 1));
@@ -100,13 +100,13 @@ public fwSecondaryAttack_JedenCios(ent)
 }
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-        if(!is_user_connected(idattacker))
+        if (!is_user_connected(idattacker))
                 return HAM_IGNORED;
 
-        if(!ma_klase[idattacker])
+        if (!ma_klase[idattacker])
                 return HAM_IGNORED;
 
-        if(get_user_team(this) != get_user_team(idattacker) && get_user_weapon(idattacker) == CSW_HEGRENADE && damagebits & DMG_HEGRENADE && random_num(1,4) == 1)
+        if (get_user_team(this) != get_user_team(idattacker) && get_user_weapon(idattacker) == CSW_HEGRENADE && damagebits & DMG_HEGRENADE && random_num(1,4) == 1)
                 cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor, damagebits);
         
         return HAM_IGNORED;

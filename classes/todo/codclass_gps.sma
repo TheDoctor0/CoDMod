@@ -25,7 +25,7 @@ public plugin_init( )
 public cod_class_enabled(id)
 {
 	ma_klase[id] = true;
-	if(!emp_czasowe || (emp_czasowe && get_user_team(id) == get_user_team(emp_czasowe)))
+	if (!emp_czasowe || (emp_czasowe && get_user_team(id) == get_user_team(emp_czasowe)))
 	CreateUVA(id);
 	return COD_CONTINUE;
 }
@@ -47,14 +47,14 @@ public CreateUVA(id)
 	for(new a = 0; a < num; a++)
 	{
 		new i = players[a]
-		if(get_user_team(id) != get_user_team(i))
+		if (get_user_team(id) != get_user_team(i))
 			client_cmd(i, "spk sound/mw/uav_enemy.wav")
 		else
 			client_cmd(i, "spk sound/mw/uav_friend.wav")
 	}
 	radar_scan()
 	
-	if(task_exists(7354+team))
+	if (task_exists(7354+team))
 	{
 		new times = (CzasUav[team]-get_systime())+9999
 		change_task(7354+team, float(times));
@@ -81,12 +81,12 @@ public radar_scan()
 	for(new i=0; i<num; i++)
 	{
 		new id = players[i];
-		if(!is_user_alive(id) || !ma_klase[id] || !radar[get_user_team(id) == 1? 0: 1])
+		if (!is_user_alive(id) || !ma_klase[id] || !radar[get_user_team(id) == 1? 0: 1])
 			continue;
 		
-		if(!emp_czasowe)
+		if (!emp_czasowe)
 			radar_continue(id)
-		else if(get_user_team(id) == get_user_team(emp_czasowe))
+		else if (get_user_team(id) == get_user_team(emp_czasowe))
 			radar_continue(id)
 	}
 }
@@ -98,7 +98,7 @@ radar_continue(id)
 	for(new a=0; a<num; a++)
 	{
 		new i = players[a]       
-		if(!is_user_alive(i) || !ma_klase[id] || get_user_team(i) == get_user_team(id)) 
+		if (!is_user_alive(i) || !ma_klase[id] || get_user_team(i) == get_user_team(id)) 
 			continue;
 		
 		get_user_origin(i, PlayerCoords)

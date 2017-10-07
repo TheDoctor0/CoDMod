@@ -29,7 +29,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	if(!(cod_get_user_status(id) & STATUS_SPREMIUM))
+	if (!(cod_get_user_status(id) & STATUS_SPREMIUM))
 	{
 		client_print(id, print_chat, "[%s] Nie masz super premium, zeby grac ta klasa!", nazwa)
 		return COD_STOP;
@@ -44,7 +44,7 @@ public cod_class_enabled(id)
 
 public fwSpawn_Grawitacja(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 	{
 		cs_set_user_bpammo(id, CSW_FLASHBANG, 2)
 		cod_remove_user_rendering(id)
@@ -59,14 +59,14 @@ public cod_class_disabled(id)
 
 public CmdStart(id)
 {
-      if(!ma_klase[id]) return;
+      if (!ma_klase[id]) return;
       
 	static Float:fVelo[3];
 	pev(id, pev_velocity, fVelo);
 
-	if(fVelo[2])
+	if (fVelo[2])
 	{
-	      if(!bInvis[id])
+	      if (!bInvis[id])
 		{
 			bInvis[id] = true;
                   cod_set_user_rendering(id, 5)
@@ -74,7 +74,7 @@ public CmdStart(id)
 	}
 	else
 	{
-		if(bInvis[id])
+		if (bInvis[id])
 		{
 			bInvis[id] = false;
 			cod_remove_user_rendering(id)
@@ -84,16 +84,16 @@ public CmdStart(id)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-      if(!is_user_connected(idattacker) || get_user_team(this) == get_user_team(idattacker))
+      if (!is_user_connected(idattacker) || get_user_team(this) == get_user_team(idattacker))
             return HAM_IGNORED;
 
-      if(!ma_klase[idattacker])
+      if (!ma_klase[idattacker])
             return HAM_IGNORED;
 
-      if(!random(5))
+      if (!random(5))
             cs_set_user_money(this, 0)
 
-      if(get_user_weapon(idattacker) == CSW_DEAGLE && damagebits & DMG_BULLET)
+      if (get_user_weapon(idattacker) == CSW_DEAGLE && damagebits & DMG_BULLET)
       {
             SetHamParamFloat(4, damage+8)
             return HAM_HANDLED

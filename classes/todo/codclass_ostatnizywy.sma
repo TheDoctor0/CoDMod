@@ -38,17 +38,17 @@ public round_end()
 
 public aktywacja(id) 
 {
-	if(is_user_alive(id) && ma_klase[id])
+	if (is_user_alive(id) && ma_klase[id])
 		niesmiertelnosc[id] = true;
 }
 
 public odrodzenie(id) {
-	if(niesmiertelnosc[id])
+	if (niesmiertelnosc[id])
 		niesmiertelnosc[id] = false;
 }
 
 public obrazenia(id) {
-	if(niesmiertelnosc[id])
+	if (niesmiertelnosc[id])
 		return HAM_SUPERCEDE;
 
 	return HAM_IGNORED;

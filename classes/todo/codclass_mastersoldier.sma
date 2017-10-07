@@ -61,7 +61,7 @@ public client_disconnect(id)
 	new entMiny = find_ent_by_class(0, "mine");
 	while(entMiny > 0)
 	{
-		if(entity_get_edict(entMiny, EV_ENT_owner) == id)
+		if (entity_get_edict(entMiny, EV_ENT_owner) == id)
 			remove_entity(entMiny);
 		entMiny = find_ent_by_class(entMiny, "mine");
 	}
@@ -115,13 +115,13 @@ public cod_class_skill_used(id)
 
 public fwSpawn_Miny(id)
 {
-	if(is_user_alive(id))
+	if (is_user_alive(id))
 		ilosc_min_gracza[id] = 3;
 }
 
 public DotykMiny(ent, id)
 {
-	if(!is_valid_ent(ent))
+	if (!is_valid_ent(ent))
 		return;
 
 	new attacker = entity_get_edict(ent, EV_ENT_owner);
@@ -175,41 +175,41 @@ public Damage_Wyrzucenie(id)
 {
 	new idattacker = get_user_attacker(id);
 
-	if(!is_user_alive(idattacker))
+	if (!is_user_alive(idattacker))
 		return;
 
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return;
 
-	if(random_num(1, 5) != 1)
+	if (random_num(1, 5) != 1)
 		return;
 
 	client_cmd(id, "drop");
 }
 public FwdAddToFullPack(es_handle, e, ent, host, hostflags, player, pSet)
 {
-if(!is_user_connected(host) || !is_user_connected(ent))
+if (!is_user_connected(host) || !is_user_connected(ent))
 return;
 
-if(!ma_klase[host])
+if (!ma_klase[host])
 return;
 
 set_es(es_handle, ES_RenderAmt, 255.0);
 }
 public PreThink(id)
 {
-if(ma_klase[id])
+if (ma_klase[id])
 set_pev(id, pev_punchangle, {0.0,0.0,0.0})
 }
 
 public UpdateClientData(id, sw, cd_handle)
 {
-if(ma_klase[id])
+if (ma_klase[id])
 set_cd(cd_handle, CD_PunchAngle, {0.0,0.0,0.0})
 }
 public CurWeapon(id)
 {
-if(!is_user_connected(id) || !is_user_alive(id) || !ma_klase[id])
+if (!is_user_connected(id) || !is_user_alive(id) || !ma_klase[id])
 return PLUGIN_CONTINUE;
 
 new iEnt;
@@ -222,7 +222,7 @@ for (new i = 1; i < sizeof g_szWpnEntNames; i++)
 {
 iEnt = fm_find_ent_by_owner(-1, g_szWpnEntNames[i], id)
 
-if(iEnt)
+if (iEnt)
 {
 set_pdata_float( iEnt, 46, ( get_pdata_float(iEnt, 46, 4) * fSpeedMultiplier), 4 );
 set_pdata_float( iEnt, 47, ( get_pdata_float(iEnt, 47, 4) * fSpeedMultiplier), 4 );

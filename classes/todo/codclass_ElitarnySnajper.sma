@@ -35,7 +35,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	if(!(cod_get_user_status(id) & STATUS_PREMIUM))
+	if (!(cod_get_user_status(id) & STATUS_PREMIUM))
 	{
 		client_print(id, print_chat, "[%s] Nie masz premium, zeby grac ta klasa!", nazwa)
 		return COD_STOP;
@@ -57,7 +57,7 @@ public cod_class_disabled(id)
 
 public fwSpawn_Grawitacja(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 	{
 		cod_remove_user_rendering(id)
 		entity_set_float(id, EV_FL_gravity, 0.75);
@@ -71,9 +71,9 @@ public fwHamItemDeploy(ent)
 	static id;
 	id = get_pdata_cbase(ent, m_pPlayer, 4)
 	
-	if(!is_user_alive(id) || !ma_klase[id]) return;
+	if (!is_user_alive(id) || !ma_klase[id]) return;
 	
-	if(cs_get_weapon_id(ent) == CSW_AWP)
+	if (cs_get_weapon_id(ent) == CSW_AWP)
 		cod_set_user_rendering(id, 88)
 	else
 		cod_remove_user_rendering(id)

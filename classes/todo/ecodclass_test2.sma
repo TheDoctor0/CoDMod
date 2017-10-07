@@ -30,15 +30,15 @@ public cod_class_enabled(id, promotion)
 
 	classPromotion = promotion;
 
-	if(classPromotion == PROMOTION_THIRD) cod_set_user_multijumps(id, 2);
+	if (classPromotion == PROMOTION_THIRD) cod_set_user_multijumps(id, 2);
 }
 	
 public cod_class_disabled(id, promotion)
 	rem_bit(id, class);
 
 public cod_class_spawned(id)
-	if(classPromotion == PROMOTION_THIRD) cod_set_user_multijumps(id, 2);
+	if (classPromotion == PROMOTION_THIRD) cod_set_user_multijumps(id, 2);
 
 public cod_item_damage_attacker(attacker, victim, Float:damage, damageBits)
-	if(get_user_weapon(attacker) == CSW_KNIFE && damageBits & DMG_BULLET && damage > 20 && get_bit(attacker, class))
+	if (get_user_weapon(attacker) == CSW_KNIFE && damageBits & DMG_BULLET && damage > 20 && get_bit(attacker, class))
 		cod_kill_player(attacker, victim, damageBits);

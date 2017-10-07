@@ -32,17 +32,17 @@ public Damage(id)
 {
 	new attacker = get_user_attacker(id);
 
-	if(!is_user_alive(attacker))
+	if (!is_user_alive(attacker))
 		return;
 
-	if(!ma_klase[attacker]) 
+	if (!ma_klase[attacker]) 
 		return;
 
-	if(attacker > 32) 
+	if (attacker > 32) 
 		return;
   
 	zatruwajacy[id] = attacker;
-	if(!task_exists(id+TASK_ZATRUCIE) && random(100) < 14)
+	if (!task_exists(id+TASK_ZATRUCIE) && random(100) < 14)
 		set_task(0.7, "Zatruj", id+TASK_ZATRUCIE, _, _, "a", 4);
 }
 public Zatruj(id)

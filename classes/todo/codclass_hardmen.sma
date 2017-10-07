@@ -34,13 +34,13 @@ public cod_class_disabled(id)
 
 public Spawn(id)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return;
 		
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 		
-	if(random_num(1,2) == 1)
+	if (random_num(1,2) == 1)
 	{
 		new CsTeams:team = cs_get_user_team(id);
 		

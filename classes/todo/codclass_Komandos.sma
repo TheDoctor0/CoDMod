@@ -32,13 +32,13 @@ public cod_class_disabled(id)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker) || get_user_team(this) == get_user_team(idattacker))
+	if (!is_user_connected(idattacker) || get_user_team(this) == get_user_team(idattacker))
 		return HAM_IGNORED;
 		
-	if(ma_klase[idattacker] && get_user_weapon(idattacker) == CSW_KNIFE && damagebits & DMG_BULLET && get_pdata_float(get_pdata_cbase(idattacker, 373, 5), 47, 4) > 1.0)
+	if (ma_klase[idattacker] && get_user_weapon(idattacker) == CSW_KNIFE && damagebits & DMG_BULLET && get_pdata_float(get_pdata_cbase(idattacker, 373, 5), 47, 4) > 1.0)
 		KillPlayer(this, idinflictor, idattacker, (1<<1))
 		
-      if(ma_klase[this] && !random(7))
+      if (ma_klase[this] && !random(7))
             cod_inflict_damage(this, idattacker, damage, 0.0, idinflictor, damagebits);
 
 	return HAM_IGNORED;
@@ -62,7 +62,7 @@ KillPlayer(id, inflictor, attacker, damagebits)
 	set_pev(id, pev_dmg_inflictor, inflictor)
 	
 	effect = pev(id, pev_effects)
-	if(effect & 128)	set_pev(id, pev_effects, effect-128)
+	if (effect & 128)	set_pev(id, pev_effects, effect-128)
 	
 	set_msg_block(DeathMsgId, msgblock)
 

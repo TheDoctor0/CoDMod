@@ -53,12 +53,12 @@ public cod_class_disabled(id)
 }
 public client_PreThink(id)   
 {
-	if(ma_klase[id]==true){
+	if (ma_klase[id]==true){
 
-	if(!is_user_connected(id) || !is_user_alive(id)) 
+	if (!is_user_connected(id) || !is_user_alive(id)) 
 		return PLUGIN_CONTINUE 
            
-	if((get_user_button(id) & IN_JUMP) && !(get_user_oldbutton(id) & IN_JUMP))   
+	if ((get_user_button(id) & IN_JUMP) && !(get_user_oldbutton(id) & IN_JUMP))   
 	{   
 		new flags = entity_get_int(id, EV_INT_flags)   
 		new waterlvl = entity_get_int(id, EV_INT_waterlevel)   
@@ -111,13 +111,13 @@ public fw_Weapon_PrimaryAttack_Pre(entity)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(this))
+	if (!is_user_connected(this))
 		return HAM_IGNORED;
 	
-	if(!ma_klase[this])
+	if (!ma_klase[this])
 		return HAM_IGNORED;
 	
-	if(damagebits & DMG_FALL)
+	if (damagebits & DMG_FALL)
 		return HAM_SUPERCEDE;
 		
 	return HAM_IGNORED;

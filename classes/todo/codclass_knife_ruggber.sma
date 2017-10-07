@@ -41,7 +41,7 @@ public plugin_init()
 }
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_H))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_H))
 	{
 		client_print(id, print_chat, "[Server] (Only Premium !!) Nie masz uprawnien, aby uzywac klasy Knife Ruggber")
 		return COD_STOP;
@@ -66,7 +66,7 @@ public client_PreThink ( id )
 }
 public Prethink_Blink(id)
 {
-	if( get_user_button(id) & IN_ATTACK2 && !(get_user_oldbutton(id) & IN_ATTACK2) && is_user_alive(id)) 
+	if ( get_user_button(id) & IN_ATTACK2 && !(get_user_oldbutton(id) & IN_ATTACK2) && is_user_alive(id)) 
 	{			
 		new clip, ammo
 		new weapon = get_user_weapon(id,clip,ammo)
@@ -84,7 +84,7 @@ public ResetHUD(id)
 {
 	if (is_user_connected(id))
 	{	
-		if(ma_klase[id])
+		if (ma_klase[id])
 			player_b_blink[id] = 1
 			
 		if (player_b_blink[id] > 0)

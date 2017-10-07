@@ -31,8 +31,8 @@ public DeathMsg()
 {
 	new kid = read_data(1);
 	
-	if(!is_user_alive(kid)) return;
+	if (!is_user_alive(kid)) return;
 	
-	if(ma_klase[kid])
+	if (ma_klase[kid])
 		set_user_health(kid, get_user_health(kid)+10)
 }

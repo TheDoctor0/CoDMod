@@ -20,7 +20,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_F))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_F))
 	{
 		client_print(id, print_chat, "[Profesjonalista (Klasa Premium)] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;

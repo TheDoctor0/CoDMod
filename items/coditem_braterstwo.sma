@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Braterstwo"
-#define VERSION "1.0.12"
+#define VERSION "1.0.14"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Braterstwo"
@@ -36,10 +36,10 @@ public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageB
 {
 	new entList[32], player, numFound = find_sphere_class(attacker, "player", 100.0, entList, charsmax(entList));
 	
-	for(new i = 0; i < numFound; i++) {
+	for (new i = 0; i < numFound; i++) {
 		player = entList[i];
 
-		if(!is_user_alive(player) || attacker == player || get_user_team(player) != get_user_team(attacker)) continue;
+		if (!is_user_alive(player) || attacker == player || get_user_team(player) != get_user_team(attacker)) continue;
 
 		damage *= (1.0 + (itemValue[attacker] / 100.0));
 

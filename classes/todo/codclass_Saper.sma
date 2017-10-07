@@ -77,7 +77,7 @@ public cod_class_skill_used(id)
 
 public fwSpawn_Miny(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 	{
 		ilosc_min_gracza[id] = 2;
 		cs_set_user_defuse(id, 1);
@@ -86,7 +86,7 @@ public fwSpawn_Miny(id)
 
 public DotykMiny(ent, id)
 {
-	if(!is_valid_ent(ent))
+	if (!is_valid_ent(ent))
 		return;
 
 	new attacker = entity_get_edict(ent, EV_ENT_owner);
@@ -127,13 +127,13 @@ public DotykMiny(ent, id)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 		return HAM_IGNORED;
 		
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
 		
-	if(!random(7))
+	if (!random(7))
 		SetHamParamFloat(4, damage * 2)
 
 	return HAM_IGNORED;

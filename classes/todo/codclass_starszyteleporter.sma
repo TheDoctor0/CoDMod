@@ -33,7 +33,7 @@ public plugin_init() {
 
 public cod_class_enabled(id)
 {	
-	if(!(get_user_flags(id) & ADMIN_LEVEL_E))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_E))
 	{
 		client_print(id, print_chat, "[] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -58,7 +58,7 @@ public cod_class_skill_used(id)
 		return PLUGIN_CONTINUE;
 	}
 	
-	if(uzyl[id] || !is_user_alive(id))
+	if (uzyl[id] || !is_user_alive(id))
 		return PLUGIN_CONTINUE;
 	
 	new Float:start[3], Float:view_ofs[3];
@@ -78,7 +78,7 @@ public cod_class_skill_used(id)
 	new Float:fDstOrigin[3];
 	get_tr2(0, TR_vecEndPos, fDstOrigin);
 	
-	if(engfunc(EngFunc_PointContents, fDstOrigin) == CONTENTS_SKY)
+	if (engfunc(EngFunc_PointContents, fDstOrigin) == CONTENTS_SKY)
 		return PLUGIN_CONTINUE;
 	
 	new Float:fNormal[3];
@@ -104,34 +104,34 @@ public InfoTel(id)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 		return HAM_IGNORED;
 	
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
 	
-	if(get_user_weapon(idattacker) == CSW_M4A1 && damagebits & DMG_BULLET)
+	if (get_user_weapon(idattacker) == CSW_M4A1 && damagebits & DMG_BULLET)
 		cod_inflict_damage(idattacker, this, 25.0, 0.0, idinflictor, damagebits);
 	
-	if(get_user_weapon(idattacker) == CSW_MP5NAVY && damagebits & DMG_BULLET)
+	if (get_user_weapon(idattacker) == CSW_MP5NAVY && damagebits & DMG_BULLET)
 		cod_inflict_damage(idattacker, this, 25.0, 0.0, idinflictor, damagebits);
 	
-	if(damagebits & DMG_BULLET && get_user_weapon(idattacker) == CSW_SG550 && random_num(1, 3) == 1)
+	if (damagebits & DMG_BULLET && get_user_weapon(idattacker) == CSW_SG550 && random_num(1, 3) == 1)
 		cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor, damagebits);
 	
-	if(damagebits & DMG_HEGRENADE && random_num(1, 2) == 1)
+	if (damagebits & DMG_HEGRENADE && random_num(1, 2) == 1)
 		cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor, damagebits);
 	
 	return HAM_IGNORED;
 }
 public fwCmdStart_MultiJump(id, uc_handle)
 {
-	if(!is_user_alive(id) || !ma_klase[id])
+	if (!is_user_alive(id) || !ma_klase[id])
 		return FMRES_IGNORED;
 	
 	new flags = pev(id, pev_flags);
 	
-	if((get_uc(uc_handle, UC_Buttons) & IN_JUMP) && !(flags & FL_ONGROUND) && !(pev(id, pev_oldbuttons) & IN_JUMP) && skoki[id])
+	if ((get_uc(uc_handle, UC_Buttons) & IN_JUMP) && !(flags & FL_ONGROUND) && !(pev(id, pev_oldbuttons) & IN_JUMP) && skoki[id])
 	{
 		skoki[id]--;
 		new Float:velocity[3];
@@ -139,7 +139,7 @@ public fwCmdStart_MultiJump(id, uc_handle)
 		velocity[2] = random_float(265.0,285.0);
 		set_pev(id, pev_velocity,velocity);
 	}
-	if(ma_klase[id] && get_user_weapon(id) == CSW_MP5NAVY && get_uc(uc_handle, UC_Buttons) & IN_ATTACK)
+	if (ma_klase[id] && get_user_weapon(id) == CSW_MP5NAVY && get_uc(uc_handle, UC_Buttons) & IN_ATTACK)
 	{
 		new Float:punchangle[3]
 		pev(id, pev_punchangle, punchangle)
@@ -147,7 +147,7 @@ public fwCmdStart_MultiJump(id, uc_handle)
 			punchangle[i]*=0.9;
 		set_pev(id, pev_punchangle, punchangle)
 	}
-	else if(flags & FL_ONGROUND)
+	else if (flags & FL_ONGROUND)
 		skoki[id] = 15;
 	
 	return FMRES_IGNORED;

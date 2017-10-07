@@ -7,7 +7,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Msciciel"
-#define DESCRIPTION  "1/2 z AWP, 1/2 z noza (PPM), mniej widoczny podczas kucania, mniejsza grawitacja."
+#define DESCRIPTION  "Ma 50 procent szansy na natychmiastowe zabicie z AWP i noza (PPM), mniej widoczny podczas kucania, mniejsza grawitacja."
 #define FRACTION     "Premium"
 #define WEAPONS      (1<<CSW_AWP)|(1<<CSW_USP)
 #define HEALTH       20
@@ -31,4 +31,4 @@ public cod_class_enabled(id)
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if((weapon == CSW_AWP && damageBits & DMG_BULLET && random_num(1, 2)) || (weapon == CSW_KNIFE && random_num(1, 2) && !(pev(attacker, pev_button) & IN_ATTACK))) damage = cod_kill_player(attacker, victim, damageBits);
+	if ((weapon == CSW_AWP && damageBits & DMG_BULLET && cod_percent_chance(50)) || (weapon == CSW_KNIFE && cod_percent_chance(50) && !(pev(attacker, pev_button) & IN_ATTACK))) damage = cod_kill_player(attacker, victim, damageBits);

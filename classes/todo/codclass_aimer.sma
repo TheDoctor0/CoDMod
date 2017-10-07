@@ -35,13 +35,13 @@ public cod_class_disabled(id)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-        if(!is_user_connected(idattacker))
+        if (!is_user_connected(idattacker))
                 return HAM_IGNORED;
 
-        if(!ma_klase[idattacker])
+        if (!ma_klase[idattacker])
                 return HAM_IGNORED;
 
-        if(get_user_team(this) != get_user_team(idattacker) && get_user_weapon(idattacker) == CSW_M4A1 && get_pdata_int(this, 75, 5) == HIT_HEAD && random_num(1, 2) == 1)
+        if (get_user_team(this) != get_user_team(idattacker) && get_user_weapon(idattacker) == CSW_M4A1 && get_pdata_int(this, 75, 5) == HIT_HEAD && random_num(1, 2) == 1)
                 cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor);
                 
         return HAM_IGNORED;

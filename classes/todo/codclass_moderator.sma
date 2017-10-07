@@ -46,7 +46,7 @@ public client_disconnect(id)
 	new entRakiety = find_ent_by_class(0, "rocket");
 	while(entRakiety > 0)
 	{
-		if(entity_get_edict(entRakiety, EV_ENT_owner) == id)
+		if (entity_get_edict(entRakiety, EV_ENT_owner) == id)
 			remove_entity(entRakiety);
 		entRakiety = find_ent_by_class(entRakiety, "rocket");
 	}
@@ -55,7 +55,7 @@ public client_disconnect(id)
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_H))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_H))
 	{
 		client_print(id, print_chat, "[Moderator(premium)] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -85,7 +85,7 @@ public cod_class_skill_used(id)
 	}
 	else
 	{
-		if(poprzednia_rakieta_gracza[id] + 2.0 > get_gametime())
+		if (poprzednia_rakieta_gracza[id] + 2.0 > get_gametime())
 		{
 			client_print(id, print_center, "Rakiet mozesz uzywac co 2 sekundy!");
 		}
@@ -127,7 +127,7 @@ public cod_class_skill_used(id)
 
 public fwSpawn_Rakiety(id)
 {
-	if(is_user_alive(id))
+	if (is_user_alive(id))
 		ilosc_rakiet_gracza[id] = 1;
 }
 
@@ -175,13 +175,13 @@ public Damage_Wyrzucenie(id)
 {
 	new idattacker = get_user_attacker(id);
 
-	if(!is_user_alive(idattacker))
+	if (!is_user_alive(idattacker))
 		return;
 
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return;
 
-	if(random_num(1, 10) != 1)
+	if (random_num(1, 10) != 1)
 		return;
 
 	client_cmd(id, "drop");

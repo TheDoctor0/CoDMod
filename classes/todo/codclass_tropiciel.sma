@@ -37,10 +37,10 @@ give_item(id, "weapon_smokegrenade");
 }
 public client_PreThink(id)
 {
-	if(!task_exists(id+TASK_ID))
+	if (!task_exists(id+TASK_ID))
 			return;
 		  
-	if(pev(id, pev_button) & (IN_MOVELEFT+IN_MOVERIGHT+IN_FORWARD+IN_BACK+IN_JUMP+IN_DUCK))
+	if (pev(id, pev_button) & (IN_MOVELEFT+IN_MOVERIGHT+IN_FORWARD+IN_BACK+IN_JUMP+IN_DUCK))
 	{
 			change_task(id+TASK_ID, CZAS_LADOWANIA.0);
 			set_bartime(id, CZAS_LADOWANIA);
@@ -48,7 +48,7 @@ public client_PreThink(id)
 }
 public CurWeapon(id)
 {
-	if(get_user_weapon(id) == CSW_KNIFE && !moc_zaladowana[id] && ma_klase[id])
+	if (get_user_weapon(id) == CSW_KNIFE && !moc_zaladowana[id] && ma_klase[id])
 	{
 			set_task(CZAS_LADOWANIA.0, "MocZaladowana", id+TASK_ID);
 			set_bartime(id, CZAS_LADOWANIA);
@@ -69,7 +69,7 @@ public MocZaladowana(id)
 {
 	id -= TASK_ID;
   
-	if(!ma_klase[id]) return;
+	if (!ma_klase[id]) return;
   
 	moc_zaladowana[id] = true;
 	client_print(id, print_center, "Umiejetnosc zostala aktywowana!");
@@ -83,12 +83,12 @@ new zatruwajacy[33];
 public Damage(id)
 {
 	new attacker = get_user_attacker(id);
-	if(!is_user_alive(attacker)) return;
+	if (!is_user_alive(attacker)) return;
   
-	if(!moc_zaladowana[attacker]) return;
+	if (!moc_zaladowana[attacker]) return;
   
 	zatruwajacy[id] = attacker;
-	if(!task_exists(id+TASK_ZATRUCIE)) set_task(1.0, "Zatruj", id+TASK_ZATRUCIE, _, _, "a", 5);
+	if (!task_exists(id+TASK_ZATRUCIE)) set_task(1.0, "Zatruj", id+TASK_ZATRUCIE, _, _, "a", 5);
 }
 public Zatruj(id)
 {

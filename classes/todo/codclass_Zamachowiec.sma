@@ -41,7 +41,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	if(!(cod_get_user_status(id) & STATUS_PREMIUM))
+	if (!(cod_get_user_status(id) & STATUS_PREMIUM))
 	{
 		client_print(id, print_chat, "[%s] Nie masz premium, zeby grac ta klasa!", nazwa)
 		return COD_STOP;
@@ -67,9 +67,9 @@ public fwHamItemDeploy(ent)
 	static id;
 	id = get_pdata_cbase(ent, m_pPlayer, 4)
 	
-	if(!is_user_alive(id) || !ma_klase[id]) return;
+	if (!is_user_alive(id) || !ma_klase[id]) return;
 	
-	if(cs_get_weapon_id(ent) == CSW_KNIFE)
+	if (cs_get_weapon_id(ent) == CSW_KNIFE)
 		cod_set_user_rendering(id, 68)
 	else
 		cod_remove_user_rendering(id)
@@ -110,7 +110,7 @@ public cod_class_skill_used(id)
 
 public fwSpawn_Apteczki(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 	{
 		ilosc_apteczek_gracza[id] = 1;
 		cod_remove_user_rendering(id)
@@ -119,7 +119,7 @@ public fwSpawn_Apteczki(id)
 
 public Think_Apteczki(ent)
 {
-	if(!is_valid_ent(ent))
+	if (!is_valid_ent(ent))
 		return PLUGIN_CONTINUE;
 
 	new id = entity_get_edict(ent, EV_ENT_owner);

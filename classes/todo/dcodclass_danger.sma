@@ -43,7 +43,7 @@ public plugin_precache()
 public cod_class_enabled(id)
 {
 	new dostepna = 60;
-	if(cod_get_class_level(id)<dostepna)
+	if (cod_get_class_level(id)<dostepna)
 	{
 		ColorChat(id, GREEN, "[COD:MW]^x01 Aby uzywac tej klasy musisz zdobyc^x04 %i^x01 poziom na dowolnej klasie!", dostepna);
 		return COD_STOP;
@@ -71,7 +71,7 @@ public cod_class_skill_used(id)
 		return PLUGIN_CONTINUE;
 	}
 
-    if(!is_user_alive(id))
+    if (!is_user_alive(id))
         return PLUGIN_CONTINUE;
     
     new Float:start[3], Float:view_ofs[3];
@@ -91,7 +91,7 @@ public cod_class_skill_used(id)
     new Float:fDstOrigin[3];
     get_tr2(0, TR_vecEndPos, fDstOrigin);
     
-    if(engfunc(EngFunc_PointContents, fDstOrigin) == CONTENTS_SKY)
+    if (engfunc(EngFunc_PointContents, fDstOrigin) == CONTENTS_SKY)
         return PLUGIN_CONTINUE;
 
     new Float:fNormal[3];
@@ -107,7 +107,7 @@ public cod_class_skill_used(id)
 }
 
 public ResetHUD(id){
-	if(ma_klase[id]) {
+	if (ma_klase[id]) {
 		teleport[id] = false;
 		pozostale_odbicia[id] = 2;
 		set_task(20.0, "Teleport", id);
@@ -115,16 +115,16 @@ public ResetHUD(id){
 }
 
 public Teleport(id){
-	if(ma_klase[id])
+	if (ma_klase[id])
 		teleport[id] = true;
 }
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!ma_klase[this])
+	if (!ma_klase[this])
 		return HAM_IGNORED;
 
-	if(pozostale_odbicia[this] > 0 && damagebits & DMG_BULLET)
+	if (pozostale_odbicia[this] > 0 && damagebits & DMG_BULLET)
 	{
 		pozostale_odbicia[this]--;
 		return HAM_SUPERCEDE;
@@ -134,12 +134,12 @@ public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 
 public Niewidzialnosc(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 	return;
 
 	new render = cod_get_class_invisible(id);
 	new button = get_user_button(id);
-	if( button & IN_DUCK && get_user_weapon(id) == CSW_KNIFE)
+	if ( button & IN_DUCK && get_user_weapon(id) == CSW_KNIFE)
 		fm_set_rendering(id, kRenderFxNone, 0,0,0, kRenderTransAlpha, 76);
 	else
 	{
@@ -149,12 +149,12 @@ public Niewidzialnosc(id)
 
 public CurWeapon(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return PLUGIN_CONTINUE;
 	
 	new bron = read_data(2)  
 
-	if(bron == CSW_M4A1){
+	if (bron == CSW_M4A1){
 		set_pev(id,pev_viewmodel2,"models/cod_slowexp/vip/v_goldm4a1.mdl")
 		set_pev(id,pev_weaponmodel2,"models/cod_slowexp/vip/p_goldm4a1.mdl")
 	}

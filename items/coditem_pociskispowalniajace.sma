@@ -2,13 +2,13 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Pociski Spowalniajace"
-#define VERSION "1.0.10"
+#define VERSION "1.0.12"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Pociski Spowalniajace"
 #define DESCRIPTION "Masz 1/%s szansy na spowolnienia przeciwnika na 3 sekundy przy trafieniu"
-#define RANDOM_MIN  7
-#define RANDOM_MAX  9
+#define RANDOM_MIN  6
+#define RANDOM_MAX  8
 #define VALUE_MIN   2
 
 #define TASK_SLOW 34921
@@ -33,7 +33,7 @@ public cod_item_upgrade(id)
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if(damageBits == DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
+	if (damageBits == DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
 		remove_task(victim + TASK_SLOW);
 
 		cod_display_icon(victim, 255, 0, 0, "dmg_chem", 1);
@@ -53,7 +53,7 @@ public remove_slow_effect(id)
 {
 	id -= TASK_SLOW;
 
-	if(is_user_connected(id))
+	if (is_user_connected(id))
 	{
 		cod_display_icon(id, 255, 0, 0, "dmg_chem", 0);
 

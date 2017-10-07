@@ -24,7 +24,7 @@ public plugin_init()
 
 public cod_class_enabled(id, promotion)
 {
-	cod_set_user_footsteps(id, 1, CLASS);
+	cod_set_user_footsteps(id, true, CLASS);
 
 	cod_set_user_rockets(id, 1, CLASS);
 }
@@ -33,4 +33,4 @@ public cod_class_skill_used(id)
 	cod_use_user_rocket(id);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if(weapon == CSW_M4A1 && damageBits & DMG_BULLET) damage += (3.0 + 0.05 * cod_get_user_intelligence(attacker));
+	if (weapon == CSW_M4A1 && damageBits & DMG_BULLET) damage += (3.0 + 0.05 * cod_get_user_intelligence(attacker));

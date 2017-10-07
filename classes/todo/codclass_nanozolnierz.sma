@@ -26,7 +26,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-    if(!(get_user_flags(id) & ADMIN_LEVEL_H))
+    if (!(get_user_flags(id) & ADMIN_LEVEL_H))
     {
         client_print(id, print_chat, "Nie masz prawa, do korzystania z tej klasy")
         return COD_STOP;

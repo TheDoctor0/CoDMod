@@ -15,6 +15,8 @@
 #define STAMINA      5
 #define CONDITION    25
 
+new classUsed;
+
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
@@ -23,7 +25,24 @@ public plugin_init()
 }
 
 public cod_class_enabled(id, promotion)
+{
 	cod_set_user_multijumps(id, 1, CLASS);
 
+	rem_bit(id, classUsed);
+}
+
+public cod_class_spawned(id, respawn)
+	if (!respawn) rem_bit(id, classUsed);
+
 public cod_class_skill_used(id)
+{
+	if (get_bit(id, classUsed)) {
+		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Niewidzialnosc mozesz aktywowac tylko raz na runde!");
+
+		return;
+	}
+
+	set_bit(id, classUsed);
+
 	cod_set_user_render(id, 0, CLASS, RENDER_ALWAYS, 0, 15.0);
+}

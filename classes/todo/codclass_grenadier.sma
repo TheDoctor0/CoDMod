@@ -81,16 +81,16 @@ public cod_class_disabled(id)
 }
 public PokazInfo(id)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return PLUGIN_CONTINUE;
 	
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return PLUGIN_CONTINUE
 	
-	if(get_user_weapon(id) != CSW_SG552)
+	if (get_user_weapon(id) != CSW_SG552)
 		return PLUGIN_CONTINUE
 	
-	if(!g_launcher[id])
+	if (!g_launcher[id])
 		return PLUGIN_CONTINUE
 		
 	
@@ -135,10 +135,10 @@ public plugin_precache()
 public WeaponDeploy(ent)
 {
 	new id = get_pdata_cbase(ent, 41, 4)
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return PLUGIN_CONTINUE
 		
-	if(g_launcher[id])
+	if (g_launcher[id])
 	{
 		set_pev(id, pev_viewmodel2, XM320_MODEL_V)
 		set_pev(id, pev_weaponmodel2, XM320_MODEL_P)
@@ -155,24 +155,24 @@ public WeaponDeploy(ent)
 public Weapon_Idle(ent)
 {
 	new id = get_pdata_cbase(ent, 41, 4);
-	if(get_user_weapon(id) == 27 && ma_klase[id])
+	if (get_user_weapon(id) == 27 && ma_klase[id])
 	{
-		if(!weapon_idle[id]) 
+		if (!weapon_idle[id]) 
 			weapon_idle[id] = get_gametime();
 	}
 }
 public cod_class_skill_used(id)
 {
-	if(!ma_klase[id] && get_user_weapon(id) != CSW_SG552)
+	if (!ma_klase[id] && get_user_weapon(id) != CSW_SG552)
 		return PLUGIN_CONTINUE
 		
-	if(get_gametime()-weapon_idle[id]<=1.5)
+	if (get_gametime()-weapon_idle[id]<=1.5)
 		return PLUGIN_CONTINUE
 		
-	if(task_exists(id+TASK_TRANSFER))
+	if (task_exists(id+TASK_TRANSFER))
 		return PLUGIN_CONTINUE
 		
-	if(task_exists(id+TASK_RELOAD))
+	if (task_exists(id+TASK_RELOAD))
 		return PLUGIN_CONTINUE
 		
 	set_pev(id, pev_weaponanim, 6)
@@ -181,12 +181,12 @@ public cod_class_skill_used(id)
 }
 public Transfer(id)
 {
-	if(task_exists(id+TASK_RELOAD))
+	if (task_exists(id+TASK_RELOAD))
 		return PLUGIN_CONTINUE
 		
 	id-=TASK_TRANSFER;
 	new ent = fm_find_ent_by_owner(-1, "weapon_sg552", id)
-	if(!g_launcher[id])
+	if (!g_launcher[id])
 	{
 		magazynek[id] = cs_get_weapon_ammo(ent)
 		naboje[id] = cs_get_user_bpammo(id, CSW_SG552)
@@ -194,7 +194,7 @@ public Transfer(id)
 	g_launcher[id] =(g_launcher[id])?false:true;
 	set_pev(id, pev_viewmodel2, (g_launcher[id])?XM320_MODEL_V:XM8_MODEL_V);
 	set_pev(id, pev_weaponanim, 0);
-	if(!g_launcher[id])
+	if (!g_launcher[id])
 	{
 		cs_set_weapon_ammo(ent, magazynek[id])
 		cs_set_user_bpammo(id, CSW_SG552, naboje[id])
@@ -203,17 +203,17 @@ public Transfer(id)
 }
 public CurWeapon(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return PLUGIN_CONTINUE;
 	
-	if(read_data(2) != CSW_SG552 && task_exists(id+TASK_TRANSFER))
+	if (read_data(2) != CSW_SG552 && task_exists(id+TASK_TRANSFER))
 		remove_task(id+TASK_TRANSFER)
 	
 	return PLUGIN_CONTINUE;
 }
 public Client_Spawn(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return PLUGIN_CONTINUE;
 		
 	g_launcher_ammo[id] = get_pcvar_num(PCvarAmmo);
@@ -225,7 +225,7 @@ public Client_Spawn(id)
 }
 public Death()
 {
-	if(!ma_klase[read_data(2)])
+	if (!ma_klase[read_data(2)])
 		return PLUGIN_CONTINUE;
 		
 	remove_task(read_data(2)+TASK_TRANSFER)	
@@ -234,25 +234,25 @@ public Death()
 }
 public CmdStart(id, uc)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return FMRES_IGNORED;
 		
-	if(get_user_weapon(id) == CSW_SG552 && ma_klase[id])
+	if (get_user_weapon(id) == CSW_SG552 && ma_klase[id])
 	{ 
 		new button = get_uc(uc, UC_Buttons);
 		new ent = fm_find_ent_by_owner(-1, "weapon_sg552", id);
 		
-		if(!g_launcher[id])
+		if (!g_launcher[id])
 			return FMRES_IGNORED
 			
-		if(button & IN_ATTACK)
+		if (button & IN_ATTACK)
 		{
 			button &= ~IN_ATTACK;
 			set_uc(uc, UC_Buttons, button);
 			
-			if(!g_launcher_ammo[id] || weapon_reloading[id] || !weapon_idle[id]) 
+			if (!g_launcher_ammo[id] || weapon_reloading[id] || !weapon_idle[id]) 
 				return FMRES_IGNORED;
-			if(weapon_idle[id] && (get_gametime()-weapon_idle[id]<=1.5)) 
+			if (weapon_idle[id] && (get_gametime()-weapon_idle[id]<=1.5)) 
 				return FMRES_IGNORED;
 		
 			new Float:Origin[3], Float:Angle[3], Float:Velocity[3];
@@ -292,32 +292,32 @@ public CmdStart(id, uc)
 			g_launcher_ammo[id]--;
 			set_pev(id, pev_weaponanim, (!g_launcher_ammo[id])?8:7)
 			new entwpn = fm_find_ent_by_owner(-1, "weapon_sg552", id)
-			if(entwpn)
+			if (entwpn)
 				set_pdata_float(entwpn, 48, 1.5+3.0, 4)
 			set_pdata_float(id, 83, 1.5, 4)
 			
 			weapon_reloading[id] = true;
 			emit_sound(id, CHAN_WEAPON, XM320_SHOOT2, 1.0, ATTN_NORM, 0, PITCH_NORM)
 			
-			if(task_exists(id+TASK_RELOAD)) 
+			if (task_exists(id+TASK_RELOAD)) 
 				remove_task(id+TASK_RELOAD)
 			
 			set_task(3.7, "RELOADING", id+TASK_RELOAD)
 		}
-		else if(button & IN_RELOAD)
+		else if (button & IN_RELOAD)
 		{
 			button &= ~IN_RELOAD;
 			set_uc(uc, UC_Buttons, button);
 			
 			set_pev(id, pev_weaponanim, 0);
 			set_pdata_float(id, 83, 0.5, 4);
-			if(ent)
+			if (ent)
 				set_pdata_float(ent, 48, 0.5+3.0, 4);
 		}
-		if(ent)
+		if (ent)
 			cs_set_weapon_ammo(ent, -1);
 	}
-	else if(get_user_weapon(id) != CSW_SG552 && ma_klase[id])
+	else if (get_user_weapon(id) != CSW_SG552 && ma_klase[id])
 		weapon_idle[id] = 0.0;
 		
 	return FMRES_IGNORED;
@@ -330,13 +330,13 @@ public RELOADING(id)
 }	
 public Nade_Touch(ent, id)
 {
-	if(!pev_valid(ent))
+	if (!pev_valid(ent))
 		return FMRES_IGNORED
 	
 	new class[32]
 	pev(ent, pev_classname, class, charsmax(class))
 
-	if(!equal(class, "mortar"))
+	if (!equal(class, "mortar"))
 		return FMRES_IGNORED
 		
 	new attacker = pev(ent, pev_owner);
@@ -350,13 +350,13 @@ public Nade_Touch(ent, id)
 	new victim = -1
 	while((victim = engfunc(EngFunc_FindEntityInSphere, victim, entOrigin, xm320_radius)) != 0)
 	{		
-		if(!is_user_alive(victim) || get_user_team(attacker) == get_user_team(victim))
+		if (!is_user_alive(victim) || get_user_team(attacker) == get_user_team(victim))
 			continue;
 		
 		pev(victim, pev_origin, Origin);
 		fDamage = xm320_damage - floatmul(xm320_damage, floatdiv(get_distance_f(Origin, entOrigin), xm320_radius));
 		fDamage *= estimate_take_hurt(entOrigin, victim);
-		if(fDamage>0.0)
+		if (fDamage>0.0)
 			UTIL_Kill(attacker, victim, fDamage, DMG_BULLET);
 	}
 	emit_sound(ent, CHAN_WEAPON, XM320_EXPLO, 1.0, ATTN_NORM, 0, PITCH_NORM)
@@ -400,7 +400,7 @@ stock Float:estimate_take_hurt(Float:fPoint[3], ent)
 	pev(ent, pev_origin, fOrigin);
 	engfunc(EngFunc_TraceLine, fPoint, fOrigin, DONT_IGNORE_MONSTERS, 0, tr);
 	get_tr2(tr, TR_flFraction, fFraction);
-	if(fFraction == 1.0 || get_tr2(tr, TR_pHit) == ent)
+	if (fFraction == 1.0 || get_tr2(tr, TR_pHit) == ent)
 		return 1.0;
 	return 0.75;
 }
@@ -415,7 +415,7 @@ public message_DeathMsg()
 {
 	new killer = get_msg_arg_int(1);
         
-	if(zabity & (1<<killer))
+	if (zabity & (1<<killer))
 	{
 		set_msg_arg_string(4, "grenade");
 		return PLUGIN_CONTINUE;

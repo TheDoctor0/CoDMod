@@ -49,9 +49,9 @@ public Death()
 {
 	new killer = read_data(1);
 	
-	if(!is_user_connected(killer)) return;
+	if (!is_user_connected(killer)) return;
 	
-	if(!jest_ukrywany[killer]) return;
+	if (!jest_ukrywany[killer]) return;
 	
 	new xp = get_pcvar_num(cvar_zabicie_z_ukrycia);
 	
@@ -63,10 +63,10 @@ public Death()
 }
 public PreThink(id)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return;
 	
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 	
 	new Float:origin[3], Float:dist = cod_get_user_intelligence(id)*0.5+50.0;
@@ -75,7 +75,7 @@ public PreThink(id)
 	static Float:zmiana[33];
 		
 	zmiana[id] += 0.5;
-	if(zmiana[id] > 360.0)
+	if (zmiana[id] > 360.0)
 		zmiana[id] = 0.0;
 		
 	new LineBegin[3], LineEnd[3];
@@ -92,10 +92,10 @@ public PreThink(id)
 		
 		for(new i = 0; i <= 32; i++)
 		{
-			if(!is_user_connected(i))
+			if (!is_user_connected(i))
 				continue;
 				
-			if(get_user_team(i) != get_user_team(id))
+			if (get_user_team(i) != get_user_team(id))
 				continue;
 				
 			Create_Line(i, LineBegin, LineEnd);
@@ -108,10 +108,10 @@ public PreThink(id)
 	new index = -1;
 	while((index = engfunc(EngFunc_FindEntityInSphere, index, origin, dist))) 
 	{
-		if(!is_user_alive(index))
+		if (!is_user_alive(index))
 			continue;
 		
-		if(get_user_team(index) != get_user_team(id) || ma_klase[index])
+		if (get_user_team(index) != get_user_team(id) || ma_klase[index])
 			continue;
 			
 		set_hudmessage(0, 212, 255, 0.04, 0.69, 0, 6.0, 0.1)
@@ -125,14 +125,14 @@ public PreThink(id)
 
 public FwdAddToFullPack(es_handle, e, ent, host, hostflags, player, pSet)
 {
-	if(!player)
+	if (!player)
 		return;
 	
-	if(pev(ent, pev_button) & IN_ATTACK)
+	if (pev(ent, pev_button) & IN_ATTACK)
 		return;
 		
 			
-	if(ma_klase[ent])
+	if (ma_klase[ent])
 	{
 		set_es(es_handle, ES_RenderMode, kRenderTransAdd);
 		set_es(es_handle, ES_RenderFx, kRenderFxGlowShell);
@@ -141,10 +141,10 @@ public FwdAddToFullPack(es_handle, e, ent, host, hostflags, player, pSet)
 		return;
 	}
 	
-	if(!jest_ukrywany[ent])
+	if (!jest_ukrywany[ent])
 		return;
 	
-	if(get_user_team(ent) == get_user_team(host))
+	if (get_user_team(ent) == get_user_team(host))
 	{
 		set_es(es_handle, ES_RenderMode, kRenderTransAdd);
 		set_es(es_handle, ES_RenderAmt, 50);

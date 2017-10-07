@@ -7,7 +7,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Snajper"
-#define DESCRIPTION  "Ma 130 procent obrazen z AWP (+int) i 1/2 szansy na zabicie z noza (PPM)"
+#define DESCRIPTION  "Ma 130 procent obrazen z AWP (+int) i 50 procent szansy na natychmiastowe zabicie z noza (PPM)."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_AWP)|(1<<CSW_DEAGLE)
 #define HEALTH       10
@@ -25,7 +25,7 @@ public plugin_init()
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if(weapon == CSW_KNIFE && pev(attacker, pev_button) & IN_ATTACK2 && random_num(1, 2) == 1) damage = cod_kill_player(attacker, victim, damageBits);
+	if (weapon == CSW_KNIFE && pev(attacker, pev_button) & IN_ATTACK2 && cod_percent_chance(50)) damage = cod_kill_player(attacker, victim, damageBits);
 
-	if(weapon == CSW_AWP && damageBits & DMG_BULLET) damage = damage * 1.3 + 0.2 * cod_get_user_intelligence(attacker);
+	if (weapon == CSW_AWP && damageBits & DMG_BULLET) damage = damage * (1.3 + (cod_get_user_intelligence(attacker) * 0.2 / 100.0));
 }

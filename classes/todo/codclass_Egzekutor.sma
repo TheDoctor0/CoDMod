@@ -26,7 +26,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	if(!(cod_get_user_status(id) & STATUS_PREMIUM))
+	if (!(cod_get_user_status(id) & STATUS_PREMIUM))
 	{
 		client_print(id, print_chat, "[%s] Nie masz premium, zeby grac ta klasa!", nazwa)
 		return COD_STOP;
@@ -44,7 +44,7 @@ public Damage_Wyrzucenie(id)
 {
 	new idattacker = get_user_attacker(id);
 
-	if(is_user_alive(idattacker) && ma_klase[idattacker] && !random(9))
+	if (is_user_alive(idattacker) && ma_klase[idattacker] && !random(9))
 	{
             new wpnname[33]
             get_weaponname(get_user_weapon(id), wpnname, charsmax(wpnname))
@@ -56,13 +56,13 @@ public SmiercGracza()
 {
       new kid = read_data(1)
       
-	if(!is_user_connected(kid))
+	if (!is_user_connected(kid))
 		return PLUGIN_CONTINUE;
 	
-	if(ma_klase[kid])
+	if (ma_klase[kid])
 	{	
 		new weapon = get_user_weapon(kid);
-		if(maxClip[weapon] != -1)
+		if (maxClip[weapon] != -1)
 			set_user_clip(kid, weapon);
 	}
 	
@@ -75,6 +75,6 @@ stock set_user_clip(id, wid)
 	get_weaponname(wid, weaponname, 31);
 	
 	new ent = find_ent_by_owner(-1, weaponname, id)
-	if(ent)
+	if (ent)
 		set_pdata_int(ent, 51, maxClip[wid], 4);
 }

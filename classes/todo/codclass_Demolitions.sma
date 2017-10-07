@@ -44,13 +44,13 @@ public cod_class_disabled(id)
 
 public cod_class_skill_used(id)
 {
-		if(!ilosc_dynamitow_gracza[id])
+		if (!ilosc_dynamitow_gracza[id])
 			client_print(id, print_center, "Wykorzystales juz wszystkie dynamity!");
 		else
 		{
 		
 			static dynamit_gracza[33];
-			if(is_valid_ent(dynamit_gracza[id]))
+			if (is_valid_ent(dynamit_gracza[id]))
 			{
 				ilosc_dynamitow_gracza[id]--;
 				
@@ -129,13 +129,13 @@ public fwSpawn_Dynamit(id)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 		return HAM_IGNORED;
 
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
       
-      if(get_user_weapon(idattacker) == CSW_AUG && damagebits & DMG_BULLET)
+      if (get_user_weapon(idattacker) == CSW_AUG && damagebits & DMG_BULLET)
       {
             SetHamParamFloat(4, damage+4)
             return HAM_HANDLED

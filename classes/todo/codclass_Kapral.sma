@@ -42,7 +42,7 @@ public plugin_precache()
 
 public cod_class_enabled(id)
 {
-	if(!(cod_get_user_status(id) & STATUS_PREMIUM))
+	if (!(cod_get_user_status(id) & STATUS_PREMIUM))
 	{
 		client_print(id, print_chat, "[%s] Nie masz premium, zeby grac ta klasa!", nazwa)
 		return COD_STOP;
@@ -67,7 +67,7 @@ public cod_class_skill_used(id)
 		
 	else
 	{
-		if(poprzednia_rakieta_gracza[id] + 2.0 > get_gametime())
+		if (poprzednia_rakieta_gracza[id] + 2.0 > get_gametime())
 			client_print(id, print_center, "Rakiet mozesz uzywac co 2 sekundy!");
 
 		else
@@ -103,7 +103,7 @@ public cod_class_skill_used(id)
 
 public fwSpawn_Rakiety(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 	{
 		cod_remove_user_rendering(id)
 		ilosc_rakiet_gracza[id] = 2;
@@ -153,9 +153,9 @@ public fwHamItemDeploy(ent)
 	static id;
 	id = get_pdata_cbase(ent, m_pPlayer, 4)
 	
-	if(!is_user_alive(id) || !ma_klase[id]) return;
+	if (!is_user_alive(id) || !ma_klase[id]) return;
 	
-	if(cs_get_weapon_id(ent) == CSW_KNIFE)
+	if (cs_get_weapon_id(ent) == CSW_KNIFE)
 		cod_set_user_rendering(id, 70)
 	else
 		cod_remove_user_rendering(id)

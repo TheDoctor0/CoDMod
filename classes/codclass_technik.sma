@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Technik"
-#define DESCRIPTION  "Posiada 1 rakiete, 1 apteczke, 1/8 z Deagle i wszystkie granaty."
+#define DESCRIPTION  "Posiada 1 rakiete, 1 apteczke, wszystkie granaty i 1/8 szansy na natychmiastowe zabicie z Deagle."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_AUG)|(1<<CSW_DEAGLE)|(1<<CSW_SMOKEGRENADE)|(1<<CSW_FLASHBANG)|(1<<CSW_FLASHBANG)|(1<<CSW_HEGRENADE)
 #define HEALTH       10
@@ -30,9 +30,9 @@ public cod_class_enabled(id, promotion)
 
 public cod_class_skill_used(id)
 {
-	if(cod_get_user_rockets(id)) cod_use_user_rocket(id);
+	if (cod_get_user_rockets(id)) cod_use_user_rocket(id);
 	else cod_use_user_medkit(id);
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if(weapon == CSW_DEAGLE && damageBits & DMG_BULLET && random_num(1, 8) == 1) damage = cod_kill_player(attacker, victim, damageBits);
+	if (weapon == CSW_DEAGLE && damageBits & DMG_BULLET && random_num(1, 8) == 1) damage = cod_kill_player(attacker, victim, damageBits);

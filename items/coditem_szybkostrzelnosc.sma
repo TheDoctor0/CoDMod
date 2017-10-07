@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Szybkostrzelnosc"
-#define VERSION "1.0.10"
+#define VERSION "1.0.12"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Szybkostrzelnosc"
@@ -47,16 +47,16 @@ public cod_item_upgrade(id)
 
 public cod_cur_weapon(id, weapon)
 {
-	if(!get_bit(id, itemActive)) return;
+	if (!get_bit(id, itemActive)) return;
 		
 	static Float:speedMultiplier, ent;
 	
 	speedMultiplier = floatdiv(1.0, 1.0 + (float(itemValue[id]) / 100.0));
 	
-	for(new i = 1; i < sizeof weaponNames; i++) {
+	for (new i = 1; i < sizeof weaponNames; i++) {
 		ent = fm_find_ent_by_owner(-1, weaponNames[i], id);
 			
-		if(ent) {
+		if (ent) {
 			set_pdata_float(ent, 46, (get_pdata_float(ent, 46, 4) * speedMultiplier), 4);
 			set_pdata_float(ent, 47, (get_pdata_float(ent, 47, 4) * speedMultiplier), 4);
 		}

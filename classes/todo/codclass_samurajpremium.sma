@@ -25,7 +25,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_H))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_H))
 	{
 		client_print(id, print_chat, "[Samuraj (Premium)] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -44,10 +44,10 @@ public cod_class_disabled(id)
 
 public eventKnife_Niewidzialnosc(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 
-	if( read_data(2) == CSW_KNIFE )
+	if ( read_data(2) == CSW_KNIFE )
 	{
 		set_rendering(id,kRenderFxNone, 0, 0, 0, kRenderTransAlpha, 70);
 	}

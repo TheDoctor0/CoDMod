@@ -32,7 +32,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-        if(!(get_user_flags(id) & ADMIN_LEVEL_H))
+        if (!(get_user_flags(id) & ADMIN_LEVEL_H))
         {
                 client_print(id, print_chat, "[Strzelec] Nie masz uprawnien, aby uzywac tej klasy.")
                 return COD_STOP;
@@ -47,15 +47,15 @@ public cod_class_disabled(id)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 		return HAM_IGNORED;
 	
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
 		
-	if(get_user_weapon(idattacker) == CSW_MP5NAVY && damagebits & DMG_BULLET)
+	if (get_user_weapon(idattacker) == CSW_MP5NAVY && damagebits & DMG_BULLET)
 		cod_inflict_damage(idattacker, this, 15.0, 0.17, idinflictor, damagebits);
-	if(get_user_weapon(idattacker) == CSW_DEAGLE && damagebits & DMG_BULLET)
+	if (get_user_weapon(idattacker) == CSW_DEAGLE && damagebits & DMG_BULLET)
 		cod_inflict_damage(idattacker, this, 15.0, 0.17, idinflictor, damagebits);
 	return HAM_IGNORED;
 }
@@ -63,7 +63,7 @@ public cod_class_skill_used(id)
 {
 	new flags = pev(id, pev_flags);
 	
-	if(flags & FL_ONGROUND && get_gametime() > ostatni_skok[id]+4.0)
+	if (flags & FL_ONGROUND && get_gametime() > ostatni_skok[id]+4.0)
 	{
 		ostatni_skok[id] = get_gametime();
 		new Float:velocity[3];

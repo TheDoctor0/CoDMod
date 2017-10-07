@@ -33,16 +33,16 @@ public DeathMsg()
 	new killer = read_data(1);
 	new victim = read_data(2);
 	
-	if(!is_user_connected(killer))
+	if (!is_user_connected(killer))
 		return;
 	
-	if(!ma_klase[killer])
+	if (!ma_klase[killer])
 		return;
 	
-	if(random(3))
+	if (random(3))
 		return;
 	
-	if(!(perk_ofiary[killer] = cod_get_user_perk(victim, wartosc_perku_ofiary[killer])))
+	if (!(perk_ofiary[killer] = cod_get_user_perk(victim, wartosc_perku_ofiary[killer])))
 		return;
 	ofiara[killer] = victim;
 	
@@ -63,10 +63,10 @@ public Zapytaj(id)
 }
 public Zapytaj_Handle(id, menu, item)
 {
-	if(item)
+	if (item)
 		return;
 	
-	if(cod_get_user_perk(ofiara[id]) != perk_ofiary[id])
+	if (cod_get_user_perk(ofiara[id]) != perk_ofiary[id])
 		return;
 	
 	new nick_zlodzieja[33];

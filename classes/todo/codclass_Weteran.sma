@@ -45,14 +45,14 @@ public cod_class_disabled(id)
 
 public cod_class_skill_used(id)
 {
-		if(!ilosc_dynamitow_gracza[id])
+		if (!ilosc_dynamitow_gracza[id])
 			client_print(id, print_center, "Wykorzystales juz wszystkie dynamity!");
 
 		else
 		{
 			
 			static dynamit_gracza[33];
-			if(is_valid_ent(dynamit_gracza[id]))
+			if (is_valid_ent(dynamit_gracza[id]))
 			{
 				ilosc_dynamitow_gracza[id]--;
 				

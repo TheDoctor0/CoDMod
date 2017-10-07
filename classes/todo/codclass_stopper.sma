@@ -41,17 +41,17 @@ public cod_class_disabled(id)
   }
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 		return HAM_IGNORED; 
 	
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
 	
-	if(damagebits & DMG_BULLET)
+	if (damagebits & DMG_BULLET)
 	{
 		new weapon = get_user_weapon(idattacker);
 			
-		if(weapon == CSW_XM1014 && damage > 20.0 && random_num(1,4) == 1) 
+		if (weapon == CSW_XM1014 && damage > 20.0 && random_num(1,4) == 1) 
 			cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor, damagebits);
 	}
 	

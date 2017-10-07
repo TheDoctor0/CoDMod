@@ -78,7 +78,7 @@ public cod_class_skill_used(id)
 public command_arrow(id) 
 {
 
-	if(!is_user_alive(id)) return PLUGIN_HANDLED
+	if (!is_user_alive(id)) return PLUGIN_HANDLED
 
 
 	new Float: Origin[3], Float: Velocity[3], Float: vAngle[3], Ent
@@ -123,16 +123,16 @@ public toucharrow(arrow, id)
 	new kid = entity_get_edict(arrow, EV_ENT_owner)
 	new lid = entity_get_edict(arrow, EV_ENT_enemy)
 	
-	if(is_user_alive(id)) 
+	if (is_user_alive(id)) 
 	{
-		if(kid == id || lid == id) return
+		if (kid == id || lid == id) return
 		
 		entity_set_edict(arrow, EV_ENT_enemy,id)
 	
 		new Float:dmg = entity_get_float(arrow,EV_FL_dmg)
 		entity_set_float(arrow,EV_FL_dmg,(dmg*3.0)/5.0)
 		
-		if(get_cvar_num("mp_friendlyfire") == 0 && get_user_team(id) == get_user_team(kid)) return
+		if (get_cvar_num("mp_friendlyfire") == 0 && get_user_team(id) == get_user_team(kid)) return
 		
 		Effect_Bleed(id,248)
 
@@ -146,7 +146,7 @@ public toucharrow(arrow, id)
 		write_short(1<<14); 
 		message_end();
 
-		if(get_user_team(id) == get_user_team(kid)) 
+		if (get_user_team(id) == get_user_team(kid)) 
 		{
 			new name[33]
 			get_user_name(kid,name,32)
@@ -154,7 +154,7 @@ public toucharrow(arrow, id)
 		}
 
 		emit_sound(id, CHAN_ITEM, "weapons/knife_hit4.wav", 1.0, ATTN_NORM, 0, PITCH_NORM)
-		if(dmg<30) remove_entity(arrow)
+		if (dmg<30) remove_entity(arrow)
 	}
 }
 

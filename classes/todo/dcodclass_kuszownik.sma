@@ -42,7 +42,7 @@ public plugin_init() {
 public cod_class_enabled(id)
 {
 	new dostepna = 25;
-	if(cod_get_class_level(id)<dostepna)
+	if (cod_get_class_level(id)<dostepna)
 	{
 		ColorChat(id, GREEN, "[COD:MW]^x01 Aby uzywac tej klasy musisz zdobyc^x04 %i^x01 poziom na dowolnej klasie!", dostepna);
 		return COD_STOP;
@@ -61,7 +61,7 @@ public cod_class_disabled(id)
 
 public Spawn(id)
 {
-	if(is_user_alive(id) && ma_klase[id]){
+	if (is_user_alive(id) && ma_klase[id]){
 		ilosc_beltow[id] = 10;
 		ilosc_rakiet_gracza[id] = 1;
 	}
@@ -78,7 +78,7 @@ public client_disconnect(id)
 	new Rakiety = find_ent_by_class(0, "rocket");
 	while(Rakiety > 0)
 	{
-		if(entity_get_edict(Rakiety, EV_ENT_owner) == id)
+		if (entity_get_edict(Rakiety, EV_ENT_owner) == id)
 			remove_entity(Rakiety);
 		Rakiety = find_ent_by_class(Rakiety, "rocket");
 	}
@@ -96,7 +96,7 @@ public CurWeapon(id)
 {
 	new weapon = read_data(2)
 	
-	if(weapon == CSW_KNIFE && ma_klase[id])
+	if (weapon == CSW_KNIFE && ma_klase[id])
 	{
 		entity_set_string(id, EV_SZ_viewmodel, "models/QTM_CodMod/v_crossbow.mdl")
 		ma_kusze[id] = true;
@@ -106,7 +106,7 @@ public CurWeapon(id)
 }
 public client_PreThink(id)
 {
-	if((pev(id,pev_button) & IN_ATTACK) && (ma_kusze[id]))
+	if ((pev(id,pev_button) & IN_ATTACK) && (ma_kusze[id]))
 		StworzBelt(id);
 		
 	return PLUGIN_CONTINUE;
@@ -116,12 +116,12 @@ public StworzBelt(id)
 	if (!is_user_alive(id))
 		return PLUGIN_CONTINUE;
 	
-	if(!ilosc_beltow[id]){
+	if (!ilosc_beltow[id]){
 		client_print(id, print_center, "Wykorzystales wszystkie belty!");
 		return PLUGIN_CONTINUE;
 	}
 	
-	if(get_gametime() < poprzedni_belt[id]+1.0){
+	if (get_gametime() < poprzedni_belt[id]+1.0){
 		client_print(id, print_center, "Mozesz strzelac kusza co 1s!");
 		return PLUGIN_CONTINUE;
 	}
@@ -184,7 +184,7 @@ public cod_class_skill_used(id)
 	}
 	else
 	{
-		if(poprzednia_rakieta_gracza[id] + 2.0 > get_gametime())
+		if (poprzednia_rakieta_gracza[id] + 2.0 > get_gametime())
 		{
 			client_print(id, print_center, "Rakiet mozesz uzywac co 2 sekundy!");
 		}

@@ -77,7 +77,7 @@ public fwSpawn_Apteczki(id)
 
 public Think_Apteczki(ent)
 {
-	if(!is_valid_ent(ent))
+	if (!is_valid_ent(ent))
 		return PLUGIN_CONTINUE;
 
 	new id = entity_get_edict(ent, EV_ENT_owner);
@@ -156,13 +156,13 @@ public Think_Apteczki(ent)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-      if(!is_user_connected(idattacker) || get_user_team(this) == get_user_team(idattacker))
+      if (!is_user_connected(idattacker) || get_user_team(this) == get_user_team(idattacker))
             return HAM_IGNORED;
 
-      if(!ma_klase[idattacker])
+      if (!ma_klase[idattacker])
             return HAM_IGNORED;
 
-      if(damagebits & DMG_BULLET && get_user_weapon(idattacker) == CSW_USP && !random(8))
+      if (damagebits & DMG_BULLET && get_user_weapon(idattacker) == CSW_USP && !random(8))
             KillPlayer(this, idinflictor, idattacker, (1<<1))
 
       return HAM_IGNORED;
@@ -186,7 +186,7 @@ KillPlayer(id, inflictor, attacker, damagebits)
 	set_pev(id, pev_dmg_inflictor, inflictor)
 	
 	effect = pev(id, pev_effects)
-	if(effect & 128)	set_pev(id, pev_effects, effect-128)
+	if (effect & 128)	set_pev(id, pev_effects, effect-128)
 	
 	set_msg_block(DeathMsgId, msgblock)
 

@@ -109,18 +109,18 @@ public plugin_init()
 }
 public fw_PreThink(id)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return FMRES_IGNORED;
 	SUsunNie(id);
-	if(!ma_klase[id])	
+	if (!ma_klase[id])	
 		return FMRES_IGNORED;
-	if(get_user_weapon(id) != CSW_AWP)
+	if (get_user_weapon(id) != CSW_AWP)
 		return FMRES_IGNORED;
-	if( !(pev(id, pev_button) & IN_DUCK) )
+	if ( !(pev(id, pev_button) & IN_DUCK) )
 		return FMRES_IGNORED;
-	if(pev(id, pev_speed) > 0.0)
+	if (pev(id, pev_speed) > 0.0)
 		return FMRES_IGNORED;
-	if(ma_nie[id])
+	if (ma_nie[id])
 		return FMRES_IGNORED;
 	set_rendering(id, kRenderFxNone, 0, 0, 0, kRenderTransAlpha, random_num(50,100));
 	ColorChat(id, GREEN, "Snajper: ^x01Udalo ci sie zamaskowac! Jestes slabo widoczny!");
@@ -129,9 +129,9 @@ public fw_PreThink(id)
 }
 public SUsunNie(id)
 {
-	if(ma_nie[id])
+	if (ma_nie[id])
 	{
-		if(get_user_weapon(id) != CSW_AWP || !(pev(id, pev_button) & IN_DUCK)  || pev(id, pev_speed) > 0.0)
+		if (get_user_weapon(id) != CSW_AWP || !(pev(id, pev_button) & IN_DUCK)  || pev(id, pev_speed) > 0.0)
 		{
 			set_rendering(id, kRenderFxNone, 0, 0, 0, kRenderTransAlpha, 255);
 			ma_nie[id]=false;
@@ -141,15 +141,15 @@ public SUsunNie(id)
 }
 public OnTakeDamage(this, idinf, idattacker, Float:damage, damagebits)
 {
-	if(this == idattacker)
+	if (this == idattacker)
 		return 0;
-	if(get_user_team(this) == get_user_team(idattacker))
+	if (get_user_team(this) == get_user_team(idattacker))
 		return 0;
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 		return 0;
-	if(!is_user_connected(this))
+	if (!is_user_connected(this))
 		return 0;
-	if(get_user_weapon(idattacker) != CSW_AWP)
+	if (get_user_weapon(idattacker) != CSW_AWP)
 		return 0;
 		
 	set_pev(this, pev_punchangle, {3.0,3.0,3.0});
@@ -159,7 +159,7 @@ public OnTakeDamage(this, idinf, idattacker, Float:damage, damagebits)
 		fVelo[i]*=0.25;
 	set_pev(this, pev_velocity, fVelo);
 	
-	if(random_num(1,10))
+	if (random_num(1,10))
 	{
 		SetHamParamFloat(4, damage+=10.0);
 		set_pev(this, pev_health, pev(this, pev_health) + 10.0);
@@ -169,7 +169,7 @@ public OnTakeDamage(this, idinf, idattacker, Float:damage, damagebits)
 }
 public OnAddToPlayerAwp( const item, const player )
 {
-    if( pev_valid( item ) && is_user_alive( player ) && ma_klase[player]) // just for safety.
+    if ( pev_valid( item ) && is_user_alive( player ) && ma_klase[player]) // just for safety.
     {
         message_begin( MSG_ONE, MsgIndexWeaponList, .player = player );
         {
@@ -213,13 +213,13 @@ public ClientCommand_SelectAwp( const client )
 }
 public CurrentWeapon(id)
 {
-	if(ma_klase[id] && is_user_alive(id))
+	if (ma_klase[id] && is_user_alive(id))
 	{
-		if(read_data(2) == WEAPON_1_ID)
+		if (read_data(2) == WEAPON_1_ID)
 		{
 			set_pev(id, pev_viewmodel2, WEAPON_1_V_MODEL);
 			set_pev(id, pev_weaponmodel2, WEAPON_1_P_MODEL);
-			if(old_weapon[id]!=WEAPON_1_ID)
+			if (old_weapon[id]!=WEAPON_1_ID)
 			{
 				UTIL_PlayWeaponAnimation(id, WEAPON_1_DRAW_ID);
 				cs_set_user_zoom(id, 0, 1);
@@ -227,11 +227,11 @@ public CurrentWeapon(id)
 				//emit_sound(id, CHAN_AUTO,"weapons/de_deploy.wav",VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 			}
 		}
-		if(read_data(2) == WEAPON_2_ID)
+		if (read_data(2) == WEAPON_2_ID)
 		{
 			set_pev(id, pev_viewmodel2, WEAPON_2_V_MODEL);
 			set_pev(id, pev_weaponmodel2, WEAPON_2_P_MODEL);
-			if(old_weapon[id]!=WEAPON_2_ID)
+			if (old_weapon[id]!=WEAPON_2_ID)
 			{
 				UTIL_PlayWeaponAnimation(id, WEAPON_2_DRAW_ID);
 				//client_cmd(id, "bind ^"mouse2^" ^"deagle_zoom^"");
@@ -243,45 +243,45 @@ public CurrentWeapon(id)
 }
 public fw_SetModel(entity, model[])
 {
-	if(!is_valid_ent(entity))
+	if (!is_valid_ent(entity))
 		return FMRES_IGNORED
 	
 	static szClassName[33]
 	entity_get_string(entity, EV_SZ_classname, szClassName, charsmax(szClassName))
 	
-	if(!equal(szClassName, "weaponbox"))
+	if (!equal(szClassName, "weaponbox"))
 		return FMRES_IGNORED
 	
 	static iOwner
 	
 	iOwner = entity_get_edict(entity, EV_ENT_owner)
 	
-	if(equal(model, WEAPON_1_OLD_W_MODEL))
+	if (equal(model, WEAPON_1_OLD_W_MODEL))
 	{
 		static iStoredAugID
 		
 		iStoredAugID = find_ent_by_owner(-1, WEAPON_1_CLASSNAME, entity)
 	
-		if(!is_valid_ent(iStoredAugID))
+		if (!is_valid_ent(iStoredAugID))
 			return FMRES_IGNORED;
 	
-		if(ma_klase[iOwner])
+		if (ma_klase[iOwner])
 		{
 			entity_set_model(entity, WEAPON_1_W_MODEL)
 			
 			return FMRES_SUPERCEDE
 		}
 	}
-	if(equal(model, WEAPON_2_OLD_W_MODEL))
+	if (equal(model, WEAPON_2_OLD_W_MODEL))
 	{
 		static iStoredAugID
 		
 		iStoredAugID = find_ent_by_owner(-1, WEAPON_2_CLASSNAME, entity)
 	
-		if(!is_valid_ent(iStoredAugID))
+		if (!is_valid_ent(iStoredAugID))
 			return FMRES_IGNORED;
 	
-		if(ma_klase[iOwner])
+		if (ma_klase[iOwner])
 		{
 			entity_set_model(entity, WEAPON_2_W_MODEL)
 			

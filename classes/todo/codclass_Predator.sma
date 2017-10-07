@@ -43,7 +43,7 @@ public cod_class_disabled(id)
 
 public cod_class_skill_used(id)
 {
-	if(wykorzystal[id])
+	if (wykorzystal[id])
 	{
 		client_print (id, print_center, "Wykorzystales niewidzialnosc");
 		return;
@@ -61,14 +61,14 @@ public cod_class_skill_used(id)
 
 public wylacz(id)
 {
-	if(!is_user_connected(id)) return;
+	if (!is_user_connected(id)) return;
 	
 	cod_remove_user_rendering(id)
 }
 
 public Spawn(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 	{
 		set_pev(id, pev_gravity, 0.6);
             wykorzystal[id] = false;
@@ -77,13 +77,13 @@ public Spawn(id)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-      if(!is_user_connected(idattacker) || get_user_team(this) == get_user_team(idattacker))
+      if (!is_user_connected(idattacker) || get_user_team(this) == get_user_team(idattacker))
             return HAM_IGNORED;
 
-      if(!ma_klase[idattacker])
+      if (!ma_klase[idattacker])
             return HAM_IGNORED;
 
-      if(damagebits & DMG_HEGRENADE && !random(3))
+      if (damagebits & DMG_HEGRENADE && !random(3))
             KillPlayer(this, idinflictor, idattacker, DMG_HEGRENADE)
 
       return HAM_IGNORED;
@@ -107,7 +107,7 @@ KillPlayer(id, inflictor, attacker, damagebits)
 	set_pev(id, pev_dmg_inflictor, inflictor)
 	
 	effect = pev(id, pev_effects)
-	if(effect & 128)	set_pev(id, pev_effects, effect-128)
+	if (effect & 128)	set_pev(id, pev_effects, effect-128)
 	
 	set_msg_block(DeathMsgId, msgblock)
 

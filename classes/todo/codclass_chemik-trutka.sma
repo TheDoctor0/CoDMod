@@ -48,13 +48,13 @@ public cod_class_disabled(id)
 
 public cod_class_skill_used(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 	{
 		return PLUGIN_CONTINUE;
 	}
 	
 	
-	if(!ilosc_trutek_gracza[id])
+	if (!ilosc_trutek_gracza[id])
 	{
 		client_print(id, print_center, "Masz tylko 2 trutki na runde!");
 		return PLUGIN_CONTINUE;
@@ -157,7 +157,7 @@ public PoisonThink(ent)
 
 public ResetHUD(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 		ilosc_trutek_gracza[id] = 2;
 }
 
@@ -166,7 +166,7 @@ public client_disconnect(id)
 	new ent = find_ent_by_class(0, "poison");
 	while(ent > 0)
 	{
-		if(entity_get_edict(id, EV_ENT_owner) == id)
+		if (entity_get_edict(id, EV_ENT_owner) == id)
 			remove_entity(ent);
 		ent = find_ent_by_class(ent, "poison");
 	}

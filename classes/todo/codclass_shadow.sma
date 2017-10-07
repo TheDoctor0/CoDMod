@@ -45,10 +45,10 @@ public cod_class_disabled(id)
 
 public cod_class_skill_used(id)
 {
-     if(!is_user_alive(id))
+     if (!is_user_alive(id))
      return;
     
-     if(wykorzystal[id])
+     if (wykorzystal[id])
      {
      ColorChat(id, RED, "Wykorzystales juz swoja niewidzialnosc.");
      return;
@@ -68,7 +68,7 @@ public cod_class_skill_used(id)
 }
 public WylaczGod(id)
 {
-     if(!is_user_connected(id)) return;
+     if (!is_user_connected(id)) return;
 
      set_rendering(id,kRenderFxNone, 0, 0, 0, kRenderTransAlpha, 255);
      set_user_footsteps(id, 0);

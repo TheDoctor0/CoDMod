@@ -117,27 +117,27 @@ public plugin_init() {
 }
 
 public ham_Spawned(id){
-	if(!is_user_alive(id)){
+	if (!is_user_alive(id)){
 		return HAM_IGNORED;
 	}
-	if(get_pcvar_num(pCvars[SpawnPortal]) && !pev_valid(player_ent[id])){
+	if (get_pcvar_num(pCvars[SpawnPortal]) && !pev_valid(player_ent[id])){
 		new szWeaponName[64],bool:bContinue = false;
 		new num, iWeapons[32] 
 		
 		get_user_weapons(id, iWeapons, num) 
 		for(new i = 1;i<=30;i++){
-			if(i == 2 || i == 4 || i == 6 || i == 9 || i == 25 || i == 29){
+			if (i == 2 || i == 4 || i == 6 || i == 9 || i == 25 || i == 29){
 				continue;
 			}
 			bContinue = false;
 			for (new j=0; j<num; j++) 
 			{
-				if(iWeapons[j] == i){
+				if (iWeapons[j] == i){
 					bContinue = true;
 					break;
 				}
 			} 
-			if(!bContinue){
+			if (!bContinue){
 				get_weaponname(i,szWeaponName,charsmax(szWeaponName));
 				player_ent[id] = give_item(id,szWeaponName)
 				RegisterHamFromEntity(Ham_Item_Deploy,player_ent[id],"ham_ItemDeploy_Post",1)
@@ -153,19 +153,19 @@ public ham_Spawned(id){
 
 public buyPortal(id){
 	new cost = get_pcvar_num(pCvars[PortalCost]);
-	if(cost < 0){
+	if (cost < 0){
 		return PLUGIN_HANDLED;
 	}
-	if(cs_get_user_money(id) < cost){
+	if (cs_get_user_money(id) < cost){
 		client_print(id,print_console,"Masz za malo kasy");
 	}
 	else
 	{
-		if(!is_user_alive(id)){
+		if (!is_user_alive(id)){
 			client_print(id,print_console,"Musisz byc zywy");
 			return PLUGIN_HANDLED
 		}
-		if(pev_valid(player_ent[id])){
+		if (pev_valid(player_ent[id])){
 			client_print(id,print_console,"Masz juz portal guna");
 			return PLUGIN_HANDLED
 		}
@@ -174,18 +174,18 @@ public buyPortal(id){
 		
 		get_user_weapons(id, iWeapons, num) 
 		for(new i = 1;i<=30;i++){
-			if(i == 2 || i == 4 || i == 6 || i == 9 || i == 25 || i == 29){
+			if (i == 2 || i == 4 || i == 6 || i == 9 || i == 25 || i == 29){
 				continue;
 			}
 			bContinue = false;
 			for (new j=0; j<num; j++) 
 			{
-				if(iWeapons[j] == i){
+				if (iWeapons[j] == i){
 					bContinue = true;
 					break;
 				}
 			} 
-			if(!bContinue){
+			if (!bContinue){
 				get_weaponname(i,szWeaponName,charsmax(szWeaponName));
 				player_ent[id] = give_item(id,szWeaponName)
 				RegisterHamFromEntity(Ham_Item_Deploy,player_ent[id],"ham_ItemDeploy_Post",1)
@@ -202,12 +202,12 @@ public buyPortal(id){
 
 public ham_damage( this, inflictor, attacker, Float:damage, damagebits )
 {
-	if( !( damagebits & DMG_FALL ) || !IsPlayer(this))
+	if ( !( damagebits & DMG_FALL ) || !IsPlayer(this))
 	return HAM_IGNORED;
 	
 	new bool:bCvar = !(!get_pcvar_num(pCvars[FallDamge]))
 	
-	if(!bCvar || (bCvar && !pev_valid(player_ent[this]))){
+	if (!bCvar || (bCvar && !pev_valid(player_ent[this]))){
 		return HAM_IGNORED;
 	}
 	
@@ -225,13 +225,13 @@ public Koniec_Rundy()
 }
 
 public touchTeleport(portal,id){
-	if(pev_valid(id)){
-		if(pev(id,pev_movetype) == MOVETYPE_FOLLOW){
+	if (pev_valid(id)){
+		if (pev(id,pev_movetype) == MOVETYPE_FOLLOW){
 			return PLUGIN_CONTINUE;
 		}
 		static szClassName[64];
 		pev(id,pev_classname,szClassName,charsmax(szClassName));
-		if(equal(szClassName,szClassTelPom) || equal(szClassName,szClassTelNieb) || equal(szClassName,szClassNameNieb) || equal(szClassName,szClassNamePom)){
+		if (equal(szClassName,szClassTelPom) || equal(szClassName,szClassTelNieb) || equal(szClassName,szClassNameNieb) || equal(szClassName,szClassNamePom)){
 			return PLUGIN_CONTINUE;
 		}
 		moveTo(id,portal,pev(portal,pev_iuser1))
@@ -241,11 +241,11 @@ public touchTeleport(portal,id){
 
 
 moveTo(id, in, out){
-	if(pev_valid(out)){
+	if (pev_valid(out)){
 		#if defined TRACE_HULL
 		new hull = HULL_POINT;
 		
-		if(is_user_alive(id)){
+		if (is_user_alive(id)){
 			hull = HULL_HUMAN;
 		}
 		#endif
@@ -268,9 +268,9 @@ moveTo(id, in, out){
 			
 			
 			#if defined TRACE_HULL
-			if(!trace_hull(fOrigin, hull, id, 0)){
+			if (!trace_hull(fOrigin, hull, id, 0)){
 				#else
-				if(checkPortalPlace(fOrigin,fMins,fMaxs)){
+				if (checkPortalPlace(fOrigin,fMins,fMaxs)){
 					#endif
 					set_pev(id, pev_origin, fOrigin);
 					
@@ -288,19 +288,19 @@ moveTo(id, in, out){
 	}
 
 	public fwd_CmdStart(id, uc_handle, seed) {
-		if(!is_user_alive(id) || player_ent[id] != get_pdata_cbase(id,OFFSET_ACTIVEITEM,OFFSET_LINUX_PLAYER)){
+		if (!is_user_alive(id) || player_ent[id] != get_pdata_cbase(id,OFFSET_ACTIVEITEM,OFFSET_LINUX_PLAYER)){
 			return FMRES_IGNORED;
 		}
 		
 		new buttons = get_uc(uc_handle,UC_Buttons)
 		new oldbuttons = get_user_oldbutton(id);
 		
-		if(buttons&IN_ATTACK && fNextAttack[id] < get_gametime()){
+		if (buttons&IN_ATTACK && fNextAttack[id] < get_gametime()){
 			fNextAttack[id] = get_gametime() + 0.5;
 			create_shot_portal(id);
 			set_animation(id,random_num(1,2))
 		}
-		if(buttons & IN_ATTACK2 && !(oldbuttons & IN_ATTACK2)){
+		if (buttons & IN_ATTACK2 && !(oldbuttons & IN_ATTACK2)){
 			bMode[id] = !bMode[id];
 			client_print(id,print_center,"Tryb %s",bMode[id] ? "Niebieski":"Pomaranczowy")
 		}
@@ -339,7 +339,7 @@ moveTo(id, in, out){
 		new szConfDir[64],szFullDir[128];
 		get_configsdir(szConfDir,charsmax(szConfDir));
 		formatex(szFullDir,charsmax(szFullDir),"%s/portal.cfg",szConfDir);
-		if(!file_exists(szFullDir)){
+		if (!file_exists(szFullDir)){
 			#if defined SPRITES
 			write_file(szFullDir,"// 1 or 2 difrent sprites 0 off this")
 			write_file(szFullDir,"portal_sprite 1");
@@ -374,7 +374,7 @@ moveTo(id, in, out){
 	}
 
 	public touchNieb(touched,toucher){
-		if(!pev_valid(toucher)){
+		if (!pev_valid(toucher)){
 			remove_entity(toucher)
 			return PLUGIN_CONTINUE;
 		}
@@ -385,7 +385,7 @@ moveTo(id, in, out){
 	}
 
 	public touchPom(touched,toucher){	
-		if(!pev_valid(toucher)){
+		if (!pev_valid(toucher)){
 			remove_entity(toucher)
 			return PLUGIN_CONTINUE;
 		}
@@ -425,7 +425,7 @@ moveTo(id, in, out){
 		
 		free_tr2(ptr)
 		
-		if(!validWall(fOrigin3,vfNormal) || !checkPlace(fOrigin3,iPos,iOwner)){
+		if (!validWall(fOrigin3,vfNormal) || !checkPlace(fOrigin3,iPos,iOwner)){
 			#if defined SOUNDS
 			engfunc(EngFunc_EmitAmbientSound, 0,fOrigin3, soundInvalid,VOL_NORM, ATTN_NORM, 0, PITCH_NORM)
 			#endif
@@ -479,7 +479,7 @@ moveTo(id, in, out){
 		
 		iEnt[iOwner][iPos] = 0;
 		
-		if(pev_valid(iTel[iOwner][iPos])){ 
+		if (pev_valid(iTel[iOwner][iPos])){ 
 			new Float:fOrigin2[3];
 			pev(iTel[iOwner][iPos],pev_origin,fOrigin2)
 			#if defined SOUNDS
@@ -531,7 +531,7 @@ moveTo(id, in, out){
 		
 		set_pev(iTel[iOwner][iPos],pev_iuser1,iTel[iOwner][iPos == 0 ? 1 : 0]);
 		
-		if(pev_valid(iTel[iOwner][iPos == 0 ? 1 : 0]) && !pev_valid(pev(iTel[iOwner][iPos == 0 ? 1 : 0],pev_iuser1))){
+		if (pev_valid(iTel[iOwner][iPos == 0 ? 1 : 0]) && !pev_valid(pev(iTel[iOwner][iPos == 0 ? 1 : 0],pev_iuser1))){
 			set_pev(iTel[iOwner][iPos == 0 ? 1 : 0],pev_iuser1,iTel[iOwner][iPos])
 		}
 		
@@ -543,25 +543,25 @@ moveTo(id, in, out){
 	}
 
 	public give_weapon(id,level,cid){
-		if(!cmd_access(id,level,cid,2)){
+		if (!cmd_access(id,level,cid,2)){
 			return PLUGIN_HANDLED;
 		}
 		new szString[64];
 		read_argv(1,szString,charsmax(szString));
 		new find = find_player("bl",szString);
-		if(!find){
+		if (!find){
 			client_print(id,print_console,"[Portal Gun] Nie moge znalezc takiego gracza");
 			return PLUGIN_HANDLED;
 		}
 		else
 		{
-			if(!is_user_alive(find)){
+			if (!is_user_alive(find)){
 				client_print(id,print_console,"[Portal Gun] Gracz musi byc zywy");
 				return PLUGIN_HANDLED
 			}
 			new szName[64];
 			get_user_name(find,szName,charsmax(szName));
-			if(pev_valid(player_ent[find])){
+			if (pev_valid(player_ent[find])){
 				client_print(id,print_console,"[Portal Gun] %s ma juz Portal Guna",szName);
 				return PLUGIN_HANDLED
 			}
@@ -575,18 +575,18 @@ moveTo(id, in, out){
 		
 		get_user_weapons(id, iWeapons, num) 
 		for(new i = 1;i<=30;i++){
-			if(i == 2 || i == 4 || i == 6 || i == 9 || i == 25 || i == 29){
+			if (i == 2 || i == 4 || i == 6 || i == 9 || i == 25 || i == 29){
 				continue;
 			}
 			bContinue = false;
 			for (new j=0; j<num; j++) 
 			{
-				if(iWeapons[j] == i){
+				if (iWeapons[j] == i){
 					bContinue = true;
 					break;
 				}
 			} 
-			if(!bContinue){
+			if (!bContinue){
 				get_weaponname(i,szWeaponName,charsmax(szWeaponName));
 				player_ent[id] = give_item(id,szWeaponName)
 				RegisterHamFromEntity(Ham_Item_Deploy,player_ent[id],"ham_ItemDeploy_Post",1)
@@ -603,7 +603,7 @@ moveTo(id, in, out){
 		static owner
 		owner = get_pdata_cbase(weapon_ent, OFFSET_WEAPONOWNER, OFFSET_LINUX_WEAPONS);
 		
-		if(!is_user_alive(owner)){
+		if (!is_user_alive(owner)){
 			return HAM_IGNORED;
 		}
 		set_pev(owner,pev_viewmodel2,v_model);
@@ -613,14 +613,14 @@ moveTo(id, in, out){
 	}
 
 	public ham_KilledPost(id){
-		if(is_user_connected(id)){
+		if (is_user_connected(id)){
 			player_ent[id] = 0;
 		}
 	}
 
 
 	public cmdDrop(id){
-		if(player_ent[id] == get_pdata_cbase(id,OFFSET_ACTIVEITEM,OFFSET_LINUX_PLAYER)){
+		if (player_ent[id] == get_pdata_cbase(id,OFFSET_ACTIVEITEM,OFFSET_LINUX_PLAYER)){
 			return PLUGIN_HANDLED;
 		}
 		return PLUGIN_CONTINUE;
@@ -628,13 +628,13 @@ moveTo(id, in, out){
 
 	public create_shot_portal(id){
 		new iPos = bMode[id] ? 0 : 1;
-		if(pev_valid(iEnt[id][iPos]) && pev(iEnt[id][iPos],pev_owner) == id){
+		if (pev_valid(iEnt[id][iPos]) && pev(iEnt[id][iPos],pev_owner) == id){
 			engfunc(EngFunc_RemoveEntity,iEnt[id][iPos])
 			iEnt[id][iPos] = 0;
 		}
 		iEnt[id][iPos] =  engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "info_target"))
 		
-		if(!pev_valid(iEnt[id][iPos])){
+		if (!pev_valid(iEnt[id][iPos])){
 			return PLUGIN_CONTINUE;
 		}
 		
@@ -675,14 +675,14 @@ moveTo(id, in, out){
 		
 		#if defined SPRITES
 		new iMode = get_pcvar_num(pCvars[SpriteType]);
-		if(iMode){
+		if (iMode){
 			message_begin(MSG_BROADCAST, SVC_TEMPENTITY)
 			write_byte(TE_BEAMFOLLOW)
 			write_short(iEnt[id][iPos])
 			write_short(iMode == 1 ? sprite:g_trail);
 			write_byte(10)
 			write_byte(5)
-			if(bMode[id]){
+			if (bMode[id]){
 				write_byte(0)
 				write_byte(0)
 				write_byte(255)
@@ -723,22 +723,22 @@ moveTo(id, in, out){
 		new Float:fPoint2[3];
 		xs_vec_add(fPoint, fNormalUp, fPoint2);
 		xs_vec_add(fPoint2, fNormalRight, fPoint2);
-		if(!traceToWall(fPoint2, fInvNormal))
+		if (!traceToWall(fPoint2, fInvNormal))
 		return false;
 		
 		xs_vec_add(fPoint, fNormalUp, fPoint2);
 		xs_vec_sub(fPoint2, fNormalRight, fPoint2);
-		if(!traceToWall(fPoint2, fInvNormal))
+		if (!traceToWall(fPoint2, fInvNormal))
 		return false;
 		
 		xs_vec_sub(fPoint, fNormalUp, fPoint2);
 		xs_vec_sub(fPoint2, fNormalRight, fPoint2);
-		if(!traceToWall(fPoint2, fInvNormal))
+		if (!traceToWall(fPoint2, fInvNormal))
 		return false;
 		
 		xs_vec_sub(fPoint, fNormalUp, fPoint2);
 		xs_vec_add(fPoint2, fNormalRight, fPoint2);
-		if(!traceToWall(fPoint2, fInvNormal))
+		if (!traceToWall(fPoint2, fInvNormal))
 		return false;
 		
 		return true;
@@ -755,7 +755,7 @@ bool:traceToWall(const Float:fOrigin[3], const Float:fVec[3]){
 		get_tr2(tr, TR_flFraction, fFrac);
 		free_tr2(tr);
 		
-		if( floatabs(fFrac - 0.5) <= 0.02 ){
+		if ( floatabs(fFrac - 0.5) <= 0.02 ){
 			return true;
 		}
 		
@@ -811,11 +811,11 @@ bool:checkPlace(Float:fOrigin[3],iMode,id){
 		new szClass[64]
 		while((ent = find_ent_in_sphere(ent,fOrigin,45.0))){
 			pev(ent,pev_classname,szClass,charsmax(szClass));
-			if(equal(szClass,szClassTelNieb) || equal(szClass,szClassTelPom)){
-				if(iMode == 0 && equal(szClass,szClassTelNieb) && pev(ent,pev_owner) == id){
+			if (equal(szClass,szClassTelNieb) || equal(szClass,szClassTelPom)){
+				if (iMode == 0 && equal(szClass,szClassTelNieb) && pev(ent,pev_owner) == id){
 					continue;
 				}
-				else if(iMode == 1 && equal(szClass,szClassTelPom) && pev(ent,pev_owner) == id){
+				else if (iMode == 1 && equal(szClass,szClassTelPom) && pev(ent,pev_owner) == id){
 					continue;
 				}
 				else{
@@ -845,7 +845,7 @@ bool:checkPortalPlace(Float: fOrigin[3],Float: fMins[3],Float: fMaxs[3]){
 		fOriginTmp[0] += fMins[0];
 		fOriginTmp[1] += fMaxs[1];
 		fOriginTmp[2] += fMaxs[2];
-		if(!traceTo(fOrigin,fOriginTmp)){
+		if (!traceTo(fOrigin,fOriginTmp)){
 			return false;
 		}
 		xs_vec_copy(fOrigin,fOriginTmp)
@@ -854,7 +854,7 @@ bool:checkPortalPlace(Float: fOrigin[3],Float: fMins[3],Float: fMaxs[3]){
 		fOriginTmp[0] += fMaxs[0];
 		fOriginTmp[1] += fMaxs[1];
 		fOriginTmp[2] += fMaxs[2];
-		if(!traceTo(fOrigin,fOriginTmp)){
+		if (!traceTo(fOrigin,fOriginTmp)){
 			return false;
 		}
 		xs_vec_copy(fOrigin,fOriginTmp)
@@ -863,7 +863,7 @@ bool:checkPortalPlace(Float: fOrigin[3],Float: fMins[3],Float: fMaxs[3]){
 		fOriginTmp[0] += fMins[0];
 		fOriginTmp[1] += fMins[1];
 		fOriginTmp[2] += fMaxs[2];
-		if(!traceTo(fOrigin,fOriginTmp)){
+		if (!traceTo(fOrigin,fOriginTmp)){
 			return false;
 		}
 		xs_vec_copy(fOrigin,fOriginTmp)
@@ -871,7 +871,7 @@ bool:checkPortalPlace(Float: fOrigin[3],Float: fMins[3],Float: fMaxs[3]){
 		fOriginTmp[0] += fMaxs[0];
 		fOriginTmp[1] += fMins[1];
 		fOriginTmp[2] += fMaxs[2];
-		if(!traceTo(fOrigin,fOriginTmp)){
+		if (!traceTo(fOrigin,fOriginTmp)){
 			return false;
 		}
 		xs_vec_copy(fOrigin,fOriginTmp)
@@ -879,7 +879,7 @@ bool:checkPortalPlace(Float: fOrigin[3],Float: fMins[3],Float: fMaxs[3]){
 		fOriginTmp[0] += fMins[0];
 		fOriginTmp[1] += fMaxs[1];
 		fOriginTmp[2] += fMins[2];
-		if(!traceTo(fOrigin,fOriginTmp)){
+		if (!traceTo(fOrigin,fOriginTmp)){
 			return false;
 		}
 		xs_vec_copy(fOrigin,fOriginTmp)
@@ -887,7 +887,7 @@ bool:checkPortalPlace(Float: fOrigin[3],Float: fMins[3],Float: fMaxs[3]){
 		fOriginTmp[0] += fMaxs[0];
 		fOriginTmp[1] += fMaxs[1];
 		fOriginTmp[2] += fMins[2];
-		if(!traceTo(fOrigin,fOriginTmp)){
+		if (!traceTo(fOrigin,fOriginTmp)){
 			return false;
 		}
 		xs_vec_copy(fOrigin,fOriginTmp)
@@ -895,7 +895,7 @@ bool:checkPortalPlace(Float: fOrigin[3],Float: fMins[3],Float: fMaxs[3]){
 		fOriginTmp[0] += fMins[0];
 		fOriginTmp[1] += fMins[1];
 		fOriginTmp[2] += fMins[2];
-		if(!traceTo(fOrigin,fOriginTmp)){
+		if (!traceTo(fOrigin,fOriginTmp)){
 			return false;
 		}
 		xs_vec_copy(fOrigin,fOriginTmp)
@@ -903,7 +903,7 @@ bool:checkPortalPlace(Float: fOrigin[3],Float: fMins[3],Float: fMaxs[3]){
 		fOriginTmp[0] += fMaxs[0];
 		fOriginTmp[1] += fMins[1];
 		fOriginTmp[2] += fMins[2];
-		if(!traceTo(fOrigin,fOriginTmp)){
+		if (!traceTo(fOrigin,fOriginTmp)){
 			return false;
 		}
 		xs_vec_copy(fOrigin,fOriginTmp)

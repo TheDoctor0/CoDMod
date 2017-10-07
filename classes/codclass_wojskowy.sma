@@ -29,4 +29,4 @@ public cod_class_skill_used(id)
 	cod_use_user_rocket(id);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if(damageBits & DMG_BULLET && random_num(1, 7) == 1) cod_display_fade(victim, 2, 2, 0x0000, 255, 155, 50, 230);
+	if (damageBits & DMG_BULLET && random_num(1, 7) == 1) cod_display_fade(victim, 2, 2, 0x0000, 255, 155, 50, 230);

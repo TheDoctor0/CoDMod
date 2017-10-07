@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Support"
-#define VERSION "1.0.12"
+#define VERSION "1.0.13"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Support"
@@ -36,10 +36,10 @@ public cod_damage_pre(attacker, victim, weapon, Float:damage, damageBits, hitPla
 {
 	new entList[32], player, numFound = find_sphere_class(attacker, "player", 100.0, entList, charsmax(entList));
 	
-	for(new i = 0; i < numFound; i++) {
+	for (new i = 0; i < numFound; i++) {
 		player = entList[i];
 
-		if(!is_user_alive(player) || attacker == player || get_user_team(player) != get_user_team(attacker) || cod_get_user_item(player) != cod_get_item_id(NAME)) continue;
+		if (!is_user_alive(player) || attacker == player || get_user_team(player) != get_user_team(attacker) || cod_get_user_item(player) != cod_get_item_id(NAME)) continue;
 
 		cod_inflict_damage(attacker, victim, damage * (itemValue[player] / 100.0), 0.0, damageBits);
 

@@ -54,7 +54,7 @@ public client_disconnect(id)
 	new entApteczki = find_ent_by_class(0, "medkit");
 	while(entApteczki > 0)
 	{
-		if(entity_get_edict(entApteczki, EV_ENT_owner) == id)
+		if (entity_get_edict(entApteczki, EV_ENT_owner) == id)
 			remove_entity(entApteczki);
 		entApteczki = find_ent_by_class(entApteczki, "medkit");
 	}
@@ -63,7 +63,7 @@ public client_disconnect(id)
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_H))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_H))
 	{
 		client_print(id, print_chat, "[ProKomandos] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -117,14 +117,14 @@ public cod_class_skill_used(id)
 
 public fwSpawn_Apteczki(id)
 {
-	if(is_user_alive(id))
+	if (is_user_alive(id))
 		ilosc_apteczek_gracza[id] = 1;
 }
 
 
 public Think_Apteczki(ent)
 {
-	if(!is_valid_ent(ent))
+	if (!is_valid_ent(ent))
 		return PLUGIN_CONTINUE;
 
 	new id = entity_get_edict(ent, EV_ENT_owner);
@@ -206,12 +206,12 @@ public Think_Apteczki(ent)
 
 public fwCmdStart_MultiJump(id, uc_handle)
 {
-	if(!is_user_alive(id) || !ma_klase[id])
+	if (!is_user_alive(id) || !ma_klase[id])
 		return FMRES_IGNORED;
 
 	new flags = pev(id, pev_flags);
 
-	if((get_uc(uc_handle, UC_Buttons) & IN_JUMP) && !(flags & FL_ONGROUND) && !(pev(id, pev_oldbuttons) & IN_JUMP) && skoki[id])
+	if ((get_uc(uc_handle, UC_Buttons) & IN_JUMP) && !(flags & FL_ONGROUND) && !(pev(id, pev_oldbuttons) & IN_JUMP) && skoki[id])
 	{
 		skoki[id]--;
 		new Float:velocity[3];
@@ -219,7 +219,7 @@ public fwCmdStart_MultiJump(id, uc_handle)
 		velocity[2] = random_float(265.0,285.0);
 		set_pev(id, pev_velocity,velocity);
 	}
-	else if(flags & FL_ONGROUND)
+	else if (flags & FL_ONGROUND)
 		skoki[id] = 1;
 
 	return FMRES_IGNORED;
@@ -227,7 +227,7 @@ public fwCmdStart_MultiJump(id, uc_handle)
 
 public fwTakeDamage_JedenCios(id, ent, attacker)
 {
-	if(is_user_alive(attacker) && ma_klase[attacker] && get_user_weapon(attacker) == CSW_KNIFE)
+	if (is_user_alive(attacker) && ma_klase[attacker] && get_user_weapon(attacker) == CSW_KNIFE)
 	{
 		cs_set_user_armor(id, 0, CS_ARMOR_NONE);
 		SetHamParamFloat(4, float(get_user_health(id) + 1));

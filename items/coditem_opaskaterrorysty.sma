@@ -2,13 +2,13 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Opaska Terrorysty"
-#define VERSION "1.0.11"
+#define VERSION "1.0.13"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Opaska Terrorysty"
-#define DESCRIPTION "Zadajesz %s obrazen wiecej. Masz 1/2 na natychmiastowe zabicie z HE"
+#define DESCRIPTION "Zadajesz %s obrazen wiecej. Masz 50 procent szansy na natychmiastowe zabicie z HE"
 #define RANDOM_MIN  6
-#define RANDOM_MAX  10
+#define RANDOM_MAX  8
 #define UPGRADE_MIN -2
 #define UPGRADE_MAX 3
 
@@ -39,6 +39,6 @@ public cod_item_upgrade(id)
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if(damageBits & DMG_HEGRENADE && random_num(1, 2) == 1) damage = cod_kill_player(attacker, victim, damageBits);
+	if (damageBits & DMG_HEGRENADE && cod_percent_chance(50)) damage = cod_kill_player(attacker, victim, damageBits);
 	else damage += itemValue[attacker];
 }

@@ -42,7 +42,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_FLAG_X))
+	if (!(get_user_flags(id) & ADMIN_FLAG_X))
 	{
 		client_print(id, print_chat, "[%s] Nie masz uprawnien, aby uzywac tej klasy.",nazwa)
 		ma_klase[id] = false
@@ -69,7 +69,7 @@ public fwTracehull(Float:fStart[3], Float:fEnd[3], conditions, hull, id, ptr){
 vTrace(id, ptr,Float:fStart[3],Float:fEnd[3],iNoMonsters,bool:hull = false,iHull = 0)
 {
 		
-	if(is_user_alive(id) && get_user_weapon(id) == CSW_KNIFE && ma_klase[id])
+	if (is_user_alive(id) && get_user_weapon(id) == CSW_KNIFE && ma_klase[id])
 	{
 		
 		xs_vec_sub(fEnd,fStart,fEnd)
@@ -84,7 +84,7 @@ vTrace(id, ptr,Float:fStart[3],Float:fEnd[3],iNoMonsters,bool:hull = false,iHull
 
 public client_disconnect(id) 
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 		
 	caughtJump[id] = false
@@ -97,24 +97,24 @@ public client_disconnect(id)
 
 public client_PreThink(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 		
-	if(is_user_alive(id)) 
+	if (is_user_alive(id)) 
 	{
 		newButton[id] = get_user_button(id)
 		new oldButton = get_user_oldbutton(id)
 		new flags = get_entity_flags(id)
 		
 		//reset if we are on ground
-		if(caughtJump[id] && (flags & FL_ONGROUND)) 
+		if (caughtJump[id] && (flags & FL_ONGROUND)) 
 		{
 			numJumps[id] = 0
 			caughtJump[id] = false
 		}
 		
 		//begin when we jump
-		if((newButton[id] & IN_JUMP) && (flags & FL_ONGROUND) && !caughtJump[id] && !(oldButton & IN_JUMP) && !numJumps[id]) 
+		if ((newButton[id] & IN_JUMP) && (flags & FL_ONGROUND) && !caughtJump[id] && !(oldButton & IN_JUMP) && !numJumps[id]) 
 		{
 			caughtJump[id] = true
 			entity_get_vector(id,EV_VEC_velocity,jumpVeloc[id])
@@ -125,13 +125,13 @@ public client_PreThink(id)
 
 public client_PostThink(id) 
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 		
-	if(is_user_alive(id)) 
+	if (is_user_alive(id)) 
 	{
 		//do velocity if we walljumped
-		if(doJump[id]) 
+		if (doJump[id]) 
 		{
 			entity_set_vector(id,EV_VEC_velocity,jumpVeloc[id])
 			
@@ -142,13 +142,13 @@ public client_PostThink(id)
 
 public Touch_World(id, world) 
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 		
-	if(is_user_alive(id)) 
+	if (is_user_alive(id)) 
 	{
 		//if we touch wall and have jump pressed, setup for jump
-		if(caughtJump[id] && (newButton[id] & IN_JUMP) && !(get_entity_flags(id) & FL_ONGROUND)) 
+		if (caughtJump[id] && (newButton[id] & IN_JUMP) && !(get_entity_flags(id) & FL_ONGROUND)) 
 		{
 			
 			//reverse velocity

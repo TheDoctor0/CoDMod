@@ -26,7 +26,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_A))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_A))
 	{
 		client_print(id, print_chat, "[Kapitan [Premium]] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -40,19 +40,19 @@ public cod_class_disabled(id)
 }
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 		return HAM_IGNORED;
 	
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
 	
-	if(!(damagebits & DMG_BULLET))
+	if (!(damagebits & DMG_BULLET))
 		return HAM_IGNORED;
 	
-	if(get_user_weapon(idattacker) == CSW_AWP && random_num(1,1) == 1)
+	if (get_user_weapon(idattacker) == CSW_AWP && random_num(1,1) == 1)
 		cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor, damagebits);
 	
-	if(get_user_weapon(idattacker) == CSW_DEAGLE && random_num(1,4) == 1)
+	if (get_user_weapon(idattacker) == CSW_DEAGLE && random_num(1,4) == 1)
 		cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor, damagebits);
 	
 	return HAM_IGNORED;

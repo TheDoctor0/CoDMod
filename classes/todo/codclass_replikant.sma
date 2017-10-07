@@ -45,7 +45,7 @@ public plugin_precache()
 public cod_class_enabled(id)
 {
 	new dostepna = 35;
-	if(cod_get_class_level(id)<dostepna)
+	if (cod_get_class_level(id)<dostepna)
 	{
 		ColorChat(id, GREEN, "[COD:MW]^x01 Aby uzywac tej klasy musisz zdobyc^x04 %i^x01 poziom na dowolnej klasie!", dostepna);
 		return COD_STOP;
@@ -60,13 +60,13 @@ public cod_class_disabled(id)
 
 public cod_class_skill_used(id)
 {
-	if(!ilosc_kukiel[id])
+	if (!ilosc_kukiel[id])
 	{
 		client_print(id, print_center, "Wykorzystales wszystkie repliki!");
 		return;
 	}
 	
-	if(poprzednia_replika[id]+5.0>get_gametime())
+	if (poprzednia_replika[id]+5.0>get_gametime())
 	{
 		client_print(id, print_center,"Replike mozesz postawic raz na 5 sek.");
 		return;
@@ -82,7 +82,7 @@ public cod_class_skill_used(id)
 	for(new i=0; i < 3; i++)
 		OriginKukly[i] = OriginGracza[i]+VBA[i];
 		
-	if(get_distance_f(OriginKukly, OriginGracza) < 40.0)
+	if (get_distance_f(OriginKukly, OriginGracza) < 40.0)
 	{
 		client_print(id, print_center, "Musisz postawic replike dalej!");
 		return;
@@ -117,25 +117,25 @@ public cod_class_skill_used(id)
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_alive(idattacker))
+	if (!is_user_alive(idattacker))
 		return HAM_IGNORED;
 		
 	new classname[33];
 	entity_get_string(this, EV_SZ_classname, classname, 32);
 	
-	if(!equal(classname, "Kukla")) 
+	if (!equal(classname, "Kukla")) 
 		return HAM_IGNORED;
 	
 	new owner = entity_get_int(this, EV_INT_iuser1);
 	
-	if(get_user_team(owner) == get_user_team(idattacker))
+	if (get_user_team(owner) == get_user_team(idattacker))
 		return HAM_SUPERCEDE;
 		
 	new perkname[33];
 	cod_get_perk_name(idattacker, perkname, 32);
 	new bool:bez_obrazen = get_user_weapon(idattacker) == CSW_KNIFE && damagebits & DMG_BULLET
 	
-	if(!bez_obrazen && !(equal(perkname, "Pogromca Replik")))
+	if (!bez_obrazen && !(equal(perkname, "Pogromca Replik")))
 		cod_inflict_damage(owner, idattacker, damage*0.5, 0.0, this, damagebits);
 	
 	new Float:fOrigin[3], iOrigin[3];
@@ -144,12 +144,12 @@ public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 	
 	FVecIVec(fOrigin, iOrigin);
 	
-	if(equal(perkname, "Pogromca Replik"))
+	if (equal(perkname, "Pogromca Replik"))
 		damage = damage*2
 	
-	if(damage > entity_get_float(this, EV_FL_health))
+	if (damage > entity_get_float(this, EV_FL_health))
 	{
-		if(!bez_obrazen)
+		if (!bez_obrazen)
 		{
 			new entlist[33];
 			new numfound = find_sphere_class(this, "player", 190.0, entlist, 32);
@@ -180,7 +180,7 @@ public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 }
 
 public Spawn(id)
-	if(is_user_alive(id) && ma_klase[id])
+	if (is_user_alive(id) && ma_klase[id])
 		ilosc_kukiel[id] = 2;
 
 public NowaRunda()
@@ -188,12 +188,12 @@ public NowaRunda()
 
 public MultiJump(id, uc_handle)
 {
-	if(!is_user_alive(id) || !ma_klase[id])
+	if (!is_user_alive(id) || !ma_klase[id])
 		return FMRES_IGNORED;
 
 	new flags = pev(id, pev_flags);
 
-	if((get_uc(uc_handle, UC_Buttons) & IN_JUMP) && !(flags & FL_ONGROUND) && !(pev(id, pev_oldbuttons) & IN_JUMP) && skoki[id])
+	if ((get_uc(uc_handle, UC_Buttons) & IN_JUMP) && !(flags & FL_ONGROUND) && !(pev(id, pev_oldbuttons) & IN_JUMP) && skoki[id])
 	{
 		skoki[id]--;
 		new Float:velocity[3];
@@ -201,7 +201,7 @@ public MultiJump(id, uc_handle)
 		velocity[2] = random_float(265.0,285.0);
 		set_pev(id, pev_velocity,velocity);
 	}
-	else if(flags & FL_ONGROUND)
+	else if (flags & FL_ONGROUND)
 		skoki[id] = 1;
 
 	return FMRES_IGNORED;

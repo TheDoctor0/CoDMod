@@ -42,7 +42,7 @@ public cod_class_disabled(id)
 
 public client_PreThink(id)
 {
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return PLUGIN_CONTINUE
 	if (entity_get_int(id, EV_INT_button) & 2) {	
 		new flags = entity_get_int(id, EV_INT_flags)
@@ -66,7 +66,7 @@ public client_PreThink(id)
 }
 public Spawn(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 	{
 		strip_user_weapons(id);
 		give_item(id, "weapon_knife");
@@ -74,13 +74,13 @@ public Spawn(id)
 }
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 		return HAM_IGNORED;
 	
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
 		
-	if(get_user_weapon(idattacker) == CSW_KNIFE && damagebits & DMG_BULLET && damage > 20.0)
+	if (get_user_weapon(idattacker) == CSW_KNIFE && damagebits & DMG_BULLET && damage > 20.0)
 		cod_inflict_damage(idattacker, this, float(get_user_health(this))-damage+1.0, 0.0, idinflictor, damagebits);
 		
 	return HAM_IGNORED;

@@ -96,13 +96,13 @@ public plugin_precache()
 }
 public event_CurWeapon(id)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 	return PLUGIN_CONTINUE
 		
 	g_iCurWpn[id] = read_data(2)
 	
 		
-	if(!ma_klase[id] || g_iCurWpn[id] != CSW_WPN) 
+	if (!ma_klase[id] || g_iCurWpn[id] != CSW_WPN) 
 		return PLUGIN_CONTINUE
 		
 	entity_set_string(id, EV_SZ_viewmodel, "models/plasma/v_plasma_16.mdl")
@@ -111,7 +111,7 @@ public event_CurWeapon(id)
 }
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_D))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_D))
    	 {
         client_print(id, print_chat, "[Space division] Nie masz uprawnien, aby uzywac tej klasy.")
         return COD_STOP;
@@ -125,40 +125,40 @@ public cod_class_disabled(id)
 }
 public fw_CmdStart(id, handle, seed)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return FMRES_IGNORED
 	
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return FMRES_IGNORED
 			
-	if(g_iCurWpn[id] != CSW_WPN)
+	if (g_iCurWpn[id] != CSW_WPN)
 		return FMRES_IGNORED
 		
 	static iButton
 	iButton = get_uc(handle, UC_Buttons)
 	
-	if(iButton & IN_ATTACK)
+	if (iButton & IN_ATTACK)
 	{
 		set_uc(handle, UC_Buttons, iButton & ~IN_ATTACK)
 		
 		static Float:flCurTime
 		flCurTime = halflife_time()
 		
-		if(flCurTime - g_flLastFireTime[id] < FIRERATE)
+		if (flCurTime - g_flLastFireTime[id] < FIRERATE)
 			return FMRES_IGNORED
 			
 		static iWpnID, iClip
 		iWpnID = get_pdata_cbase(id, m_pActiveItem, 5)
 		iClip = cs_get_weapon_ammo(iWpnID)
 		
-		if(get_pdata_int(iWpnID, m_fInReload, 4))
+		if (get_pdata_int(iWpnID, m_fInReload, 4))
 			return FMRES_IGNORED
 		
 		set_pdata_float(iWpnID, m_flNextPrimaryAttack, FIRERATE, 4)
 		set_pdata_float(iWpnID, m_flNextSecondaryAttack, FIRERATE, 4)
 		set_pdata_float(iWpnID, m_flTimeWeaponIdle, FIRERATE, 4)
 		g_flLastFireTime[id] = flCurTime
-		if(iClip <= 0)
+		if (iClip <= 0)
 		{
 			ExecuteHamB(Ham_Weapon_PlayEmptySound, iWpnID)
 			return FMRES_IGNORED
@@ -174,13 +174,13 @@ public fw_CmdStart(id, handle, seed)
 }
 public fw_UpdateClientData_Post(id, sendweapons, handle)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return FMRES_IGNORED
 		
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return FMRES_IGNORED
 	
-	if(g_iCurWpn[id] != CSW_WPN)
+	if (g_iCurWpn[id] != CSW_WPN)
 		return FMRES_IGNORED
 		
 	set_cd(handle, CD_flNextAttack, halflife_time() + 0.001)
@@ -191,7 +191,7 @@ public fw_Deploy_Post(wpn)
 	static id
 	id = get_pdata_cbase(wpn, m_pPlayer, 4)
 	
-	if(is_user_connected(id) && ma_klase[id])
+	if (is_user_connected(id) && ma_klase[id])
 	{
 		set_wpnanim(id, ANIM_DRAW)
 	}
@@ -203,7 +203,7 @@ public fw_PostFrame(wpn)
 	static id
 	id = get_pdata_cbase(wpn, m_pPlayer, 4)
 
-	if(is_user_alive(id) && ma_klase[id])
+	if (is_user_alive(id) && ma_klase[id])
 	{
 		static Float:flNextAttack, iBpAmmo, iClip, iInReload
 		iInReload = get_pdata_int(wpn, m_fInReload, 4)
@@ -211,7 +211,7 @@ public fw_PostFrame(wpn)
 		iBpAmmo = cs_get_user_bpammo(id, CSW_WPN)
 		iClip = cs_get_weapon_ammo(wpn)
 		
-		if(iInReload && flNextAttack <= 0.0)
+		if (iInReload && flNextAttack <= 0.0)
 		{
 			new iRemClip = min(WPN_MAXCLIP - iClip, iBpAmmo)
 			cs_set_weapon_ammo(wpn, iClip + iRemClip)
@@ -222,19 +222,19 @@ public fw_PostFrame(wpn)
 		static iButton
 		iButton = get_user_button(id)
 
-		if((iButton & IN_ATTACK2 && get_pdata_float(wpn, m_flNextSecondaryAttack, 4) <= 0.0) || (iButton & IN_ATTACK && get_pdata_float(wpn, m_flNextPrimaryAttack, 4) <= 0.0))
+		if ((iButton & IN_ATTACK2 && get_pdata_float(wpn, m_flNextSecondaryAttack, 4) <= 0.0) || (iButton & IN_ATTACK && get_pdata_float(wpn, m_flNextPrimaryAttack, 4) <= 0.0))
 			return
 		
-		if(iButton & IN_RELOAD && !iInReload)
+		if (iButton & IN_RELOAD && !iInReload)
 		{
-			if(iClip >= WPN_MAXCLIP)
+			if (iClip >= WPN_MAXCLIP)
 			{
 				entity_set_int(id, EV_INT_button, iButton & ~IN_RELOAD)
 				set_wpnanim(id, 0)
 			}
-			else if(iClip == WPN_MAXCLIP)
+			else if (iClip == WPN_MAXCLIP)
 			{
-				if(iBpAmmo)
+				if (iBpAmmo)
 				{
 					reload(id, wpn, 1)
 				}
@@ -247,7 +247,7 @@ public fw_Reload_Post(wpn)
 	static id
 	id = get_pdata_cbase(wpn, m_pPlayer, 4)
 	
-	if(is_user_alive(id) && ma_klase[id] && get_pdata_int(wpn, m_fInReload, 4))
+	if (is_user_alive(id) && ma_klase[id] && get_pdata_int(wpn, m_fInReload, 4))
 	{		
 		reload(id, wpn)
 	}
@@ -272,9 +272,9 @@ public primary_attack(id)
 	remove_entity(iEnt)
 	new team = get_user_team(iTarget);
 	
-	if(is_user_alive(iTarget))
+	if (is_user_alive(iTarget))
 	{	
-		if(HITSD > 0.0)
+		if (HITSD > 0.0)
 		{
 			static Float:flVelocity[3]
 			get_user_velocity(iTarget, flVelocity)
@@ -282,11 +282,11 @@ public primary_attack(id)
 			set_user_velocity(iTarget, flVelocity)	
 		}
 		
-		if(get_user_team(id) != team)
+		if (get_user_team(id) != team)
 		{
 			new iHp = pev(iTarget, pev_health)
 			new Float:iDamage, iBloodScale
-			if(iBody != HIT_HEAD)
+			if (iBody != HIT_HEAD)
 			{
 				iDamage = DAMAGE
 				iBloodScale = 10
@@ -296,13 +296,13 @@ public primary_attack(id)
 				iDamage = DAMAGE*DAMAGE_MULTI
 				iBloodScale = 25
 			}
-			if(iHp > iDamage) 
+			if (iHp > iDamage) 
 			{
 				make_blood(iTarget, iBloodScale)
 				set_pev(iTarget, pev_health, iHp-iDamage)
 				damage_effects(iTarget)
 			}
-			else if(iHp <= iDamage)
+			else if (iHp <= iDamage)
 			{
 			ExecuteHamB(Ham_Killed, iTarget, id, 2)
 			}
@@ -353,7 +353,7 @@ stock reload(id, wpn, force_reload = 0)
 	set_wpnanim(id, ANIM_RELOAD)
 	emit_sound(id, CHAN_WEAPON, snd_reload[random_num(0, sizeof snd_reload - 1)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM)
 	
-	if(force_reload)
+	if (force_reload)
 		set_pdata_int(wpn, m_fInReload, 1, 4)
 }
 stock damage_effects(id)

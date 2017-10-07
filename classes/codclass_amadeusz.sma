@@ -29,4 +29,4 @@ public cod_class_skill_used(id)
 	cod_use_user_rocket(id);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if(weapon == CSW_MP5NAVY && damageBits & DMG_BULLET) damage += (3.0 + 0.1 * cod_get_user_intelligence(attacker));
+	if (weapon == CSW_MP5NAVY && damageBits & DMG_BULLET) damage += (3.0 + 0.1 * cod_get_user_intelligence(attacker));

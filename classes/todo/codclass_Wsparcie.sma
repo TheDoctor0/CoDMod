@@ -48,7 +48,7 @@ public cod_class_skill_used(id)
 
 	else
 	{
-		if(poprzednia_rakieta_gracza[id] + 2.0 > get_gametime())
+		if (poprzednia_rakieta_gracza[id] + 2.0 > get_gametime())
 			client_print(id, print_center, "Rakiet mozesz uzywac co 2 sekundy!");
 
 		else
@@ -129,12 +129,12 @@ public Death()
 {
 	new attacker = read_data(1);
 
-	if(!is_user_connected(attacker))
+	if (!is_user_connected(attacker))
 		return PLUGIN_CONTINUE;
 
-	if(ma_klase[attacker])
+	if (ma_klase[attacker])
 	{
-		if(!random(20))
+		if (!random(20))
 		{
 			cod_add_user_xp(attacker, 4000);
 			client_print(attacker, print_center, "Dostales 4000 expa za frag!")

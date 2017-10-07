@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Duch"
-#define VERSION "1.0.8"
+#define VERSION "1.0.9"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Duch"
@@ -37,4 +37,4 @@ public cod_item_spawned(id)
 	cod_set_user_health(id, 1);
 
 public Health(id)
-	if(get_bit(id, itemActive) && is_user_alive(id) && read_data(1) > 1) cod_set_user_health(id, 1);
+	if (get_bit(id, itemActive) && is_user_alive(id) && read_data(1) > 1) cod_set_user_health(id, 1);

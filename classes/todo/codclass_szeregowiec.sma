@@ -41,7 +41,7 @@ public cod_class_disabled(id)
 
 public fwSpawn_Grawitacja(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 		entity_set_float(id, EV_FL_gravity, 400.0/800.0);
 }
 /* AMXX-Studio Notes - DO NOT MODIFY BELOW HERE

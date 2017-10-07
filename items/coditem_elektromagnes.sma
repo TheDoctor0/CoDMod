@@ -3,7 +3,7 @@
 #include <engine>
 
 #define PLUGIN "CoD Item Elektromagnes"
-#define VERSION "1.0.10"
+#define VERSION "1.0.11"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Elektromagnes"
@@ -29,7 +29,7 @@ public cod_item_enabled(id, value)
 	rem_bit(id, itemUsed);
 
 public cod_item_spawned(id, respawn)
-	if(!respawn) rem_bit(id, itemUsed);
+	if (!respawn) rem_bit(id, itemUsed);
 
 public client_disconnected(id)
 	remove_ents(id);
@@ -39,7 +39,7 @@ public cod_new_round()
 
 public cod_item_skill_used(id)
 {	
-	if(get_bit(id, itemUsed)) {
+	if (get_bit(id, itemUsed)) {
 		cod_show_hud(id, TYPE_HUD, 218, 40, 67, -1.0, 0.35, 0, 0.0, 3.0, 0.0, 0.0, "Wykorzystales juz elektromagnes w tej rundzie!");
 
 		return PLUGIN_CONTINUE;
@@ -70,9 +70,9 @@ public cod_item_skill_used(id)
 
 public item_think(ent)
 {
-	if(entity_get_int(ent, EV_INT_iuser2)) return PLUGIN_CONTINUE;
+	if (entity_get_int(ent, EV_INT_iuser2)) return PLUGIN_CONTINUE;
 	
-	if(!entity_get_int(ent, EV_INT_iuser1)) emit_sound(ent, CHAN_VOICE, codSounds[SOUND_ACTIVATE], 0.5, ATTN_NORM, 0, PITCH_NORM);
+	if (!entity_get_int(ent, EV_INT_iuser1)) emit_sound(ent, CHAN_VOICE, codSounds[SOUND_ACTIVATE], 0.5, ATTN_NORM, 0, PITCH_NORM);
 	
 	entity_set_int(ent, EV_INT_iuser1, 1);
 	
@@ -82,15 +82,15 @@ public item_think(ent)
 	
 	new entsFound = find_sphere_class(0, "player", distance, entList, charsmax(entList), origin);
 	
-	for(new i = 0; i < entsFound; i++) {		
+	for (new i = 0; i < entsFound; i++) {		
 		player = entList[i];
 		
-		if(!is_user_alive(player) || get_user_team(player) == get_user_team(id)) continue;
+		if (!is_user_alive(player) || get_user_team(player) == get_user_team(id)) continue;
 		
 		playerWeapons = entity_get_int(player, EV_INT_weapons);
 
-		for(new j = 1; j <= 32; j++) {
-			if(1<<j & playerWeapons) {
+		for (new j = 1; j <= 32; j++) {
+			if (1<<j & playerWeapons) {
 				get_weaponname(j, weaponName, charsmax(weaponName));
 
 				engclient_cmd(player, "drop", weaponName);
@@ -100,9 +100,9 @@ public item_think(ent)
 	
 	entsFound = find_sphere_class(0, "weaponbox", distance + 100.0, entList, charsmax(entList), origin);
 	
-	for(new i = 0; i < entsFound; i++) if(get_entity_distance(ent, entList[i]) > 50.0) set_velocity_to_origin(entList[i], origin, 999.0);
+	for (new i = 0; i < entsFound; i++) if (get_entity_distance(ent, entList[i]) > 50.0) set_velocity_to_origin(entList[i], origin, 999.0);
 	
-	if(entity_get_float(ent, EV_FL_ltime) < halflife_time() || !is_user_alive(id)) {
+	if (entity_get_float(ent, EV_FL_ltime) < halflife_time() || !is_user_alive(id)) {
 		entity_set_int(ent, EV_INT_iuser2, 1);
 
 		return PLUGIN_CONTINUE;
@@ -119,8 +119,8 @@ stock remove_ents(id = 0)
 {
 	new ent = find_ent_by_class(-1, "electromagnet");
 	
-	while(ent > 0) {
-		if(!id || entity_get_edict(ent, EV_ENT_owner) == id) remove_entity(ent);
+	while (ent > 0) {
+		if (!id || entity_get_edict(ent, EV_ENT_owner) == id) remove_entity(ent);
 		
 		ent = find_ent_by_class(ent, "electromagnet");
 	}

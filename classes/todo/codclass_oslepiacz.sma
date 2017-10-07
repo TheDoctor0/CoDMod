@@ -43,7 +43,7 @@ public plugin_precache()
 public DeathMsg(id)
 {
 	new id = read_data(2);
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 	return PLUGIN_CONTINUE;
 	new iOrigin[3];
 	get_user_origin(id, iOrigin);

@@ -56,9 +56,9 @@ public cod_class_disabled(id)
 
 public cod_class_skill_used(id) {
 	
-	if(!is_user_alive(id)) return PLUGIN_HANDLED;
+	if (!is_user_alive(id)) return PLUGIN_HANDLED;
 	
-	if(!ilosc_blyskawic[id]) {
+	if (!ilosc_blyskawic[id]) {
 		return PLUGIN_HANDLED;
 	}
 	new target = Find_Best_Angle(id,750.0,false)
@@ -69,12 +69,12 @@ public cod_class_skill_used(id) {
 		return PLUGIN_CONTINUE
 	}
 	
-	if(is_user_alive(target)){
-		if(get_user_team(target) == get_user_team(id)) {
+	if (is_user_alive(target)){
+		if (get_user_team(target) == get_user_team(id)) {
 			return PLUGIN_HANDLED;
 		}
 		
-		if(poprzednia_blyskawica[id]+15.0>get_gametime()) {
+		if (poprzednia_blyskawica[id]+15.0>get_gametime()) {
 			client_print(id,print_center,"Pioruna mozesz uzyc raz na 15 sek.");
 			return PLUGIN_HANDLED;
 		}
@@ -169,7 +169,7 @@ puscBlyskawice(id, target){
 
 public ResetHUD(id) 
 {
-	if(ma_klase[id]) 
+	if (ma_klase[id]) 
 		ilosc_blyskawic[id] = 5;
 }
 

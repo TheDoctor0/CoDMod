@@ -35,14 +35,14 @@ public cod_class_disabled(id)
       
 public fwSpawn(id)
 {
-      if(is_user_alive(id) && ma_klase[id])
+      if (is_user_alive(id) && ma_klase[id])
       {
             new ent = find_ent_by_owner(-1, "weapon_usp", id)
-            if(ent)
+            if (ent)
                   set_pdata_int(ent, m_fWeaponState_Usp, get_pdata_int(ent, m_fWeaponState_Usp, 4) | CBASE_WEAPONSTATE_USP_SILENCED, 4)
                   
             ent = find_ent_by_owner(-1, "weapon_m4a1", id)
-            if(ent)
+            if (ent)
                   set_pdata_int(ent, m_fWeaponState_Usp, get_pdata_int(ent, m_fWeaponState_Usp, 4) | CBASE_WEAPONSTATE_M4A1_SILENCED, 4)
       }
 }

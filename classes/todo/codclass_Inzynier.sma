@@ -67,7 +67,7 @@ public plugin_precache()
 	
 public cod_class_enabled(id)
 {
-	if(!(cod_get_user_status(id) & STATUS_PREMIUM))
+	if (!(cod_get_user_status(id) & STATUS_PREMIUM))
 	{
 		client_print(id, print_chat, "[%s] Nie masz premium, zeby grac ta klasa!", nazwa)
 		return COD_STOP;
@@ -88,10 +88,10 @@ public DeathMsg()
 {
 	new killer = read_data(1);
 	
-	if(!is_user_connected(killer))
+	if (!is_user_connected(killer))
 		return PLUGIN_CONTINUE;
 	
-	if(ma_klase[killer])
+	if (ma_klase[killer])
 	{
 		new cur_health = pev(killer, pev_health);
 		new Float:max_health = 100.0+cod_get_user_health(killer);
@@ -107,7 +107,7 @@ public fwHamTakeDamage_Dzialko(this, idinflictor, idattacker)
 	static classname[13];
 	pev(this, pev_classname, classname, 12);
 	
-	if((equal(classname, "sentry_shot") || equal(classname, "sentry_base")) && is_user_connected(idattacker) && get_user_team(pev(this, pev_iuser1)) == get_user_team(idattacker))
+	if ((equal(classname, "sentry_shot") || equal(classname, "sentry_base")) && is_user_connected(idattacker) && get_user_team(pev(this, pev_iuser1)) == get_user_team(idattacker))
 		return HAM_SUPERCEDE;
 
 	return HAM_IGNORED;
@@ -118,18 +118,18 @@ public ham_ItemDeploy_Post(weapon_ent)
 	static owner
 	owner = get_pdata_cbase(weapon_ent, OFFSET_WPN_WIN, OFFSET_WPN_LINUX);
 	
-	if(!is_user_alive(owner) || !ma_klase[owner]) return;
+	if (!is_user_alive(owner) || !ma_klase[owner]) return;
 
-	if(pokazacModel[owner])
+	if (pokazacModel[owner])
 		entity_set_string(owner, EV_SZ_viewmodel, "models/v_tfc_spanner.mdl")
 
-	if(ma_dzialko[owner])
+	if (ma_dzialko[owner])
 		client_print(owner, print_center, "Wcisnij c, aby postawic dzialko")
 }	
 
 public cod_class_skill_used(id)
 {
-	if(ma_dzialko[id])
+	if (ma_dzialko[id])
 	{
 		new Float:Origin[3]
 		pev(id, pev_origin, Origin)
@@ -150,7 +150,7 @@ public cod_class_skill_used(id)
 		vTraceEnd[1] = vTraceResult[1]
 		vTraceEnd[2] = Origin[2]
 		
-		if(!(StawDzialo(vTraceEnd, id)))
+		if (!(StawDzialo(vTraceEnd, id)))
 			client_print(id, print_center, "Nie mozesz tu postawic dziala!")
 		else
 		{
@@ -196,7 +196,7 @@ public bool:StawDzialo(Float:origin[3], id)
 
 public DajNoweDzialko(id)
 {
-	if(is_user_alive(id) && ma_klase[id])
+	if (is_user_alive(id) && ma_klase[id])
 		ma_dzialko[id] = true;
 }
 
@@ -215,15 +215,15 @@ public fw_TraceAttack_Building(id, enemy)
 	if (!(1 <= enemy <= g_maxplayers) || !is_user_alive(enemy))
 		return HAM_IGNORED
 
-	if(ma_klase[enemy] && get_user_weapon(enemy) == CSW_KNIFE && pev(id, pev_iuser1) == enemy && pev(id, pev_iuser2) < 100)
+	if (ma_klase[enemy] && get_user_weapon(enemy) == CSW_KNIFE && pev(id, pev_iuser1) == enemy && pev(id, pev_iuser2) < 100)
 	{
 		new classname[14]
 		pev(id, pev_classname, classname, 13)
-		if(!equal(classname, "sentry_base")) return HAM_IGNORED
+		if (!equal(classname, "sentry_base")) return HAM_IGNORED
 		
 		set_pev(id, pev_iuser2, pev(id, pev_iuser2)+get_pcvar_num(pcvarPercent) > 100 ? 100 : pev(id, pev_iuser2)+get_pcvar_num(pcvarPercent));
 		set_animation(enemy, 8);
-		if(pev(id, pev_iuser2) >= 100 && !pev(id, pev_iuser3))
+		if (pev(id, pev_iuser2) >= 100 && !pev(id, pev_iuser3))
 		{
 			client_print(enemy, print_center, "%d %%", pev(id, pev_iuser2))
 			set_pev(id, pev_iuser3, stawdzialo2(id));
@@ -283,12 +283,12 @@ public sentry_find_player(ent)
 	pev(ent, pev_origin, fOrigin)
 	for(new i = 1; i < g_maxplayers; i++)
 	{
-		if(!is_user_alive(i) || get_user_team(i) == get_user_team(iOwner))
+		if (!is_user_alive(i) || get_user_team(i) == get_user_team(iOwner))
 			continue;
 
 		pev(i, pev_origin, fOrigin2)
 
-		if(distance > vector_distance(fOrigin, fOrigin2) && fm_trace_line(ent, fOrigin, fOrigin2, hitOrigin) == i)
+		if (distance > vector_distance(fOrigin, fOrigin2) && fm_trace_line(ent, fOrigin, fOrigin2, hitOrigin) == i)
 		{
 			distance = vector_distance(fOrigin, fOrigin2)
 			iCloseId = i;
@@ -299,12 +299,12 @@ public sentry_find_player(ent)
 
 public sentry_shot(ent)
 {
-	if(!pev_valid(ent)) return;
+	if (!pev_valid(ent)) return;
 
-	if(entity_get_float(ent, EV_FL_health) <= 0.0)
+	if (entity_get_float(ent, EV_FL_health) <= 0.0)
 	{
 		new entt = pev(ent, pev_iuser2)
-		if(pev_valid(entt))
+		if (pev_valid(entt))
 			remove_entity(entt);
 
 		remove_entity(ent);
@@ -312,7 +312,7 @@ public sentry_shot(ent)
 	}
 	
 	static iFind = 0;
-	if((iFind = sentry_find_player(ent)))
+	if ((iFind = sentry_find_player(ent)))
 	{
 		remove_task(ent+45676);
 		turntotarget(ent, iFind);
@@ -334,7 +334,7 @@ public sentry_shot3(ent, target)
 	targetOrigin[1] += random_float(-16.0, 16.0)
 	targetOrigin[2] += random_float(-16.0, 16.0)
 
-	if(fm_trace_line(ent, sentryOrigin, targetOrigin, hitOrigin) == target)
+	if (fm_trace_line(ent, sentryOrigin, targetOrigin, hitOrigin) == target)
 	{
 		knockback_explode(target, sentryOrigin)
 		ExecuteHam(Ham_TakeDamage, target, 0, pev(ent, pev_iuser1), float(random_num(15, 40)), 1);
@@ -351,7 +351,7 @@ public sentry_shot3(ent, target)
 public stop_anim(ent)
 {
 	ent -= 45676;
-	if(pev_valid(ent))
+	if (pev_valid(ent))
 	{
 		set_pev( ent, pev_sequence, 0 );
 		set_pev(ent, pev_animtime, get_gametime() );
@@ -361,7 +361,7 @@ public stop_anim(ent)
 
 public knockback_explode(id, const Float:exp_origin[3])
 {
-	if(!is_user_alive(id)) return
+	if (!is_user_alive(id)) return
 	
 	new Float:velocity[3], Float:id_origin[3], Float:output[3];
 

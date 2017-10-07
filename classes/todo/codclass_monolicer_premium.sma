@@ -24,7 +24,7 @@ public plugin_init()
 }
 public cod_class_enabled(id)
 {
-	if(!(get_user_flags(id) & ADMIN_LEVEL_G))
+	if (!(get_user_flags(id) & ADMIN_LEVEL_G))
 	{
 		client_print(id, print_chat, "[Monolicer[Premium]] Nie masz uprawnien, aby uzywac tej klasy.")
 		return COD_STOP;
@@ -45,13 +45,13 @@ public cod_class_disabled(id)
 }
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker))
+	if (!is_user_connected(idattacker))
 		return HAM_IGNORED;
 	
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
 		return HAM_IGNORED;
 	
-	if(!(damagebits & (1<<1)))
+	if (!(damagebits & (1<<1)))
 		return HAM_IGNORED;
 	
 	new hp_ofiary = get_user_health(this)

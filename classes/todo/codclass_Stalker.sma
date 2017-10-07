@@ -36,20 +36,20 @@ public plugin_precache()
 
 public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(idattacker) || get_user_team(idattacker) == get_user_team(this))
+	if (!is_user_connected(idattacker) || get_user_team(idattacker) == get_user_team(this))
             return HAM_IGNORED;
 
-	if(!ma_klase[idattacker])
+	if (!ma_klase[idattacker])
             return HAM_IGNORED;
 
-      if(!random(6))
+      if (!random(6))
       {
             new wpnname[33]
             get_weaponname(get_user_weapon(this), wpnname, charsmax(wpnname))
 		engclient_cmd(this, "drop", wpnname);
       }
 	
-	if(get_user_weapon(idattacker) == CSW_USP && damagebits & DMG_BULLET)
+	if (get_user_weapon(idattacker) == CSW_USP && damagebits & DMG_BULLET)
 	{
             SetHamParamFloat(4, damage+(0.2*cod_get_user_intelligence(idattacker, 1, 1, 1)))
             return HAM_HANDLED
@@ -60,7 +60,7 @@ public TakeDamage(this, idinflictor, idattacker, Float:damage, damagebits)
 
 public cod_class_enabled(id)
 {
-	if(!(cod_get_user_status(id) & STATUS_SPREMIUM))
+	if (!(cod_get_user_status(id) & STATUS_SPREMIUM))
 	{
 		client_print(id, print_chat, "[%s] Nie masz super premium, zeby grac ta klasa!", nazwa)
 		return COD_STOP;
@@ -82,7 +82,7 @@ public cod_class_skill_used(id)
 		client_print(id, print_center, "Wykorzystales juz wszystkie rakiety!");
 	else
 	{
-		if(poprzednia_rakieta_gracza[id] + 0.5 < get_gametime())
+		if (poprzednia_rakieta_gracza[id] + 0.5 < get_gametime())
 		{
 				poprzednia_rakieta_gracza[id] = floatround(get_gametime());
 				ilosc_rakiet_gracza[id]--;
@@ -115,7 +115,7 @@ public cod_class_skill_used(id)
 
 public fwSpawn_Rakiety(id)
 {
-      if(ma_klase[id])
+      if (ma_klase[id])
       {
             ilosc_rakiet_gracza[id] = 2;
             cs_set_user_bpammo(id, CSW_FLASHBANG, 2)

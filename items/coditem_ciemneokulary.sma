@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Ciemne Okulary"
-#define VERSION "1.0.12"
+#define VERSION "1.0.15"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Ciemne Okulary"
@@ -25,9 +25,9 @@ public cod_item_enabled(id, value)
 public cod_item_disabled(id)
 	rem_bit(id, itemActive);
 
-public message_screen_fade(msgtype, msgid, id)
+public message_screen_fade(msgType, msgID, id)
 {
-	if(get_bit(id, itemActive))	return PLUGIN_HANDLED;
+	if(get_bit(id, itemActive) && get_msg_arg_int(4) == 255 && get_msg_arg_int(5) == 255 && get_msg_arg_int(6) == 255) return PLUGIN_HANDLED;
 
 	return PLUGIN_CONTINUE;
 }

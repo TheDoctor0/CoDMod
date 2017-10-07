@@ -7,7 +7,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Grabiezca"
-#define DESCRIPTION  "Masz 1/4 szansy na kradziez itemu swojej ofiary. Pelny magazynek po zabiciu."
+#define DESCRIPTION  "Ma 25 procent szansy na kradziez itemu swojej ofiary. Pelny magazynek po zabiciu."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_FAMAS)|(1<<CSW_USP)
 #define HEALTH       10
@@ -27,7 +27,7 @@ public cod_class_kill(killer, victim)
 {
 	cod_refill_ammo(killer);
 
-	if(cod_get_user_item(victim) && cod_get_user_item(killer) != cod_get_user_item(victim) && random_num(1, 4) == 1) show_question(killer, victim);
+	if (cod_get_user_item(victim) && cod_get_user_item(killer) != cod_get_user_item(victim) && cod_percent_chance(25)) show_question(killer, victim);
 }
 
 public show_question(id, victim)
@@ -50,7 +50,7 @@ public show_question(id, victim)
 
 public show_question_handle(id, menu, item)
 {
-	if(item) {
+	if (item) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -70,7 +70,7 @@ public show_question_handle(id, menu, item)
 
 	menu_destroy(menu);
 
-	if(!cod_get_user_item(victim) || cod_get_user_item(id) == cod_get_user_item(victim)) return;
+	if (!cod_get_user_item(victim) || cod_get_user_item(id) == cod_get_user_item(victim)) return;
 	
 	new thiefName[32];
 

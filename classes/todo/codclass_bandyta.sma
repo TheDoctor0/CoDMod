@@ -39,13 +39,13 @@ public cod_class_disabled(id)
 
 public Spawn(id)
 {
-	if(!is_user_alive(id))
+	if (!is_user_alive(id))
 		return;
 		
-	if(!ma_klase[id])
+	if (!ma_klase[id])
 		return;
 		
-	if(random_num(1,5) == 1)
+	if (random_num(1,5) == 1)
 	{
 		new CsTeams:team = cs_get_user_team(id);
 		
@@ -62,7 +62,7 @@ public ZmienUbranie(id, reset)
 	if (!is_user_connected(id)) 
 		return PLUGIN_CONTINUE;
 	
-	if(reset)
+	if (reset)
 		cs_reset_user_model(id);
 	else
 	{

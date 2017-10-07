@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Promien Slonca"
-#define VERSION "1.0.11"
+#define VERSION "1.0.12"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Promien Slonca"
@@ -30,4 +30,4 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], .valueMin = VALUE_MIN);
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if(damageBits & DMG_BULLET && random_num(1, itemValue[attacker]) == 1) cod_display_fade(victim, 2, 2, 0x0000, 255, 155, 50, 230);
+	if (damageBits & DMG_BULLET && random_num(1, itemValue[attacker]) == 1) cod_display_fade(victim, 2, 2, 0x0000, 255, 155, 50, 230);

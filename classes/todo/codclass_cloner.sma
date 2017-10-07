@@ -56,11 +56,11 @@ public client_PreThink(id)
 	if (!is_user_alive(id) && !is_user_connected(id))
 		return PLUGIN_CONTINUE
 		
-	if(ma_klase[id])
+	if (ma_klase[id])
 	{
-		if(get_user_health(id) <= 50)
+		if (get_user_health(id) <= 50)
 		{
-			if(klon[id])
+			if (klon[id])
 			{
 				new Float:OriginGracza[3], Float:OriginKlona[3], Float:VBA[3];
 				entity_get_vector(id, EV_VEC_origin, OriginGracza);
@@ -116,9 +116,9 @@ public usun_klona(id)
 {
 	remove_entity_name("Klon")
 	
-	if(ma_klase[id])
+	if (ma_klase[id])
 	{
-		if(!klon[id])
+		if (!klon[id])
 		{
 			set_user_health(id, get_user_health(id)+50);
 			set_rendering(id,kRenderFxGlowShell, 0, 0, 0, kRenderTransAlpha, 255);
@@ -130,7 +130,7 @@ public usun_klona(id)
 			give_item(id,"ammo_9mm")
 			give_item(id,"ammo_9mm")
 			
-			if(get_user_team(id) == 1)
+			if (get_user_team(id) == 1)
 			{
 				cod_give_weapon(id, CSW_GLOCK18)
 				give_item(id,"ammo_9mm")
@@ -153,7 +153,7 @@ public usun_klona(id)
 
 public Odrodzenie(id)
 {
-	if(ma_klase[id])
+	if (ma_klase[id])
 	{
 		klon[id] = true;
 		set_rendering(id,kRenderFxGlowShell, 0, 0, 0, kRenderTransAlpha, 255);
