@@ -5,9 +5,6 @@ Do zrobienia:
 
 Klasy:
 - Czolgista (Dostajesz M3, Elite oraz Bazooke (na nozu, PPM) | codclass_czolgister.sma)
-- Lewiter (Masz 1/5 szansy na wyrzucenie wroga w powietrze, gdy sie w nim znajduje zadajesz mu 2 razy wieksze dmg | codclass_lewiter.sma)
-- Duch (Stajesz sie niewidzialny na 2 sekundy po otrzymaniu obrazen | codclass_nanozolnierz.sma)
-- Policjant (Ma 1/9 z usp i glocka +15 dmg z deagla. | codclass_policjant.sma)
 - Jasnowidz (Moze przechodzic w cialo przeciwnika, zeby go sledzic i oznaczyc na radarze | codclass_jasnowidz.sma)
 - Mag (Ukrywa calkowicie czlonkow druzyny w promieniu 50 (int) jednostek. Ma latarke naswietlajaca niewidzialnych | codclass_camoman.sma)
 - Spryciarz (Posiada M4|FAMAS|FB ma 40% wiecej obrazen z famasa, 4 fleshe nie slychac jego krokow. | cosclass_spryciarz.sma)

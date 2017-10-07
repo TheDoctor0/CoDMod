@@ -8,7 +8,7 @@
 #define NAME         "Technik"
 #define DESCRIPTION  "Posiada 1 rakiete, 1 apteczke, wszystkie granaty i 1/8 szansy na zabicie z Deagle."
 #define FRACTION     "Podstawowe"
-#define WEAPONS      (1<<CSW_AUG)|(1<<CSW_DEAGLE)|(1<<CSW_SMOKEGRENADE)|(1<<CSW_FLASHBANG)|(1<<CSW_FLASHBANG)|(1<<CSW_HEGRENADE)
+#define WEAPONS      (1<<CSW_AUG)|(1<<CSW_DEAGLE)|(1<<CSW_SMOKEGRENADE)|(1<<CSW_FLASHBANG)|(1<<CSW_HEGRENADE)
 #define HEALTH       10
 #define INTELLIGENCE 10
 #define STRENGTH     0
@@ -24,6 +24,8 @@ public plugin_init()
 
 public cod_class_enabled(id, promotion)
 {
+	cod_give_weapon(id, CSW_FLASHBANG, 2);
+	
 	cod_set_user_rockets(id, 1, CLASS);
 	cod_set_user_medkits(id, 1, CLASS);
 }

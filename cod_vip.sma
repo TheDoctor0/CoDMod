@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD VIP"
-#define VERSION "1.0.4"
+#define VERSION "1.0.6"
 #define AUTHOR "O'Zone"
 
 new Array:listVIPs, vip;
@@ -133,10 +133,7 @@ public cod_spawned(id)
 {
 	if (get_bit(id, vip) && is_user_alive(id)) {
 		cod_give_weapon(id, CSW_HEGRENADE);
-	
-		cod_give_weapon(id, CSW_FLASHBANG);
-		cs_set_user_bpammo(id, CSW_FLASHBANG, 2);
-	
+		cod_give_weapon(id, CSW_FLASHBANG, 2);
 		cod_give_weapon(id, CSW_SMOKEGRENADE);
 	}
 }

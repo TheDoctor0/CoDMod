@@ -761,7 +761,7 @@ public display_classes_description_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new menuData[256], codClass[classInfo], classId[5], promotionData[10], itemAccess, itemCallback;
+	new menuData[512], codClass[classInfo], classId[5], promotionData[10], itemAccess, itemCallback;
 	
 	menu_item_getinfo(menu, item, itemAccess, classId, charsmax(classId), _, _, itemCallback);
 	
@@ -844,7 +844,7 @@ public display_promotions_description(id, class, promotion)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new classDesc[64][32], codClass[classInfo], menuData[256], descFirstLine[75], descSecondLine[75], promotionData[10], classId[5], descWords;
+	new classDesc[64][32], codClass[classInfo], menuData[512], descFirstLine[75], descSecondLine[75], promotionData[10], classId[5], descWords;
 
 	num_to_str(class, classId, charsmax(classId));
 
@@ -3849,7 +3849,7 @@ public _cod_set_user_recoil_reducer(id, value, type, weapon)
 	codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] = weapons;
 }
 
-public _cod_give_weapon(id, weapon)
+public _cod_give_weapon(id, weapon, amount)
 {
 	new weaponName[22];
 	
@@ -3859,7 +3859,7 @@ public _cod_give_weapon(id, weapon)
 
 	give_item(id, weaponName);
 
-	cs_set_user_bpammo(id, weapon, maxBpAmmo[weapon]);
+	cs_set_user_bpammo(id, weapon, amount ? amount : maxBpAmmo[weapon]);
 }
 
 public _cod_take_weapon(id, weapon)
