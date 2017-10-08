@@ -853,7 +853,7 @@ native cod_repeat_damage(attacker, victim, Float:damage, Float:time, counter = 1
 /*------------------------------
 Make damage with intelligence factor.
 Factor is intelligence bonus for damage.
-Flags are damage flags (COD_SKILL flag will be added).
+Flags are damage flags (DMG_CODSKILL flag will be added).
 ------------------------------*/
 native cod_inflict_damage(attacker, victim, Float:damage, Float:factor = 0.5, flags = 0);
 
@@ -895,6 +895,12 @@ native cod_percent_chance(percent);
 Return if player is not in passage.
 */
 native cod_is_enough_space(id);
+
+/*------------------------------
+Remove all ents with specified className.
+If id > 0 will remove only ents owned by that player.
+*/
+native cod_remove_ents(id = 0, className[]);
 
 /*------------------------------
 Register new item and return its id.

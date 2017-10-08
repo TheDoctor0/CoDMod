@@ -1,12 +1,12 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Class Spryciarz"
+#define PLUGIN "CoD Class Rambo"
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-#define NAME         "Spryciarz"
-#define DESCRIPTION  "Zadaje 30% (+int) wiecej obrazen z Famasa, nie slychac jego krokow, ma 4 Flashe."
+#define NAME         "Rambo"
+#define DESCRIPTION  "Zadaje 30 (+int) procent wiecej obrazen z Famasa, nie slychac jego krokow, ma 4 Flashe."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_M4A1)|(1<<CSW_FAMAS)|(1<<CSW_USP)|(1<<CSW_FLASHBANG)
 #define HEALTH       20

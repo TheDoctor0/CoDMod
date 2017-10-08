@@ -2,13 +2,7 @@ Do zrobienia:
 - Klasy i itemy
 - Menu bindowania (o ile beda chcieli tego gracze)
 - Crash i Jackpot
-
-Klasy:
-- Czolgista (Dostajesz M3, Elite oraz Bazooke (na nozu, PPM) | codclass_czolgister.sma)
-- Jasnowidz (Moze przechodzic w cialo przeciwnika, zeby go sledzic i oznaczyc na radarze | codclass_jasnowidz.sma)
-- Mag (Ukrywa calkowicie czlonkow druzyny w promieniu 50 (int) jednostek. Ma latarke naswietlajaca niewidzialnych | codclass_camoman.sma)
-- Lowca (Dostaje kusze i 10 beltow, ktore zabijaja po trafieniu | dcodclass_kuszownik.sma)
-- Chemik (Ma 15% na zatrucie przeciwnika po trafieniu. Ma jedna apteczke.)
+- Przeniesc radar do silnika
 
 Itemy:
 - Latarka (Ma latarke dzieki, ktorej moze naswietlic niewidzialnych | coclass_mag.sma)

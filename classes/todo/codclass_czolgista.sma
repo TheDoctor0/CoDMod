@@ -41,7 +41,6 @@ public plugin_init()
 
 public plugin_precache()
 {
-	sprite_blast = precache_model("sprites/dexplo.spr");
 	sprite_smoke = precache_model("sprites/steam1.spr");
 	sprite_nadeexp = precache_model("sprites/law_exp.spr");
 	sprite_trail = precache_model("sprites/smoke.spr");

@@ -32,6 +32,9 @@ public plugin_init()
 	RegisterHam(Ham_TakeDamage, "info_target", "take_damage");
 }
 
+public client_disconnected(id)
+	cod_remove_ents(id, "replica");
+
 public cod_class_enabled(id, promotion)
 {
 	cod_set_user_gravity(id, -0.3, CLASS);
@@ -45,7 +48,7 @@ public cod_class_spawned(id, respawn)
 	if (!respawn) itemUse[id] = REPLICAS;
 
 public cod_new_round()
-	remove_entity_name("replica");
+	cod_remove_ents(0, "replica");
 
 public cod_class_skill_used(id)
 {

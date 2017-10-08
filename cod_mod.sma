@@ -10,7 +10,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.155"
+#define VERSION "1.0.159"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -378,6 +378,7 @@ public plugin_natives()
 	register_native("cod_random_upgrade", "_cod_random_upgrade", 1);
 	register_native("cod_percent_chance", "_cod_percent_chance", 1);
 	register_native("cod_is_enough_space", "_cod_is_enough_space", 1);
+	register_native("cod_remove_ents", "_cod_remove_ents", 1);
 	
 	register_native("cod_register_item", "_cod_register_item");
 	register_native("cod_register_class", "_cod_register_class");
@@ -1771,7 +1772,7 @@ public use_teleport(id)
 
 public use_item(id)
 {
-	if (!is_user_alive(id) || !codPlayer[id][PLAYER_ITEM] || freezeTime || skills_blocked(id)) return PLUGIN_CONTINUE;
+	if (!is_user_alive(id) || !codPlayer[id][PLAYER_ITEM] || freezeTime || skills_blocked(id)) return PLUGIN_HANDLED;
 	
 	execute_forward_ignore_one_param(get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_SKILL_USED), id);
 	
@@ -2963,7 +2964,7 @@ public remove_tasks(id)
 	remove_task(id + TASK_END_KILL_STREAK);
 }
 
-stock remove_ents(id = 0)
+stock remove_ents(id = 0, const ent[] = "")
 {
 	new className[16], ents = engfunc(EngFunc_NumberOfEntities);
 
@@ -2972,7 +2973,7 @@ stock remove_ents(id = 0)
 
 		pev(i, pev_classname, className, charsmax(className));
 
-		if (equal(className, "rocket") || equal(className, "mine") || equal(className, "dynamite") || equal(className, "medkit")) engfunc(EngFunc_RemoveEntity, i);
+		if (equal(className, "rocket") || equal(className, "mine") || equal(className, "dynamite") || equal(className, "medkit") || equal(className, ent)) engfunc(EngFunc_RemoveEntity, i);
 	}
 }
 
@@ -4127,6 +4128,13 @@ public _cod_percent_chance(percent)
 
 public _cod_is_enough_space(id)
 	return is_enough_space(id);
+
+public _cod_remove_ents(id, className[])
+{
+	param_convert(2);
+
+	remove_ents(id, className);
+}
 	
 public _cod_register_item(plugin, params)
 {

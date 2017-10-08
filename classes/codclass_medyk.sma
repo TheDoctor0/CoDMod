@@ -6,13 +6,13 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Medyk"
-#define DESCRIPTION  "Ma 2 apteczki, ktorymi moze leczyc siebie i innych."
+#define DESCRIPTION  "Ma 3 apteczki, ktorymi moze leczyc siebie i innych."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_M4A1)|(1<<CSW_GLOCK18)
-#define HEALTH       10
+#define HEALTH       20
 #define INTELLIGENCE 0
 #define STRENGTH     10
-#define STAMINA      20
+#define STAMINA      10
 #define CONDITION    0
 
 public plugin_init() 
@@ -23,7 +23,7 @@ public plugin_init()
 }
 
 public cod_class_enabled(id, promotion)
-	cod_set_user_medkits(id, 2, CLASS);
+	cod_set_user_medkits(id, 3, CLASS);
 
 public cod_class_skill_used(id)
 	cod_use_user_medkit(id);

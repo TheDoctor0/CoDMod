@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Policjant"
-#define DESCRIPTION  "Ma podwojny skok, 15 procent na zabicie z USP/Glocka, +20 obrazen z Deagle."
+#define DESCRIPTION  "Ma podwojny skok, 20 procent na zabicie z USP/Glocka, +20 obrazen z Deagle."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_USP)|(1<<CSW_GLOCK18)|(1<<CSW_DEAGLE)
 #define HEALTH       30
@@ -28,8 +28,8 @@ public cod_class_enabled(id, promotion)
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
 	if (damageBits & DMG_BULLET) {
-		if (weapon == CSW_DEAGLE) damage += 15.0;
+		if (weapon == CSW_DEAGLE) damage += 20.0;
 
-		if ((weapon == CSW_USP || weapon == CSW_GLOCK18) && cod_percent_chance(15)) damage = cod_kill_player(attacker, victim, damageBits);
+		if ((weapon == CSW_USP || weapon == CSW_GLOCK18) && cod_percent_chance(20)) damage = cod_kill_player(attacker, victim, damageBits);
 	}
 }

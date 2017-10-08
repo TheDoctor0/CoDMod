@@ -5,9 +5,6 @@
 #define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-#define TASK_RADAR 84722
-#define TASK_STOP 89431
-
 #define NAME         "Telegrafista"
 #define DESCRIPTION  "Moze aktywowac na 60s radar pokazujacy pozycje przeciwnikow. Ma ubranie wroga."
 #define FRACTION     "Podstawowe"
@@ -17,6 +14,9 @@
 #define STRENGTH     0
 #define STAMINA      20
 #define CONDITION    0
+
+#define TASK_RADAR 84722
+#define TASK_STOP 89431
 
 new classUsed;
 
