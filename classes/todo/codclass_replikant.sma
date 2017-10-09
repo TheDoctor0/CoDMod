@@ -28,7 +28,7 @@ public plugin_init()
 {
 	register_plugin(nazwa, "1.0", "O'Zone");
 	
-	cod_register_class(nazwa, opis, bronie, zdrowie, kondycja, inteligencja, wytrzymalosc, niewidzialnosc, bonus_niewidzialnosci);
+	//cod_register_class(nazwa, opis, bronie, zdrowie, kondycja, inteligencja, wytrzymalosc, niewidzialnosc, bonus_niewidzialnosci);
 	
 	RegisterHam(Ham_TakeDamage, "info_target", "TakeDamage");
 	

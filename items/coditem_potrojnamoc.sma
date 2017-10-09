@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Potrojna Moc"
-#define VERSION "1.0.17"
+#define VERSION "1.0.18"
 #define AUTHOR "O'Zone"
 
 #define TASK_ITEM 87432
@@ -50,7 +50,7 @@ public cod_item_upgrade(id)
 public cod_item_skill_used(id)
 {
 	if (get_bit(id, itemUsed)) {
-		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Potrojnej Mocy mozesz uzyc tylko raz na runde!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Potrojnej Mocy mozesz uzyc tylko raz na runde!");
 
 		return;
 	}

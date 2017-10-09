@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Tajemnica Mysliwego"
-#define VERSION "1.0.11"
+#define VERSION "1.0.13"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Tajemnica Mysliwego"

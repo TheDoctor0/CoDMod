@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Ksiega Doswiadczenia"
-#define VERSION "1.0.11"
+#define VERSION "1.0.12"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Ksiega Doswiadczenia"
@@ -31,5 +31,5 @@ public cod_item_value(id)
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, .valueMax = VALUE_MAX);
 
-public cod_item_kill(killer, victim)
+public cod_item_kill(killer, victim, hitPlace)
 	cod_set_user_exp(killer, itemValue[killer]);

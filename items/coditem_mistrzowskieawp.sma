@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Mistrzowskie AWP"
-#define VERSION "1.0.16"
+#define VERSION "1.0.17"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Mistrzowskie AWP"

@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Licznik Zycia"
-#define VERSION "1.0.21"
+#define VERSION "1.0.24"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Licznik Zycia"
@@ -26,7 +26,7 @@ public cod_item_disabled(id)
 public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
 {
 	if (get_bit(attacker, itemActive)) {
-		new name[32];
+		static name[32];
 
 		get_user_name(victim, name, charsmax(name));
 

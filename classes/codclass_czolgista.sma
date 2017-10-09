@@ -103,13 +103,13 @@ public shoot_missile(id)
 	if (!is_user_alive(id)) return;
 	
 	if (!bazookaMissiles[id]) {
-		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Juz wykorzystales wszystkie pociski bazooki!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Juz wykorzystales wszystkie pociski bazooki!");
 
 		return;
 	}
 	
 	if (lastBazookaMissile[id] + 5.0 > get_gametime()) {
-		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Pocisk mozesz wystrzelic raz na 5 sekund!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Pocisk mozesz wystrzelic raz na 5 sekund!");
 
 		return;
 	}

@@ -1,9 +1,8 @@
 #include <amxmodx>
-#include <cstrike>
 #include <cod>
 
 #define PLUGIN "CoD Shop"
-#define VERSION "1.0.5"
+#define VERSION "1.0.9"
 #define AUTHOR "O'Zone"
 
 new const commandShopMenu[][] = { "say /shop", "say_team /shop", "say /sklep", "say_team /sklep", "sklep" };
@@ -389,7 +388,7 @@ public shop_menu_handle(id, menu, item)
 		}
 	}
 
-	cod_set_user_honor(id, cod_get_user_honor(id) - price);
+	cod_add_user_honor(id, -price);
 
 	menu_destroy(menu);
 
@@ -415,13 +414,13 @@ public buy_honor_handle(id)
 		return PLUGIN_HANDLED;
 	}
 	
-	if (cs_get_user_money(id) < honorAmount * cvarExchangeRatio) { 
+	if (cod_get_user_money(id) < honorAmount * cvarExchangeRatio) { 
 		cod_print_chat(id, "Nie masz wystarczajaco^x03 kasy^x01, aby kupic tyle^x03 Honoru^x01!");
 
 		return PLUGIN_HANDLED;
 	}
 	
-	cs_set_user_money(id, cs_get_user_money(id) - honorAmount * cvarExchangeRatio);
+	cod_add_user_money(id, honorAmount * cvarExchangeRatio);
 	cod_add_user_honor(id, honorAmount);
 	
 	cod_print_chat(id, "Wymieniles^x03 %i$^x01 na ^x03%i Honoru^x01.", honorAmount * cvarExchangeRatio, honorAmount);

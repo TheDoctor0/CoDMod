@@ -3,7 +3,7 @@
 #include <engine>
 
 #define PLUGIN "CoD Item Elektromagnes"
-#define VERSION "1.0.12"
+#define VERSION "1.0.17"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Elektromagnes"
@@ -32,15 +32,15 @@ public cod_item_spawned(id, respawn)
 	if (!respawn) rem_bit(id, itemUsed);
 
 public client_disconnected(id)
-	remove_ents(id);
+	cod_remove_ents(id, "electromagnet");
 
 public cod_new_round()
-	remove_ents();
+	cod_remove_ents(0, "electromagnet");
 
 public cod_item_skill_used(id)
 {	
 	if (get_bit(id, itemUsed)) {
-		cod_show_hud(id, TYPE_HUD, 218, 40, 67, -1.0, 0.35, 0, 0.0, 3.0, 0.0, 0.0, "Wykorzystales juz elektromagnes w tej rundzie!");
+		cod_show_hud(id, TYPE_HUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 3.0, 0.0, 0.0, "Wykorzystales juz elektromagnes w tej rundzie!");
 
 		return PLUGIN_CONTINUE;
 	}
@@ -68,7 +68,7 @@ public cod_item_skill_used(id)
 	return PLUGIN_CONTINUE;
 }
 
-public item_think(ent)
+public electromagnet_think(ent)
 {
 	if (entity_get_int(ent, EV_INT_iuser2)) return PLUGIN_CONTINUE;
 	
@@ -113,17 +113,6 @@ public item_think(ent)
 	entity_set_float(ent, EV_FL_nextthink, halflife_time() + 0.1);
 	
 	return PLUGIN_CONTINUE;
-}
-
-stock remove_ents(id = 0)
-{
-	new ent = find_ent_by_class(-1, "electromagnet");
-	
-	while (ent > 0) {
-		if (!id || entity_get_edict(ent, EV_ENT_owner) == id) remove_entity(ent);
-		
-		ent = find_ent_by_class(ent, "electromagnet");
-	}
 }
 
 stock get_velocity_to_origin(ent, Float:origin[3], Float:speed, Float:velocity[3])

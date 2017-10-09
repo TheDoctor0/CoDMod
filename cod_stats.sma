@@ -8,7 +8,7 @@
 #include <unixtime>
 
 #define PLUGIN "CoD Stats"
-#define VERSION "1.0.7"
+#define VERSION "1.0.8"
 #define AUTHOR "O'Zone"
 
 #define TASK_TIME 9054

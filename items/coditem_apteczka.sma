@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Apteczka"
-#define VERSION "1.0.6"
+#define VERSION "1.0.7"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Apteczka"
@@ -26,7 +26,7 @@ public cod_item_spawned(id, respawn)
 public cod_item_skill_used(id)
 {
 	if (get_bit(id, itemUsed)) {
-		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Apteczki mozesz uzyc tylko raz na runde!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Apteczki mozesz uzyc tylko raz na runde!");
 
 		return;
 	}

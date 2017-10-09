@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Clans System"
-#define VERSION "1.0.5"
+#define VERSION "1.0.8"
 #define AUTHOR "O'Zone"
 
 new const commandClan[][] = { "say /clan", "say_team /clan", "say /clans", "say_team /clans", "say /klany", "say_team /klany", "say /klan", "say_team /klan", "klan" };
@@ -163,8 +163,7 @@ public show_clan_menu_callback(id, menu, item)
 	switch (str_to_num(itemData)) {
 		case 0: return cod_get_user_highest_level(id) >= cvarCreateLevel ? ITEM_ENABLED : ITEM_DISABLED;
 		case 1: return get_user_status(id) > STATUS_MEMBER ? ITEM_ENABLED : ITEM_DISABLED;
-		case 2, 3, 4: return clan[id] ? ITEM_ENABLED : ITEM_DISABLED;
-		case 6: return clan[id] ? ITEM_DISABLED : ITEM_ENABLED;
+		case 2, 3, 4, 5: return clan[id] ? ITEM_ENABLED : ITEM_DISABLED;
 	}
 
 	return ITEM_ENABLED;
@@ -1262,7 +1261,7 @@ public deposit_honor_handle(id)
 		return PLUGIN_HANDLED;
 	}
 
-	cod_set_user_honor(id, cod_get_user_honor(id) - honorAmount);
+	cod_add_user_honor(id, -honorAmount);
 	
 	set_clan_info(clan[id], CLAN_HONOR, get_clan_info(clan[id], CLAN_HONOR) + honorAmount);
 
@@ -1282,7 +1281,7 @@ public depositors_list(id)
 	
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT name, honor FROM `cod_clans_members` WHERE honor > 0 ORDER BY honor DESC");
+	formatex(queryData, charsmax(queryData), "SELECT name, honor FROM `cod_clans_members` WHERE clan = '%i' AND honor > 0 ORDER BY honor DESC", clan[id]);
 
 	SQL_ThreadQuery(sql, "show_depositors_list", queryData, tempId, sizeof(tempId));
 	

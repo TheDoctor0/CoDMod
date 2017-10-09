@@ -1,11 +1,11 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Item Nano kamizelka"
-#define VERSION "1.0.10"
+#define PLUGIN "CoD Item Nano Kamizelka"
+#define VERSION "1.0.11"
 #define AUTHOR "O'Zone"
 
-#define NAME        "Nano kamizelka"
+#define NAME        "Nano Kamizelka"
 #define DESCRIPTION "Jestes odporny na umiejetnosci klas i itemow zadajace obrazenia"
 
 public plugin_init()

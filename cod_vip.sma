@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD VIP"
-#define VERSION "1.0.6"
+#define VERSION "1.0.9"
 #define AUTHOR "O'Zone"
 
 new Array:listVIPs, vip;
@@ -127,6 +127,15 @@ public show_vips(id)
 	cod_print_chat(id, "^x03VIPy^x01 na serwerze:^x04 %s", message);
 	
 	return PLUGIN_CONTINUE;
+}
+
+public cod_class_changed(id, class)
+{
+	if (get_bit(id, vip) && is_user_alive(id)) {
+		cod_give_weapon(id, CSW_HEGRENADE);
+		cod_give_weapon(id, CSW_FLASHBANG, 2);
+		cod_give_weapon(id, CSW_SMOKEGRENADE);
+	}
 }
 
 public cod_spawned(id)

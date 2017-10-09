@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Worek TNT"
-#define VERSION "1.0.23"
+#define VERSION "1.0.25"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Worek TNT"
@@ -25,6 +25,9 @@ public cod_item_enabled(id, value)
 
 	cod_set_user_dynamites(id, itemValue[id], ITEM);
 }
+
+public cod_item_skill_used(id)
+	cod_use_user_dynamite(id);
 
 public cod_item_value(id)
 	return itemValue[id];

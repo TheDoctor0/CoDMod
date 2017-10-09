@@ -53,33 +53,32 @@ public cod_new_round()
 public cod_class_skill_used(id)
 {
 	if (!itemUse[id]) {
-		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Juz wykorzystales wszystkie repliki!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Juz wykorzystales wszystkie repliki!");
 
 		return;
 	}
 	
 	if (itemLastUse[id] + 5.0 > get_gametime()) {
-		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Replike mozesz postawic raz na 5 sekund!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Replike mozesz postawic raz na 5 sekund!");
 
 		return;
 	}
 
 	if (!(pev(id, pev_flags) & FL_ONGROUND)) {
-		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Musisz stac na podlozu, zeby postawic replike!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Musisz stac na podlozu, zeby postawic replike!");
 
 		return;
 	}
+
+	new Float:entOrigin[3];
 		
-	if (!cod_is_enough_space(id)) {
-		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Nie mozesz postawic repliki w przejsciu!");
+	if (!get_origin_in_distance(id, entOrigin, 45.0)) {
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Musisz odsunac sie nieco dalej od przeszkody, aby postawic replike!");
 
 		return;
 	}
-
-	itemLastUse[id] = floatround(get_gametime());
-	itemUse[id]--;
 	
-	new entModel[64], playerModel[32], Float:entOrigin[3], Float:entAngles[3], entSequence = entity_get_int(id, EV_INT_gaitsequence);
+	new entModel[64], playerModel[32], Float:entAngle[3], entSequence = entity_get_int(id, EV_INT_gaitsequence);
 
 	entSequence = (entSequence == 3 || entSequence == 4) ? 1 : entSequence;
 
@@ -87,24 +86,37 @@ public cod_class_skill_used(id)
 
 	format(entModel, charsmax(playerModel), "models/player/%s/%s.mdl", playerModel, playerModel);
 
-	entity_get_vector(id, EV_VEC_angles, entAngles);
-	entity_get_vector(id, EV_VEC_origin, entOrigin);
+	entity_get_vector(id, EV_VEC_angles, entAngle);
 	
-	entAngles[0] = 0.0;
+	entAngle[0] = 0.0;	
+	entOrigin[2] -= distance_to_floor(id, entOrigin);
 	
 	new ent = create_entity("info_target");
 	
 	entity_set_string(ent, EV_SZ_classname, "replica");
 	entity_set_model(ent, entModel);
 	entity_set_vector(ent, EV_VEC_origin, entOrigin);
-	entity_set_vector(ent, EV_VEC_angles, entAngles);
-	entity_set_vector(ent, EV_VEC_v_angle, entAngles);
+	entity_set_vector(ent, EV_VEC_angles, entAngle);
+	entity_set_vector(ent, EV_VEC_v_angle, entAngle);
 	entity_set_int(ent, EV_INT_sequence, entSequence);
 	entity_set_int(ent, EV_INT_solid, SOLID_BBOX);
 	entity_set_float(ent, EV_FL_health, 300.0);
 	entity_set_float(ent, EV_FL_takedamage, DAMAGE_YES);
-	entity_set_size(ent, Float:{-16.0, -16.0, -36.0}, Float:{16.0, 16.0, 40.0});
+	entity_set_size(ent, Float:{-16.0, -16.0, -36.0}, Float:{16.0, 16.0, 36.0});
 	entity_set_int(ent, EV_INT_iuser1, id);
+
+	if (!cod_is_enough_space(ent)) {
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Nie mozesz postawic repliki w przejsciu!");
+
+		remove_entity(ent);
+
+		return;
+	}
+
+	itemLastUse[id] = floatround(get_gametime());
+	itemUse[id]--;
+
+	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 
 public take_damage(victim, inflictor, attacker, Float:damage, damageBits)
@@ -126,8 +138,7 @@ public take_damage(victim, inflictor, attacker, Float:damage, damageBits)
 	cod_get_user_item_name(attacker, itemName, charsmax(itemName));
 
 	if (equal(itemName, "Pogromca Replik")) damage *= 2;
-	
-	if (!knifeUsed && !(equal(itemName, "Pogromca Replik"))) cod_inflict_damage(owner, attacker, damage * 0.5, 0.0, damageBits);
+	else if (!knifeUsed) cod_inflict_damage(owner, attacker, damage * 0.5, 0.0, damageBits);
 	
 	if (damage > entity_get_float(victim, EV_FL_health)) {
 		if (!knifeUsed) cod_make_explosion(victim, 190, 1);
@@ -135,4 +146,41 @@ public take_damage(victim, inflictor, attacker, Float:damage, damageBits)
 	}
 	
 	return HAM_IGNORED;
+}
+
+stock get_origin_in_distance(id, Float:origin[3], Float:distance)
+{
+	new Float:playerAngle[3], Float:playerOrigin[3], trace;
+
+	entity_get_vector(id, EV_VEC_origin, playerOrigin);
+	entity_get_vector(id, EV_VEC_v_angle, playerAngle);
+
+	playerAngle[0] *= -1;
+
+	origin[0] = playerOrigin[0] + distance * floatcos(playerAngle[1], degrees);
+	origin[1] = playerOrigin[1] + distance * floatsin(playerAngle[1], degrees);
+	origin[2] = playerOrigin[2];
+
+	engfunc(EngFunc_TraceHull, origin, origin, 0, (pev(id, pev_flags) & FL_DUCKING) ? HULL_HEAD : HULL_HUMAN, id, trace);
+		
+	if (engfunc(EngFunc_PointContents, origin) != CONTENTS_EMPTY || get_tr2(trace, TR_StartSolid) || get_tr2(trace, TR_AllSolid)) return false;
+
+	return true;
+}
+
+stock Float:distance_to_floor(id, Float:origin[3])
+{
+	new Float:start[3], Float:end[3];
+
+	start[0] = origin[0];
+	start[1] = origin[1];
+	start[2] = -8191.0;
+
+	engfunc(EngFunc_TraceLine, origin, start, 1, 0, 0);
+
+	get_tr2(0, TR_vecEndPos, end);
+
+	start[2] = origin[2];
+
+	return floatmax(0.0, origin[2] - end[2] - (pev(id, pev_flags) & FL_DUCKING ? 18.0 : 36.0));
 }

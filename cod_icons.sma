@@ -6,7 +6,7 @@
 #include <cod>
 
 #define PLUGIN  "CoD Icons"
-#define VERSION "1.0.6"
+#define VERSION "1.0.9"
 #define AUTHOR  "O'Zone"
 
 #define TASK_PLANT 6583
@@ -206,6 +206,8 @@ public cod_end_round()
 
 public spawn_sprite(entity, sprite)
 {
+	if (!pev_valid(entity)) return;
+
 	static ent, Float:origin[3];
 
 	if (sprite == BOMBSITE_A || sprite == BOMBSITE_B) get_brush_entity_origin(entity, origin);

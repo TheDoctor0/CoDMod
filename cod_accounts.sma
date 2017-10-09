@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Accounts System"
-#define VERSION "1.0.7"
+#define VERSION "1.0.9"
 #define AUTHOR "O'Zone"
 
 #define SETINFO "_csrpass"

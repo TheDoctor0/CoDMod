@@ -2,7 +2,7 @@
 #include <cod>
  
 #define PLUGIN "CoD Menu"
-#define VERSION "1.0.11"
+#define VERSION "1.0.16"
 #define AUTHOR "O'Zone" 
 
 new const commandMenu[][] = { "say /help", "say_team /help", "say /pomoc", "say_team /pomoc", "say /komendy", "say_team /komendy", "say /menu", "say_team /menu", "menu" };
@@ -88,11 +88,11 @@ public display_menu_handle(id, menu, item)
 
 	if (!item) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new menuCommand[64];
+	new menuCommand[32];
     
 	ArrayGetString(menuCommands, item, menuCommand, charsmax(menuCommand));
-	
-	cod_cmd_execute(id, menuCommand);
+
+	client_cmd(id, menuCommand);
 	
 	menu_destroy(menu);
 

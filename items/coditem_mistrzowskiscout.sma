@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Mistrzowski Scout"
-#define VERSION "1.0.15"
+#define VERSION "1.0.16"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Mistrzowski Scout"

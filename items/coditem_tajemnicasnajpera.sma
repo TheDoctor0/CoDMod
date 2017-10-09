@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Tajemnica Snajpera"
-#define VERSION "1.0.10"
+#define VERSION "1.0.13"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Tajemnica Snajpera"

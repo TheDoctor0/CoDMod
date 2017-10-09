@@ -177,6 +177,11 @@ Return player's class and promotion if necessary.
 native cod_get_user_class(id, &promotion = 0);
 
 /*------------------------------
+Return player's class name.
+------------------------------*/
+native cod_get_user_class_name(id, dataReturn[], dataLength);
+
+/*------------------------------
 Return player's promotion.
 ------------------------------*/
 native cod_get_user_promotion(id);
@@ -779,6 +784,22 @@ Timer sets glow for certain amount of time.
 native cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:timer = 0.0);
 
 /*------------------------------
+Print message to player with [CoD] prefix.
+Color formaters are allowed.
+*/
+native cod_print_chat(id, const text[], any:...);
+
+/*------------------------------
+Execute command on player with bypassing protectors (most of them)
+*/
+native cod_cmd_execute(id, const text[], any:...);
+
+/*------------------------------
+Prepare safe sql string for query.
+*/
+native cod_sql_string(const source[], dest[], length);
+
+/*------------------------------
 Diplay text in HUD/DHUD.
 Type can be TYPE_HUD or TYPE_DHUD.
 HUD/DHUD params usage is the same as in set_hudmessage/set_dhudmessage.
@@ -800,11 +821,11 @@ native cod_display_fade(id, duration, holdTime, fadeType, red, green, blue, alph
 
 /*------------------------------
 Display status icon.
-Red, green, blue is status color in RGB.
-Name is status icon name - all icons can be found here https://forums.alliedmods.net/showthread.php?t=52529.
+Red, green, blue is status color in RGB - not required if hiding icon.
+Icon is status icon name - all icons can be found here https://forums.alliedmods.net/showthread.php?t=52529.
 Enable defines if show or hide icon.
 ------------------------------*/
-native cod_display_icon(id, red, green, blue, const name[], enable = 1);
+native cod_display_icon(id, const icon[], enable = 0, red = 0, green = 0, blue = 0);
 
 /*------------------------------
 Display bartimer.
@@ -892,9 +913,9 @@ Return true/false result for given percent chance.
 native cod_percent_chance(percent);
 
 /*------------------------------
-Return if player is not in passage.
+Return if there is enough space for ent (or origin) with defined minimum distance.
 */
-native cod_is_enough_space(id);
+native cod_is_enough_space(ent, Float:distance = 50.0);
 
 /*------------------------------
 Remove all ents with specified className.
@@ -1072,7 +1093,7 @@ forward cod_item_kill(killer, victim, hitPlace);
 /*------------------------------
 Item forward executed on death event.
 ------------------------------*/
-forward cod_item_killed(victim, killer, hitPlace);
+forward cod_item_killed(killer, victim, hitPlace);
 
 /*------------------------------
 Item forward executed on skill use.
@@ -1123,7 +1144,7 @@ forward cod_class_kill(killer, victim, hitPlace);
 /*------------------------------
 Class forward executed on death event.
 ------------------------------*/
-forward cod_class_killed(victim, killer, hitPlace);
+forward cod_class_killed(killer, victim, hitPlace);
 
 /*------------------------------
 Class forward executed on skill use.
@@ -1139,46 +1160,3 @@ forward cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damag
 Class function for victim damage change.
 ------------------------------*/
 forward cod_class_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace);
-
-/*------------------------------
-Print message to player with [CoD] prefix.
-Color formaters are allowed.
-*/
-stock cod_print_chat(id, const text[], any:...)
-{
-	new message[192];
-
-	if(numargs() == 2) copy(message, charsmax(message), text);
-	else vformat(message, charsmax(message), text, 3);
-
-	client_print_color(id, id, "^x04[CoD]^x01 %s", message);
-}
-
-stock cod_cmd_execute(id, const text[], any:...)
-{
-	#pragma unused text
-
-	new message[192];
-
-	format_args(message, charsmax(message), 1);
-
-	message_begin(id == 0 ? MSG_ALL : MSG_ONE, SVC_DIRECTOR, _, id);
-	write_byte(strlen(message) + 2);
-	write_byte(10);
-	write_string(message);
-	message_end();
-}
-
-stock cod_sql_string(const source[], dest[], length)
-{
-	copy(dest, length, source);
-	
-	replace_all(dest, length, "\\", "\\\\");
-	replace_all(dest, length, "\0", "\\0");
-	replace_all(dest, length, "\n", "\\n");
-	replace_all(dest, length, "\r", "\\r");
-	replace_all(dest, length, "\x1a", "\Z");
-	replace_all(dest, length, "'", "\'");
-	replace_all(dest, length, "`", "\`");
-	replace_all(dest, length, "^"", "\^"");
-}

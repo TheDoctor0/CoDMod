@@ -39,7 +39,7 @@ public cod_class_enabled(id, promotion)
 public cod_class_skill_used(id)
 {
 	if (classLastUsed[id] + 30.0 > get_gametime()) {
-		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Jasnowidzenia mozesz uzyc raz na 30 sekund!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Jasnowidzenia mozesz uzyc raz na 30 sekund!");
 		
 		return PLUGIN_CONTINUE;
 	}
@@ -180,11 +180,13 @@ public radar_scan(id)
 
 public camera_think(ent)
 {
+	if(!pev_valid(ent)) return FMRES_IGNORED;
+
 	static className[32], owner;
 
 	pev(ent, pev_classname, className, charsmax(className));
 	
-	if (!equal(className, "player_camera")) return FMRES_IGNORED
+	if (!equal(className, "player_camera")) return FMRES_IGNORED;
 	
 	owner = pev(ent, pev_owner);
 	

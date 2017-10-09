@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Market"
-#define VERSION "1.0.5"
+#define VERSION "1.0.6"
 #define AUTHOR "O'Zone"
 
 #define MAX_ITEMS 5

@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Pierscien Zeusa"
-#define VERSION "1.0.22"
+#define VERSION "1.0.23"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Pierscien Zeusa"
@@ -25,6 +25,9 @@ public cod_item_enabled(id, value)
 
 	cod_set_user_thunders(id, itemValue[id], ITEM);
 }
+
+public cod_item_skill_used(id)
+	cod_use_user_thunder(id);
 
 public cod_item_value(id)
 	return itemValue[id];

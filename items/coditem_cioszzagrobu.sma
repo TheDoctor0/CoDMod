@@ -2,13 +2,13 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Cios zza Grobu"
-#define VERSION "1.0.5"
+#define VERSION "1.0.8"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Cios zza Grobu"
 #define DESCRIPTION "Po smierci wybuchasz zadajac %s (+int) obrazen wrogom w poblizu"
-#define RANDOM_MIN  75
-#define RANDOM_MAX  100
+#define RANDOM_MIN  100
+#define RANDOM_MAX  125
 #define UPGRADE_MIN -5
 #define UPGRADE_MAX 7
 
@@ -30,5 +30,5 @@ public cod_item_value(id)
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
 
-public cod_item_killed(victim, killer, hitPlace)
+public cod_item_killed(killer, victim, hitPlace)
 	cod_make_explosion(victim, 250, 1, 250.0, float(itemValue[victim]), 0.5);

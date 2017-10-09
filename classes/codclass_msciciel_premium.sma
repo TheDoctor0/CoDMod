@@ -7,7 +7,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Msciciel"
-#define DESCRIPTION  "Ma 50 procent szansy na natychmiastowe zabicie z AWP i noza (PPM), mniej widoczny podczas kucania, mniejsza grawitacja."
+#define DESCRIPTION  "Ma 1/2 na natychmiastowe zabicie z AWP i noza (PPM), mniej widoczny podczas kucania, mniejsza grawitacja."
 #define FRACTION     "Premium"
 #define WEAPONS      (1<<CSW_AWP)|(1<<CSW_USP)
 #define HEALTH       20

@@ -4,7 +4,7 @@
 #include <engine>
 
 #define PLUGIN "CoD Item Aimbot"
-#define VERSION "1.0.11"
+#define VERSION "1.0.15"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Aimbot"
@@ -31,7 +31,7 @@ public cod_item_skill_used(id)
 
 	new target = get_nearest_player(id);
 			
-	if (!target) {
+	if (target) {
 		cod_show_hud(id, TYPE_HUD, 0, 255, 0, -1.0, 0.43, 0, 0.0, 1.0, 1.0, 1.0, "Namierzono glowe przeciwnika!");
 		
 		new Float:headOrigin[3], Float:headAngles[3];
@@ -84,7 +84,7 @@ stock get_nearest_player(ent)
 {
 	new Float:nearestDistance = 1000.0, Float:distance, nearestPlayer;
 	
-	for (new id = 0; id <= MAX_PLAYERS; id++) {
+	for (new id = 1; id <= MAX_PLAYERS; id++) {
 		if (!is_user_connected(id) || !is_user_alive(id) || get_user_team(id) == get_user_team(ent)) continue;
 
 		distance = entity_range(id, ent);

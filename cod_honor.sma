@@ -5,7 +5,7 @@
 
 #define PLUGIN	"CoD Honor System"
 #define AUTHOR	"O'Zone"
-#define VERSION	"1.0.4"
+#define VERSION	"1.0.6"
 
 new cvarMinPlayers, cvarKill, cvarKillHS, cvarWinRound, cvarBombPlanted, cvarBombDefused, cvarRescueHostage, cvarKillHostage;
 
@@ -280,7 +280,7 @@ public _cod_set_user_honor(id, amount)
 
 public _cod_add_user_honor(id, amount)
 {
-	playerHonor[id] += max(0, amount);
+	playerHonor[id] = max(0, playerHonor[id] + amount);
 	
 	save_honor(id);
 }

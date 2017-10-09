@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Morfina"
-#define VERSION "1.0.8"
+#define VERSION "1.0.10"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Morfina"
@@ -29,5 +29,5 @@ public cod_item_value(id)
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], .valueMin = VALUE_MIN);
 
-public cod_item_killed(victim, killer, hitPlace)
+public cod_item_killed(killer, victim, hitPlace)
 	cod_respawn_player(victim);

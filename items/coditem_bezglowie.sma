@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Bezglowie"
-#define VERSION "1.0.13"
+#define VERSION "1.0.14"
 #define AUTHOR "O'Zone"
 
 #define TASK_ITEM 783426
@@ -54,7 +54,7 @@ public cod_item_value(id)
 public cod_item_skill_used(id)
 {
 	if (get_bit(id, itemUsed)) {
-		cod_show_hud(id, TYPE_DHUD, 218, 40, 67, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Bezglowia mozesz uzyc tylko raz na runde!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Bezglowia mozesz uzyc tylko raz na runde!");
 
 		return;
 	}

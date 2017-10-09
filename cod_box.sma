@@ -6,7 +6,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Box"
-#define VERSION "1.0.7"
+#define VERSION "1.0.10"
 #define AUTHOR "O'Zone"
 
 new const boxClass[] = "cod_box", boxModel[] = "models/CoDMod/box.mdl";
@@ -135,7 +135,7 @@ public get_box(id)
 
 			if (frags > 0) set_user_frags(id, get_user_frags(id) + frags);
 			
-			cs_set_user_deaths(id, min(0, cs_get_user_deaths(id) - deaths));
+			cs_set_user_deaths(id, max(0, cs_get_user_deaths(id) - deaths));
 			
 			cod_print_chat(id, "Masz o^x04 %i zgon%s^x01 mniej!", deaths, deaths == 1 ? "" : "y");
 		}
