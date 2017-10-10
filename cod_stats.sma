@@ -751,10 +751,12 @@ public message_intermission()
 	if (!winnersId[FIRST]) return PLUGIN_CONTINUE;
 
 	new const medals[][] = { "Brazowy", "Srebrny", "Zloty" };
-	
+
 	cod_print_chat(0, "Gratulacje dla^x03 Najlepszych Graczy^x01!");
-	
+
 	for (new i = 2; i >= 0; i--) {
+		if (!is_user_connected(winnersId[i])) continue;
+
 		switch (i) {
 			case THIRD: {
 				exp = cvarBronzeMedalExp;
@@ -781,7 +783,7 @@ public message_intermission()
 
 		cod_print_chat(0, "^x03 %s^x01 -^x03 %i^x01 Zabojstw - %s Medal (+^x03%i^x01 Doswiadczenia).", playerName, winnersFrags[i], medals[i], exp);
 	}
-	
+
 	for (new id = 1; id <= MAX_PLAYERS; id++) {
 		if (!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
 		

@@ -143,7 +143,7 @@ public cod_player_prethink(id)
 		if(target && get_user_team(id) != get_user_team(target)) {
 			render = pev(target, pev_renderamt);
 
-			if(render < 255) cod_set_user_glow(id, kRenderFxGlowShell, flashlightR, flashlightG, flashlightB, kRenderNormal, 10, 5.0);
+			if(render < 255) cod_set_user_glow(target, kRenderFxGlowShell, flashlightR, flashlightG, flashlightB, kRenderNormal, 10, 5.0);
 		}
 	}
 

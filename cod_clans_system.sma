@@ -19,7 +19,7 @@ new playerName[MAX_PLAYERS + 1][64], chosenName[MAX_PLAYERS + 1][64], clan[MAX_P
 public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	for (new i; i < sizeof commandClan; i++) register_clcmd(commandClan[i], "show_clan_menu");
 	
 	register_clcmd("PODAJ_NAZWE_KLANU", "create_clan_handle");

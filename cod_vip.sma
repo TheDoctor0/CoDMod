@@ -138,7 +138,7 @@ public cod_class_changed(id, class)
 	}
 }
 
-public cod_spawned(id)
+public cod_spawned(id, respawn)
 {
 	if (get_bit(id, vip) && is_user_alive(id)) {
 		cod_give_weapon(id, CSW_HEGRENADE);

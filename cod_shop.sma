@@ -420,7 +420,7 @@ public buy_honor_handle(id)
 		return PLUGIN_HANDLED;
 	}
 	
-	cod_add_user_money(id, honorAmount * cvarExchangeRatio);
+	cod_add_user_money(id, -honorAmount * cvarExchangeRatio);
 	cod_add_user_honor(id, honorAmount);
 	
 	cod_print_chat(id, "Wymieniles^x03 %i$^x01 na ^x03%i Honoru^x01.", honorAmount * cvarExchangeRatio, honorAmount);

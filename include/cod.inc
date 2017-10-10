@@ -862,14 +862,14 @@ native cod_make_explosion(ent, distance = 0, explosion = 1, Float:damageDistance
 Make repeating damage to player.
 Attacker is player that makes damage.
 Victim is player that is receiving damage.
-Damage is damage amount.
-Time is interval between damage.
+Damage is damage amount. If damage = 0.0 previous task will be removed and no task created.
+Time is interval between damage. If time = 0.0 previous task will be removed and no task created.
 Counter is how many times make damage. If counter = 0 effect will last till player death or round end - usefull for constant healing.
 Flags is damage flag (DMG_).
 Flags can also be FIRE, POISON or HEAL (healing player instead of huring) if want to use custom effects out of the box.
 Instant makes first damage immediately.
 ------------------------------*/
-native cod_repeat_damage(attacker, victim, Float:damage, Float:time, counter = 1, flags = DMG_CODSKILL, instant = 1);
+native cod_repeat_damage(attacker, victim, Float:damage = 0.0, Float:time = 0.0, counter = 1, flags = DMG_CODSKILL, instant = 1);
 
 /*------------------------------
 Make damage with intelligence factor.
@@ -915,7 +915,7 @@ native cod_percent_chance(percent);
 /*------------------------------
 Return if there is enough space for ent (or origin) with defined minimum distance.
 */
-native cod_is_enough_space(ent, Float:distance = 50.0);
+native cod_is_enough_space(ent, Float:distance = 120.0);
 
 /*------------------------------
 Remove all ents with specified className.

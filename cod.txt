@@ -3,13 +3,10 @@ Do zrobienia:
 - Menu bindowania (o ile beda chcieli tego gracze)
 - Crash i Jackpot
 - Przeniesc radar do silnika
+- Zarzadzanie noclipem i godmode w silniku
+- Przerobienie zarzadzanie predkoscia - na wzor rendera
 
 Itemy:
-- Latarka (Ma latarke dzieki, ktorej moze naswietlic niewidzialnych | coclass_mag.sma)
-- Regeneracja (Co 3 sekundy dostajesz 5hp)
-- Noz Medyka (Na nozu regenerujesz 2hp co sekunde)
-- Trujace oslepienie (1/2-4 na zatrucie przeciwnika po oslepieniu flashem)
-- Kosmiczne klapki (Dostajesz +x do kondycji oraz masz o 50 procent mniejsza grawitacje)
 - Duch Kaprala (Przez 3-5s przenikasz przez ściany)
 - Dobra Krowka (Dostajesz zestaw granatow i Krowę, a z niej zadajesz +10dmg)
 - Zimne kule (Szansa na zamrożenie wroga od 1/4-8)

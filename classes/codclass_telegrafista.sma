@@ -53,13 +53,17 @@ public cod_class_skill_used(id)
 	if (get_bit(id, classUsed)) {
 		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Radar mozesz aktywowac tylko raz na runde!");
 
-		return;
+		return PLUGIN_CONTINUE;
 	}
 
 	set_bit(id, classUsed);
 
 	set_task(1.0, "radar_scan", id + TASK_RADAR, _, _, "b");
 	set_task(60.0, "radar_stop", id + TASK_STOP);
+
+	emit_sound(id, CHAN_ITEM, codSounds[SOUND_CHARGE], 0.5, ATTN_NORM, 0, PITCH_NORM);
+
+	return PLUGIN_CONTINUE;
 }
 
 public radar_stop(id)

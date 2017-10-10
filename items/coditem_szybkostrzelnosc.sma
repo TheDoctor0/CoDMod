@@ -8,7 +8,7 @@
 
 #define NAME        "Szybkostrzelnosc"
 #define DESCRIPTION "Masz o %s procent wieksza szybkostrzelnosc"
-#define RANDOM_MIN  25
+#define RANDOM_MIN  20
 #define RANDOM_MAX  40
 #define UPGRADE_MIN -3
 #define UPGRADE_MAX 5

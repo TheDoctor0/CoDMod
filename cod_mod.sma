@@ -10,7 +10,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.285"
+#define VERSION "1.0.0"
 #define AUTHOR "O'Zone"
 
 #define MAX_NAME 64
@@ -181,9 +181,9 @@ public plugin_init()
 	for (new i = 1; i < sizeof weapons; i++) {
 		if (weapons[i][0]) RegisterHam(Ham_Item_Deploy, weapons[i], "weapon_deploy_post", 1);
 	}
-	
+
 	register_logevent("round_start", 2, "1=Round_Start");
-	register_logevent("round_end", 2, "1=Round_End");   
+	register_logevent("round_end", 2, "1=Round_End");
 	
 	register_event("HLTV", "new_round", "a", "1=0", "2=0");
 	register_event("Health", "message_health", "be", "1!255");
@@ -1439,7 +1439,7 @@ public touch_rocket(ent)
 
 public use_mine(id)
 {
-	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_HANDLED;
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_CONTINUE;
 
 	if (!codPlayer[id][PLAYER_MINES][ALL]) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 2.0, 0.0, 0.0);
@@ -1492,7 +1492,7 @@ public use_mine(id)
 
 	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-	return PLUGIN_HANDLED;
+	return PLUGIN_CONTINUE;
 }
 
 public touch_mine(ent, victim)
@@ -1510,7 +1510,7 @@ public touch_mine(ent, victim)
 
 public use_dynamite(id)
 {
-	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_HANDLED;
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_CONTINUE;
 
 	if (is_valid_ent(codPlayer[id][PLAYER_DYNAMITE])) {
 		make_explosion(codPlayer[id][PLAYER_DYNAMITE], 250, 1, 250.0, 70.0, 0.5, _, DYNAMITE_EXPLODE);
@@ -1519,7 +1519,7 @@ public use_dynamite(id)
 		
 		codPlayer[id][PLAYER_DYNAMITE] = 0;
 		
-		return PLUGIN_HANDLED;
+		return PLUGIN_CONTINUE;
 	}
 	
 	if (!codPlayer[id][PLAYER_DYNAMITES][ALL]) {
@@ -1566,12 +1566,12 @@ public use_dynamite(id)
 
 	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	
-	return PLUGIN_HANDLED;
+	return PLUGIN_CONTINUE;
 }
 
 public use_medkit(id)
 {
-	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_HANDLED;
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_CONTINUE;
 
 	if (!codPlayer[id][PLAYER_MEDKITS][ALL]) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 2.0, 0.0, 0.0);
@@ -1609,7 +1609,7 @@ public use_medkit(id)
 
 	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-	return PLUGIN_HANDLED;
+	return PLUGIN_CONTINUE;
 }
 
 public think_medkit(ent)
@@ -1649,7 +1649,7 @@ public think_medkit(ent)
 
 public use_thunder(id)
 {
-	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_HANDLED;
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_CONTINUE;
 
 	if (!codPlayer[id][PLAYER_THUNDERS][ALL]) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 2.0, 0.0, 0.0);
@@ -1662,7 +1662,7 @@ public use_thunder(id)
 
 	get_user_aiming(id, victim, body);
 	
-	if (!is_user_alive(victim) || get_user_team(victim) == get_user_team(id)) return PLUGIN_HANDLED;
+	if (!is_user_alive(victim) || get_user_team(victim) == get_user_team(id)) return PLUGIN_CONTINUE;
 	
 	if (codPlayer[id][PLAYER_LAST_THUNDER] + 3.0 > get_gametime()) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 2.0, 0.0, 0.0);
@@ -1707,12 +1707,12 @@ public use_thunder(id)
 	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_THUNDER], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	emit_sound(victim, CHAN_WEAPON, codSounds[SOUND_THUNDER], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-	return PLUGIN_HANDLED;
+	return PLUGIN_CONTINUE;
 }
 
 public use_teleport(id)
 {
-	if (!is_user_alive(id) || freezeTime) return PLUGIN_HANDLED;
+	if (!is_user_alive(id) || freezeTime) return PLUGIN_CONTINUE;
 	
 	if (codPlayer[id][PLAYER_TELEPORTS][ALL] == 0) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 2.0, 0.0, 0.0);
@@ -1976,7 +1976,7 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 
 public client_death(killer, victim, weaponId, hitPlace, teamKill)
 {   
-	if (!is_user_connected(killer) || !is_user_connected(victim) || !is_user_alive(killer) || get_user_team(victim) == get_user_team(killer)) return PLUGIN_CONTINUE;
+	if (!is_user_connected(killer) || !is_user_connected(victim) || !is_user_alive(killer) || (get_user_team(victim) == get_user_team(killer)) return PLUGIN_CONTINUE;
 
 	new playerName[MAX_NAME], className[MAX_NAME];
 	
@@ -2463,7 +2463,7 @@ public show_info(id)
 	if (!is_user_alive(id)) {
 		target = pev(id, pev_iuser2);
 		
-		set_hudmessage(255, 255, 255, 0.7, -1.0, 0, 0.0, 0.3, 0.0, 0.0, 4);
+		set_hudmessage(255, 255, 255, 0.6, -1.0, 0, 0.0, 0.3, 0.0, 0.0, 4);
 	} else set_hudmessage(codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], float(codPlayer[id][PLAYER_HUD_POSX]) / 100.0, float(codPlayer[id][PLAYER_HUD_POSY]) / 100.0, 0, 0.0, 0.3, 0.0, 0.0, 4);
 	
 	if (!target) return PLUGIN_CONTINUE;
@@ -2477,16 +2477,16 @@ public show_info(id)
 		format(clanName, charsmax(clanName), "^n[Klan : %s]", clanName);
 	}
 
-	if (cod_get_user_mission(id) > NONE) formatex(missionProgress, charsmax(missionProgress), "^n[Misja : %i/%i (%0.1f%s)]", 
-		cod_get_user_mission_progress(id), cod_get_user_mission_need(id), float(cod_get_user_mission_progress(id)) / float(cod_get_user_mission_need(id)) * 100.0, "%%");
+	if (cod_get_user_mission(target) > NONE) formatex(missionProgress, charsmax(missionProgress), "^n[Misja : %i/%i (%0.1f%s)]", 
+		cod_get_user_mission_progress(target), cod_get_user_mission_need(target), float(cod_get_user_mission_progress(target)) / float(cod_get_user_mission_need(target)) * 100.0, "%%");
 
-	cod_get_user_time_text(id, gameTime, charsmax(gameTime));
+	cod_get_user_time_text(target, gameTime, charsmax(gameTime));
 
 	exp = codPlayer[target][PLAYER_LEVEL] - 1 >= 0 ? get_level_exp(codPlayer[target][PLAYER_LEVEL] - 1) : 0;
 	levelPercent = codPlayer[target][PLAYER_LEVEL] < cvarLevelLimit ? (float((codPlayer[target][PLAYER_EXP] - exp)) / float((get_level_exp(codPlayer[target][PLAYER_LEVEL]) - exp))) * 100.0 : 0.0;
 	
 	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot : %s (%i/%i)]%s^n[Zycie : %i]^n[Honor : %i]^n[Czas Gry : %s]", 
-	className, clanName, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, codPlayer[target][PLAYER_ITEM_DURA], cvarMaxDurability, missionProgress, get_user_health(id), cod_get_user_honor(target), gameTime);
+	className, clanName, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, codPlayer[target][PLAYER_ITEM_DURA], cvarMaxDurability, missionProgress, get_user_health(target), cod_get_user_honor(target), gameTime);
 	
 	if (get_exp_bonus(target, NONE)) format(hudData, charsmax(hudData), "%s^n[Exp Bonus : %i%s]", hudData, get_exp_bonus(target, NONE), "%%");
 
@@ -3885,7 +3885,7 @@ public _cod_give_weapon(id, weapon, amount)
 
 	give_item(id, weaponName);
 
-	if(amount) cs_set_user_bpammo(id, weapon, amount);
+	if(amount > cs_get_user_bpammo(id, weapon)) cs_set_user_bpammo(id, weapon, amount);
 }
 
 public _cod_take_weapon(id, weapon)
@@ -3935,7 +3935,7 @@ public _cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:tim
 {
 	set_user_rendering(id, effect, red, green, blue, model, max(0, amount));
 
-	if (timer != 0.0) set_task(timer, "reset_glow", id + TASK_RENDER);
+	if (timer != 0.0) set_task(timer, "reset_glow", id + TASK_GLOW);
 }
 
 public reset_render(id)
@@ -4056,9 +4056,11 @@ public _cod_repeat_damage(attacker, victim, Float:damage, Float:time, counter, f
 
 	if (task_exists(victim + attacker + TASK_DAMAGE)) remove_task(victim + attacker + TASK_DAMAGE);
 
-	set_task(time, "repeat_damage", victim + attacker + TASK_DAMAGE, data, sizeof data, counter ? "a" : "b", counter - instant);
+	if (damage > 0.0 && time > 0.0) {
+		set_task(time, "repeat_damage", victim + attacker + TASK_DAMAGE, data, sizeof data, counter ? "a" : "b", counter - instant);
 
-	if (instant) repeat_damage(data);
+		if (instant) repeat_damage(data);
+	}
 }
 
 public repeat_damage(data[])
@@ -4892,9 +4894,9 @@ stock ham_strip_user_weapon(id, weaponId, slot = 0, bool:switchIfActive = true)
 	return 0;
 }
 
-stock bool:is_enough_space(ent, Float:limit = 50.0)
+stock bool:is_enough_space(ent, Float:limit = 120.0)
 {
-	new Float:origin[3], Float:start[3], Float:end[3], bool:wall[4];
+	new Float:origin[3], Float:start[3], Float:end[3];
 
 	pev(ent, pev_origin, origin);
  
@@ -4905,52 +4907,16 @@ stock bool:is_enough_space(ent, Float:limit = 50.0)
 	start[0] += limit;
 	end[0] -= limit;
 
-	if(engfunc(EngFunc_PointContents, start) != CONTENTS_EMPTY) wall[0] = true;
-	if(engfunc(EngFunc_PointContents, end) != CONTENTS_EMPTY) wall[1] = true;
-
-	if(wall[0] && wall[1]) return false;
+	if(engfunc(EngFunc_PointContents, start) != CONTENTS_EMPTY && engfunc(EngFunc_PointContents, end) != CONTENTS_EMPTY) return false;
  
 	start[0] -= limit;
 	end[0] += limit;
 	start[1] += limit;
 	end[1] -= limit;
 
-	if(engfunc(EngFunc_PointContents, start) != CONTENTS_EMPTY) wall[2] = true;
-	if(engfunc(EngFunc_PointContents, end) != CONTENTS_EMPTY) wall[3] = true;
-
-	if(wall[2] && wall[3]) return false;
- 
-	start[1] -= limit;
-	end[1] += limit;
-
-	start[0] -= limit;
-	end[0] += limit;
-	start[1] -= limit;
-	end[1] += limit;
-
-	if(!wall[0] && !wall[1] && !wall[2] && !wall[3] && is_wall_between_points(origin, start, ent) && is_wall_between_points(origin, end, ent)) return false;
-
-	start[0] += limit * 2;
-	end[0] -= limit * 2;
-	start[1] += limit * 2;
-	end[1] -= limit * 2;
-
-	if(!wall[0] && !wall[1] && !wall[2] && !wall[3] && is_wall_between_points(origin, start, ent) && is_wall_between_points(origin, end, ent)) return false;
+	if(engfunc(EngFunc_PointContents, start) != CONTENTS_EMPTY && engfunc(EngFunc_PointContents, end) != CONTENTS_EMPTY) return false;
  
 	return true;
-}
- 
-stock bool:is_wall_between_points(Float:start[3], Float:end[3], ignoreEnt)
-{
-	new Float:fraction, traceLine = create_tr2();
-
-	engfunc(EngFunc_TraceLine, start, end, IGNORE_GLASS | IGNORE_MISSILE | IGNORE_MONSTERS, ignoreEnt, traceLine);
-     
-	get_tr2(traceLine, TR_flFraction, fraction);
-
-	free_tr2(traceLine);
-
-	return (fraction != 1.0);
 }
 
 stock check_if_player_stuck(id)

@@ -24,7 +24,7 @@ public plugin_init()
 
 public cod_class_enabled(id, promotion)
 {
-	cod_set_user_bunnyhop(id, true, ITEM);
+	cod_set_user_bunnyhop(id, true, CLASS);
 
 	cod_set_user_multijumps(id, 1, CLASS);
 }

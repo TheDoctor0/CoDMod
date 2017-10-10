@@ -55,19 +55,19 @@ public cod_class_skill_used(id)
 	if (!itemUse[id]) {
 		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Juz wykorzystales wszystkie repliki!");
 
-		return;
+		return PLUGIN_CONTINUE;
 	}
 	
 	if (itemLastUse[id] + 5.0 > get_gametime()) {
 		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Replike mozesz postawic raz na 5 sekund!");
 
-		return;
+		return PLUGIN_CONTINUE;
 	}
 
 	if (!(pev(id, pev_flags) & FL_ONGROUND)) {
 		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Musisz stac na podlozu, zeby postawic replike!");
 
-		return;
+		return PLUGIN_CONTINUE;
 	}
 
 	new Float:entOrigin[3];
@@ -75,7 +75,7 @@ public cod_class_skill_used(id)
 	if (!get_origin_in_distance(id, entOrigin, 45.0)) {
 		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Musisz odsunac sie nieco dalej od przeszkody, aby postawic replike!");
 
-		return;
+		return PLUGIN_CONTINUE;
 	}
 	
 	new entModel[64], playerModel[32], Float:entAngle[3], entSequence = entity_get_int(id, EV_INT_gaitsequence);
@@ -105,18 +105,20 @@ public cod_class_skill_used(id)
 	entity_set_size(ent, Float:{-16.0, -16.0, -36.0}, Float:{16.0, 16.0, 36.0});
 	entity_set_int(ent, EV_INT_iuser1, id);
 
-	if (!cod_is_enough_space(ent)) {
+	if (!cod_is_enough_space(ent, 150.0)) {
 		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Nie mozesz postawic repliki w przejsciu!");
 
 		remove_entity(ent);
 
-		return;
+		return PLUGIN_CONTINUE;
 	}
 
 	itemLastUse[id] = floatround(get_gametime());
 	itemUse[id]--;
 
 	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+	return PLUGIN_CONTINUE;
 }
 
 public take_damage(victim, inflictor, attacker, Float:damage, damageBits)

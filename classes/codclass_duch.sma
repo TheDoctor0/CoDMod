@@ -25,5 +25,8 @@ public plugin_init()
 public cod_class_enabled(id, promotion)
 	cod_set_user_rockets(id, 1, CLASS);
 
+public cod_class_skill_used(id)
+	cod_use_user_rocket(id);
+
 public cod_class_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 	cod_set_user_render(victim, 0, .timer = 1.0);
