@@ -760,6 +760,11 @@ Remove player a weapon and disallows player to own it.
 native cod_take_weapon(id, weapon);
 
 /*------------------------------
+Return player's current weapon.
+------------------------------*/
+native cod_get_user_weapon(id);
+
+/*------------------------------
 Return player's render amount.
 Type can be NONE - at this moment (with status and weapon rules applied), ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/

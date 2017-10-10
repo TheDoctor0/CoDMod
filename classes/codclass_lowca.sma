@@ -74,7 +74,7 @@ public cod_cmd_start(id, button, oldButton, playerState)
 {
 	if (!get_bit(id, classActive)) return;
 
-	if (get_user_weapon(id) == CSW_KNIFE && button & IN_RELOAD && !(oldButton & IN_RELOAD)) {
+	if (cod_get_user_weapon(id) == CSW_KNIFE && button & IN_RELOAD && !(oldButton & IN_RELOAD)) {
 		set_bit(id, crossbowActive);
 
 		entity_set_string(id, EV_SZ_viewmodel, classModels[V_CROSSBOW]);

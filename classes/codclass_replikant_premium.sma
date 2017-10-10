@@ -135,7 +135,7 @@ public take_damage(victim, inflictor, attacker, Float:damage, damageBits)
 	
 	if (get_user_team(owner) == get_user_team(attacker)) return HAM_SUPERCEDE;
 		
-	new itemName[32], bool:knifeUsed = get_user_weapon(attacker) == CSW_KNIFE;
+	new itemName[32], bool:knifeUsed = cod_get_user_weapon(attacker) == CSW_KNIFE;
 
 	cod_get_user_item_name(attacker, itemName, charsmax(itemName));
 

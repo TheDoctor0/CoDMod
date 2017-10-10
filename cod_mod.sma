@@ -96,11 +96,13 @@ enum _:playerClassInfo { PCLASS_LEVEL, PCLASS_EXP, PCLASS_HEAL, PCLASS_INT, PCLA
 
 enum _:renderInfo { RENDER_TYPE, RENDER_VALUE, RENDER_STATUS, RENDER_WEAPON };
 
+enum _:glowInfo { GLOW_EFFECT, GLOW_RED, GLOW_GREEN, GLOW_BLUE, GLOW_MODEL, GLOW_AMOUNT };
+
 enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL, PLAYER_INT, 
 	PLAYER_STAM, PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTRA_HEAL, PLAYER_EXTRA_INT, PLAYER_EXTRA_STAM, PLAYER_EXTRA_STR, PLAYER_EXTRA_COND, PLAYER_EXTRA_WEAPONS, 
 	PLAYER_WEAPON, PLAYER_WEAPONS, PLAYER_STATUS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_SPAWNED, PLAYER_KS, PLAYER_TIME_KS, PLAYER_RESISTANCE, Float:PLAYER_LAST_ROCKET, 
 	Float:PLAYER_LAST_MINE, Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, 
-	PLAYER_HUD_POSX, PLAYER_HUD_POSY, PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], 
+	PLAYER_HUD_POSX, PLAYER_HUD_POSY, PLAYER_GLOW[glowInfo], PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], 
 	PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1], PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1], PLAYER_ELIMINATOR[ALL + 1], 
 	PLAYER_ELIMINATOR_WEAPONS[ALL + 1], PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_NAME] };
 
@@ -111,7 +113,7 @@ new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpWinRound, cvarExpPlant, cv
 
 new Array:codItems, Array:codClasses, Array:codPromotions, Array:codFractions, Array:codPlayerClasses[MAX_PLAYERS + 1], Array:codPlayerRender[MAX_PLAYERS + 1], codForwards[forwards];
 
-new Handle:sql, bool:freezeTime, bool:skillsBlocked, bool:nightExp, bool:mapChange, hudInfo, hudSync, hudSync2, playersNum, dataLoaded, hudLoaded, resetStats, userConnected, renderTimer, roundStart, lastInfo;
+new Handle:sql, bool:freezeTime, bool:skillsBlocked, bool:nightExp, bool:mapChange, hudInfo, hudSync, hudSync2, playersNum, dataLoaded, hudLoaded, resetStats, userConnected, renderTimer, glowActive, roundStart, lastInfo;
 
 public plugin_init() 
 {
@@ -359,6 +361,7 @@ public plugin_natives()
 	
 	register_native("cod_give_weapon", "_cod_give_weapon", 1);
 	register_native("cod_take_weapon", "_cod_take_weapon", 1);
+	register_native("cod_get_user_weapon", "_cod_get_user_weapon", 1);
 
 	register_native("cod_get_user_render", "_cod_get_user_render", 1);
 	register_native("cod_set_user_render", "_cod_set_user_render", 1);
@@ -1976,7 +1979,7 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 
 public client_death(killer, victim, weaponId, hitPlace, teamKill)
 {   
-	if (!is_user_connected(killer) || !is_user_connected(victim) || !is_user_alive(killer) || (get_user_team(victim) == get_user_team(killer)) return PLUGIN_CONTINUE;
+	if (!is_user_connected(killer) || !is_user_connected(victim) || !is_user_alive(killer) || get_user_team(victim) == get_user_team(killer)) return PLUGIN_CONTINUE;
 
 	new playerName[MAX_NAME], className[MAX_NAME];
 	
@@ -2101,6 +2104,8 @@ public new_round()
 	skillsBlocked = true;
 
 	for (new i = 1; i <= MAX_PLAYERS; i++) {
+		remove_glow(i);
+
 		codPlayer[i][PLAYER_SPAWNED] = false;
 
 		for (new j = 1; j <= MAX_PLAYERS; j++) remove_task(i + j + TASK_DAMAGE);
@@ -2226,20 +2231,26 @@ public hostages_rescued()
 
 stock render_change(id, playerStatus = NONE)
 {
-	if (!is_user_alive(id) || codPlayer[id][PLAYER_STATUS] == playerStatus || get_bit(id, renderTimer)) return;
+	if (!is_user_alive(id) || codPlayer[id][PLAYER_STATUS] == playerStatus) return;
 
 	if (playerStatus != NONE) codPlayer[id][PLAYER_STATUS] = playerStatus;
 
-	new renderAmount = render_count(id);
+	if (!get_bit(id, renderTimer)) {
+		new renderAmount = render_count(id);
 
-	set_user_rendering(id, kRenderFxNone, 0, 0, 0, kRenderTransAlpha, renderAmount);
+		set_user_rendering(id, kRenderFxNone, 0, 0, 0, kRenderTransAlpha, renderAmount);
 
-	execute_forward_ignore_two_params(codForwards[RENDER_CHANGED], id, renderAmount);
+		execute_forward_ignore_two_params(codForwards[RENDER_CHANGED], id, renderAmount);
+	}
+
+	if (get_bit(id, glowActive)) set_user_rendering(id, codPlayer[id][PLAYER_GLOW][GLOW_EFFECT], codPlayer[id][PLAYER_GLOW][GLOW_RED], codPlayer[id][PLAYER_GLOW][GLOW_GREEN], codPlayer[id][PLAYER_GLOW][GLOW_BLUE], codPlayer[id][PLAYER_GLOW][GLOW_MODEL], codPlayer[id][PLAYER_GLOW][GLOW_AMOUNT]);
 }
 
 stock render_count(id, type = NONE)
 {
 	new render = 255, codRender[renderInfo];
+
+	if(get_bit(id, glowActive)) return render;
 
 	if (type == NONE) {
 		for (new i = CLASS; i <= ADDITIONAL; i++) {
@@ -2905,6 +2916,7 @@ public reset_player(id)
 	clear_render(id);
 
 	for (new i = PLAYER_CLASS; i <= PLAYER_RESISTANCE; i++) codPlayer[id][i] = 0;
+	for (new i = GLOW_EFFECT; i <= GLOW_AMOUNT; i++) codPlayer[id][PLAYER_GLOW][i] = 0;
 	for (new i = PLAYER_LAST_ROCKET; i <= PLAYER_LAST_TELEPORT; i++) codPlayer[id][i] = _:0.0;
 
 	for (new i = CLASS; i <= ALL; i++) {
@@ -3901,6 +3913,9 @@ public _cod_take_weapon(id, weapon)
 	if (!((1<<weapon) & (1<<CSW_HEGRENADE | 1<<CSW_SMOKEGRENADE | 1<<CSW_FLASHBANG))) engclient_cmd(id, "drop", weaponName);
 }
 
+public _cod_get_user_weapon(id)
+	return codPlayer[id][PLAYER_WEAPON];
+
 public _cod_get_user_render(id, type)
 	return render_count(id, type);
 
@@ -3910,7 +3925,7 @@ public _cod_set_user_render(id, value, type, status, weapon, Float:timer)
 		new codRender[renderInfo];
 
 		codRender[RENDER_TYPE] = type;
-		codRender[RENDER_VALUE] = value;
+		codRender[RENDER_VALUE] = max(0, min(value, 256));
 		codRender[RENDER_STATUS] = status;
 		codRender[RENDER_WEAPON] = weapon;
 
@@ -3933,7 +3948,16 @@ public _cod_set_user_render(id, value, type, status, weapon, Float:timer)
 
 public _cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:timer)
 {
-	set_user_rendering(id, effect, red, green, blue, model, max(0, amount));
+	codPlayer[id][PLAYER_GLOW][GLOW_EFFECT] = effect;
+	codPlayer[id][PLAYER_GLOW][GLOW_RED] = red;
+	codPlayer[id][PLAYER_GLOW][GLOW_GREEN] = green;
+	codPlayer[id][PLAYER_GLOW][GLOW_BLUE] = green;
+	codPlayer[id][PLAYER_GLOW][GLOW_MODEL] = green;
+	codPlayer[id][PLAYER_GLOW][GLOW_AMOUNT] = max(0, min(amount, 255));
+
+	set_bit(id, glowActive);
+
+	render_change(id);
 
 	if (timer != 0.0) set_task(timer, "reset_glow", id + TASK_GLOW);
 }
@@ -3951,9 +3975,18 @@ public reset_glow(id)
 {
 	id -= TASK_GLOW;
 
+	remove_glow(id);
+
 	set_user_rendering(id);
 
 	render_change(id);
+}
+
+public remove_glow(id)
+{
+	rem_bit(id, glowActive);
+
+	for (new i = GLOW_EFFECT; i <= GLOW_AMOUNT; i++) codPlayer[id][PLAYER_GLOW][i] = 0;
 }
 
 public _cod_display_fade(id, duration, holdtime, fadetype, red, green, blue, alpha)

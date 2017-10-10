@@ -7,7 +7,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME        "Latarka"
-#define DESCRIPTION "Masz latarke naswietlajaca wszystkich niewidzialnych graczy."
+#define DESCRIPTION "Masz latarke naswietlajaca wszystkich niewidzialnych graczy"
 
 #define TASK_CHARGE  30293
 
@@ -46,6 +46,8 @@ public cod_item_spawned(id, respawn)
 
 public cod_item_skill_used(id)
 {
+	cod_set_user_glow(id, kRenderFxGlowShell, 255, 0, 0, kRenderNormal, 10, 5.0);
+
 	if(get_bit(id, flashlightActive)) {
 		rem_bit(id, flashlightActive);
 	} else if(flashlightBattery[id]) set_bit(id, flashlightActive);
@@ -102,7 +104,7 @@ public cod_player_prethink(id)
 		if(target && get_user_team(id) != get_user_team(target)) {
 			render = pev(target, pev_renderamt);
 
-			if(render < 255) cod_set_user_glow(id, kRenderFxGlowShell, flashlightR, flashlightG, flashlightB, kRenderNormal, 10, 5.0);
+			if(render < 255) cod_set_user_glow(target, kRenderFxGlowShell, flashlightR, flashlightG, flashlightB, kRenderNormal, 20, 5.0);
 		}
 	}
 }
