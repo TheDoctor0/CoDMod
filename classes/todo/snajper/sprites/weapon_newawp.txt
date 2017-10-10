@@ -1,3 +1,0 @@
-2
-weapon			640 sniperW1	3	1.5	170	45
-weapon_s		640 sniperW1s	3	1.5	170	45
