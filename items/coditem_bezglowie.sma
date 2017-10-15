@@ -1,5 +1,4 @@
 #include <amxmodx>
-#include <fakemeta>
 #include <cod>
 
 #define PLUGIN "CoD Item Bezglowie"
@@ -22,8 +21,6 @@ public plugin_init()
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
 	cod_register_item(NAME, DESCRIPTION, RANDOM_MIN, RANDOM_MAX);
-
-	register_forward(FM_TraceLine, "trace_line");
 }
 
 public cod_item_enabled(id, value)
@@ -70,15 +67,5 @@ public cod_item_skill_used(id)
 public deactivate_item(id)
 	rem_bit(id - TASK_ITEM, itemActive);
 
-public trace_line(Float:startVector[3], Float:endVector[3], conditions, id, trace)
-{
-	if (!is_user_alive(id) || !(get_bit(id, itemActive))) return FMRES_IGNORED;
-        
-	static ent; ent = get_tr(TR_pHit);
-
-	if (!is_user_alive(ent) || id == ent) return FMRES_IGNORED;
-
-	set_tr2(trace, TR_iHitgroup, 8);
-
-	return FMRES_IGNORED;
-}
+public cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
+	if (damageBits == DMG_BULLET && get_bit(victim, itemActive) && hitPlace == HIT_HEAD) damage = COD_BLOCK;

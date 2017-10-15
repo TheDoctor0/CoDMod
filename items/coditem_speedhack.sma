@@ -40,3 +40,6 @@ public cod_item_upgrade(id)
 
 	cod_add_user_bonus_condition(id, itemValue[id]);
 }
+
+public cod_item_value(id)
+	return itemValue[id];

@@ -38,8 +38,7 @@ public cod_item_skill_used(id)
 
 		engfunc(EngFunc_GetBonePosition, target, 8, headOrigin, headAngles);	
 		
-		if (cod_get_user_weapon(id) == CSW_AK47 || cod_get_user_weapon(id) == CSW_AUG || cod_get_user_weapon(id) == CSW_GALIL || cod_get_user_weapon(id) == CSW_DEAGLE) headOrigin[2] -= 14.0;
-		else headOrigin[2] -= 8.5;
+		headOrigin[2] -= 14.0;
 		
 		entity_set_aim(id, headOrigin);
 	}

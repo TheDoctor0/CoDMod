@@ -28,7 +28,7 @@ public cod_item_enabled(id, value)
 
 	cod_add_user_bonus_condition(id, itemValue[id]);
 
-	cod_set_user_gravity(id, -0.5);
+	cod_set_user_gravity(id, -0.5, ITEM);
 }
 
 public cod_item_disabled(id)

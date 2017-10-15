@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Szturmowiec"
-#define DESCRIPTION  "Zadaje o 3 (+inteligencja) zwiekszone obrazenia z M4A1. Ma 1 rakiete i nie slychac jego krokow."
+#define DESCRIPTION  "Zadaje o 3 (+int) zwiekszone obrazenia z M4A1. Ma 1 rakiete i nie slychac jego krokow."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_M4A1)|(1<<CSW_DEAGLE)
 #define HEALTH       10

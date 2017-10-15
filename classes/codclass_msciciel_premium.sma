@@ -25,9 +25,9 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	cod_add_user_gravity(id, 0.45, CLASS);
+	cod_set_user_gravity(id, 0.45, CLASS);
 
-	cod_set_user_render(id, 120, CLASS, RENDER_DUCK);
+	cod_set_user_render(id, 80, CLASS, RENDER_DUCK);
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)

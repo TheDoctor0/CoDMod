@@ -44,7 +44,7 @@ public cod_class_skill_used(id)
 		return PLUGIN_CONTINUE;
 	}
 
-	new playerName[32], playerId[3], menu = menu_create("Wybierz \rGraczaw, ktorego chcesz \ysledzic\w:", "cod_class_skill_used_handle");
+	new playerName[32], playerId[3], menu = menu_create("\wWybierz \rGracza\w, ktorego chcesz \ysledzic\w:", "cod_class_skill_used_handle");
 
 	for (new i = 1; i <= MAX_PLAYERS; i++) {
 		if (!is_user_alive(i) || get_user_team(i) == get_user_team(id) || i == id) continue;
@@ -87,7 +87,7 @@ public cod_class_skill_used_handle(id, menu, item)
 
 	new player = str_to_num(playerId);
 
-	if(!is_user_alive(player)) {
+	if (!is_user_alive(player)) {
 		cod_print_chat(id, "Wybrany gracz juz nie zyje.");
 
 		return PLUGIN_HANDLED;
@@ -119,6 +119,8 @@ public cod_class_skill_used_handle(id, menu, item)
 	emit_sound(player, CHAN_VOICE, codSounds[SOUND_CHARGE], 0.6, ATTN_NORM, 0, PITCH_NORM);
 	
 	set_task(3.0, "deactivate_class", .parameter = data, .len = sizeof(data));
+
+	classLastUsed[id] = floatround(get_gametime());
 
 	return PLUGIN_HANDLED;
 }

@@ -32,4 +32,4 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, .valueMax = VALUE_MAX);
 
 public cod_item_kill(killer, victim, hitPlace)
-	cod_set_user_exp(killer, itemValue[killer]);
+	cod_set_user_exp(killer, itemValue[killer], 1);

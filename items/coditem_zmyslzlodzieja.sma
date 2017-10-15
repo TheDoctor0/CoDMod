@@ -38,15 +38,15 @@ public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageB
 		if (neededMoney < money) money = neededMoney;
 
 		if (money) {
-			cod_set_user_money(attacker, cod_get_user_money(attacker) + money);
-			cod_set_user_money(victim, cod_get_user_money(victim) - money);
+			cod_add_user_money(attacker, money);
+			cod_add_user_money(victim, -money);
 		}
 	}
 }
 
 public cod_item_skill_used(id)
 {
-	if (cod_get_user_health(id) == cod_get_user_max_health(id)) return;
+	if (cod_get_user_health(id) >= cod_get_user_max_health(id)) return;
 
 	if (cod_get_user_money(id) < 1000)
 	{
@@ -55,7 +55,7 @@ public cod_item_skill_used(id)
 		return;
 	}
 
-	cod_set_user_money(id, cod_get_user_money(id) - 1000);
+	cod_add_user_money(id, -1000);
 		
 	cod_add_user_health(id, 10);	
 	

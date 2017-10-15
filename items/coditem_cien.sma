@@ -10,7 +10,7 @@
 
 #define TASK_HEALTH 98372
 
-new itemActive;
+new playerHealth[MAX_PLAYERS + 1], itemActive;
 
 public plugin_init()
 {
@@ -25,6 +25,8 @@ public cod_item_enabled(id, value)
 
 	cod_set_user_footsteps(id, true, ITEM);
 
+	playerHealth[id] = cod_get_user_health(id, 1, 0, 0, 0);
+
 	cod_set_user_health(id, 1);
 
 	set_bit(id, itemActive);
@@ -37,10 +39,16 @@ public cod_item_disabled(id)
 	rem_bit(id, itemActive);
 
 	remove_task(id + TASK_HEALTH);
+
+	cod_set_user_health(id, playerHealth[id]);
 }
 
 public cod_item_spawned(id)
+{
+	playerHealth[id] = cod_get_user_max_health(id);
+	
 	cod_set_user_health(id, 1);
+}
 
 public set_health(id)
 {

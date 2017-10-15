@@ -21,7 +21,11 @@ public plugin_init()
 }
 
 public cod_item_enabled(id, value)
+{
 	itemValue[id] = value;
+
+	cod_set_user_model(id, true, ITEM);
+}
 
 public cod_item_value(id)
 	return itemValue[id];

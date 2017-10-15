@@ -46,8 +46,6 @@ public cod_item_spawned(id, respawn)
 
 public cod_item_skill_used(id)
 {
-	cod_set_user_glow(id, kRenderFxGlowShell, 255, 0, 0, kRenderNormal, 10, 5.0);
-
 	if(get_bit(id, flashlightActive)) {
 		rem_bit(id, flashlightActive);
 	} else if(flashlightBattery[id]) set_bit(id, flashlightActive);

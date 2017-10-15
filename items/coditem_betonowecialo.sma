@@ -1,12 +1,9 @@
 #include <amxmodx>
-#include <fakemeta>
 #include <cod>
 
 #define PLUGIN "CoD Item Betonowe Cialo"
 #define VERSION "1.0.12"
 #define AUTHOR "O'Zone"
-
-#define TASK_ITEM 90342
 
 #define NAME        "Betonowe Cialo"
 #define DESCRIPTION "Po aktywacji przez %ss otrzymujesz obrazenia jedynie od strzalow w glowe"
@@ -15,6 +12,8 @@
 #define UPGRADE_MIN -2
 #define UPGRADE_MAX 3
 
+#define TASK_ITEM 90342
+
 new itemValue[MAX_PLAYERS + 1], itemUsed, itemActive;
 
 public plugin_init()
@@ -22,8 +21,6 @@ public plugin_init()
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
 	cod_register_item(NAME, DESCRIPTION, RANDOM_MIN, RANDOM_MAX);
-
-	register_forward(FM_TraceLine, "trace_line");
 }
 
 public cod_item_enabled(id, value)
@@ -70,19 +67,5 @@ public cod_item_skill_used(id)
 public deactivate_item(id)
 	rem_bit(id - TASK_ITEM, itemActive);
 
-public trace_line(Float:startVector[3], Float:endVector[3], conditions, id)
-{
-	if (!is_user_alive(id) || !(get_bit(id, itemActive))) return FMRES_IGNORED;
-        
-	static ent; ent = get_tr(TR_pHit);
-
-	if (!is_user_alive(ent) || id == ent) return FMRES_IGNORED;
-
-	if (get_tr(TR_iHitgroup) != 1) {
-		set_tr(TR_flFraction, 1.0);
-
-		return FMRES_SUPERCEDE;
-	}
-
-	return FMRES_IGNORED;
-}
+public cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
+	if (damageBits == DMG_BULLET && get_bit(victim, itemActive) && hitPlace != HIT_HEAD) damage = COD_BLOCK;

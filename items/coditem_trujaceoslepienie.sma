@@ -23,6 +23,8 @@ public plugin_init()
 
 public cod_item_enabled(id, value)
 {
+	itemValue[id] = value;
+	
 	cod_give_weapon(id, CSW_FLASHBANG, 2);
 
 	set_bit(id, itemActive);

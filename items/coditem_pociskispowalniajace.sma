@@ -1,6 +1,4 @@
 #include <amxmodx>
-#include <engine>
-#include <fakemeta>
 #include <cod>
 
 #define PLUGIN "CoD Item Pociski Spowalniajace"

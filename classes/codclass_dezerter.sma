@@ -28,7 +28,7 @@ public cod_class_enabled(id)
 {
 	cod_set_user_rockets(id, 1, CLASS);
 	
-	cod_set_user_model(id, 1, CLASS);
+	cod_set_user_model(id, true, CLASS);
 }
 
 public cod_class_spawned(id)
