@@ -1,34 +1,17 @@
 Do zrobienia:
 - Klasy i itemy
-- Menu bindowania (o ile beda chcieli tego gracze)
 - Crash i Jackpot
-- Przeniesc radar do silnika
-- Zarzadzanie noclipem i godmode w silniku
-- Przerobienie zarzadzanie predkoscia - na wzor rendera
+- Przerobienie zarzadzanie predkoscia - na wzor renderu
 
 Itemy:
-- Duch Kaprala (Przez 3-5s przenikasz przez ściany)
-- Dobra Krowka (Dostajesz zestaw granatow i Krowę, a z niej zadajesz +10dmg)
-- Zimne kule (Szansa na zamrożenie wroga od 1/4-8)
-- Pancerz Nomexowy (Szansa na odbicie pocisku 1/4-1/8)
-- Notatki Kapitania (Odbijasz 2-3 pociski na runde)
-- Podręcznik Szpiega (Masz przebranie wroga i 1/2-1/6 na natychmiastowe zabicie z HE)
-- Zabojcze MP5 (Dostajemy MP5 + 15dmg z niego oraz 1/2 na uzupelnienie magazynka po zabiciu)
-- Radar (Widzisz wrogow na radarze)
-- Mocne AK47 (Dostajesz AK47 z ktorego zadajesz +10 dmg)
-- Ulepszone M4A1 (Dostajesz M4A1 z ktorego zadajesz +10 dmg)
-- Doskonaly Deagle (Dostajesz Deagle, ktory zadaje o 30-50 wieksze obrazenia)
-- Kamuflarz (Widocznosc mniejsza o 50-60 procent)
-- Platynowe Naboje (15-25 obrazen wiecej)
-- Tytanowe Naboje (5 (+int) wieksze obrazenia obrażenia)
+- Ostatnie Tchnienie (Po śmierci masz dodatkowe 3-5s życia, a następnie umierasz)
+- Sakkubus (Wyglądasz jak przeciwnik, masz tylko nóż, a twoje ataki powodują zatrucie i oślepienie)
+- Sadysta (Po aktywacji itemu przez 3-5s obrażenia cie leczą)
+- Pentagram (Naznacza wroga. Twoja śmierć jest równa jego i na odwrót)
 - Bron Biologiczna (Masz 3 granaty zatrowajace | codperk_bronbiologiczna.sma)
 - Smiercionosny AUG (Dostajesz AUG, z ktorego masz 1/8-10 na natychmiastowe zabicie)
 - Galil Weterana (Dostajesz Galila, z ktorego masz 1/8-10 na natychmiastowe zabicie)
 - Chwilowka (Po uzyciu na 30 sekund dostajesz AutoLame)
-- USP Agenta (Masz 1/5-6 na zabicie z USP z zalozonym tlumikiem, nie slychac twoich krokow)
-- Pakiet Granatow (Dostajesz wszystkie granaty)
-- Zestaw Powiekszony (Dostajesz po 5 granatow z kazdego typu)
-- Skoczne Szalenstwo (Masz bunnyhop, mniejsza widocznosc na nozu i 1/2-3 na zabicie z kosy (PPM))
 - Kurtka Kampera (Jestes niewidzialny podczas bezruchu do momentu trafienia wroga)
 - Dawka LSD (Dostajesz +10-20 do wszystkich statystyk)
 - Dezercja (Masz 1/5 na odrodzenie na respie wroga, masz M4A1 lub AK47 w zaleznosci od druzyny i +10 dmg)
@@ -42,7 +25,7 @@ Itemy:
 - Mrozaca Mgla (Dostajesz 2 smoki zamrazajace)
 - Furia (Po uzyciu przez 5 sekund zadajesz potrojne obrazenia)
 - Generator Rakiet (Co 15 sekund dostajesz rakiete)
-- Geniusz (Dostajesz +75-100 inteligencji
+- Geniusz (Dostajesz +75-100 inteligencji)
 - Granat Odlamkowy (Posiadasz 2 granaty odlamkowe, ktory rozpadaja sie na kilka odlamkow zadajacych 40(+int) dmg | codperk_granatodlamkowy.sma)
 - Blogoslawienstwo (Po uzyciu jestes niesmiertelny do konca rundy. Item niszczy sie po uzyciu.)
 - Miecz Jedi (1/2 na natychmiastowe zabicie z kosy i 1/4-6 na odbicie pocisku)
