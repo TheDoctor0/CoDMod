@@ -147,9 +147,10 @@ native cod_get_user_exp(id);
 
 /*------------------------------
 Set player's gained exp.
+If bonus = 1 exp bonus will be applied.
 To remove exp use negative value.
 ------------------------------*/
-native cod_set_user_exp(id, value);
+native cod_set_user_exp(id, value, bonus = 0);
 
 /*------------------------------
 Return exp multiplied by player's exp bonus.
@@ -662,8 +663,21 @@ native cod_use_user_teleport(id);
 
 /*------------------------------
 Return if player have resistance for powers.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
 ------------------------------*/
-native cod_get_user_resistance(id);
+native cod_get_user_resistance(id, type = ALL);
+
+/*------------------------------
+Return if player have god mode.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
+------------------------------*/
+native cod_get_user_godmode(id, type = ALL);
+
+/*------------------------------
+Return if player have noclip.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
+------------------------------*/
+native cod_get_user_noclip(id, type = ALL);
 
 /*------------------------------
 Return if player have bunnyhop.
@@ -723,6 +737,24 @@ Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - unti
 native cod_set_user_model(id, value, type = ROUND);
 
 /*------------------------------
+Set player's resistance for powers.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+------------------------------*/
+native cod_set_user_resistance(id, value, type = ROUND);
+
+/*------------------------------
+Set player's god mode.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+------------------------------*/
+native cod_set_user_godmode(id, value, type = ROUND);
+
+/*------------------------------
+Set player's noclip.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
+------------------------------*/
+native cod_set_user_noclip(id, value, type = ROUND);
+
+/*------------------------------
 Set player's unlimited clip ammo.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 Weapon is weapon id (1<<CSW_ format) or FULL for all weapons.
@@ -742,11 +774,6 @@ Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - unti
 Weapon is weapon id (1<<CSW_ format) or FULL for all weapons.
 ------------------------------*/
 native cod_set_user_recoil_reducer(id, value, type = ROUND, weapon = FULL);
-
-/*------------------------------
-Set player's resistance for powers.
-------------------------------*/
-native cod_set_user_resistance(id, value);
 
 /*------------------------------
 Give player a weapon and allows player to own it.
