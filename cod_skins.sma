@@ -94,7 +94,7 @@ public plugin_cfg()
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
 	if (errorNum) {
-		log_to_file("cod_mod.log", "Error: %s", error);
+		log_to_file("cod_mod.log", "[CoD Skins] SQL Error: %s", error);
 		
 		return;
 	}
@@ -436,7 +436,7 @@ public load_skins(id)
 public load_skins_handle(failState, Handle:query, error[], errorNum, playerId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Skins] SQL Error: %s (%d)", error, errorNum);
 		
 		return;
 	}
@@ -521,8 +521,8 @@ stock get_skin_info(skinId, info, dataReturn[] = "", dataLength = 0)
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
 	if (failState) {
-		if (failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
-		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "Query failed. [%d] %s", errorNum, error);
+		if (failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "[CoD Skins] Could not connect to SQL database. [%d] %s", errorNum, error);
+		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "[CoD Skins] Query failed. [%d] %s", errorNum, error);
 	}
 	
 	return PLUGIN_CONTINUE;

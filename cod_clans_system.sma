@@ -904,7 +904,7 @@ public members_menu(id)
 public members_menu_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Clans] SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -1113,7 +1113,7 @@ public applications_menu(id)
 public applications_menu_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Clans] SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -1291,7 +1291,7 @@ public depositors_list(id)
 public show_depositors_list(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Clans] SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -1345,7 +1345,7 @@ public clans_top15(id)
 public show_clans_top15(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Clans] SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -1436,7 +1436,7 @@ public application_menu(id)
 public application_menu_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Clans] SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -1624,7 +1624,7 @@ public sql_init()
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
 	if (errorNum) {
-		log_to_file("cod_mod.log", "Error: %s", error);
+		log_to_file("cod_mod.log", "[CoD Clans] SQL Error: %s", error);
 		
 		return;
 	}
@@ -1656,8 +1656,8 @@ public sql_init()
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
 	if (failState) {
-		if (failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
-		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "Query failed. [%d] %s", errorNum, error);
+		if (failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "[CoD Clans] Could not connect to SQL database. [%d] %s", errorNum, error);
+		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "[CoD Clans] Query failed. [%d] %s", errorNum, error);
 	}
 	
 	return PLUGIN_CONTINUE;
@@ -1692,7 +1692,7 @@ public load_data(id)
 public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Clans] SQL Error: %s (%d)", error, errorNum);
 		
 		return;
 	}
@@ -1801,7 +1801,7 @@ stock check_applications(id, clanId)
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
 	if (errorNum) {
-		log_to_file("cod_mod.log", "Error: %s", error);
+		log_to_file("cod_mod.log", "[CoD Clans] SQL Error: %s", error);
 		
 		return false;
 	}
@@ -1883,7 +1883,7 @@ stock get_applications_count(clan)
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
 	if (errorNum) {
-		log_to_file("cod_mod.log", "Error: %s", error);
+		log_to_file("cod_mod.log", "[CoD Clans] SQL Error: %s", error);
 		
 		return 0;
 	}
@@ -1915,7 +1915,7 @@ stock check_clan_name(const clanName[])
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
 	if (errorNum) {
-		log_to_file("cod_mod.log", "Error: %s", error);
+		log_to_file("cod_mod.log", "[CoD Clans] SQL Error: %s", error);
 		
 		return false;
 	}
@@ -1943,7 +1943,7 @@ stock check_user_clan(const userName[])
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
 	if (errorNum) {
-		log_to_file("cod_mod.log", "Error: %s", error);
+		log_to_file("cod_mod.log", "[CoD Clans] SQL Error: %s", error);
 		
 		return false;
 	}
@@ -1971,7 +1971,7 @@ stock create_clan(id, const clanName[])
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
 	if (errorNum) {
-		log_to_file("cod_mod.log", "Error: %s", error);
+		log_to_file("cod_mod.log", "[CoD Clans] SQL Error: %s", error);
 		
 		return;
 	}
@@ -1985,7 +1985,7 @@ stock create_clan(id, const clanName[])
 	connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
 	if (errorNum) {
-		log_to_file("cod_mod.log", "Error: %s", error);
+		log_to_file("cod_mod.log", "[CoD Clans] SQL Error: %s", error);
 		
 		return;
 	}

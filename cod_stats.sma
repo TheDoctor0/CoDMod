@@ -178,7 +178,7 @@ public command_time(id)
 public show_time(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Stats] SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -240,7 +240,7 @@ public command_time_top(id)
 public show_top_time(failState, Handle:query, error[], errorNum, tempData[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Stats] SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -308,7 +308,7 @@ public command_best_stats(id)
 public show_best_stats(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Stats] SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -344,7 +344,7 @@ public command_top_stats(id)
 public show_top_stats(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Stats] SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -401,7 +401,7 @@ public command_medals(id)
 public show_medals(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Stats] SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -435,7 +435,7 @@ public command_top_medals(id)
 public show_top_medals(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Stats] SQL Error: %s (%d)", error, errorNum);
 		
 		return PLUGIN_HANDLED;
 	}
@@ -798,7 +798,7 @@ public say_text(msgId, msgDest, msgEnt)
 	new id = get_msg_arg_int(1);
 	
 	if (is_user_connected(id)) {
-		new tempMessage[192], message[192], chatPrefix[16], stats[8], body[8], rank;
+		new tempMessage[192], message[192], playerName[32], chatPrefix[16], stats[8], body[8], rank;
 		
 		get_msg_arg_string(2, tempMessage, charsmax(tempMessage));
 		rank = get_user_stats(id, stats, body);
@@ -810,14 +810,22 @@ public say_text(msgId, msgDest, msgEnt)
 			case 2: formatex(chatPrefix, charsmax(chatPrefix), "^x04[TOP2]");
 			case 3: formatex(chatPrefix, charsmax(chatPrefix), "^x04[TOP3]");
 		}
-		
+
 		if (!equal(tempMessage, "#Cstrike_Chat_All")) {
 			add(message, charsmax(message), chatPrefix);
 			add(message, charsmax(message), " ");
 			add(message, charsmax(message), tempMessage);
 		} else {
-			add(message, charsmax(message), chatPrefix);
-			add(message, charsmax(message), "^x03 %s1^x01 :  %s2");
+	        get_user_name(id, playerName, charsmax(playerName));
+	        
+	        get_msg_arg_string(4, tempMessage, charsmax(tempMessage)); 
+	        set_msg_arg_string(4, "");
+	    
+	        add(message, charsmax(message), chatPrefix);
+	        add(message, charsmax(message), "^x03 ");
+	        add(message, charsmax(message), playerName);
+	        add(message, charsmax(message), "^x01 :  ");
+	        add(message, charsmax(message), tempMessage);
 		}
 		
 		set_msg_arg_string(2, message);
@@ -849,7 +857,7 @@ public sql_init()
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
 	if (errorNum) {
-		log_to_file("cod_mod.log", "Error: %s", error);
+		log_to_file("cod_mod.log", "[CoD Stats] SQL Error: %s", error);
 		
 		return;
 	}
@@ -881,7 +889,7 @@ public load_stats(id)
 public load_stats_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Stats] SQL Error: %s (%d)", error, errorNum);
 		
 		return;
 	}
@@ -945,7 +953,7 @@ stock save_stats(id, end = 0)
 			sqlConnection = SQL_Connect(sql, errorNum, error, charsmax(error));
 
 			if (!sqlConnection) {
-				log_to_file("cod_mod.log", "Save - Could not connect to SQL database.  [%d] %s", error, error);
+				log_to_file("cod_mod.log", "[CoD Stats] Save - Could not connect to SQL database.  [%d] %s", error, error);
 				
 				SQL_FreeHandle(sqlConnection);
 				
@@ -957,7 +965,7 @@ stock save_stats(id, end = 0)
 			if (!SQL_Execute(query)) {
 				errorNum = SQL_QueryError(query, error, charsmax(error));
 				
-				log_to_file("cod_mod.log", "Save Query Nonthreaded failed. [%d] %s", errorNum, error);
+				log_to_file("cod_mod.log", "[CoD Stats] Save Query Nonthreaded failed. [%d] %s", errorNum, error);
 				
 				SQL_FreeHandle(query);
 				SQL_FreeHandle(sqlConnection);
@@ -976,8 +984,8 @@ stock save_stats(id, end = 0)
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
 	if (failState) {
-		if (failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
-		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "Query failed. [%d] %s", errorNum, error);
+		if (failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "[CoD Stats] Could not connect to SQL database. [%d] %s", errorNum, error);
+		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "[CoD Stats] Query failed. [%d] %s", errorNum, error);
 	}
 	
 	return PLUGIN_CONTINUE;

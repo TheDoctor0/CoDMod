@@ -163,7 +163,7 @@ public sql_init()
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
 	if (errorNum) {
-		log_to_file("cod_mod.log", "Error: %s", error);
+		log_to_file("cod_mod.log", "[CoD Honor] SQL Error: %s", error);
 		
 		return;
 	}
@@ -191,7 +191,7 @@ public load_honor(id)
 public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		log_to_file("cod_mod.log", "[CoD Honor] SQL Error: %s (%d)", error, errorNum);
 		
 		return;
 	}
@@ -261,8 +261,8 @@ stock save_honor(id, end = 0)
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
 	if (failState) {
-		if (failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
-		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "Query failed. [%d] %s", errorNum, error);
+		if (failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "[CoD Honor] Could not connect to SQL database. [%d] %s", errorNum, error);
+		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "[CoD Honor] Query failed. [%d] %s", errorNum, error);
 	}
 	
 	return PLUGIN_CONTINUE;
