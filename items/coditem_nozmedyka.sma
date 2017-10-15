@@ -33,9 +33,11 @@ public cod_item_disabled(id)
 
 public cod_weapon_deploy(id, weapon, ent)
 {
-	cod_repeat_damage(id, id);
+	if (get_bit(id, itemActive)) {
+		cod_repeat_damage(id, id);
 	
-	if (cod_get_user_weapon(id) == CSW_KNIFE) cod_repeat_damage(id, id, float(itemValue[id]), 1.0, 0, HEAL, 0);
+		if (cod_get_user_weapon(id) == CSW_KNIFE) cod_repeat_damage(id, id, float(itemValue[id]), 1.0, 0, HEAL, 0);
+	}
 }
 
 public cod_item_spawned(id, respawn)

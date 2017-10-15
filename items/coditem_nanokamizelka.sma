@@ -16,7 +16,4 @@ public plugin_init()
 }
 
 public cod_item_enabled(id, value)
-	cod_set_user_resistance(id, true);
-
-public cod_item_disabled(id)
-	cod_set_user_resistance(id, false);
+	cod_set_user_resistance(id, true, ITEM);

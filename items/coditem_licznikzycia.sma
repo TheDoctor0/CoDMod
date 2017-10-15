@@ -25,7 +25,7 @@ public cod_item_disabled(id)
 
 public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
 {
-	if (get_bit(attacker, itemActive)) {
+	if (get_bit(attacker, itemActive) && is_user_alive(victim)) {
 		static name[32];
 
 		get_user_name(victim, name, charsmax(name));
