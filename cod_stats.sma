@@ -42,13 +42,6 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_assist_damage", "65"), cvarAssistDamage);
 	bind_pcvar_num(create_cvar("cod_assist_exp", "15"), cvarAssistExp);
 
-	cvarGoldMedalExp = register_cvar("cod_medal_gold_exp", "500");
-	cvarSilverMedalExp = register_cvar("cod_medal_silver_exp", "300");
-	cvarBronzeMedalExp = register_cvar("cod_medal_bronze_exp", "100");
-	cvarAssistEnabled = register_cvar("cod_assist_enabled", "1");
-	cvarAssistDamage = register_cvar("cod_assist_damage", "65");
-	cvarAssistExp = register_cvar("cod_assist_exp", "15");
-
 	for (new i; i < sizeof commandMenu; i++) register_clcmd(commandMenu[i], "stats_menu");
 	for (new i; i < sizeof commandTime; i++) register_clcmd(commandTime[i], "command_time");
 	for (new i; i < sizeof commandAdminTime; i++) register_clcmd(commandAdminTime[i], "command_time_admin");
