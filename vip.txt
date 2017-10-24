@@ -1,0 +1,30 @@
+<head>
+		<style type="text/css">
+			body{
+				background-color: #000000;
+				font-family:Verdana,Tahoma;
+				color: #FFFFFF;
+			}
+		</style>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+	</head>
+	<body>
+		<center><br><font size="2" color="#E0A518"><b>VIP posiada :</b></font><br>
+			<font size="1">
+			* 1 HE co rundę<br>
+			* 2 Flashe co rundę<br>
+			* 1 Smoke co rundę<br>
+			* O 25% zwiększone zdobywane doświadczenie
+			* O 50% zwiększony zdobywany Honor
+			* O 5% zwiększone zadawane obrażenia
+			* Dodatkowa kasa za podłożenie bomby (500$)<br>
+			* Dodatkowa kasa za rozbrojenie bomby (500$)<br>
+			* Dodatkowe życie za zabójstwo ( 15HP - z HeadShotem | 10HP - Normalne )<br>
+			* Dodatkowa kasa za zabójstwo ( 1000$ - z HeadShotem | 500$ - Normalne )<br>
+			* Dodatkowy exp za zabójstwo ( 15HP - z HeadShotem | 10HP - Normalne )<br>
+			* Prefix [VIP] w czacie<br>
+			* Status VIP w tabeli punktów<br>
+			* VIP widoczny na liście /vips<br>
+			<font size="2" color="#FF0000"><b>VIPa możesz zakupić pod komenda /sklepsms</b>
+		</font><center>
+</body>
