@@ -68,7 +68,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 {
 	if (get_playersnum() < cvarMinPlayers) return;
 		
-	playerHonor[killer] += cod_get_user_vip(killer) ? cvarKill * 2 : cvarKill;
+	playerHonor[killer] += cod_get_user_vip(killer) ? floatround(cvarKill * 1.5) : cvarKill;
 	
 	if (hitPlace == HIT_HEAD) playerHonor[killer] += cod_get_user_vip(killer) ? cvarKillHS * 2 : cvarKillHS;
 	
@@ -88,7 +88,7 @@ public round_winner(team)
 	for (new id = 1; id < MAX_PLAYERS; id++) {
 		if (!cod_get_user_class(id) || get_user_team(id) != team) continue;
 
-		playerHonor[id] += cod_get_user_vip(id) ? cvarWinRound * 2 : cvarWinRound;
+		playerHonor[id] += cod_get_user_vip(id) ? floatround(cvarWinRound * 1.5) : cvarWinRound;
 
 		save_honor(id);
 	}
@@ -98,7 +98,7 @@ public bomb_planted(id)
 {
 	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) return;
 
-	playerHonor[id] += cod_get_user_vip(id) ? cvarBombPlanted * 2 : cvarBombPlanted;
+	playerHonor[id] += cod_get_user_vip(id) ? floatround(cvarBombPlanted * 1.5) : cvarBombPlanted;
 
 	save_honor(id);
 }
@@ -107,7 +107,7 @@ public bomb_defused(id)
 {
 	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) return;
 
-	playerHonor[id] += cod_get_user_vip(id) ? cvarBombDefused * 2 : cvarBombDefused;
+	playerHonor[id] += cod_get_user_vip(id) ? floatround(cvarBombDefused * 1.5) : cvarBombDefused;
 
 	save_honor(id);
 }
@@ -120,7 +120,7 @@ public hostage_rescued()
 
 	if (!cod_get_user_class(id)) return;
 	
-	playerHonor[id] += cod_get_user_vip(id) ? cvarRescueHostage * 2 : cvarRescueHostage;
+	playerHonor[id] += cod_get_user_vip(id) ? floatround(cvarRescueHostage * 1.5) : cvarRescueHostage;
 
 	save_honor(id);
 }
@@ -133,7 +133,7 @@ public hostage_killed()
 
 	if (!cod_get_user_class(id)) return;
 	
-	playerHonor[id] -= cod_get_user_vip(id) ? cvarKillHostage / 2 : cvarKillHostage;
+	playerHonor[id] -= cod_get_user_vip(id) ? floatround(cvarKillHostage / 2.0) : cvarKillHostage;
 
 	save_honor(id);
 }
