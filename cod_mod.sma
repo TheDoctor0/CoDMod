@@ -88,9 +88,9 @@ enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, 
 enum _:itemInfo { ITEM_NAME[MAX_NAME], ITEM_DESC[MAX_DESC], ITEM_PLUGIN, ITEM_RANDOM_MIN, ITEM_RANDOM_MAX, ITEM_GIVE, ITEM_DROP, 
 	ITEM_SPAWNED, ITEM_KILL, ITEM_KILLED, ITEM_SKILL_USED, ITEM_UPGRADE, ITEM_VALUE, ITEM_DAMAGE_ATTACKER, ITEM_DAMAGE_VICTIM };
 
-enum _:classInfo { CLASS_NAME[MAX_NAME], CLASS_DESC[MAX_DESC], CLASS_FRACTION[MAX_NAME], CLASS_HEAL, CLASS_INT, CLASS_STR, CLASS_COND, 
-	CLASS_STAM, CLASS_WEAPONS, CLASS_PROMOTION, CLASS_DEGREE, CLASS_LEVEL, CLASS_PLUGIN, CLASS_ENABLED, CLASS_DISABLED, 
-	CLASS_SPAWNED, CLASS_KILL, CLASS_KILLED, CLASS_SKILL_USED, CLASS_DAMAGE_VICTIM, CLASS_DAMAGE_ATTACKER };
+enum _:classInfo { CLASS_NAME[MAX_NAME], CLASS_DESC[MAX_DESC], CLASS_FRACTION[MAX_NAME], CLASS_HEAL, CLASS_INT, CLASS_STR, 
+	CLASS_COND, CLASS_STAM, CLASS_WEAPONS, CLASS_PROMOTION, CLASS_DEGREE, CLASS_LEVEL, CLASS_FLAG, CLASS_PLUGIN, CLASS_ENABLED, 
+	CLASS_DISABLED, CLASS_SPAWNED, CLASS_KILL, CLASS_KILLED, CLASS_SKILL_USED, CLASS_DAMAGE_VICTIM, CLASS_DAMAGE_ATTACKER };
 
 enum _:playerClassInfo { PCLASS_LEVEL, PCLASS_EXP, PCLASS_HEAL, PCLASS_INT, PCLASS_STAM, PCLASS_STR, PCLASS_COND, PCLASS_POINTS };
 
@@ -478,8 +478,8 @@ public client_putinserver(id)
 	
 	set_task(20.0, "show_advertisement", id + TASK_SHOW_AD);
 	set_task(5.0, "set_speed_limit", id + TASK_SPEED_LIMIT);
-	set_task(90.0, "show_help", id + TASK_SHOW_HELP, _, _, "b");
-	set_task(0.1, "show_info", id + TASK_SHOW_INFO, _, _, "b");
+	set_task(90.0, "show_help", id + TASK_SHOW_HELP, .flags = "b");
+	set_task(0.1, "show_info", id + TASK_SHOW_INFO, .flags = "b");
 }
 
 public client_disconnected(id)
@@ -491,6 +491,11 @@ public client_disconnected(id)
 	remove_tasks(id);
 	
 	remove_ents(id);
+
+	if (!mapChange) {
+		if (codPlayer[id][PLAYER_CLASS]) execute_forward_ignore_one_param(get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_DISABLED), id);
+		if (codPlayer[id][PLAYER_ITEM]) execute_forward_ignore_one_param(get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_DROP), id);
+	}
 }
 
 public create_arrays()
@@ -662,13 +667,21 @@ public select_class_confirm(id, menu, item)
 
 	new class = str_to_num(itemData);
 
+	menu_destroy(menu);
+
 	if (class == codPlayer[id][PLAYER_CLASS] && !codPlayer[id][PLAYER_NEW_CLASS]) {
 		chat_print(id, "To twoja aktualnie wybrana klasa.");
 
 		return PLUGIN_CONTINUE;
 	}
 
-	menu_destroy(menu);
+	new flag = get_class_info(class, CLASS_FLAG);
+
+	if (flag != NONE && !(get_user_flags(id) & flag)) {
+		chat_print(id, "Nie posiadasz uprawnien do korzystania z tej klasy. Wykup je w^x03 /sklepsms^x01!");
+
+		return PLUGIN_CONTINUE;
+	}
 
 	load_class(id, class);
 
@@ -682,7 +695,7 @@ public select_class_confirm(id, menu, item)
 	formatex(descSecondLine, charsmax(descSecondLine), "^n");
 
 	for (new i = 0; i < descWords; i++) {
-		if(strlen(descFirstLine) + strlen(classDesc[i]) < charsmax(descFirstLine)) format(descFirstLine, charsmax(descFirstLine), "%s%s%s", descFirstLine, strlen(descFirstLine) ? " " : "", classDesc[i]);
+		if (strlen(descFirstLine) + strlen(classDesc[i]) < charsmax(descFirstLine)) format(descFirstLine, charsmax(descFirstLine), "%s%s%s", descFirstLine, strlen(descFirstLine) ? " " : "", classDesc[i]);
 		else format(descSecondLine, charsmax(descSecondLine), "%s%s%s", descSecondLine, strlen(descSecondLine) > 2 ? " " : "", classDesc[i]);
 	}
 	
@@ -792,7 +805,7 @@ public display_classes_description_handle(id, menu, item)
 	formatex(descSecondLine, charsmax(descSecondLine), "^n");
 
 	for (new i = 0; i < descWords; i++) {
-		if(strlen(descFirstLine) + strlen(classDesc[i]) < charsmax(descFirstLine)) format(descFirstLine, charsmax(descFirstLine), "%s%s%s", descFirstLine, strlen(descFirstLine) ? " " : "", classDesc[i]);
+		if (strlen(descFirstLine) + strlen(classDesc[i]) < charsmax(descFirstLine)) format(descFirstLine, charsmax(descFirstLine), "%s%s%s", descFirstLine, strlen(descFirstLine) ? " " : "", classDesc[i]);
 		else format(descSecondLine, charsmax(descSecondLine), "%s%s%s", descSecondLine, strlen(descSecondLine) > 2 ? " " : "", classDesc[i]);
 	}
 
@@ -869,7 +882,7 @@ public display_promotions_description(id, class, promotion)
 	formatex(descSecondLine, charsmax(descSecondLine), "^n");
 
 	for (new i = 0; i < descWords; i++) {
-		if(strlen(descFirstLine) + strlen(classDesc[i]) < charsmax(descFirstLine)) format(descFirstLine, charsmax(descFirstLine), "%s%s%s", descFirstLine, strlen(descFirstLine) ? " " : "", classDesc[i]);
+		if (strlen(descFirstLine) + strlen(classDesc[i]) < charsmax(descFirstLine)) format(descFirstLine, charsmax(descFirstLine), "%s%s%s", descFirstLine, strlen(descFirstLine) ? " " : "", classDesc[i]);
 		else format(descSecondLine, charsmax(descSecondLine), "%s%s%s", descSecondLine, strlen(descSecondLine) > 2 ? " " : "", classDesc[i]);
 	}
 
@@ -1847,7 +1860,7 @@ public player_spawn(id)
 		return PLUGIN_CONTINUE;
 	}
 
-	if(!codPlayer[id][PLAYER_SPAWNED]) reset_attributes(id, ROUND);
+	if (!codPlayer[id][PLAYER_SPAWNED]) reset_attributes(id, ROUND);
 	
 	if (get_bit(id, resetStats)) reset_points(id);
 	
@@ -2122,7 +2135,7 @@ public new_round()
 	execute_forward_ignore(codForwards[NEW_ROUND]);
 }
 
-public round_start()    
+public round_start()
 {
 	freezeTime = false;
 
@@ -2258,7 +2271,7 @@ stock render_count(id, type = NONE)
 {
 	new render = 255, codRender[renderInfo];
 
-	if(get_bit(id, glowActive)) return render;
+	if (get_bit(id, glowActive)) return render;
 
 	if (type == NONE) {
 		for (new i = CLASS; i <= ADDITIONAL; i++) {
@@ -2592,7 +2605,7 @@ public set_new_class(id)
 	if (codPlayer[id][PLAYER_CLASS]) {
 		save_data(id, NORMAL);
 
-		execute_forward_ignore_two_params(get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_DISABLED), id, codPlayer[id][PLAYER_PROMOTION]);
+		execute_forward_ignore_one_param(get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_DISABLED), id);
 
 		reset_attributes(id, CLASS);
 	}
@@ -2650,7 +2663,7 @@ stock set_item(id, item = 0, value = 0)
 		return COD_STOP;
 	}
 	
-	if (codPlayer[id][PLAYER_ITEM]) execute_forward_ignore_one_param(get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_DROP), id);  
+	if (codPlayer[id][PLAYER_ITEM]) execute_forward_ignore_one_param(get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_DROP), id);
 	
 	codPlayer[id][PLAYER_ITEM] = item;
 
@@ -2999,7 +3012,7 @@ stock remove_ents(id = 0, const className[] = "")
 		for (new i = 0; i < sizeof(ents); i++) {
 			new ent = find_ent_by_class(-1, ents[i]);
 
-			while(ent > 0) {
+			while (ent > 0) {
 				if (!id || (id && entity_get_edict(ent, EV_ENT_owner) == id)) remove_entity(ent);
 
 				ent = find_ent_by_class(ent, ents[i]);
@@ -3008,7 +3021,7 @@ stock remove_ents(id = 0, const className[] = "")
 	} else {
 		new ent = find_ent_by_class(0, className);
 
-		while(ent > 0) {
+		while (ent > 0) {
 			if (!id || (id && entity_get_edict(ent, EV_ENT_owner) == id)) remove_entity(ent);
 
 			ent = find_ent_by_class(ent, className);
@@ -3423,7 +3436,18 @@ public _cod_upgrade_user_item(id, check)
 	if (check) return get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_UPGRADE) > 0 ? true : false;
 	
 	switch (random_num(1, 10)) {
-		case 1 .. 4: {
+		case 1 .. 6: {
+			new ret;
+
+			ExecuteForward(get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_UPGRADE), ret, id);
+
+			if (ret == COD_STOP) return false;
+
+			codPlayer[id][PLAYER_ITEM_DURA] = cvarMaxDurability;
+
+			chat_print(id, "Twoj przedmiot zostal pomyslnie^x03 ulepszony^x01.");
+		}
+		case 7 .. 9: {
 			new durability = random_num(cvarMinDamageDurability, cvarMaxDamageDurability);
 			
 			codPlayer[id][PLAYER_ITEM_DURA] -= durability;
@@ -3434,19 +3458,10 @@ public _cod_upgrade_user_item(id, check)
 				chat_print(id, "Ulepszenie^x03 nieudane^x01! Twoj przedmiot ulegl^x03 zniszczeniu^x01.");
 			} else chat_print(id, "Ulepszenie^x03 nieudane^x01! Straciles^x03 %i^x01 wytrzymalosci przedmiotu.", durability);
 		}
-		case 5: {
+		case 10: {
 			set_item(id);
 		
 			chat_print(id, "Ulepszenie^x03 nieudane^x01! Twoj przedmiot ulegl^x03 zniszczeniu^x01.");
-		}
-		case 6 .. 10: {
-			new ret;
-
-			ExecuteForward(get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_UPGRADE), ret, id);
-
-			if (ret == COD_STOP) return false;
-
-			chat_print(id, "Twoj przedmiot zostal pomyslnie^x03 ulepszony^x01.");
 		}
 	}
 
@@ -3802,7 +3817,7 @@ public _cod_get_user_recoil_reducer(id, type, weapon)
 	return codPlayer[id][PLAYER_REDUCER][type];
 }
 	
-public _cod_set_user_resistance(id, type, value)
+public _cod_set_user_resistance(id, value, type)
 {
 	codPlayer[id][PLAYER_RESISTANCE][type] = value;
 
@@ -3815,7 +3830,7 @@ public _cod_set_user_resistance(id, type, value)
 	codPlayer[id][PLAYER_RESISTANCE][ALL] = enabled;
 }
 
-public _cod_set_user_godmode(id, type, value)
+public _cod_set_user_godmode(id, value, type)
 {
 	codPlayer[id][PLAYER_GODMODE][type] = value;
 
@@ -3825,12 +3840,12 @@ public _cod_set_user_godmode(id, type, value)
 		if (codPlayer[id][PLAYER_GODMODE][i]) enabled = true;
 	}
 
-	set_user_godmode(id, codPlayer[id][PLAYER_GODMODE][ALL]);
+	set_user_godmode(id, enabled);
 
 	codPlayer[id][PLAYER_GODMODE][ALL] = enabled;
 }
 
-public _cod_set_user_noclip(id, type, value)
+public _cod_set_user_noclip(id, value, type)
 {
 	codPlayer[id][PLAYER_NOCLIP][type] = value;
 
@@ -3842,9 +3857,9 @@ public _cod_set_user_noclip(id, type, value)
 
 	codPlayer[id][PLAYER_NOCLIP][ALL] = enabled;
 
-	set_user_noclip(id, codPlayer[id][PLAYER_NOCLIP][ALL]);
+	set_user_noclip(id, enabled);
 
-	if(!codPlayer[id][PLAYER_NOCLIP][ALL]) check_if_player_stuck(id);
+	if (!codPlayer[id][PLAYER_NOCLIP][ALL]) check_if_player_stuck(id);
 }
 
 public _cod_set_user_bunnyhop(id, value, type)
@@ -3956,7 +3971,9 @@ public _cod_give_weapon(id, weapon, amount)
 
 	give_item(id, weaponName);
 
-	if(amount > cs_get_user_bpammo(id, weapon)) cs_set_user_bpammo(id, weapon, amount);
+	if (amount > cs_get_user_bpammo(id, weapon)) cs_set_user_bpammo(id, weapon, amount);
+
+	if (weapon != CSW_KNIFE && weapon != CSW_C4 && weapon != CSW_HEGRENADE && weapon != CSW_FLASHBANG && weapon != CSW_SMOKEGRENADE) cs_set_user_bpammo(id, weapon, maxBpAmmo[weapon]);
 }
 
 public _cod_take_weapon(id, weapon)
@@ -4027,7 +4044,7 @@ public reset_render(id)
 
 	rem_bit(id, renderTimer);
 
-	if(is_user_connected(id)) render_change(id);
+	if (is_user_connected(id)) render_change(id);
 }
 
 public reset_glow(id)
@@ -4036,7 +4053,7 @@ public reset_glow(id)
 
 	remove_glow(id);
 
-	if(is_user_connected(id)) {
+	if (is_user_connected(id)) {
 		set_user_rendering(id);
 
 		render_change(id);
@@ -4082,9 +4099,9 @@ public _cod_print_chat(id, const text[], any:...)
 
 	param_convert(2);
 
-	for(new i = 3; i <= numargs(); i++) param_convert(i);
+	for (new i = 3; i <= numargs(); i++) param_convert(i);
 
-	if(numargs() == 2) copy(message, charsmax(message), text);
+	if (numargs() == 2) copy(message, charsmax(message), text);
 	else vformat(message, charsmax(message), text, 3);
 
 	chat_print(id, message);
@@ -4096,7 +4113,7 @@ public _cod_show_hud(id, type, red, green, blue, Float:x, Float:y, effects, Floa
 
 	param_convert(13);
 
-	for(new i = 14; i <= numargs(); i++) param_convert(i);
+	for (new i = 14; i <= numargs(); i++) param_convert(i);
 
 	if (numargs() == 13) copy(message, charsmax(message), text);
 	else vformat(message, charsmax(message), text, 14);
@@ -4110,7 +4127,7 @@ public _cod_cmd_execute(id, const text[], any:...)
 
 	param_convert(2);
 
-	for(new i = 3; i <= numargs(); i++) param_convert(i);
+	for (new i = 3; i <= numargs(); i++) param_convert(i);
 
 	cmd_execute(id, message);
 }
@@ -4277,11 +4294,14 @@ public _cod_teleport_to_spawn(id, enemy)
 
 public _cod_random_upgrade(&value, upgradeMin, upgradeMax, valueMin, valueMax)
 {
+	param_convert(1);
+
 	if ((valueMin != NONE && value <= valueMin) || (valueMax != NONE && value >= valueMax)) return COD_STOP;
 
-	value = max(0, value + (upgradeMin & upgradeMin) ? random_num(upgradeMin, upgradeMax) : (random(2) ? random_num(upgradeMin, -1) : random_num(1, upgradeMax)));
+	value = max(0, value + (((upgradeMin > 0 && upgradeMax > 0) || (upgradeMin < 0 && upgradeMax < 0)) ? random_num(upgradeMin, upgradeMax) : (random_num(0, 1) ? random_num(upgradeMin, -1) : random_num(1, upgradeMax))));
 
 	if (valueMax != NONE) value = min(value, valueMax);
+	if (valueMin != NONE) value = max(value, valueMin);
 
 	return COD_CONTINUE;
 }
@@ -4331,7 +4351,7 @@ public _cod_register_item(plugin, params)
 
 public _cod_register_class(plugin, params)
 {
-	if (params != 9) return PLUGIN_CONTINUE;
+	if (params != 10) return PLUGIN_CONTINUE;
 
 	new codClass[classInfo];
 	
@@ -4348,11 +4368,12 @@ public _cod_register_class(plugin, params)
 	codClass[CLASS_STR] = get_param(7);
 	codClass[CLASS_STAM] = get_param(8);
 	codClass[CLASS_COND] = get_param(9);
+	codClass[CLASS_FLAG] = get_param(10);
 
 	codClass[CLASS_PLUGIN] = plugin;
 	
 	codClass[CLASS_ENABLED] = CreateOneForward(plugin, "cod_class_enabled", FP_CELL, FP_CELL);
-	codClass[CLASS_DISABLED] = CreateOneForward(plugin, "cod_class_disabled", FP_CELL, FP_CELL);
+	codClass[CLASS_DISABLED] = CreateOneForward(plugin, "cod_class_disabled", FP_CELL);
 	codClass[CLASS_SPAWNED] = CreateOneForward(plugin, "cod_class_spawned", FP_CELL, FP_CELL);
 	codClass[CLASS_KILL] = CreateOneForward(plugin, "cod_class_kill", FP_CELL, FP_CELL, FP_CELL);
 	codClass[CLASS_KILLED] = CreateOneForward(plugin, "cod_class_killed", FP_CELL, FP_CELL, FP_CELL);
@@ -4367,7 +4388,7 @@ public _cod_register_class(plugin, params)
 
 public _cod_register_promotion(plugin, params)
 {
-	if (params != 11) return PLUGIN_CONTINUE;
+	if (params != 12) return PLUGIN_CONTINUE;
 
 	new codPromotion[classInfo], className[MAX_NAME];
 	
@@ -4392,6 +4413,7 @@ public _cod_register_promotion(plugin, params)
 	codPromotion[CLASS_STR] = get_param(9) == NONE ? codClass[CLASS_STR] : get_param(9);
 	codPromotion[CLASS_STAM] = get_param(10) == NONE ? codClass[CLASS_STAM] : get_param(10);
 	codPromotion[CLASS_COND] = get_param(11) == NONE ? codClass[CLASS_COND] : get_param(11);
+	codPromotion[CLASS_FLAG] = get_param(12) == NONE ? codClass[CLASS_FLAG] : get_param(12);
 	
 	ArrayPushArray(codPromotions, codPromotion);
 
@@ -4713,7 +4735,7 @@ stock remove_render_type(id, type)
 
 		if (codRender[RENDER_TYPE] == type)
 		{
-		 	if(type == ROUND) ArrayDeleteItem(codPlayerRender[id], i);
+		 	if (type == ROUND) ArrayDeleteItem(codPlayerRender[id], i);
 			else {
 				codRender[RENDER_VALUE] = 256;
 				codRender[RENDER_STATUS] = 0;
@@ -4788,7 +4810,7 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 				if (ret == COD_BLOCK) continue;
 			}
 
-			if(damage < 0.0) cod_add_user_health(player, floatround(floatabs(damage) + codPlayer[id][PLAYER_INT] * factor), 1);
+			if (damage < 0.0) cod_add_user_health(player, floatround(floatabs(damage) + codPlayer[id][PLAYER_INT] * factor), 1);
 			else cod_inflict_damage(id, player, damage, factor, DMG_CODSKILL);
 		}
 	}
@@ -4814,7 +4836,7 @@ stock chat_print(id, const text[], any:...)
 {
 	new message[192];
 
-	if(numargs() == 2) copy(message, charsmax(message), text);
+	if (numargs() == 2) copy(message, charsmax(message), text);
 	else vformat(message, charsmax(message), text, 3);
 
 	client_print_color(id, id, "^x04[CoD]^x01 %s", message);
@@ -5003,14 +5025,14 @@ stock bool:is_enough_space(ent, Float:limit = 120.0)
 	start[0] += limit;
 	end[0] -= limit;
 
-	if(engfunc(EngFunc_PointContents, start) != CONTENTS_EMPTY && engfunc(EngFunc_PointContents, end) != CONTENTS_EMPTY) return false;
+	if (engfunc(EngFunc_PointContents, start) != CONTENTS_EMPTY && engfunc(EngFunc_PointContents, end) != CONTENTS_EMPTY) return false;
  
 	start[0] -= limit;
 	end[0] += limit;
 	start[1] += limit;
 	end[1] -= limit;
 
-	if(engfunc(EngFunc_PointContents, start) != CONTENTS_EMPTY && engfunc(EngFunc_PointContents, end) != CONTENTS_EMPTY) return false;
+	if (engfunc(EngFunc_PointContents, start) != CONTENTS_EMPTY && engfunc(EngFunc_PointContents, end) != CONTENTS_EMPTY) return false;
  
 	return true;
 }

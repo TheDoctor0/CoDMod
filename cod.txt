@@ -2,6 +2,7 @@ Do zrobienia:
 - Klasy i itemy
 - Crash i Jackpot
 - Przerobienie zarzadzanie predkoscia - na wzor renderu
+- Daily Rewards
 
 Itemy:
 - Ostatnie Tchnienie (Po śmierci masz dodatkowe 3-5s życia, a następnie umierasz)

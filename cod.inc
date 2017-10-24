@@ -966,13 +966,13 @@ native cod_register_item(const name[], const description[], valueMin = 0, valueM
 /*------------------------------
 Register new class and return its id.
 ------------------------------*/
-native cod_register_class(const name[], const description[], const fraction[], weapons, health, intelligence, strength, stamina, condition);
+native cod_register_class(const name[], const description[], const fraction[], weapons, health, intelligence, strength, stamina, condition, flag = NONE);
 
 /*------------------------------
 Register new class promotion and return its id.
-Values weapons to condition will be copied from class if not specified.
+Values weapons to flag will be copied from class if not specified.
 ------------------------------*/
-native cod_register_promotion(const name[], const description[], const className[], level, promotion, weapons = NONE, health = NONE, intelligence = NONE, strength = NONE, stamina = NONE, condition = NONE);
+native cod_register_promotion(const name[], const description[], const className[], level, promotion, weapons = NONE, health = NONE, intelligence = NONE, strength = NONE, stamina = NONE, condition = NONE, flag = NONE);
 
 /*------------------------------
 Multiforward executed when player's class is changed.
