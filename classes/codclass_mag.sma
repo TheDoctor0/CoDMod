@@ -8,7 +8,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Mag"
-#define DESCRIPTION  "Ukrywa siebie i czlonkow druzyny w promieniu 50(+int) jednostek. Ma latarke (E) naswietlajaca niewidzialnych."
+#define DESCRIPTION  "Ukrywa siebie i czlonkow druzyny w promieniu 50 (+int) jednostek. Ma latarke (E) naswietlajaca niewidzialnych."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_AUG)|(1<<CSW_FIVESEVEN)
 #define HEALTH       -10
@@ -32,19 +32,19 @@ public plugin_init()
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
+public cod_class_enabled(id)
+{
+	flashlightBattery[id] = FLASHLIGHT;
+
+	set_bit(id, classActive);
+}
+
 public cod_class_disabled(id)
 {
 	remove_task(id + TASK_CHARGE);
 
 	rem_bit(id, flashlightActive);
 	rem_bit(id, classActive);
-}
-
-public cod_class_enabled(id)
-{
-	flashlightBattery[id] = FLASHLIGHT;
-
-	set_bit(id, classActive);
 }
 
 public cod_class_spawned(id, respawn)

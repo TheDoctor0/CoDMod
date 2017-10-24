@@ -25,7 +25,7 @@
 // #define DESCRIPTION4 "Posiada 6 blyskawic. Ma 10% szansy ma podpalenie przeciwnika po trafieniu USP."
 // #define WEAPONS4     (1<<CSW_M4A1)|(1<<CSW_AK47)|(1<<CSW_USP)
 
-new classPromotion[MAX_PLAYERS + 1];
+//new classPromotion[MAX_PLAYERS + 1];
 
 public plugin_init() 
 {
@@ -40,14 +40,15 @@ public plugin_init()
 
 public cod_class_enabled(id, promotion)
 {
-	classPromotion[id] = promotion;
+	//classPromotion[id] = promotion;
 
-	switch (promotion) {
-		case PROMOTION_NONE: cod_add_user_thunders(id, 3, CLASS);
-		case PROMOTION_FIRST: cod_add_user_thunders(id, 4, CLASS);
-		case PROMOTION_SECOND: cod_add_user_thunders(id, 5, CLASS);
-		case PROMOTION_THIRD: cod_add_user_thunders(id, 6, CLASS);
-	}
+	// switch (promotion) {
+	// 	case PROMOTION_NONE: cod_set_user_thunders(id, 3, CLASS);
+	// 	case PROMOTION_FIRST: cod_set_user_thunders(id, 4, CLASS);
+	// 	case PROMOTION_SECOND: cod_set_user_thunders(id, 5, CLASS);
+	// 	case PROMOTION_THIRD: cod_set_user_thunders(id, 6, CLASS);
+	// }
+	cod_set_user_thunders(id, 3, CLASS);
 }
 	
 public cod_class_skill_used(id)
