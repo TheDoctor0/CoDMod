@@ -1376,7 +1376,7 @@ public show_level_top(failState, Handle:query, error[], errorNum, tempData[], da
 	motdLength = format(motdData, charsmax(motdData), "<html><body bgcolor=^"#666666^"><center><table style=^"color:#FFFFFF;width:600%^">");
 	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "<tr style=color:#000000;font-weight:bold;><td>#<td>Nick<td>Klasa<td>Poziom<td>Doswiadczenie");
 	
-	while(SQL_MoreResults(query)) {
+	while (SQL_MoreResults(query)) {
 		SQL_ReadResult(query, 0, name, charsmax(name));
 		SQL_ReadResult(query, 1, class, charsmax(class));
 
@@ -1996,7 +1996,7 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 
 	ExecuteForward(codForwards[DAMAGE_POST], ret, attacker, victim, weapon, damage, damageBits, hitPlace);
 
-	while(damage > 20) {
+	while (damage > 20) {
 		damage -= 20;
 
 		codPlayer[attacker][PLAYER_GAINED_EXP] += get_exp_bonus(attacker, cvarExpDamage);
@@ -2702,9 +2702,9 @@ public check_level(id)
 {   
 	if (!is_user_connected(id) || !codPlayer[id][PLAYER_CLASS]) return;
 	
-	while((codPlayer[id][PLAYER_GAINED_EXP] + codPlayer[id][PLAYER_EXP]) >= get_level_exp(codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL]) && codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] < cvarLevelLimit) codPlayer[id][PLAYER_GAINED_LEVEL]++;
+	while ((codPlayer[id][PLAYER_GAINED_EXP] + codPlayer[id][PLAYER_EXP]) >= get_level_exp(codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL]) && codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] < cvarLevelLimit) codPlayer[id][PLAYER_GAINED_LEVEL]++;
 	
-	if (!codPlayer[id][PLAYER_GAINED_LEVEL]) while((codPlayer[id][PLAYER_GAINED_EXP] + codPlayer[id][PLAYER_EXP]) < get_level_exp(codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] - 1)) codPlayer[id][PLAYER_GAINED_LEVEL]--;
+	if (!codPlayer[id][PLAYER_GAINED_LEVEL]) while ((codPlayer[id][PLAYER_GAINED_EXP] + codPlayer[id][PLAYER_EXP]) < get_level_exp(codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] - 1)) codPlayer[id][PLAYER_GAINED_LEVEL]--;
 
 	if (codPlayer[id][PLAYER_GAINED_LEVEL]) {
 		codPlayer[id][PLAYER_POINTS] = (codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] - 1) - codPlayer[id][PLAYER_INT] - codPlayer[id][PLAYER_HEAL] - codPlayer[id][PLAYER_STAM] - codPlayer[id][PLAYER_STR] - codPlayer[id][PLAYER_COND];
@@ -3162,7 +3162,7 @@ public load_data_handle(failState, Handle:query, error[], errorNum, playerId[], 
 	
 	new id = playerId[0], className[MAX_NAME], codClass[playerClassInfo], classId;
 	
-	while(SQL_MoreResults(query)) {
+	while (SQL_MoreResults(query)) {
 		SQL_ReadResult(query, SQL_FieldNameToNum(query, "class"), className, charsmax(className));
 
 		if (equal(className, "hud")) {
@@ -4946,7 +4946,7 @@ stock set_user_clip(id)
 
 	get_weaponname(weapon, weaponName, charsmax(weaponName));
 
-	while((weaponid = engfunc(EngFunc_FindEntityByString, weaponid, "classname", weaponName)) != 0) {
+	while ((weaponid = engfunc(EngFunc_FindEntityByString, weaponid, "classname", weaponName)) != 0) {
 		if (pev(weaponid, pev_owner) == id) set_pdata_int(weaponid, 51, maxClipAmmo[weapon], 4);
 	}
 }
@@ -4981,7 +4981,7 @@ stock strip_weapons(id, type, bool:switchIfActive = true)
 	{
 		new ent, weapon;
 
-		while((weapon = get_weapon_from_slot(id, type, ent)) > 0) ham_strip_user_weapon(id, weapon, type, switchIfActive);
+		while ((weapon = get_weapon_from_slot(id, type, ent)) > 0) ham_strip_user_weapon(id, weapon, type, switchIfActive);
 	}
 }
 
@@ -5004,19 +5004,16 @@ stock ham_strip_user_weapon(id, weaponId, slot = 0, bool:switchIfActive = true)
 
 	weapon = get_pdata_cbase(id, 367 + slot, 5);
 
-	while(weapon > 0)
-	{
+	while (weapon > 0) {
 		if (get_pdata_int(weapon, 43, 4) == weaponId) break;
 
 		weapon = get_pdata_cbase(weapon, 42, 4);
 	}
 
-	if (weapon > 0)
-	{
+	if (weapon > 0) {
 		if (switchIfActive && get_pdata_cbase(id, 373, 5) == weapon) ExecuteHamB(Ham_Weapon_RetireWeapon, weapon);
 
-		if (ExecuteHamB(Ham_RemovePlayerItem, id, weapon))
-		{
+		if (ExecuteHamB(Ham_RemovePlayerItem, id, weapon)) {
 			user_has_weapon(id, weaponId, 0);
 
 			ExecuteHamB(Ham_Item_Kill, weapon);
@@ -5077,10 +5074,10 @@ stock unstuck_player(id)
 
 	distance = 32;
  
-	while(distance < 1000) {
+	while (distance < 1000) {
 		attempts = 128;
 
-		while(attempts--) {
+		while (attempts--) {
 			newOrigin[x] = random_float(originalOrigin[x] - distance, originalOrigin[x] + distance);
 			newOrigin[y] = random_float(originalOrigin[y] - distance, originalOrigin[y] + distance);
 			newOrigin[z] = random_float(originalOrigin[z] - distance, originalOrigin[z] + distance);
