@@ -7,8 +7,8 @@
 
 #define NAME        "Farbowany Lis"
 #define DESCRIPTION "Masz 1/%s szansy na odrodzenie na respie wroga. Posiadasz ubranie wroga."
-#define RANDOM_MIN  4
-#define RANDOM_MAX  6
+#define RANDOM_MIN  3
+#define RANDOM_MAX  4
 #define VALUE_MIN   2
 
 new itemValue[MAX_PLAYERS + 1];
