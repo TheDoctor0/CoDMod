@@ -83,7 +83,7 @@ enum _:repeatingData { ATTACKER, VICTIM, DAMAGE, COUNTER, FLAGS };
 enum _:weaponSlots { PRIMARY = 1, SECONDARY, KNIFE, GRENADES, C4 };
 
 enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, SPEED_CHANGED, DAMAGE_PRE, DAMAGE_POST, WEAPON_DEPLOY, CUR_WEAPON, KILLED, 
-	SPAWNED, CMD_START, PRETHINK, NEW_ROUND, START_ROUND, END_ROUND, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH };
+	SPAWNED, CMD_START, PRETHINK, NEW_ROUND, START_ROUND, END_ROUND, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH, TELEPORT_USED };
 
 enum _:itemInfo { ITEM_NAME[MAX_NAME], ITEM_DESC[MAX_DESC], ITEM_PLUGIN, ITEM_RANDOM_MIN, ITEM_RANDOM_MAX, ITEM_GIVE, ITEM_DROP, 
 	ITEM_SPAWNED, ITEM_KILL, ITEM_KILLED, ITEM_SKILL_USED, ITEM_UPGRADE, ITEM_VALUE, ITEM_DAMAGE_ATTACKER, ITEM_DAMAGE_VICTIM };
@@ -214,7 +214,7 @@ public plugin_init()
 	codForwards[RENDER_CHANGED] = CreateMultiForward("cod_render_changed", ET_IGNORE, FP_CELL, FP_CELL);
 	codForwards[GRAVITY_CHANGED] = CreateMultiForward("cod_gravity_changed", ET_IGNORE, FP_CELL, FP_FLOAT);
 	codForwards[SPEED_CHANGED] = CreateMultiForward("cod_speed_changed", ET_IGNORE, FP_CELL, FP_FLOAT);
-	codForwards[DAMAGE_PRE] = CreateMultiForward ("cod_damage_pre", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL, FP_CELL);
+	codForwards[DAMAGE_PRE] = CreateMultiForward ("cod_damage_pre", ET_CONTINUE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL, FP_CELL);
 	codForwards[DAMAGE_POST] = CreateMultiForward ("cod_damage_post", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL, FP_CELL);
 	codForwards[WEAPON_DEPLOY] = CreateMultiForward("cod_weapon_deploy", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[CUR_WEAPON] = CreateMultiForward("cod_cur_weapon", ET_IGNORE, FP_CELL, FP_CELL);
@@ -230,6 +230,7 @@ public plugin_init()
 	codForwards[MINE_EXPLODE] = CreateMultiForward("cod_mine_explode", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
 	codForwards[DYNAMITE_EXPLODE] = CreateMultiForward("cod_dynamite_explode", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
 	codForwards[THUNDER_REACH] = CreateMultiForward("cod_thunder_reach", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
+	codForwards[TELEPORT_USED] = CreateMultiForward("cod_teleport_used", ET_CONTINUE, FP_CELL);
 
 	register_clcmd("say /wybierzitem", "select_item");
 }
@@ -1794,6 +1795,12 @@ public use_teleport(id)
 	set_pev(id, pev_origin, dest);
 
 	check_if_player_stuck(id);
+
+	new ret;
+
+	ExecuteForward(codForwards[TELEPORT_USED], ret, id);
+
+	if (ret > 0) codPlayer[id][PLAYER_LAST_TELEPORT] += ret;
 	
 	return PLUGIN_HANDLED;
 }
@@ -4808,6 +4815,16 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 				ExecuteForward(codForwards[type], ret, id, player, floatabs(damage) + get_intelligence(id) * factor);
 
 				if (ret == COD_BLOCK) continue;
+
+				if (ret > 0) {
+					switch(type) {
+						case MEDKIT_HEAL: codPlayer[id][PLAYER_LAST_MEDKIT] += ret;
+						case MINE_EXPLODE: codPlayer[id][PLAYER_LAST_MINE] += ret;
+						case ROCKET_EXPLODE: codPlayer[id][PLAYER_LAST_ROCKET] += ret;
+						case DYNAMITE_EXPLODE: codPlayer[id][PLAYER_LAST_DYNAMITE] += ret;
+						case THUNDER_REACH: codPlayer[id][PLAYER_LAST_THUNDER] += ret;
+					}
+				}
 			}
 
 			if (damage < 0.0) cod_add_user_health(player, floatround(floatabs(damage) + codPlayer[id][PLAYER_INT] * factor), 1);
