@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME        "Furia"
-#define DESCRIPTION "Po aktywacji przez %ss zadajesz potrojne obrazenia"
+#define DESCRIPTION "Po aktywacji przez %ss masz 1/3 szansy na natychmiastowe zabicie z kazdej broni."
 #define RANDOM_MIN  4
 #define RANDOM_MAX  5
 
@@ -65,5 +65,5 @@ public cod_item_skill_used(id)
 public deactivate_item(id)
 	rem_bit(id - TASK_ITEM, itemActive);
 
-public cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits == DMG_BULLET && get_bit(victim, itemActive)) damage *= 3.0;
+public cod_item_damage_killer(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
+	if (get_bit(victim, itemActive) && random_num(1, 3) == 1) damage = cod_kill_player(attacker, victim, damageBits);
