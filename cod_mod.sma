@@ -1703,8 +1703,6 @@ public use_thunder(id)
 	new ent = create_entity("info_target");
 
 	entity_set_string(ent, EV_SZ_classname, "thunder");
-
-	cod_inflict_damage(id, victim, 65.0, 0.5, DMG_CODSKILL);
 	
 	remove_entity(ent);
 	
@@ -1732,7 +1730,9 @@ public use_thunder(id)
 
 	if (float(ret) == COD_BLOCK) return PLUGIN_CONTINUE;
 
-	if (ret > 0) codPlayer[id][PLAYER_LAST_THUNDER] += ret;
+	cod_inflict_damage(id, victim, 65.0, 0.5, DMG_CODSKILL);
+
+	codPlayer[id][PLAYER_LAST_THUNDER] += ret;
 
 	return PLUGIN_CONTINUE;
 }
@@ -4818,13 +4818,11 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 
 				if (float(ret) == COD_BLOCK) continue;
 
-				if (ret > 0) {
-					switch(type) {
-						case MEDKIT_HEAL: codPlayer[id][PLAYER_LAST_MEDKIT] += ret;
-						case MINE_EXPLODE: codPlayer[id][PLAYER_LAST_MINE] += ret;
-						case ROCKET_EXPLODE: codPlayer[id][PLAYER_LAST_ROCKET] += ret;
-						case DYNAMITE_EXPLODE: codPlayer[id][PLAYER_LAST_DYNAMITE] += ret;
-					}
+				switch(type) {
+					case MEDKIT_HEAL: codPlayer[id][PLAYER_LAST_MEDKIT] += ret;
+					case MINE_EXPLODE: codPlayer[id][PLAYER_LAST_MINE] += ret;
+					case ROCKET_EXPLODE: codPlayer[id][PLAYER_LAST_ROCKET] += ret;
+					case DYNAMITE_EXPLODE: codPlayer[id][PLAYER_LAST_DYNAMITE] += ret;
 				}
 			}
 

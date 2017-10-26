@@ -1071,7 +1071,7 @@ Id is medkit owner.
 Player is healed player.
 Healed is healed hp.
 Healing will be blocked if COD_BLOCK is returned.
-Time for next medkit use will be reduced if returned value is greater than 0.
+Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
 ------------------------------*/
 forward cod_medkit_heal(id, player, Float:healed);
 
@@ -1081,7 +1081,7 @@ Id is rocket owner.
 Player is hurt player.
 Damage is damage that rocket made to player.
 Damage will be blocked if COD_BLOCK is returned.
-Time for next rocket use will be reduced if returned value is greater than 0.
+Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
 ------------------------------*/
 forward cod_rocket_explode(id, player, Float:damage);
 
@@ -1091,7 +1091,7 @@ Id is mine owner.
 Player is hurt player.
 Damage is damage that mine made to player.
 Damage will be blocked if COD_BLOCK is returned.
-Time for next mine use will be reduced if returned value is greater than 0.
+Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
 ------------------------------*/
 forward cod_mine_explode(id, player, Float:damage);
 
@@ -1101,7 +1101,7 @@ Id is dynamite owner.
 Player is hurt player.
 Damage is damage that dynamite made to player.
 Damage will be blocked if COD_BLOCK is returned.
-Time for next dynamite use will be reduced if returned value is greater than 0.
+Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
 ------------------------------*/
 forward cod_dynamite_explode(id, player, Float:damage);
 
@@ -1111,14 +1111,14 @@ Id is thunder owner.
 Player is hurt player.
 Damage is damage that thunder made to player.
 Damage will be blocked if COD_BLOCK is returned.
-Time for next thunder use will be reduced if returned value is greater than 0.
+Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
 ------------------------------*/
 forward cod_thunder_reach(id, player, Float:damage);
 
 /*------------------------------
 Multiforward executed on teleport use.
 Id is player that used teleport.
-Time for next teleport use will be reduced if returned value is greater than 0.
+Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
 ------------------------------*/
 forward cod_thunder_reach(id);
 
