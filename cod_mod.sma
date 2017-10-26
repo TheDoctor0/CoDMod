@@ -1696,10 +1696,6 @@ public use_thunder(id)
 		return PLUGIN_CONTINUE;
 	}
 
-	ExecuteForward(codForwards[THUNDER_REACH], ret, id, victim, 65.0 + get_intelligence(id) * 0.5);
-
-	if (ret == COD_BLOCK) return PLUGIN_CONTINUE;
-	
 	codPlayer[id][PLAYER_LAST_THUNDER] = get_gametime();
 	codPlayer[id][PLAYER_THUNDERS][ALL]--;
 	codPlayer[id][PLAYER_THUNDERS][USED]++;
@@ -1731,6 +1727,12 @@ public use_thunder(id)
 	
 	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_THUNDER], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	emit_sound(victim, CHAN_WEAPON, codSounds[SOUND_THUNDER], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+	ExecuteForward(codForwards[THUNDER_REACH], ret, id, victim, 65.0 + get_intelligence(id) * 0.5);
+
+	if (float(ret) == COD_BLOCK) return PLUGIN_CONTINUE;
+
+	if (ret > 0) codPlayer[id][PLAYER_LAST_THUNDER] += ret;
 
 	return PLUGIN_CONTINUE;
 }
@@ -1973,7 +1975,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 
 	ExecuteForward(codForwards[DAMAGE_PRE], ret, attacker, victim, weapon, damage, damageBits, hitPlace);
 
-	if (damage <= 0.0 || ret == COD_BLOCK) return HAM_SUPERCEDE;
+	if (damage <= 0.0 || float(ret) == COD_BLOCK) return HAM_SUPERCEDE;
 
 	SetHamParamFloat(4, damage);
 
@@ -4814,7 +4816,7 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 			if (type != NONE) {
 				ExecuteForward(codForwards[type], ret, id, player, floatabs(damage) + get_intelligence(id) * factor);
 
-				if (ret == COD_BLOCK) continue;
+				if (float(ret) == COD_BLOCK) continue;
 
 				if (ret > 0) {
 					switch(type) {
@@ -4822,7 +4824,6 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 						case MINE_EXPLODE: codPlayer[id][PLAYER_LAST_MINE] += ret;
 						case ROCKET_EXPLODE: codPlayer[id][PLAYER_LAST_ROCKET] += ret;
 						case DYNAMITE_EXPLODE: codPlayer[id][PLAYER_LAST_DYNAMITE] += ret;
-						case THUNDER_REACH: codPlayer[id][PLAYER_LAST_THUNDER] += ret;
 					}
 				}
 			}
