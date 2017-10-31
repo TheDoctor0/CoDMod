@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Mnich"
-#define DESCRIPTION  "Posiada teleport, ktorego moze uzyc co 15 sekund."
+#define DESCRIPTION  "Posiada 3 teleporty, ktorych moze uzyc co 15 sekund."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_AK47)|(1<<CSW_P228)
 #define HEALTH       15
@@ -23,7 +23,7 @@ public plugin_init()
 }
 
 public cod_class_enabled(id, promotion)
-	cod_set_user_teleports(id, FULL, CLASS);
+	cod_set_user_teleports(id, 3, CLASS);
 
 public cod_class_skill_used(id)
 	cod_use_user_teleport(id);

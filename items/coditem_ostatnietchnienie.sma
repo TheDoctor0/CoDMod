@@ -57,6 +57,8 @@ public cod_damage_pre(attacker, victim, weapon, Float:damage, damageBits, hitPla
 
 		set_task(float(itemValue[victim]), "deactivate_item", victim + TASK_DEATH, data, sizeof data);
 
+		cod_set_user_godmode(victim, true, ITEM);
+
 		return _:COD_BLOCK;
 	}
 
@@ -64,4 +66,10 @@ public cod_damage_pre(attacker, victim, weapon, Float:damage, damageBits, hitPla
 }
 
 public deactivate_item(data[])
-	if (is_user_connected(data[0]) && is_user_alive(data[1])) cod_kill_player(data[0], data[1], data[2]);
+{
+	if (is_user_connected(data[0]) && is_user_alive(data[1])) {
+		cod_set_user_godmode(data[1], false, ITEM);
+		
+		cod_kill_player(data[0], data[1], data[2]);
+	}
+}

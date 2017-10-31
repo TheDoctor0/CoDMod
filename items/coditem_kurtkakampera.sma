@@ -16,10 +16,10 @@ public plugin_init()
 }
 
 public cod_item_enabled(id, value)
-	cod_set_user_render(id, ITEM, 20, RENDER_STAND);
+	cod_set_user_render(id, 20, ITEM, RENDER_STAND);
 
 public cod_item_spawned(id, respawn)
-	if (!respawn) cod_set_user_render(id, ITEM, 20, RENDER_STAND);
+	if (!respawn) cod_set_user_render(id, 20, ITEM, RENDER_STAND);
 
 public cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	cod_set_user_render(victim, ITEM, 256);
+	cod_set_user_render(victim, 256, ITEM);

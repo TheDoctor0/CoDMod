@@ -35,4 +35,4 @@ public cod_class_skill_used(id)
 	cod_use_user_dynamite(id);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (weapon == CSW_SCOUT && damageBits & DMG_BULLET & cod_percent_chance(50)) damage = cod_kill_player(attacker, victim, damageBits);
+	if (weapon == CSW_SCOUT && damageBits & DMG_BULLET && cod_percent_chance(50)) damage = cod_kill_player(attacker, victim, damageBits);

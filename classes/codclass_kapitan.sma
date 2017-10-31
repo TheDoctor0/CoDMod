@@ -33,6 +33,9 @@ public cod_class_enabled(id, promotion)
 	cod_set_user_teleports(id, 1, CLASS);
 }
 
+public cod_class_skill_used(id)
+	cod_use_user_teleport(id);
+
 public cod_class_spawned(id, respawn)
 	if(!respawn) itemUse[id] = BULLETS;
 

@@ -2788,11 +2788,20 @@ public reset_attributes(id, type)
 		calculate_teleports_left(id);
 	}
 
-	new unlimitedWeapons, eliminatorWeapons, reductorWeapons;
-
 	codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] = 0;
 	codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] = 0;
 	codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] = 0;
+	codPlayer[id][PLAYER_FOOTSTEPS][ALL] = 0;
+	codPlayer[id][PLAYER_BUNNYHOP][ALL] = 0;
+	codPlayer[id][PLAYER_RESISTANCE][ALL] = 0;
+	codPlayer[id][PLAYER_NOCLIP][ALL] = 0;
+	codPlayer[id][PLAYER_GODMODE][ALL] = 0;
+	codPlayer[id][PLAYER_MODEL][ALL] = 0;
+	codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] = 0;
+	codPlayer[id][PLAYER_ELIMINATOR][ALL] = 0;
+	codPlayer[id][PLAYER_REDUCER][ALL] = 0;
+
+	new unlimitedWeapons, eliminatorWeapons, reductorWeapons;
 
 	for (new i = CLASS; i <= ROUND; i++) {
 		if (codPlayer[id][PLAYER_FOOTSTEPS][i]) codPlayer[id][PLAYER_FOOTSTEPS][ALL] = true;
