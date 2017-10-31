@@ -1665,7 +1665,7 @@ public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSiz
 
 public save_clan(clan)
 {
-	static queryData[256], safeClanName[64], codClan[clanInfo];
+	static queryData[512], safeClanName[64], codClan[clanInfo];
 	
 	ArrayGetArray(codClans, clan, codClan);
 

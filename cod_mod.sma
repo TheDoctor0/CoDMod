@@ -3210,7 +3210,7 @@ public save_data(id, end)
 {
 	if (!codPlayer[id][PLAYER_CLASS] || !get_bit(id, dataLoaded)) return;
 
-	new queryData[256], className[MAX_NAME];
+	static queryData[512], className[MAX_NAME];
 
 	get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 	
@@ -3253,7 +3253,7 @@ public save_data(id, end)
 	codPlayer[id][PLAYER_LEVEL] += codPlayer[id][PLAYER_GAINED_LEVEL];
 	codPlayer[id][PLAYER_GAINED_LEVEL] = 0;
 	
-	new codClass[playerClassInfo];
+	static codClass[playerClassInfo];
 	
 	codClass[PCLASS_LEVEL] = codPlayer[id][PLAYER_LEVEL];
 	codClass[PCLASS_EXP] = codPlayer[id][PLAYER_EXP];
@@ -3295,7 +3295,7 @@ public load_class(id, class)
 		
 		ArraySetArray(codPlayerClasses[id], class, codClass);
 		
-		new tempData[128], className[MAX_NAME];
+		new tempData[256], className[MAX_NAME];
 		
 		get_class_info(class, CLASS_NAME, className, charsmax(className));
 		
