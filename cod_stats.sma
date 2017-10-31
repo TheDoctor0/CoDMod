@@ -90,11 +90,11 @@ public client_putinserver(id)
 	
 	rem_bit(id, dataLoaded);
 	rem_bit(id, visitInfo);
-	rem_bit(id, soundMayTheForce);
 	rem_bit(id, soundOneAndOnly);
-	rem_bit(id, soundHumiliation);
 	rem_bit(id, soundLastLeft);
 	rem_bit(id, soundPrepare);
+	set_bit(id, soundMayTheForce);
+	set_bit(id, soundHumiliation);
 	
 	load_sounds(id);
 	load_stats(id);
@@ -653,7 +653,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 		for (new i = 1; i <= MAX_PLAYERS; i++) {
 			if (!is_user_connected(i)) continue;
 
-			if (pev(i, pev_iuser2) == victim || i == victim) client_cmd(i, "spk %s", codSounds[SOUND_HUMILIATION]);
+			if ((pev(i, pev_iuser2) == victim || i == victim) && get_bit(i, soundHumiliation)) client_cmd(i, "spk %s", codSounds[SOUND_HUMILIATION]);
 		}
 	}
 
@@ -728,7 +728,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 		for (new i = 1; i <= MAX_PLAYERS; i++) {
 			if (!is_user_connected(i)) continue;
 
-			if (pev(i, pev_iuser2) == lastT || pev(i, pev_iuser2) == lastCT || i == lastT || i == lastCT) client_cmd(i, "spk %s", codSounds[SOUND_FORCE]);
+			if ((pev(i, pev_iuser2) == lastT || pev(i, pev_iuser2) == lastCT || i == lastT || i == lastCT) && get_bit(i, soundMayTheForce)) client_cmd(i, "spk %s", codSounds[SOUND_FORCE]);
 		}
 
 		new lastTName[32], lastCTName[32];
@@ -744,7 +744,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 		for (new i = 1; i <= MAX_PLAYERS; i++) {
 			if (!is_user_connected(i)) continue;
 
-			if ((is_user_alive(i) && get_user_team(i) == 2) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 2)) client_cmd(i, "spk %s", codSounds[SOUND_LAST]);
+			if (((is_user_alive(i) && get_user_team(i) == 2) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 2)) && get_bit(i, soundOneAndOnly)) client_cmd(i, "spk %s", codSounds[SOUND_LAST]);
 
 			if (pev(i, pev_iuser2) == lastT || i == lastT) client_cmd(i, "spk %s", codSounds[SOUND_ONE]);
 		}
@@ -757,7 +757,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 		for (new i = 1; i <= MAX_PLAYERS; i++) {
 			if (!is_user_connected(i)) continue;
 			
-			if ((is_user_alive(i) && get_user_team(i) == 1) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 1)) client_cmd(i, "spk %s", codSounds[SOUND_LAST]);
+			if (((is_user_alive(i) && get_user_team(i) == 1) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 1)) && get_bit(i, soundOneAndOnly)) client_cmd(i, "spk %s", codSounds[SOUND_LAST]);
 
 			if (pev(i, pev_iuser2) == lastCT || i == lastCT) client_cmd(i, "spk %s", codSounds[SOUND_ONE]);
 		}
@@ -771,7 +771,7 @@ public bomb_planted(planter)
 	for (new i = 1; i <= MAX_PLAYERS; i++) {
 		if (!is_user_connected(i)) continue;
 
-		if ((is_user_alive(i) && get_user_team(i) == 2) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 2)) client_cmd(i, "spk %s", codSounds[SOUND_BOMB]);
+		if (((is_user_alive(i) && get_user_team(i) == 2) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 2)) && get_bit(i, soundPrepare)) client_cmd(i, "spk %s", codSounds[SOUND_BOMB]);
 	}
 }
 
