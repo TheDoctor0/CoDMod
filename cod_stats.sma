@@ -6,6 +6,7 @@
 #include <cstrike>
 #include <fakemeta>
 #include <unixtime>
+#include <nvault>
 
 #define PLUGIN "CoD Stats"
 #define VERSION "1.0.8"
@@ -21,6 +22,7 @@ new const commandBestStats[][] = { "say /staty", "say_team /staty", "say /bestst
 new const commandTopStats[][] = { "say /stop15", "say_team /stop15", "say /topstats", "say_team /topstats", "say /topstaty", "say_team /topstaty", "topstaty" };
 new const commandMedals[][] = { "say /medal", "say_team /medal", "say /medale", "say_team /medale", "say /medals", "say_team /medals", "medale" };
 new const commandTopMedals[][] = { "say /mtop15", "say_team /mtop15", "say /topmedals", "say_team /topmedals", "say /topmedale", "say_team /topmedale", "topmedale" };
+new const commandSounds[][] = { "say /dzwiek", "say_team /dzwiek", "say /dzwieki", "say_team /dzwieki", "say /sound", "say_team /sound", "dzwieki" };
 
 enum _:statsInfo { ADMIN, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE, SILVER, GOLD, MEDALS, BEST_STATS, BEST_KILLS, 
 	BEST_HS_KILLS, BEST_DEATHS, CURRENT_STATS, CURRENT_KILLS, CURRENT_HS_KILLS, CURRENT_DEATHS, ROUND_KILLS, ROUND_HS_KILLS };
@@ -30,6 +32,8 @@ new playerName[MAX_PLAYERS + 1][64], playerStats[MAX_PLAYERS + 1][statsInfo], pl
 	Handle:sql, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo;
 
 new cvarGoldMedalExp, cvarSilverMedalExp, cvarBronzeMedalExp, cvarAssistEnabled, cvarAssistDamage, cvarAssistExp;
+
+new soundsVault, soundMayTheForce, soundOneAndOnly, soundPrepare, soundHumiliation, soundLastLeft;
 
 public plugin_init() 
 {
@@ -50,12 +54,15 @@ public plugin_init()
 	for (new i; i < sizeof commandTopStats; i++) register_clcmd(commandTopStats[i], "command_top_stats");
 	for (new i; i < sizeof commandMedals; i++) register_clcmd(commandMedals[i], "command_medals");
 	for (new i; i < sizeof commandTopMedals; i++) register_clcmd(commandTopMedals[i], "command_top_medals");
+	for (new i; i < sizeof commandSounds; i++) register_clcmd(commandSounds[i], "command_sounds");
 
 	register_event("TextMsg", "hostages_rescued", "a", "2&#All_Hostages_R");
 
 	register_message(get_user_msgid("SayText"), "say_text");
 
 	register_message(SVC_INTERMISSION, "message_intermission");
+
+	soundsVault = nvault_open("cod_sound");
 }
 
 public plugin_cfg()
@@ -78,12 +85,18 @@ public client_putinserver(id)
 	get_user_name(id, playerName[id], charsmax(playerName[]));
 
 	cod_sql_string(playerName[id], playerName[id], charsmax(playerName[]));
-	
-	rem_bit(id, dataLoaded);
-	rem_bit(id, visitInfo);
 
 	for (new i = 0; i <= ROUND_HS_KILLS; i++) playerStats[id][i] = 0;
 	
+	rem_bit(id, dataLoaded);
+	rem_bit(id, visitInfo);
+	rem_bit(id, soundMayTheForce);
+	rem_bit(id, soundOneAndOnly);
+	rem_bit(id, soundHumiliation);
+	rem_bit(id, soundLastLeft);
+	rem_bit(id, soundPrepare);
+	
+	load_sounds(id);
 	load_stats(id);
 }
 
@@ -465,6 +478,60 @@ public show_top_medals(failState, Handle:query, error[], errorNum, tempId[], dat
 	
 	show_motd(id, motdData, "Top15 Medali");
 	
+	return PLUGIN_HANDLED;
+}
+
+public command_sounds(id)
+{
+	new menuData[64], menu = menu_create("\yUstawienia \rDzwiekow\w:", "command_sounds_handle");
+
+	formatex(menuData, charsmax(menuData), "\wThe Force Will Be With You \w[\r%s\w]", get_bit(id, soundMayTheForce) ? "Wlaczony" : "Wylaczony");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "\wI Am The One And Only \w[\r%s\w]", get_bit(id, soundOneAndOnly) ? "Wlaczony" : "Wylaczony");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "\wDziabnal Mnie \w[\r%s\w]", get_bit(id, soundHumiliation) ? "Wlaczony" : "Wylaczony");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "\wKici Kici Tas Tas \w[\r%s\w]", get_bit(id, soundLastLeft) ? "Wlaczony" : "Wylaczony");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "\wNie Obijac Sie \w[\r%s\w]", get_bit(id, soundPrepare) ? "Wlaczony" : "Wylaczony");
+	menu_additem(menu, menuData);
+	
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	
+	menu_display(id, menu);
+	
+	return PLUGIN_HANDLED;
+}
+
+public command_sounds_handle(id, menu, item)
+{
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
+	
+	if (item == MENU_EXIT) {
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	
+	switch(item) {
+		case 0: get_bit(id, soundMayTheForce) ? rem_bit(id, soundMayTheForce) : set_bit(id, soundMayTheForce);
+		case 1: get_bit(id, soundOneAndOnly) ? rem_bit(id, soundOneAndOnly) : set_bit(id, soundOneAndOnly);
+		case 2: get_bit(id, soundHumiliation) ? rem_bit(id, soundHumiliation) : set_bit(id, soundHumiliation);
+		case 3: get_bit(id, soundLastLeft) ? rem_bit(id, soundLastLeft) : set_bit(id, soundLastLeft);
+		case 4: get_bit(id, soundPrepare) ? rem_bit(id, soundPrepare) : set_bit(id, soundPrepare);
+	}
+	
+	save_sounds(id);
+
+	command_sounds(id);
+
+	menu_destroy(menu);
+
 	return PLUGIN_HANDLED;
 }
 
@@ -973,6 +1040,37 @@ stock save_stats(id, end = 0)
 	
 	if (end) rem_bit(id, dataLoaded);
 }
+
+public save_sounds(id)
+{
+	new vaultKey[64], vaultData[16];
+
+	formatex(vaultKey, charsmax(vaultKey), "%s-sounds", playerName[id]);
+	formatex(vaultData, charsmax(vaultData), "%d %d %d %d %d", get_bit(id, soundMayTheForce), get_bit(id, soundOneAndOnly), get_bit(id, soundHumiliation), get_bit(id, soundPrepare), get_bit(id, soundLastLeft));
+
+	nvault_set(soundsVault, vaultKey, vaultData);
+
+	return PLUGIN_CONTINUE;
+}
+
+public load_sounds(id)
+{
+	new vaultKey[64], vaultData[16], soundsData[5][5];
+
+	formatex(vaultKey, charsmax(vaultKey), "%s-sounds", playerName[id]);
+
+	if (nvault_get(soundsVault, vaultKey, vaultData, charsmax(vaultData))) {
+		parse(vaultData, soundsData[0], charsmax(soundsData), soundsData[1], charsmax(soundsData), soundsData[2], charsmax(soundsData), soundsData[3], charsmax(soundsData), soundsData[4], charsmax(soundsData));
+
+		if(str_to_num(soundsData[0])) set_bit(id, soundMayTheForce);
+		if(str_to_num(soundsData[1])) set_bit(id, soundOneAndOnly);
+		if(str_to_num(soundsData[2])) set_bit(id, soundHumiliation);
+		if(str_to_num(soundsData[3])) set_bit(id, soundPrepare);
+		if(str_to_num(soundsData[4])) set_bit(id, soundLastLeft);
+	}
+
+	return PLUGIN_CONTINUE;
+} 
 
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
