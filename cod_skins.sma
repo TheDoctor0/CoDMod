@@ -376,7 +376,11 @@ public buy_weapon_skin_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
+	if (playerData[id][ACTIVE][get_weaponid(skin[SKIN_WEAPON])] == NONE) {
+		set_skin(id, skin[SKIN_WEAPON], skinId);
+
+		add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME], 1);
+	} else add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
 
 	ArrayPushCell(playerSkins[id], skinId);
 
@@ -396,7 +400,7 @@ public cod_weapon_deploy(id, weaponId, ent)
 
 public set_fov(id)
 {
-	if (playerData[id][SKIN] > -1 && (playerData[id][WEAPON] == CSW_AWP || playerData[id][WEAPON] == CSW_SCOUT)) {
+	if (playerData[id][SKIN] > NONE && (playerData[id][WEAPON] == CSW_AWP || playerData[id][WEAPON] == CSW_SCOUT)) {
 		switch (read_data(1)) {
 			case 10..55: {
 				if (playerData[id][WEAPON] == CSW_AWP) set_pev(id, pev_viewmodel2, "models/v_awp.mdl");
