@@ -8,16 +8,17 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Lowca"
-#define DESCRIPTION  "Dostaje kusze (R na nozu) i 10 beltow, ktore zabijaja po trafieniu."
-#define FRACTION     "Podstawowe"
-#define WEAPONS      (1<<CSW_AK47)|(1<<CSW_USP)
-#define HEALTH       10
+#define DESCRIPTION  "Dostaje kusze (R na nozu) i 10 beltow, ktore zabijaja po trafieniu. Ma jedna mine."
+#define FRACTION     "Premium"
+#define WEAPONS      (1<<CSW_M4A1)|(1<<CSW_FIVESEVEN)
+#define HEALTH       15
 #define INTELLIGENCE 0
 #define STRENGTH     10
 #define STAMINA      20
-#define CONDITION    0
+#define CONDITION    5
+#define FLAG         ADMIN_LEVEL_F
 
-#define BELTS        5
+#define BELTS        10
 
 new const classModels[][] = { "models/CoDMod/crossbow.mdl", "models/CoDMod/crossbow2.mdl", "models/CoDMod/belt.mdl" };
 
@@ -29,7 +30,7 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
+	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION, FLAG);
 
 	register_touch("belt", "*" , "touch_belt");
 
@@ -44,6 +45,8 @@ public client_disconnected(id)
 
 public cod_class_enabled(id, promotion)
 {
+	cod_set_user_mines(id, 1, CLASS);
+
 	set_bit(id, classActive);
 
 	crossbowBelts[id] = BELTS;
@@ -63,6 +66,9 @@ public cod_class_spawned(id, respawn)
 
 	if (!respawn) crossbowBelts[id] = BELTS;
 }
+
+public cod_class_skill_used(id)
+	cod_use_user_mine(id);
 
 public cod_new_round()
 	cod_remove_ents(0, "belt");
@@ -138,7 +144,7 @@ public shoot_belt(id)
 
 	set_rendering(ent, kRenderFxGlowShell, 255, 0, 0, kRenderNormal, 56);
 	
-	VelocityByAim(id, 1000, velocity);
+	VelocityByAim(id, 1500, velocity);
 
 	entity_set_vector(ent, EV_VEC_velocity, velocity);
 
