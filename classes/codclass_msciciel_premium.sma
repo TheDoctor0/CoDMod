@@ -15,12 +15,13 @@
 #define STRENGTH     5
 #define STAMINA      20
 #define CONDITION    5
+#define FLAG         ADMIN_LEVEL_F
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
+	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION, FLAG);
 }
 
 public cod_class_enabled(id)

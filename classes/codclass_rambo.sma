@@ -30,7 +30,7 @@ public cod_class_enabled(id, promotion)
 }
 
 public cod_class_spawned(id, respawn)
-	cod_give_weapon(id, CSW_FLASHBANG, 4);
+	if (!respawn) cod_give_weapon(id, CSW_FLASHBANG, 4);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 	if (weapon == CSW_FAMAS && damageBits & DMG_BULLET) damage *= 1.3 + (0.002 * cod_get_user_intelligence(attacker));

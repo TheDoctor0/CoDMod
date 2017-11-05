@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Mysliwy"
-#define DESCRIPTION  "Ma 1/2 na natychmiastowe zabicie ze Scouta, mala widocznosc na nozu, podwojny skok i 2 dynamity."
+#define DESCRIPTION  "Ma 1/2 na natychmiastowe zabicie ze Scouta, podwojny skok, mala widocznosc na nozu i 2 dynamity."
 #define FRACTION     "SuperPremium"
 #define WEAPONS      (1<<CSW_SCOUT)|(1<<CSW_DEAGLE)
 #define HEALTH       30
@@ -14,12 +14,13 @@
 #define STRENGTH     10
 #define STAMINA      0
 #define CONDITION    20
+#define FLAG         ADMIN_LEVEL_G
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
+	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION, FLAG);
 }
 
 public cod_class_enabled(id)

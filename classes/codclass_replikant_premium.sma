@@ -18,6 +18,7 @@
 #define STRENGTH     0
 #define STAMINA      10
 #define CONDITION    15
+#define FLAG         ADMIN_LEVEL_F
 
 #define REPLICAS     2
 
@@ -27,7 +28,7 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 	
-	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
+	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION, FLAG);
 
 	RegisterHam(Ham_TakeDamage, "info_target", "take_damage");
 }
