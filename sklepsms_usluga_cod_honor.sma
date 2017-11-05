@@ -22,8 +22,7 @@ public ss_service_bought(id,amount)
 
 public native_filter(const native_name[], index, trap) 
 {
-	if(trap == 0) 
-	{
+	if (trap == 0) {
 		register_plugin(PLUGIN, VERSION, AUTHOR);
 
 		pause_plugin();

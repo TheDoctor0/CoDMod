@@ -19,8 +19,7 @@ public plugin_cfg()
 
 public ss_service_chosen(id) 
 {
-	if(!cod_get_user_class(id)) 
-	{
+	if (!cod_get_user_class(id)) {
 		client_print_color(id, id, "^x03[SKLEPSMS]^x01 Musisz^x04 wybrac klase^x01, aby moc zakupic^x04 EXP^x01.");
 
 		return SS_STOP;
@@ -34,8 +33,7 @@ public ss_service_bought(id, amount)
 
 public native_filter(const native_name[], index, trap) 
 {
-	if(trap == 0) 
-	{
+	if (trap == 0) {
 		register_plugin(PLUGIN, VERSION, AUTHOR);
 
 		pause_plugin();
