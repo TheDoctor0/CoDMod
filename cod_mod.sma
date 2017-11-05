@@ -137,7 +137,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_night_exp_from", "22"), cvarNightExpFrom);
 	bind_pcvar_num(create_cvar("cod_night_exp_to", "8"), cvarNightExpTo);
 	bind_pcvar_num(create_cvar("cod_max_level", "501"), cvarLevelLimit);
-	bind_pcvar_num(create_cvar("cod_level_ratio", "25"), cvarLevelRatio);
+	bind_pcvar_num(create_cvar("cod_level_ratio", "20"), cvarLevelRatio);
 	bind_pcvar_num(create_cvar("cod_killstreak_time", "15"), cvarKillStreakTime);
 	bind_pcvar_num(create_cvar("cod_min_players", "4"), cvarMinPlayers);
 	bind_pcvar_num(create_cvar("cod_min_bonus_players", "10"), cvarMinBonusPlayers);
@@ -3299,15 +3299,10 @@ public load_class(id, class)
 		
 		get_class_info(class, CLASS_NAME, className, charsmax(className));
 		
-		//TESTY
-		//formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`) VALUES ('%s', '%s')", codPlayer[id][PLAYER_NAME], className);
-		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`, `level`, `exp`) VALUES ('%s', '%s', '%i', '%i')", codPlayer[id][PLAYER_NAME], className, 49, get_level_exp(49 - 1));
+		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`) VALUES ('%s', '%s')", codPlayer[id][PLAYER_NAME], className);
+
 		SQL_ThreadQuery(sql, "ignore_handle", tempData);
 	}
-
-	//TESTY
-	if (codClass[PCLASS_LEVEL] < 49) codPlayer[id][PLAYER_LEVEL] = codClass[PCLASS_LEVEL] = 49;
-	if (codClass[PCLASS_EXP] < get_level_exp(49 - 1)) codPlayer[id][PLAYER_EXP] = codClass[PCLASS_EXP] = get_level_exp(49 - 1);
 	
 	codPlayer[id][PLAYER_POINTS] = (codPlayer[id][PLAYER_LEVEL] - 1) - codPlayer[id][PLAYER_INT] - codPlayer[id][PLAYER_HEAL] - codPlayer[id][PLAYER_STAM] - codPlayer[id][PLAYER_STR] - codPlayer[id][PLAYER_COND];
 } 

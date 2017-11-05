@@ -21,7 +21,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_honor_winround", "1"), cvarWinRound);
 	bind_pcvar_num(create_cvar("cod_honor_bombplanted", "2"), cvarBombPlanted);
 	bind_pcvar_num(create_cvar("cod_honor_bombdefused", "2"), cvarBombDefused);
-	bind_pcvar_num(create_cvar("cod_honor_rescuehostage", "1"), cvarRescueHostage);
+	bind_pcvar_num(create_cvar("cod_honor_rescuehostage", "2"), cvarRescueHostage);
 	bind_pcvar_num(create_cvar("cod_honor_killhostage", "4"), cvarKillHostage);
 	
 	register_event("SendAudio", "t_win_round" , "a", "2&%!MRAD_terwin");
@@ -202,13 +202,9 @@ public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], d
 	else {
 		new queryData[128];
 		
-		//formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_honor` (`name`) VALUES ('%s')", playerName[id]);
-		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_honor` (`name`, `honor`) VALUES ('%s', '10000')", playerName[id]);
+		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_honor` (`name`) VALUES ('%s')", playerName[id]);
 		
 		SQL_ThreadQuery(sql, "ignore_handle", queryData);
-
-		//TESTY
-		playerHonor[id] = 10000;
 	}
 	
 	set_bit(id, dataLoaded);
