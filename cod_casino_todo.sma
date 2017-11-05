@@ -162,7 +162,7 @@ public plugin_end()
 	TrieDestroy(g_tUserChance)
 }
 
-public client_disconnect(id)
+public client_disconnected(id)
 {
 	savePlayerBets(id)
 	checkPlayerTasks(id)
@@ -270,7 +270,7 @@ public cmdSay(id)
 	if(szSay[0] == '/')
 	{
 		new szCommand[15], szValue[MAX_PLAYERS]
-		strbreak(szSay, szCommand, charsmax(szCommand), szValue, charsmax(szValue))
+		argbreak(szSay, szCommand, charsmax(szCommand), szValue, charsmax(szValue))
 		new iMoneyBet = str_to_num(szValue)
 
 		if(equal(szCommand, "/roulette"))
