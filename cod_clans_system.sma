@@ -1395,21 +1395,30 @@ public say_text(msgId, msgDest, msgEnt)
 	new id = get_msg_arg_int(1);
 	
 	if (is_user_connected(id) && clan[id]) {
-		new tempMessage[192], message[192], prefix[64];
+		new tempMessage[192], message[192], chatPrefix[64], steamId[33], playerName[32];
 		
 		get_msg_arg_string(2, tempMessage, charsmax(tempMessage));
+		get_user_authid(id, steamId, charsmax(steamId)); 
 
-		get_clan_info(clan[id], CLAN_NAME, prefix, charsmax(prefix));
+		get_clan_info(clan[id], CLAN_NAME, chatPrefix, charsmax(chatPrefix));
 
-		format(prefix, charsmax(prefix), "^x04[%s]", prefix);
+		format(chatPrefix, charsmax(chatPrefix), "^x04[%s]", chatPrefix);
 		
 		if (!equal(tempMessage, "#Cstrike_Chat_All")) {
-			add(message, charsmax(message), prefix);
+			add(message, charsmax(message), chatPrefix);
 			add(message, charsmax(message), " ");
 			add(message, charsmax(message), tempMessage);
 		} else {
-			add(message, charsmax(message), prefix);
-			add(message, charsmax(message), "^x03 %s1^x01 :  %s2");
+	        get_user_name(id, playerName, charsmax(playerName));
+	        
+	        get_msg_arg_string(4, tempMessage, charsmax(tempMessage)); 
+	        set_msg_arg_string(4, "");
+	    
+	        add(message, charsmax(message), chatPrefix);
+	        add(message, charsmax(message), "^x03 ");
+	        add(message, charsmax(message), playerName);
+	        add(message, charsmax(message), "^x01 :  ");
+	        add(message, charsmax(message), tempMessage);
 		}
 		
 		set_msg_arg_string(2, message);
