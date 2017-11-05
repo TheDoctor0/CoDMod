@@ -12,10 +12,3 @@ public plugin_init()
 
 public plugin_cfg()
 	ss_register_service(serviceID);
-
-public ss_service_addingtolist(id, flags[])
-{
-	if(get_user_flags(id) & read_flags(flags)) return ITEM_DISABLED;
-		
-	return ITEM_ENABLED;
-}
