@@ -54,19 +54,19 @@ public cod_new_round()
 public cod_class_skill_used(id)
 {
 	if (!itemUse[id]) {
-		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Juz wykorzystales wszystkie repliki!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Juz wykorzystales wszystkie repliki!");
 
 		return PLUGIN_CONTINUE;
 	}
 	
 	if (itemLastUse[id] + 5.0 > get_gametime()) {
-		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Replike mozesz postawic raz na 5 sekund!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Replike mozesz postawic raz na 5 sekund!");
 
 		return PLUGIN_CONTINUE;
 	}
 
 	if (!(pev(id, pev_flags) & FL_ONGROUND)) {
-		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Musisz stac na podlozu, zeby postawic replike!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Musisz stac na podlozu, zeby postawic replike!");
 
 		return PLUGIN_CONTINUE;
 	}
@@ -74,7 +74,7 @@ public cod_class_skill_used(id)
 	new Float:entOrigin[3];
 		
 	if (!get_origin_in_distance(id, entOrigin, 45.0)) {
-		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Musisz odsunac sie nieco dalej od przeszkody, aby postawic replike!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Musisz odsunac sie nieco dalej od przeszkody, aby postawic replike!");
 
 		return PLUGIN_CONTINUE;
 	}
@@ -107,7 +107,7 @@ public cod_class_skill_used(id)
 	entity_set_int(ent, EV_INT_iuser1, id);
 
 	if (!cod_is_enough_space(ent, 150.0)) {
-		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Nie mozesz postawic repliki w przejsciu!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Nie mozesz postawic repliki w przejsciu!");
 
 		remove_entity(ent);
 

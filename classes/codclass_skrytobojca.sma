@@ -37,7 +37,7 @@ public cod_class_spawned(id, respawn)
 public cod_class_skill_used(id)
 {
 	if (get_bit(id, classUsed)) {
-		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Niewidzialnosc mozesz aktywowac tylko raz na runde!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Niewidzialnosc mozesz aktywowac tylko raz na runde!");
 
 		return PLUGIN_CONTINUE;
 	}

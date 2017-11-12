@@ -30,6 +30,6 @@ public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPl
 
 		get_user_name(victim, name, charsmax(name));
 
-		cod_show_hud(attacker, TYPE_DHUD, 0, 255, 0, -1.0, 0.45, 0, 0.0, 2.0, 0.0, 0.0, "Pozostale HP %s: %d", name, get_user_health(victim));
+		cod_show_hud(attacker, TYPE_DHUD, 0, 255, 0, -1.0, 0.55, 0, 0.0, 2.0, 0.0, 0.0, "Pozostale HP %s: %d", name, get_user_health(victim));
 	}
 }

@@ -101,19 +101,19 @@ public shoot_belt(id)
 	if (!is_user_alive(id)) return;
 	
 	if (!crossbowBelts[id]) {
-		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Juz wykorzystales wszystkie belty!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Juz wykorzystales wszystkie belty!");
 
 		return;
 	}
 
 	if (!get_bit(id, crossbowActive)) {
-		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Przeladuj kusze na R!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Przeladuj kusze na R!");
 
 		return;
 	}
 	
 	if (lastCrossbowBelt[id] + 3.0 > get_gametime()) {
-		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Belt mozesz wystrzelic raz na 3 sekundy!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Belt mozesz wystrzelic raz na 3 sekundy!");
 
 		return;
 	}

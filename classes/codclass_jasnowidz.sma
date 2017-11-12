@@ -39,7 +39,7 @@ public cod_class_enabled(id, promotion)
 public cod_class_skill_used(id)
 {
 	if (classLastUsed[id] + 30.0 > get_gametime()) {
-		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Jasnowidzenia mozesz uzyc raz na 30 sekund!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Jasnowidzenia mozesz uzyc raz na 30 sekund!");
 		
 		return PLUGIN_CONTINUE;
 	}
