@@ -182,8 +182,8 @@ public load_knife(id)
 	if (nvault_get(knives, vaultKey, vaultData, charsmax(vaultData))) {
 		playerKnife[id] = str_to_num(vaultData);
 
-		set_bonus(id, DEFAULT, playerKnife[id]);
-	} else set_bonus(id, BONUS, DEFAULT);
+		set_bonus(id, NONE, playerKnife[id]);
+	} else set_bonus(id, NONE, DEFAULT);
 
 	return PLUGIN_CONTINUE;
 } 
