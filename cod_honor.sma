@@ -9,7 +9,7 @@
 
 new cvarMinPlayers, cvarKill, cvarKillHS, cvarWinRound, cvarBombPlanted, cvarBombDefused, cvarRescueHostage, cvarKillHostage;
 
-new playerName[MAX_PLAYERS + 1][64], playerHonor[MAX_PLAYERS + 1], Handle:sql, dataLoaded;
+new playerName[MAX_PLAYERS + 1][64], playerHonor[MAX_PLAYERS + 1], Handle:sql, bool:sqlConnected, dataLoaded;
 
 public plugin_init()
 {	
@@ -58,11 +58,11 @@ public client_putinserver(id)
 
 	cod_sql_string(playerName[id], playerName[id], charsmax(playerName[]));
 	
-	load_honor(id);
+	set_task(0.1, "load_honor", id);
 }
 
 public client_disconnected(id)
-	save_honor(id);
+	remove_task(id);
 
 public cod_killed(killer, victim, weaponId, hitPlace)
 {
@@ -164,9 +164,13 @@ public sql_init()
 	
 	if (errorNum) {
 		log_to_file("cod_mod.log", "[CoD Honor] SQL Error: %s", error);
+
+		set_task(3.0, "sql_init");
 		
 		return;
 	}
+
+	sqlConnected = true;
 	
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_honor` (`name` VARCHAR(35), `honor` INT(11) NOT NULL, PRIMARY KEY(`name`));");
 
@@ -180,6 +184,12 @@ public sql_init()
 
 public load_honor(id)
 {
+	if (!sqlConnected) {
+		set_task(1.0, "load_honor", id);
+
+		return;
+	}
+
 	new queryData[128], tempId[1];
 	
 	tempId[0] = id;

@@ -21,7 +21,7 @@ enum _:queries { UPDATE, INSERT, DELETE };
 new const accountStatus[status][] = { "Niezarejestrowany", "Niezalogowany", "Zalogowany", "Gosc" };
 
 new playerName[MAX_PLAYERS + 1][64], playerSafeName[MAX_PLAYERS + 1][64], playerPassword[MAX_PLAYERS + 1][32], playerTempPassword[MAX_PLAYERS + 1][32], 
-	playerFails[MAX_PLAYERS + 1], playerStatus[MAX_PLAYERS + 1], Handle:sql, dataLoaded, autoLogin, cvarAccountsEnabled;
+	playerFails[MAX_PLAYERS + 1], playerStatus[MAX_PLAYERS + 1], Handle:sql, bool:sqlConnected, dataLoaded, autoLogin, cvarAccountsEnabled;
 
 public plugin_init() 
 {
@@ -75,11 +75,14 @@ public client_connect(id)
 	
 	cod_sql_string(playerName[id], playerSafeName[id], charsmax(playerSafeName[]));
 	
-	load_account(id);
+	set_task(0.1, "load_account", id);
 }
 
 public client_disconnected(id)
+{
+	remove_task(id);
 	remove_task(id + TASK_PASSWORD);
+}
 
 public message_team(id) 
 {
@@ -171,6 +174,8 @@ public account_menu(id, sound)
 	}
 
 	if (!get_user_team(id) && playerStatus[id] == LOGGED) {
+		client_cmd(id, "chooseteam");
+
 		engclient_cmd(id, "chooseteam");
 
 		return PLUGIN_HANDLED;
@@ -180,7 +185,7 @@ public account_menu(id, sound)
 
 	if (sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	static menuData[192];
+	static menuData[256];
 
 	formatex(menuData, charsmax(menuData), "\rSYSTEM REJESTRACJI^n^n\rNick: \w[\y%s\w]^n\rStatus: \w[\y%s\w]", playerName[id], accountStatus[playerStatus[id]]);
 	
@@ -267,6 +272,8 @@ public account_menu_handle(id, menu, item)
 			remove_task(id + TASK_PASSWORD);
 			
 			playerStatus[id] = GUEST;
+
+			client_cmd(id, "chooseteam");
 			
 			engclient_cmd(id, "chooseteam");
 		}
@@ -310,6 +317,8 @@ public login_account(id)
 	cod_print_chat(id, "Zostales pomyslnie^x04 zalogowany^x01. Zyczymy milej gry.");
 
 	cod_show_hud(id, TYPE_HUD, 0, 255, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Zostales pomyslnie zalogowany.");
+
+	client_cmd(id, "chooseteam");
 	
 	engclient_cmd(id, "chooseteam");
 	
@@ -419,6 +428,8 @@ public register_confirmation_handle(id, menu, item)
 	
 			cod_cmd_execute(id, "setinfo %s %s", SETINFO, playerPassword[id]);
 			cod_cmd_execute(id, "writecfg %s", CONFIG);
+
+			client_cmd(id, "chooseteam");
 	
 			engclient_cmd(id, "chooseteam");
 		}
@@ -620,9 +631,13 @@ public sql_init()
 	
 	if (errorNum) {
 		log_to_file("cod_mod.log", "[CoD Accounts] SQL Error: %s", error);
+
+		set_task(3.0, "sql_init");
 		
 		return;
 	}
+
+	sqlConnected = true;
 	
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_accounts` (`name` VARCHAR(64), `pass` VARCHAR(33), PRIMARY KEY(`name`));");
 
@@ -636,6 +651,12 @@ public sql_init()
 
 public load_account(id)
 {
+	if (!sqlConnected) {
+		set_task(1.0, "load_account", id);
+
+		return;
+	}
+
 	new queryData[128], tempId[1];
 	
 	tempId[0] = id;

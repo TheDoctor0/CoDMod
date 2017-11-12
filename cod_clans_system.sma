@@ -14,7 +14,7 @@ enum _:statusInfo { STATUS_NONE, STATUS_MEMBER, STATUS_DEPUTY, STATUS_LEADER };
 new cvarCreateLevel, cvarMembersStart, cvarLevelMax, cvarSkillMax, cvarChatPrefix, cvarLevelCost, cvarNextLevelCost, cvarSkillCost, 
 	cvarNextSkillCost, cvarMembersPerLevel, cvarHealthPerLevel, cvarGravityPerLevel, cvarDamagePerLevel, cvarWeaponDropPerLevel;
 
-new playerName[MAX_PLAYERS + 1][64], chosenName[MAX_PLAYERS + 1][64], clan[MAX_PLAYERS + 1], chosenId[MAX_PLAYERS + 1], Handle:sql, Array:codClans;
+new playerName[MAX_PLAYERS + 1][64], chosenName[MAX_PLAYERS + 1][64], clan[MAX_PLAYERS + 1], chosenId[MAX_PLAYERS + 1], Handle:sql, bool:sqlConnected, Array:codClans;
 
 public plugin_init()
 {
@@ -80,11 +80,15 @@ public client_putinserver(id)
 
 	cod_sql_string(playerName[id], playerName[id], charsmax(playerName));
 
-	load_data(id);
+	set_task(0.1, "load_data", id);
 }
 
 public client_disconnected(id)
+{
+	remove_task(id);
+
 	clan[id] = 0;
+}
 
 public cod_spawned(id, respawn)
 {
@@ -1634,9 +1638,13 @@ public sql_init()
 	
 	if (errorNum) {
 		log_to_file("cod_mod.log", "[CoD Clans] SQL Error: %s", error);
+
+		set_task(3.0, "sql_init");
 		
 		return;
 	}
+
+	sqlConnected = true;
 	
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans` (`id` INT NOT NULL AUTO_INCREMENT, `name` varchar(64) NOT NULL, ");
 	add(queryData, charsmax(queryData), "`members` INT NOT NULL, `honor` INT NOT NULL, `kills` INT NOT NULL, `level` INT NOT NULL, `health` INT NOT NULL, ");
@@ -1688,7 +1696,11 @@ public save_clan(clan)
 
 public load_data(id)
 {
-	if (!is_user_connected(id)) return;
+	if (!sqlConnected) {
+		set_task(1.0, "load_data", id);
+
+		return;
+	}
 
 	new queryData[128], tempId[1];
 	
@@ -1707,8 +1719,6 @@ public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], da
 	}
 	
 	new id = tempId[0];
-	
-	if (!is_user_connected(id)) return;
 	
 	if (SQL_MoreResults(query)) {
 		new codClan[clanInfo];

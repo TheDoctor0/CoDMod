@@ -29,7 +29,7 @@ enum _:statsInfo { ADMIN, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE, SILVER, 
 enum _:winers { THIRD, SECOND, FIRST };
 
 new playerName[MAX_PLAYERS + 1][64], playerStats[MAX_PLAYERS + 1][statsInfo], playerDamage[MAX_PLAYERS + 1][MAX_PLAYERS + 1],
-	Handle:sql, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo;
+	Handle:sql, bool:sqlConnected, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo;
 
 new cvarGoldMedalExp, cvarSilverMedalExp, cvarBronzeMedalExp, cvarAssistEnabled, cvarAssistDamage, cvarAssistExp;
 
@@ -97,14 +97,19 @@ public client_putinserver(id)
 	set_bit(id, soundHumiliation);
 	
 	load_sounds(id);
-	load_stats(id);
+
+	set_task(0.1, "load_stats", id);
 }
 
 public client_authorized(id)
 	playerStats[id][ADMIN] = get_user_flags(id) & ADMIN_BAN ? 1 : 0;
 	
 public client_disconnected(id)
+{
+	remove_task(id);
+
 	save_stats(id, 1);
+}
 	
 public stats_menu(id)
 {
@@ -918,9 +923,13 @@ public sql_init()
 	
 	if (errorNum) {
 		log_to_file("cod_mod.log", "[CoD Stats] SQL Error: %s", error);
+
+		set_task(3.0, "sql_init");
 		
 		return;
 	}
+
+	sqlConnected = true;
 	
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_stats` (`name` varchar(35) NOT NULL, `admin` INT NOT NULL, `kills` INT NOT NULL, `time` INT NOT NULL, ");
 	add(queryData, charsmax(queryData), "`firstvisit` INT NOT NULL, `lastvisit` INT NOT NULL, `bestkills` INT NOT NULL, `bestdeaths` INT NOT NULL, `besths` INT NOT NULL, ");
@@ -936,7 +945,11 @@ public sql_init()
 
 public load_stats(id)
 {
-	if (!is_user_connected(id)) return;
+	if (!sqlConnected) {
+		set_task(1.0, "load_stats", id);
+
+		return;
+	}
 
 	new queryData[128], tempId[1];
 	
@@ -955,8 +968,6 @@ public load_stats_handle(failState, Handle:query, error[], errorNum, tempId[], d
 	}
 	
 	new id = tempId[0];
-	
-	if (!is_user_connected(id)) return;
 	
 	if (SQL_NumRows(query)) {
 		playerStats[id][KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "kills"));

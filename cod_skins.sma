@@ -7,14 +7,12 @@
 #define VERSION "1.0.14"
 #define AUTHOR "O'Zone"
 
-#define TASK_LOAD 3045
-
 new const commandSkins[][] = { "skiny", "say /skins", "say_team /skins", "say /skin", "say_team /skin", "say /skiny", "say_team /skiny", "say /modele", "say_team /modele", "say /model", "say_team /model" };
 
 enum _:playerInfo { NAME[32], ACTIVE[CSW_P90 + 1], WEAPON, SKIN };
 enum _:skinsInfo { SKIN_NAME[64], SKIN_WEAPON[32], SKIN_MODEL[64], SKIN_PRICE };
 
-new playerData[MAX_PLAYERS + 1][playerInfo], Array:playerSkins[MAX_PLAYERS + 1], Array:skins, Array:weapons, Handle:sql, loaded;
+new playerData[MAX_PLAYERS + 1][playerInfo], Array:playerSkins[MAX_PLAYERS + 1], Array:skins, Array:weapons, Handle:sql, bool:sqlConnected, loaded;
 
 public plugin_init() 
 {
@@ -81,33 +79,7 @@ public plugin_precache()
 }
 
 public plugin_cfg()
-{
-	new host[32], user[32], pass[32], db[32], queryData[192], error[128], errorNum;
-	
-	get_cvar_string("cod_sql_host", host, charsmax(host));
-	get_cvar_string("cod_sql_user", user, charsmax(user));
-	get_cvar_string("cod_sql_pass", pass, charsmax(pass));
-	get_cvar_string("cod_sql_db", db, charsmax(db));
-	
-	sql = SQL_MakeDbTuple(host, user, pass, db);
-
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
-	
-	if (errorNum) {
-		log_to_file("cod_mod.log", "[CoD Skins] SQL Error: %s", error);
-		
-		return;
-	}
-	
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_skins` (name VARCHAR(35), weapon VARCHAR(35), skin VARCHAR(64), PRIMARY KEY(name, weapon, skin))");
-
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
-
-	SQL_Execute(query);
-	
-	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
-}
+	sql_init();
 
 public plugin_end()
 {
@@ -119,7 +91,7 @@ public plugin_end()
 }
 
 public client_disconnected(id)
-	remove_task(id + TASK_LOAD);
+	remove_task(id);
 
 public client_putinserver(id)
 {
@@ -135,7 +107,7 @@ public client_putinserver(id)
 	
 	cod_sql_string(playerData[id][NAME], playerData[id][NAME], charsmax(playerData[][NAME]));
 	
-	load_skins(id);
+	set_task(0.1, "load_skins", id);
 }
 
 public skins_menu(id)
@@ -426,8 +398,47 @@ public change_skin(id, weapon)
 	}
 }
 
+public sql_init()
+{
+	new host[32], user[32], pass[32], db[32], queryData[192], error[128], errorNum;
+	
+	get_cvar_string("cod_sql_host", host, charsmax(host));
+	get_cvar_string("cod_sql_user", user, charsmax(user));
+	get_cvar_string("cod_sql_pass", pass, charsmax(pass));
+	get_cvar_string("cod_sql_db", db, charsmax(db));
+	
+	sql = SQL_MakeDbTuple(host, user, pass, db);
+
+	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	
+	if (errorNum) {
+		log_to_file("cod_mod.log", "[CoD Skins] SQL Error: %s", error);
+
+		set_task(3.0, "sql_init");
+		
+		return;
+	}
+
+	sqlConnected = true;
+	
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_skins` (name VARCHAR(35), weapon VARCHAR(35), skin VARCHAR(64), PRIMARY KEY(name, weapon, skin))");
+
+	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
+
+	SQL_Execute(query);
+	
+	SQL_FreeHandle(query);
+	SQL_FreeHandle(connectHandle);
+}
+
 public load_skins(id)
 {
+	if (!sqlConnected) {
+		set_task(1.0, "load_skins", id);
+
+		return;
+	}
+
 	new playerId[1], queryData[128];
 	
 	playerId[0] = id;
