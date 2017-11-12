@@ -23,8 +23,8 @@ enum _:iconInfo { BOMBSITE_A, BOMBSITE_B, BOMB_DROPPED, BOMB_PLANTED, BOMB_EXPLO
 
 new const iconSprite[iconInfo][] =
 {
-	"sprites/CoDMod/bs_a.spr",
-	"sprites/CoDMod/bs_b.spr",
+	"sprites/CoDMod/bombsite_a.spr",
+	"sprites/CoDMod/bombsite_b.spr",
 	"sprites/CoDMod/dropped.spr",
 	"sprites/CoDMod/planted.spr",
 	"sprites/CoDMod/explode.spr",
@@ -42,7 +42,7 @@ public plugin_init()
 
 	get_mapname(mapName, charsmax(mapName));
 	
-	if (equal(mapName, "de_chateau") || equal(mapName, "de_dust2") || equal(mapName, "de_train")) {
+	if (equal(mapName, "de_chateau") || equal(mapName, "de_dust2") || equal(mapName, "de_train") || equal(mapName, "de_alexandra")) {
 		bsBombSiteA = BOMBSITE_B;
 		bsBombSiteB = BOMBSITE_A;
 	} else {
