@@ -69,7 +69,7 @@ public create_box(id)
 	set_pev(ent, pev_size, Float:{ -1.0, -3.0, 0.0, 1.0, 1.0, 10.0 });
 	engfunc(EngFunc_SetSize, ent, Float:{ -1.0, -3.0, 0.0 }, Float:{ 1.0, 1.0, 10.0 });
 	
-	entity_set_int(ent, EV_INT_solid, SOLID_BBOX);
+	entity_set_int(ent, EV_INT_solid, SOLID_TRIGGER);
 	set_pev(ent, pev_movetype, MOVETYPE_FLY);
 
 	cod_spawn_box_icon(ent);
