@@ -40,7 +40,7 @@ public cod_new_round()
 public cod_item_skill_used(id)
 {	
 	if (get_bit(id, itemUsed)) {
-		cod_show_hud(id, TYPE_HUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 3.0, 0.0, 0.0, "Wykorzystales juz elektromagnes w tej rundzie!");
+		cod_show_hud(id, TYPE_HUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Elektromagnesu mozesz uzyc tylko raz na rundee!");
 
 		return PLUGIN_CONTINUE;
 	}

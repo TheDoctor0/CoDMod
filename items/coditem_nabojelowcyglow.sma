@@ -33,4 +33,4 @@ public cod_item_value(id)
 	return itemValue[id];
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits == DMG_BULLET && hitPlace & HIT_HEAD) damage *= (1.0 + (itemValue[attacker] / 100.0));
+	if (damageBits & DMG_BULLET && hitPlace & HIT_HEAD) damage *= (1.0 + (itemValue[attacker] / 100.0));

@@ -51,4 +51,4 @@ public cod_item_value(id)
 	return itemValue[id];
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (weapon == CSW_AWP && damageBits == DMG_BULLET && cod_percent_chance(50)) damage = cod_kill_player(attacker, victim, damageBits);
+	if (weapon == CSW_AWP && damageBits & DMG_BULLET && cod_percent_chance(50)) damage = cod_kill_player(attacker, victim, damageBits);

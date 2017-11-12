@@ -23,7 +23,7 @@ public cod_item_disabled(id)
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if (damageBits == DMG_BULLET && weapon == CSW_DEAGLE) {
+	if (damageBits & DMG_BULLET && weapon == CSW_DEAGLE) {
 		if (cod_percent_chance(80)) damage = cod_kill_player(attacker, victim, damageBits);
 		else user_silentkill(attacker);
 	}

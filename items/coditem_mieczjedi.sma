@@ -34,7 +34,7 @@ public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageB
 
 public cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if (damageBits == DMG_BULLET && random_num(1, itemValue[victim]) == 1 && get_user_weapon(victim) == CSW_KNIFE) {
+	if (damageBits & DMG_BULLET && random_num(1, itemValue[victim]) == 1 && get_user_weapon(victim) == CSW_KNIFE) {
 		damage = COD_BLOCK;
 
 		cod_inflict_damage(victim, attacker, damage, 0.0, DMG_BULLET);

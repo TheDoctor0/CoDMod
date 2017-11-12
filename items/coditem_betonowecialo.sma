@@ -51,7 +51,7 @@ public cod_item_spawned(id, respawn)
 public cod_item_skill_used(id)
 {
 	if (get_bit(id, itemUsed)) {
-		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Betonowego Ciala mozesz uzyc tylko raz na runde!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.45, 0, 0.0, 1.25, 0.0, 0.0, "Betonowego Ciala mozesz uzyc tylko raz na runde!");
 
 		return;
 	}
@@ -68,4 +68,4 @@ public deactivate_item(id)
 	rem_bit(id - TASK_ITEM, itemActive);
 
 public cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits == DMG_BULLET && get_bit(victim, itemActive) && hitPlace != HIT_HEAD) damage = COD_BLOCK;
+	if (damageBits & DMG_BULLET && get_bit(victim, itemActive) && hitPlace != HIT_HEAD) damage = COD_BLOCK;

@@ -33,7 +33,7 @@ public cod_item_upgrade(id)
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if (damageBits == DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
+	if (damageBits & DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
 		remove_task(victim + TASK_FREEZE);
 
 		cod_display_icon(victim, "dmg_cold", 1, 0, 255, 255);

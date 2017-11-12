@@ -32,7 +32,7 @@ public cod_item_skill_used(id)
 	new target = get_nearest_player(id);
 			
 	if (target) {
-		cod_show_hud(id, TYPE_HUD, 0, 255, 0, -1.0, 0.43, 0, 0.0, 1.0, 1.0, 1.0, "Namierzono glowe przeciwnika!");
+		cod_show_hud(id, TYPE_HUD, 0, 255, 0, -1.0, 0.45, 0, 0.0, 1.25, 0.0, 0.0, "Namierzono glowe przeciwnika!");
 		
 		new Float:headOrigin[3], Float:headAngles[3];
 
@@ -42,7 +42,7 @@ public cod_item_skill_used(id)
 		
 		entity_set_aim(id, headOrigin);
 	}
-	else cod_show_hud(id, TYPE_HUD, 0, 255, 0, -1.0, 0.43, 0, 0.0, 1.0, 1.0, 1.0, "Wszyscy przeciwnicy sa zbyt daleko.");
+	else cod_show_hud(id, TYPE_HUD, 0, 255, 0, -1.0, 0.45, 0, 0.0, 1.25, 0.0, 0.0, "Wszyscy przeciwnicy sa zbyt daleko.");
 }
 
 stock entity_set_aim(ent, const Float:oldOrigin[3])

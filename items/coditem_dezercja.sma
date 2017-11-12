@@ -49,4 +49,4 @@ public cod_item_spawned(id, respawn)
 }
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits == DMG_BULLET && ((get_user_team(attacker) == 1 && weapon == CSW_AK47) || (get_user_team(attacker) == 2 && weapon == CSW_M4A1))) damage += 10.0;
+	if (damageBits & DMG_BULLET && ((get_user_team(attacker) == 1 && weapon == CSW_AK47) || (get_user_team(attacker) == 2 && weapon == CSW_M4A1))) damage += 10.0;

@@ -49,7 +49,7 @@ public cod_item_value(id)
 
 public cod_item_spawned(id, respawn)
 {
-	cod_set_user_dynamites(id, ITEM, 0);
+	cod_set_user_dynamites(id, 0, ITEM);
 
 	remove_task(id + TASK_ITEM);
 
@@ -60,5 +60,5 @@ public generate_item(id)
 {
 	id -= TASK_ITEM;
 
-	cod_add_user_dynamites(id, ITEM, 1);
+	cod_add_user_dynamites(id, 1, ITEM);
 }

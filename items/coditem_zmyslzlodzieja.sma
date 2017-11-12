@@ -50,7 +50,7 @@ public cod_item_skill_used(id)
 
 	if (cod_get_user_money(id) < 1000)
 	{
-		cod_show_hud(id, TYPE_DHUD, 255, 0, 0, -1.0, 0.45, 0, 0.0, 2.5, 0.0, 0.0, "Nie masz wystarczajaco pieniedzy na ich wymiane na zycie.");
+		cod_show_hud(id, TYPE_DHUD, 255, 0, 0, -1.0, 0.45, 0, 0.0, 1.25, 0.0, 0.0, "Nie masz wystarczajaco pieniedzy na ich wymiane na zycie.");
 
 		return;
 	}

@@ -34,7 +34,7 @@ public cod_item_upgrade(id)
 
 public cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if (damageBits == DMG_BULLET && random_num(1, itemValue[victim]) == 1 && itemUse[victim]) {
+	if (damageBits & DMG_BULLET && random_num(1, itemValue[victim]) == 1 && itemUse[victim]) {
 		damage = COD_BLOCK;
 
 		itemUse[victim]--;

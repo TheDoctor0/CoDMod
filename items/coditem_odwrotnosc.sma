@@ -7,8 +7,8 @@
 
 #define NAME        "Odwrotnosc"
 #define DESCRIPTION "Po aktywacji przez %s sekund otrzymane obrazenia cie lecza."
-#define RANDOM_MIN  3
-#define RANDOM_MAX  5
+#define RANDOM_MIN  4
+#define RANDOM_MAX  6
 
 #define TASK_ITEM 83241
 
@@ -49,7 +49,7 @@ public cod_item_spawned(id, respawn)
 public cod_item_skill_used(id)
 {
 	if (get_bit(id, itemUsed)) {
-		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.42, 0, 0.0, 2.0, 0.0, 0.0, "Odwrotnosci mozesz uzyc tylko raz na runde!");
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.45, 0, 0.0, 1.25, 0.0, 0.0, "Odwrotnosci mozesz uzyc tylko raz na runde!");
 
 		return;
 	}
