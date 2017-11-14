@@ -83,17 +83,6 @@ public client_disconnected(id)
 	remove_task(id);
 	remove_task(id + TASK_PASSWORD);
 }
-
-public message_team(id) 
-{
-	if (is_user_connected(id) && !is_user_bot(id) && !is_user_hltv(id) && playerStatus[id] < LOGGED) {
-		account_menu(id, true);
-
-		return PLUGIN_HANDLED;
-	}
-
-	return PLUGIN_CONTINUE;
-}
 	
 public message_show_menu(msgId, dest, id)
 {
@@ -102,8 +91,7 @@ public message_show_menu(msgId, dest, id)
     
 	get_msg_arg_string(4, menuData, charsmax(menuData));
 
-	if (equal(menuData, Team_Select) && playerStatus[id] < LOGGED)
-	{
+	if (equal(menuData, Team_Select) && playerStatus[id] < LOGGED) {
 		set_pdata_int(id, 205, 0, 5);
 
 		set_task(0.1, "account_menu", id);
