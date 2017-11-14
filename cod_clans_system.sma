@@ -1654,7 +1654,7 @@ public sql_init()
 
 	SQL_Execute(query);
 
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_members` (`name` varchar(64) NOT NULL, `clan` INT NOT NULL, `flag` INT NOT NULL, `honor` INT NOR NULL, PRIMARY KEY (`name`));");
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_members` (`name` varchar(64) NOT NULL, `clan` INT NOT NULL, `flag` INT NOT NULL, `honor` INT NOT NULL, PRIMARY KEY (`name`));");
 	
 	query = SQL_PrepareQuery(connectHandle, queryData);
 
@@ -1702,7 +1702,7 @@ public load_data(id)
 		return;
 	}
 
-	new queryData[128], tempId[1];
+	new queryData[192], tempId[1];
 	
 	tempId[0] = id;
 
