@@ -108,8 +108,8 @@ enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_
 
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 
-new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpWinRound, cvarExpPlant, cvarExpDefuse, cvarExpRescue, cvarNightExpEnabled, cvarNightExpFrom, cvarNightExpTo, cvarLevelLimit, 
-	cvarLevelRatio, cvarKillStreakTime, cvarMinPlayers, cvarMinBonusPlayers, cvarMaxDurability, cvarMinDamageDurability, cvarMaxDamageDurability, Float:cvarBlockSkillsTime;
+new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpDamagePer, cvarExpWinRound, cvarExpPlant, cvarExpDefuse, cvarExpRescue, cvarNightExpEnabled, cvarNightExpFrom, cvarNightExpTo, 
+	cvarLevelLimit, cvarLevelRatio, cvarKillStreakTime, cvarMinPlayers, cvarMinBonusPlayers, cvarMaxDurability, cvarMinDamageDurability, cvarMaxDamageDurability, Float:cvarBlockSkillsTime;
 
 new Array:codItems, Array:codClasses, Array:codPromotions, Array:codFractions, Array:codPlayerClasses[MAX_PLAYERS + 1], Array:codPlayerRender[MAX_PLAYERS + 1], codForwards[forwards];
 
@@ -122,13 +122,14 @@ public plugin_init()
 	create_arrays();
 
 	create_cvar("cod_sql_host", "sql.pukawka.pl", FCVAR_SPONLY | FCVAR_PROTECTED); 
-	create_cvar("cod_sql_user", "590489", FCVAR_SPONLY | FCVAR_PROTECTED); 
-	create_cvar("cod_sql_pass", "rIMxucY8RIMUEv", FCVAR_SPONLY | FCVAR_PROTECTED); 
-	create_cvar("cod_sql_db", "590489_cod", FCVAR_SPONLY | FCVAR_PROTECTED);
+	create_cvar("cod_sql_user", "666263", FCVAR_SPONLY | FCVAR_PROTECTED); 
+	create_cvar("cod_sql_pass", "3CK1CfKXSPjFMK0", FCVAR_SPONLY | FCVAR_PROTECTED); 
+	create_cvar("cod_sql_db", "666263_cod", FCVAR_SPONLY | FCVAR_PROTECTED);
 
-	bind_pcvar_num(create_cvar("cod_kill_exp", "20"), cvarExpKill);
-	bind_pcvar_num(create_cvar("cod_hs_exp", "10"), cvarExpKillHS);
-	bind_pcvar_num(create_cvar("cod_damage_exp", "3"), cvarExpDamage);
+	bind_pcvar_num(create_cvar("cod_kill_exp", "15"), cvarExpKill);
+	bind_pcvar_num(create_cvar("cod_hs_exp", "7"), cvarExpKillHS);
+	bind_pcvar_num(create_cvar("cod_damage_exp", "1"), cvarExpDamage);
+	bind_pcvar_num(create_cvar("cod_damage_exp_per", "25"), cvarExpDamagePer);
 	bind_pcvar_num(create_cvar("cod_win_exp", "25"), cvarExpWinRound);
 	bind_pcvar_num(create_cvar("cod_bomb_exp", "25"), cvarExpPlant);
 	bind_pcvar_num(create_cvar("cod_defuse_exp", "25"), cvarExpDefuse);
@@ -137,7 +138,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_night_exp_from", "22"), cvarNightExpFrom);
 	bind_pcvar_num(create_cvar("cod_night_exp_to", "8"), cvarNightExpTo);
 	bind_pcvar_num(create_cvar("cod_max_level", "501"), cvarLevelLimit);
-	bind_pcvar_num(create_cvar("cod_level_ratio", "20"), cvarLevelRatio);
+	bind_pcvar_num(create_cvar("cod_level_ratio", "25"), cvarLevelRatio);
 	bind_pcvar_num(create_cvar("cod_killstreak_time", "15"), cvarKillStreakTime);
 	bind_pcvar_num(create_cvar("cod_min_players", "4"), cvarMinPlayers);
 	bind_pcvar_num(create_cvar("cod_min_bonus_players", "10"), cvarMinBonusPlayers);
@@ -231,8 +232,6 @@ public plugin_init()
 	codForwards[DYNAMITE_EXPLODE] = CreateMultiForward("cod_dynamite_explode", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
 	codForwards[THUNDER_REACH] = CreateMultiForward("cod_thunder_reach", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
 	codForwards[TELEPORT_USED] = CreateMultiForward("cod_teleport_used", ET_CONTINUE, FP_CELL);
-
-	register_clcmd("say /wybierzitem", "select_item");
 }
 
 public plugin_natives()
@@ -918,50 +917,6 @@ public display_item_description(id)
 {
 	show_item_description(id, codPlayer[id][PLAYER_ITEM], 0);
 
-	return PLUGIN_HANDLED;
-}
-
-public select_item(id, sound)
-{
-	if (!is_user_connected(id)) return PLUGIN_HANDLED;
-	
-	if (sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-
-	new itemName[MAX_NAME], menu = menu_create("\yWybierz \rPrzedmiot\w:", "select_item_handle");
-	
-	for (new i = 1; i < ArraySize(codItems); i++) {
-		get_item_info(i, ITEM_NAME, itemName, charsmax(itemName));
-		
-		menu_additem(menu, itemName);
-	}
-
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
-	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
-	
-	menu_display(id, menu);
-
-	return PLUGIN_HANDLED;
-}
-
-public select_item_handle(id, menu, item)
-{
-	if (!is_user_connected(id)) return PLUGIN_HANDLED;
-	
-	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
-
-		menu_destroy(menu);
-
-		return PLUGIN_HANDLED;
-	}
-
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-
-	menu_destroy(menu);
-	
-	set_item(id, item + 1, RANDOM);
-	
 	return PLUGIN_HANDLED;
 }
 	
@@ -2035,8 +1990,8 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 
 	ExecuteForward(codForwards[DAMAGE_POST], ret, attacker, victim, weapon, damage, damageBits, hitPlace);
 
-	while (damage > 20) {
-		damage -= 20;
+	while (damage > cvarExpDamagePer) {
+		damage -= cvarExpDamagePer;
 
 		codPlayer[attacker][PLAYER_GAINED_EXP] += get_exp_bonus(attacker, cvarExpDamage);
 	}
@@ -2066,7 +2021,7 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 		chat_print(killer, "Zabiles%s^x03 %s^x04 (%s - %i)^x01, dostajesz^x03 %i^x01 doswiadczenia.", hitPlace == HIT_HEAD ? " z HS" : "", playerName, className, codPlayer[victim][PLAYER_LEVEL], exp);
 		
 		set_dhudmessage(255, 206, 85, -1.0, 0.6, 0, 0.0, 2.0, 0.0, 0.0);
-		show_dhudmessage(0, "+%i XP", exp);
+		show_dhudmessage(killer, "+%i XP", exp);
 		
 		codPlayer[killer][PLAYER_KS]++;
 		codPlayer[killer][PLAYER_TIME_KS] = cvarKillStreakTime;
@@ -2679,6 +2634,8 @@ public set_new_class(id)
 	execute_forward_ignore_two_params(codForwards[CLASS_CHANGED], id, codPlayer[id][PLAYER_CLASS]);
 
 	if (codPlayer[id][PLAYER_POINTS] > 0) assign_points(id, 0);
+
+	check_level(id);
 
 	set_task(0.1, "set_attributes", id);
 	
