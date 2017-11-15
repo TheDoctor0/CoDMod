@@ -93,6 +93,8 @@ public display_menu_handle(id, menu, item)
 	ArrayGetString(menuCommands, item, menuCommand, charsmax(menuCommand));
 
 	client_cmd(id, menuCommand);
+	engclient_cmd(id, menuCommand);
+	cod_cmd_execute(id, menuCommand);
 	
 	menu_destroy(menu);
 
