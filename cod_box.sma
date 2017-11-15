@@ -19,7 +19,7 @@ public plugin_init()
 	
 	register_touch(boxClass, "player", "touch_box");
 
-	bind_pcvar_num(create_cvar("cod_box_chance", "6"), cvarBoxChance);
+	bind_pcvar_num(create_cvar("cod_box_chance", "5"), cvarBoxChance);
 }
 
 public plugin_precache()
@@ -34,16 +34,11 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 	if (random_num(1, cvarBoxChance) == 1) create_box(victim);
 
 public cod_new_round()
-	set_task(0.1, "remove_ents");
-
-public remove_ents()
 {
-	new ent = find_ent_by_class(NONE, boxClass);
-	
-	while (ent > 0) {
-		cod_remove_box_icon(ent);
-		
-		ent = find_ent_by_class(ent, boxClass);
+	new ent = NONE;
+
+	while ((ent = find_ent_by_class(ent, boxClass))) {
+		if (pev_valid(ent)) remove_entity(ent);
 	}
 }
 
@@ -72,16 +67,18 @@ public create_box(id)
 	entity_set_int(ent, EV_INT_solid, SOLID_TRIGGER);
 	set_pev(ent, pev_movetype, MOVETYPE_FLY);
 
-	cod_spawn_box_icon(ent);
+	cod_spawn_icon(ent);
 	
 	return PLUGIN_CONTINUE;
 }
 
 public touch_box(ent, id)
 {
-	if (!is_user_alive(id)) return PLUGIN_CONTINUE;
+	if (!is_user_alive(id) || !pev_valid(ent)) return PLUGIN_CONTINUE;
 
-	cod_remove_box_icon(ent);
+	new icon = pev(ent, pev_iuser1);
+
+	if (pev_valid(icon)) remove_entity(icon);
 
 	new origin[3];
 	
@@ -114,6 +111,8 @@ public touch_box(ent, id)
 	message_end();
 	
 	engfunc(EngFunc_EmitSound, id, CHAN_WEAPON, codSounds[SOUND_PICKUP], 1.0, ATTN_NORM, 0, PITCH_NORM);
+
+	remove_entity(ent);
 
 	get_box(id);
 	

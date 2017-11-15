@@ -37,13 +37,10 @@
 
 enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_DEPLOY, SOUND_ACTIVATE, 
 	SOUND_CHARGE, SOUND_PICKUP, SOUND_THUNDER, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_APPLAUSE, SOUND_LAUGH };
-
+enum _:icons { BOMBSITE_A, BOMBSITE_B, BOMB_DROPPED, BOMB_PLANTED, BOMB_EXPLODE, BOX };
 enum _:promotions { PROMOTION_NONE, PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION_THIRD };
-
 enum _:types { RANDOM = -3, FULL, NONE, CLASS, ITEM, ADDITIONAL, ROUND, USED, ALL };
-
 enum _:repeating { FIRE, POISON, HEAL };
-
 enum _:hud { TYPE_HUD, TYPE_DHUD };
 
 new const codSounds[sounds][] =
@@ -121,14 +118,10 @@ Return player's mission need.
 native cod_get_user_mission_need(id);
 
 /*------------------------------
-Spawns an icon above box.
+Spawns an icon with defined type.
+Icon entity will be saved in ent pev_user1.
 ------------------------------*/
-native cod_spawn_box_icon(ent);
-
-/*------------------------------
-Removes entity of box and icon.
-------------------------------*/
-native cod_remove_box_icon(ent);
+native cod_spawn_icon(ent, type = BOX);
 
 /*------------------------------
 Return player's time in seconds
