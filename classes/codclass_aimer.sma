@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Aimer"
-#define DESCRIPTION  "Ma 25 procent szansy na natychmiastowe zabicie HeadShotem."
+#define DESCRIPTION  "Ma 20 procent szansy na natychmiastowe zabicie HeadShotem."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_M4A1)|(1<<CSW_P228)
 #define HEALTH       20
@@ -23,4 +23,4 @@ public plugin_init()
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits & DMG_BULLET && hitPlace == HIT_HEAD && cod_percent_chance(25)) damage = cod_kill_player(attacker, victim, damageBits);
+	if (damageBits & DMG_BULLET && hitPlace == HIT_HEAD && cod_percent_chance(20)) damage = cod_kill_player(attacker, victim, damageBits);

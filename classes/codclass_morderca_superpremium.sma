@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Morderca"
-#define DESCRIPTION  "Ma 1/5 zabicie z AK47/M4A1, posiada 2 miny, niemal niewidoczny podczas kucania."
+#define DESCRIPTION  "Ma 1/6 zabicie z AK47/M4A1, posiada 2 miny, niemal niewidoczny podczas kucania."
 #define FRACTION     "SuperPremium"
 #define WEAPONS      (1<<CSW_AK47)|(1<<CSW_M4A1)|(1<<CSW_DEAGLE)
 #define HEALTH       30
@@ -25,7 +25,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	cod_set_user_render(id, 25, CLASS, RENDER_DUCK);
+	cod_set_user_render(id, 35, CLASS, RENDER_DUCK);
 
 	cod_set_user_mines(id, 2, CLASS);
 }
@@ -34,4 +34,4 @@ public cod_class_skill_used(id)
 	cod_use_user_mine(id);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if ((weapon == CSW_M4A1 || weapon == CSW_AK47) && damageBits & DMG_BULLET && cod_percent_chance(20)) damage = cod_kill_player(attacker, victim, damageBits);
+	if ((weapon == CSW_M4A1 || weapon == CSW_AK47) && damageBits & DMG_BULLET && random_num(1, 6) == 1) damage = cod_kill_player(attacker, victim, damageBits);
