@@ -56,6 +56,7 @@ public plugin_init()
 	for (new i; i < sizeof commandTopMedals; i++) register_clcmd(commandTopMedals[i], "command_top_medals");
 	for (new i; i < sizeof commandSounds; i++) register_clcmd(commandSounds[i], "command_sounds");
 
+	register_event("TextMsg", "round_restart", "a", "2&#Game_C", "2&#Game_w");
 	register_event("TextMsg", "hostages_rescued", "a", "2&#All_Hostages_R");
 
 	register_message(get_user_msgid("SayText"), "say_text");
