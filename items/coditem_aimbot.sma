@@ -10,7 +10,7 @@
 #define NAME        "Aimbot"
 #define DESCRIPTION "Po uzyciu itemu namierzona zostaje glowa najblizszego przeciwnika"
 
-new itemActive;
+new itemLastUse[MAX_PLAYERS + 1], itemActive;
 
 public plugin_init() 
 {
@@ -29,6 +29,12 @@ public cod_item_skill_used(id)
 {
 	if (!get_bit(id, itemActive)) return;
 
+	if (itemLastUse[id] + 3.0 > get_gametime()) {
+		cod_show_hud(id, TYPE_HUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Aimbota mozesz uzyc raz na 3 sekundy!");
+		
+		return;
+	}
+
 	new target = get_nearest_player(id);
 			
 	if (target) {
@@ -41,8 +47,9 @@ public cod_item_skill_used(id)
 		headOrigin[2] -= 14.0;
 		
 		entity_set_aim(id, headOrigin);
-	}
-	else cod_show_hud(id, TYPE_HUD, 0, 255, 0, -1.0, 0.45, 0, 0.0, 1.25, 0.0, 0.0, "Wszyscy przeciwnicy sa zbyt daleko.");
+
+		itemLastUse[id] = floatround(get_gametime());
+	} else cod_show_hud(id, TYPE_HUD, 255, 0, 0, -1.0, 0.45, 0, 0.0, 1.25, 0.0, 0.0, "Wszyscy przeciwnicy sa zbyt daleko.");
 }
 
 stock entity_set_aim(ent, const Float:oldOrigin[3])
