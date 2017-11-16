@@ -13,6 +13,8 @@
 #define VERSION "1.0.0"
 #define AUTHOR "O'Zone"
 
+#pragma dynamic 65536
+
 #define MAX_NAME 64
 #define MAX_DESC 256
 
@@ -2027,6 +2029,12 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 		if (task_exists(killer + TASK_END_KILL_STREAK)) remove_task(killer + TASK_END_KILL_STREAK);
 
 		set_task(1.0, "end_kill_streak", killer + TASK_END_KILL_STREAK, _, _, "b");
+	} else {
+		get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
+
+		get_user_name(victim, playerName, charsmax(playerName));
+
+		chat_print(killer, "Zabiles^x03 %s^x04 (%s - %i)^x01.", playerName, className, codPlayer[victim][PLAYER_LEVEL]);
 	}
 	
 	if (!codPlayer[killer][PLAYER_ITEM]) set_item(killer, RANDOM, RANDOM);
@@ -2549,7 +2557,7 @@ public show_help(id)
 	
 	set_dhudmessage(0, 255, 0, -1.0, 0.7, 0, 5.0, 5.0, 0.1, 0.5);
 	
-	switch (random_num(1, 16)) {
+	switch (random_num(1, 17)) {
 		case 1: show_dhudmessage(id, "Aby uzyc umiejetnosci klasy wcisnij klawisz E. Przedmiotow uzywa sie klawiszem F.");
 		case 2: show_dhudmessage(id, "Chcialbys zalozyc klan lub do niego dolaczyc? Wpisz komende /klan.");
 		case 3: show_dhudmessage(id, "Sposobem na zdobywanie wiekszej ilosci doswiadczenia sa /misje.");
@@ -2566,6 +2574,13 @@ public show_help(id)
 		case 14: show_dhudmessage(id, "Glowne menu serwera znajdziesz pod komenda /menu lub klawiszem V.");
 		case 15: show_dhudmessage(id, "Jesli chcesz kupic VIPa, klasy premium, exp lub honor zajrzyj do /sklepsms.");
 		case 16: show_dhudmessage(id, "Jest wiele dodatkowych statystyk, ktore znajdziesz pod komenda /statymenu.");
+		case 17: {
+			static info[64];
+
+			formatex(info, charsmax(info), "Doswiadczenie i misje sa naliczane, jesli na serwerze gra co najmniej %i graczy.", cvarMinPlayers - 1);
+
+			show_dhudmessage(id, info);
+		}
 	}
 }
 
