@@ -10,7 +10,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Replikant"
-#define DESCRIPTION  "Ma dwie repliki odbijajace polowe obrazen, podwojny skok i mniejsza grawitacje."
+#define DESCRIPTION  "Ma trzy repliki odbijajace polowe obrazen, podwojny skok i mniejsza grawitacje."
 #define FRACTION     "Premium"
 #define WEAPONS      (1<<CSW_MP5NAVY)|(1<<CSW_DEAGLE)
 #define HEALTH       25
@@ -18,9 +18,9 @@
 #define STRENGTH     0
 #define STAMINA      10
 #define CONDITION    15
-#define FLAG         ADMIN_LEVEL_F
+#define FLAG         ADMIN_LEVEL_D
 
-#define REPLICAS     2
+#define REPLICAS     3
 
 new itemLastUse[MAX_PLAYERS + 1], itemUse[MAX_PLAYERS + 1];
 

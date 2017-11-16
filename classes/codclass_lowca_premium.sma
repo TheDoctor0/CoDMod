@@ -16,7 +16,7 @@
 #define STRENGTH     10
 #define STAMINA      20
 #define CONDITION    5
-#define FLAG         ADMIN_LEVEL_F
+#define FLAG         ADMIN_LEVEL_D
 
 #define BELTS        10
 

@@ -14,7 +14,7 @@
 #define STRENGTH     10
 #define STAMINA      20
 #define CONDITION    10
-#define FLAG         ADMIN_LEVEL_F
+#define FLAG         ADMIN_LEVEL_D
 
 public plugin_init() 
 {

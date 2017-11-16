@@ -6,15 +6,15 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Mysliwy"
-#define DESCRIPTION  "Ma 1/2 na natychmiastowe zabicie ze Scouta, podwojny skok, mala widocznosc na nozu i 2 dynamity."
+#define DESCRIPTION  "Ma 1/2 na natychmiastowe zabicie ze Scouta, podwojny skok, mala widocznosc na nozu i teleport."
 #define FRACTION     "SuperPremium"
-#define WEAPONS      (1<<CSW_SCOUT)|(1<<CSW_DEAGLE)
+#define WEAPONS      (1<<CSW_SCOUT)|(1<<CSW_MP5NAVY)|(1<<CSW_DEAGLE)
 #define HEALTH       30
 #define INTELLIGENCE 0
 #define STRENGTH     10
 #define STAMINA      0
 #define CONDITION    20
-#define FLAG         ADMIN_LEVEL_G
+#define FLAG         ADMIN_LEVEL_E
 
 public plugin_init() 
 {
@@ -25,15 +25,15 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	cod_set_user_render(id, 50, CLASS, RENDER_ALWAYS, 1<<CSW_KNIFE);
+	cod_set_user_render(id, 40, CLASS, RENDER_ALWAYS, 1<<CSW_KNIFE);
 
 	cod_set_user_multijumps(id, 1, CLASS);
 
-	cod_set_user_dynamites(id, 2, CLASS);
+	cod_set_user_teleports(id, 1, CLASS);
 }
 
 public cod_class_skill_used(id)
-	cod_use_user_dynamite(id);
+	cod_use_user_teleport(id);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 	if (weapon == CSW_SCOUT && damageBits & DMG_BULLET && cod_percent_chance(50)) damage = cod_kill_player(attacker, victim, damageBits);
