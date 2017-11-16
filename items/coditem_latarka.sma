@@ -41,20 +41,20 @@ public cod_item_spawned(id, respawn)
 {
 	rem_bit(id, flashlightActive);
 
-	if(!respawn) flashlightBattery[id] = FLASHLIGHT;
+	if (!respawn) flashlightBattery[id] = FLASHLIGHT;
 }
 
 public cod_item_skill_used(id)
 {
-	if(get_bit(id, flashlightActive)) {
+	if (get_bit(id, flashlightActive)) {
 		rem_bit(id, flashlightActive);
-	} else if(flashlightBattery[id]) set_bit(id, flashlightActive);
+	} else if (flashlightBattery[id]) set_bit(id, flashlightActive);
 
-	if(!task_exists(id + TASK_CHARGE)) set_task(1.0, "flashlight_charge", id + TASK_CHARGE, .flags = "b");
+	if (!task_exists(id + TASK_CHARGE)) set_task(1.0, "flashlight_charge", id + TASK_CHARGE, .flags = "b");
 
 	static msgFlashlight;
 
-	if(!msgFlashlight) msgFlashlight = get_user_msgid("Flashlight");
+	if (!msgFlashlight) msgFlashlight = get_user_msgid("Flashlight");
 
 	message_begin(MSG_ONE, msgFlashlight, {0, 0, 0}, id);
 	write_byte(get_bit(id, flashlightActive));
@@ -66,10 +66,9 @@ public cod_item_skill_used(id)
 
 public cod_player_prethink(id)
 {
-	if(!get_bit(id, flashlightActive)) return;
+	if (!get_bit(id, flashlightActive)) return;
 
-	if(get_bit(id, flashlightActive) && flashlightBattery[id]) 
-	{
+	if (get_bit(id, flashlightActive) && flashlightBattery[id]) {
 		static flashlightR, flashlightG, flashlightB;
 		
 		if ((flashlightR += 1 + random_num(0, 2)) > 250) flashlightR -= 245;
@@ -99,10 +98,10 @@ public cod_player_prethink(id)
 
 		get_user_aiming(id, target, bodyPart);
 
-		if(target && get_user_team(id) != get_user_team(target)) {
+		if (is_user_alive(target) && get_user_team(id) != get_user_team(target)) {
 			render = pev(target, pev_renderamt);
 
-			if(render < 255) cod_set_user_glow(target, kRenderFxGlowShell, flashlightR, flashlightG, flashlightB, kRenderNormal, 20, 5.0);
+			if (render < 255) cod_set_user_glow(target, kRenderFxGlowShell, flashlightR, flashlightG, flashlightB, kRenderNormal, 20, 5.0);
 		}
 	}
 }
@@ -111,7 +110,7 @@ public flashlight_charge(id)
 {
 	id -= TASK_CHARGE;
 
-	if(!is_user_alive(id)) {
+	if (!is_user_alive(id)) {
 		remove_task(id + TASK_CHARGE);
 
 		return;
@@ -119,18 +118,17 @@ public flashlight_charge(id)
 
 	static msgFlashlight, msgFlashBat;
 
-	if(!msgFlashlight) msgFlashlight = get_user_msgid("Flashlight");
-	if(!msgFlashBat) msgFlashBat = get_user_msgid("FlashBat");
+	if (!msgFlashlight) msgFlashlight = get_user_msgid("Flashlight");
+	if (!msgFlashBat) msgFlashBat = get_user_msgid("FlashBat");
 
-	if(get_bit(id, flashlightActive)) flashlightBattery[id] = max(0, --flashlightBattery[id]);
+	if (get_bit(id, flashlightActive)) flashlightBattery[id] = max(0, --flashlightBattery[id]);
 	else flashlightBattery[id] = min(++flashlightBattery[id], FLASHLIGHT);
 
 	message_begin(MSG_ONE, msgFlashBat, {0, 0, 0}, id);
 	write_byte(flashlightBattery[id]);
 	message_end();
 
-	if(!flashlightBattery[id])
-	{
+	if (!flashlightBattery[id]) {
 		rem_bit(id, flashlightActive);
 
 		message_begin(MSG_ONE, msgFlashlight, {0, 0, 0}, id);
