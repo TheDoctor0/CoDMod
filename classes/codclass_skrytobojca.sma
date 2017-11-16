@@ -8,7 +8,7 @@
 #define NAME         "Skrytobojca"
 #define DESCRIPTION  "Po uzyciu mocy klasy jest niemal niewidzialny przez 5s. Posiada podwojny skok."
 #define FRACTION     "Podstawowe"
-#define WEAPONS      (1<<CSW_UMP45)|(1<<CSW_DEAGLE)
+#define WEAPONS      (1<<CSW_UMP45)|(1<<CSW_USP)
 #define HEALTH       0
 #define INTELLIGENCE 0
 #define STRENGTH     10
@@ -44,7 +44,7 @@ public cod_class_skill_used(id)
 
 	set_bit(id, classUsed);
 
-	cod_set_user_render(id, 30, CLASS, RENDER_ALWAYS, 0, 5.0);
+	cod_set_user_render(id, 40, CLASS, RENDER_ALWAYS, 0, 5.0);
 
 	return PLUGIN_CONTINUE;
 }
