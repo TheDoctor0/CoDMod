@@ -55,8 +55,7 @@ new const pointsDistribution[] = { 1, 3, 5, 10, 25, FULL };
 
 enum _:models { MODEL_ROCKET, MODEL_MINE, MODEL_DYNAMITE, MODEL_MEDKIT };
 
-new const codModels[models][] =
-{
+new const codModels[models][] = {
 	"models/CoDMod/rocket.mdl",
 	"models/CoDMod/mine.mdl",
 	"models/CoDMod/dynamite.mdl",
@@ -65,8 +64,7 @@ new const codModels[models][] =
 
 enum _:sprites { SPRITE_EXPLOSION, SPRITE_WHITE, SPRITE_THUNDER, SPRITE_FIRE, SPRITE_SMOKE };
 
-new const codSprites[sprites][] =
-{
+new const codSprites[sprites][] = {
 	"sprites/dexplo.spr",
 	"sprites/white.spr",
 	"sprites/lgtning.spr",
@@ -1442,7 +1440,7 @@ public use_mine(id)
 		return PLUGIN_CONTINUE;
 	}
 	
-	if (!is_enough_space(id)) {
+	if (!is_enough_space(id, 80.0)) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Nie mozesz postawic miny w przejsciu!");
 
@@ -2005,10 +2003,10 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 {   
 	if (!is_user_connected(killer) || !is_user_connected(victim) || !is_user_alive(killer) || get_user_team(victim) == get_user_team(killer)) return PLUGIN_CONTINUE;
 
-	new playerName[MAX_NAME], className[MAX_NAME];
+	new playerName[MAX_NAME], className[MAX_NAME], itemName[MAX_NAME];
 	
 	if (codPlayer[killer][PLAYER_CLASS] && get_playersnum() > cvarMinPlayers) {
-		new exp = get_exp_bonus(killer, hitPlace == HIT_HEAD ? cvarExpKill : (cvarExpKill + cvarExpKillHS));
+		new exp = get_exp_bonus(killer, hitPlace == HIT_HEAD ? (cvarExpKill + cvarExpKillHS) : cvarExpKill);
 		
 		if (codPlayer[victim][PLAYER_LEVEL] > codPlayer[killer][PLAYER_LEVEL]) exp += get_exp_bonus(killer, (codPlayer[victim][PLAYER_LEVEL] - codPlayer[killer][PLAYER_LEVEL]) * (cvarExpKill/10));
 
@@ -2036,16 +2034,22 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 
 		chat_print(killer, "Zabiles^x03 %s^x04 (%s - %i)^x01.", playerName, className, codPlayer[victim][PLAYER_LEVEL]);
 	}
-	
-	if (!codPlayer[killer][PLAYER_ITEM]) set_item(killer, RANDOM, RANDOM);
-
-	check_level(killer);
 
 	get_user_name(killer, playerName, charsmax(playerName));
 
 	get_user_class_info(killer, codPlayer[killer][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
-	chat_print(victim, "Zostales zabity przez^x03 %s^x04 (%s - %i)^x01, ktoremu zostalo^x04 %i^x01 HP.", playerName, className, codPlayer[killer][PLAYER_LEVEL], get_user_health(killer));
+	if (!codPlayer[killer][PLAYER_ITEM]) {
+		set_item(killer, RANDOM, RANDOM);
+
+		chat_print(victim, "Zostales zabity przez^x03 %s^x04 (%s - %i)^x01, ktoremu zostalo^x04 %i^x01 HP.", playerName, className, codPlayer[killer][PLAYER_LEVEL], get_user_health(killer));
+	} else {
+		get_item_info(codPlayer[killer][PLAYER_ITEM], ITEM_NAME, itemName, charsmax(itemName));
+
+		chat_print(victim, "Zostales zabity przez^x03 %s^x04 (%s - %i - %s)^x01, ktoremu zostalo^x04 %i^x01 HP.", playerName, className, codPlayer[killer][PLAYER_LEVEL], itemName, get_user_health(killer));
+	}
+
+	check_level(killer);
 
 	if (codPlayer[killer][PLAYER_CLASS]) execute_forward_ignore_three_params(get_class_info(codPlayer[killer][PLAYER_CLASS], CLASS_KILL), killer, victim, hitPlace);
 	if (codPlayer[killer][PLAYER_ITEM]) execute_forward_ignore_three_params(get_item_info(codPlayer[killer][PLAYER_ITEM], ITEM_KILL), killer, victim, hitPlace);
@@ -2266,18 +2270,16 @@ stock render_change(id, playerStatus = NONE)
 
 	if (playerStatus != NONE) codPlayer[id][PLAYER_STATUS] = playerStatus;
 
-	if (!get_bit(id, renderTimer)) {
-		static renderAmount, oldRenderAmount[MAX_PLAYERS + 1];
+	static renderAmount, oldRenderAmount[MAX_PLAYERS + 1];
 
-		renderAmount = render_count(id);
+	renderAmount = render_count(id);
 
-		if (renderAmount != oldRenderAmount[id]) {
-			set_user_rendering(id, kRenderFxNone, 0, 0, 0, kRenderTransAlpha, renderAmount);
+	if (renderAmount != oldRenderAmount[id]) {
+		set_user_rendering(id, kRenderFxNone, 0, 0, 0, kRenderTransAlpha, renderAmount);
 
-			execute_forward_ignore_two_params(codForwards[RENDER_CHANGED], id, renderAmount);
+		execute_forward_ignore_two_params(codForwards[RENDER_CHANGED], id, renderAmount);
 
-			oldRenderAmount[id] = renderAmount;
-		}
+		oldRenderAmount[id] = renderAmount;
 	}
 }
 
@@ -2876,9 +2878,9 @@ public set_attributes(id)
 	
 	set_gravity(id);
 
-	model_change(id);
+	set_speed(id);
 
-	speed_change(id);
+	model_change(id);
 
 	render_change(id);
 
@@ -2949,6 +2951,8 @@ public set_speed(id)
 	}
 
 	codPlayer[id][PLAYER_SPEED][ALL] = _:speed;
+
+	if (!is_user_alive(id) || freezeTime || !codPlayer[id][PLAYER_CLASS]) return;
 
 	ExecuteHamB(Ham_CS_Player_ResetMaxSpeed, id);
 }
@@ -3383,6 +3387,8 @@ public _cod_get_user_highest_level(id)
 
 public _cod_get_user_class(id, &promotion)
 {
+	param_convert(2);
+
 	promotion = codPlayer[id][PLAYER_PROMOTION];
 
 	return codPlayer[id][PLAYER_CLASS];
@@ -3449,6 +3455,8 @@ public _cod_get_classes_num()
 
 public _cod_get_user_item(id, &value)
 {
+	param_convert(2);
+
 	value = _cod_get_user_item_value(id);
 
 	return codPlayer[id][PLAYER_ITEM];
@@ -3966,8 +3974,6 @@ public _cod_set_user_unlimited_ammo(id, value, type, weapon)
 
 	codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] = enabled;
 	codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] = weapons;
-
-	client_print(id, print_chat, "Enabled: %s (%i)", codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] ? true : false, codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL]);
 }
 
 public _cod_set_user_recoil_eliminator(id, value, type, weapon)
@@ -4082,7 +4088,11 @@ public reset_render(id)
 
 	rem_bit(id, renderTimer);
 
-	if (is_user_connected(id)) render_change(id);
+	if (is_user_connected(id)) {
+		set_user_rendering(id);
+
+		render_change(id);
+	}
 }
 
 public reset_glow(id)
