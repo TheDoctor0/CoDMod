@@ -2,7 +2,7 @@
 #include <sqlx>
 #include <cod>
 
-#define PLUGIN "CoD Clans System"
+#define PLUGIN "CoD Clans"
 #define VERSION "1.0.8"
 #define AUTHOR "O'Zone"
 
@@ -200,7 +200,7 @@ public show_clan_menu_handle(id, menu, item)
 			}
 			
 			if (cod_get_user_highest_level(id) < cvarCreateLevel) {
-				cod_print_chat(id, "Nie masz wystarczajacego poziomu by stworzyc klan (Wymagany^x03 %i^x01)!", cvarCreateLevel);
+				cod_print_chat(id, "Nie masz wystarczajacego poziomu by zalozyc klan (Wymagany^x03 %i^x01)!", cvarCreateLevel);
 
 				return PLUGIN_HANDLED;
 			}
@@ -239,8 +239,8 @@ public create_clan_handle(id)
 		
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 	
-	if (cod_get_user_level(id) < cvarCreateLevel) {
-		cod_print_chat(id, "Nie masz wystarczajaco wysokiego poziomu (Wymagany: %i)!", cvarCreateLevel);
+	if (cod_get_user_highest_level(id) < cvarCreateLevel) {
+		cod_print_chat(id, "Nie masz wystarczajacego poziomu by zalozyc klan (Wymagany^x03 %i^x01)!", cvarCreateLevel);
 
 		return PLUGIN_HANDLED;
 	}
@@ -509,19 +509,19 @@ public skills_menu(id)
 
 	new menu = menu_create(menuData, "skills_menu_handle");
 	
-	formatex(menuData, charsmax(menuData), "Poziom Klanu \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_LEVEL], cvarLevelMax, cvarLevelCost + cvarNextLevelCost * codClan[CLAN_LEVEL]);
+	formatex(menuData, charsmax(menuData), "Poziom Klanu \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i Honoru\w]", codClan[CLAN_LEVEL], cvarLevelMax, cvarLevelCost + cvarNextLevelCost * codClan[CLAN_LEVEL]);
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "Zycie \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_HEALTH], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_HEALTH]);
+	formatex(menuData, charsmax(menuData), "Zycie \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i Honoru\w]", codClan[CLAN_HEALTH], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_HEALTH]);
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "Grawitacja \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_GRAVITY], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_GRAVITY]);
+	formatex(menuData, charsmax(menuData), "Grawitacja \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i Honoru\w]", codClan[CLAN_GRAVITY], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_GRAVITY]);
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "Obrazenia \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_DAMAGE], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_DAMAGE]);
+	formatex(menuData, charsmax(menuData), "Obrazenia \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i Honoru\w]", codClan[CLAN_DAMAGE], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_DAMAGE]);
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "Obezwladnienie \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i AP\w]", codClan[CLAN_DROP], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_DROP]);
+	formatex(menuData, charsmax(menuData), "Obezwladnienie \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i Honoru\w]", codClan[CLAN_DROP], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_DROP]);
 	menu_additem(menu, menuData);
 	
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
@@ -1054,22 +1054,22 @@ public update_member(id, status)
 					set_user_status(id, STATUS_DEPUTY);
 					set_user_status(player, STATUS_LEADER);
 
-					cod_print_chat(player,  "Zostales mianowany przywodca klanu!");
+					cod_print_chat(player, "Zostales mianowany przywodca klanu!");
 				}
 				case STATUS_DEPUTY: {
 					set_user_status(player, STATUS_DEPUTY);
 
-					cod_print_chat(player,  "^x01 Zostales zastepca przywodcy klanu!");		
+					cod_print_chat(player, "Zostales zastepca przywodcy klanu!");		
 				}
 				case STATUS_MEMBER: {
 					set_user_status(player, STATUS_MEMBER);
 
-					cod_print_chat(player,  "^x01 Zostales zdegradowany do rangi czlonka klanu.");
+					cod_print_chat(player,  "Zostales zdegradowany do rangi czlonka klanu.");
 				}
 				case STATUS_NONE: {
 					set_user_clan(player);
 
-					cod_print_chat(player,  "Zostales wyrzucony z klanu.");
+					cod_print_chat(player, "Zostales wyrzucony z klanu.");
 				}
 			}
 
@@ -2040,13 +2040,13 @@ stock remove_clan(id)
 		}
 	}
 
-	ArrayDeleteItem(codClans, clan[id]);
+	ArrayDeleteItem(codClans, get_clan_id(clan[id]));
 
 	clan[id] = 0;
 
 	new queryData[128];
 			
-	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans` WHERE clan_id = '%i'", clan[id]);
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans` WHERE id = '%i'", clan[id]);
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 	
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET flag = '0', clan = '0' WHERE clan = '%i'", clan[id]);
