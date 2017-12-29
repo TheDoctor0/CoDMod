@@ -2,6 +2,8 @@ Do zrobienia:
 - Klasy i itemy
 - Rozbudowa misji
 - Rozbudowa kasyna: Crash, Jackpot, Coin 1vs1 + cvary
+- Zmiana sposobu wyswietlania opisu itemu (jako menu, dodatkowo wartosci ulepszen)
+- Podglad skinow
 - Daily Rewards
 - Itemy:
 * Sakkubus - Wyglądasz jak przeciwnik, masz tylko nóż, a twoje ataki powodują zatrucie i oślepienie

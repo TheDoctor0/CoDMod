@@ -43,8 +43,7 @@ enum _:types { RANDOM = -3, FULL, NONE, CLASS, ITEM, ADDITIONAL, ROUND, USED, AL
 enum _:repeating { FIRE, POISON, HEAL };
 enum _:hud { TYPE_HUD, TYPE_DHUD };
 
-new const codSounds[sounds][] =
-{
+new const codSounds[sounds][] = {
 	"CoDMod/select.wav",
 	"CoDMod/close.wav",
 	"CoDMod/start.wav",
