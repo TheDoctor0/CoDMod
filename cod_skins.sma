@@ -249,7 +249,7 @@ public set_weapon_skin_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 	
-	new queryData[256], itemData[32], itemAccess, itemCallback;
+	new itemData[32], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
 
@@ -259,15 +259,13 @@ public set_weapon_skin_handle(id, menu, item)
 
 	ArrayGetArray(skins, skinId, skin);
 
-	if (!skinId && strlen(itemData) > 3) formatex(queryData, charsmax(queryData), "DELETE FROM `cod_skins` WHERE name = '%s' AND weapon = '%s ACTIVE'", playerData[id][NAME], itemData);
-	else formatex(queryData, charsmax(queryData), "DELETE FROM `cod_skins` WHERE name = '%s' AND weapon = '%s ACTIVE'", playerData[id][NAME], skin[SKIN_WEAPON]);
-
-	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+	if (!skinId && strlen(itemData[0]) > 3) remove_active_skin(id, itemData);
+	else remove_active_skin(id, skin[SKIN_WEAPON]);
 
 	if (item) {
-		add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME], 1);
-
 		set_skin(id, skin[SKIN_WEAPON], skinId);
+
+		add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME], 1);
 
 		cod_print_chat(id, "Twoj nowy skin^x03 %s^x01 to^x03 %s^x01.", skin[SKIN_WEAPON], skin[SKIN_NAME]);
 	} else {
@@ -349,9 +347,11 @@ public buy_weapon_skin_handle(id, menu, item)
 	}
 
 	if (playerData[id][ACTIVE][get_weaponid(skin[SKIN_WEAPON])] == NONE) {
-		set_skin(id, skin[SKIN_WEAPON], skinId);
+		remove_active_skin(id, skin[SKIN_WEAPON]);
 
 		add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME], 1);
+		
+		set_skin(id, skin[SKIN_WEAPON], skinId);
 	} else add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
 
 	ArrayPushCell(playerSkins[id], skinId);
@@ -489,11 +489,20 @@ stock get_weapon_id(weapon[])
 	return get_weaponid(weaponName);
 }
 
+stock remove_active_skin(id, weapon[])
+{
+	static queryData[256];
+
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_skins` WHERE name = '%s' AND weapon = '%s ACTIVE'", playerData[id][NAME], weapon);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+}
+
 stock add_skin(id, weapon[], name[], active = 0)
 {
-	new queryData[192];
+	static queryData[256];
 
-	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES ('%s', '%s%s', '%s')", playerData[id][NAME], weapon, active ? " ACTIVE" : "", name);
+	formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES ('%s', '%s%s', '%s')", playerData[id][NAME], weapon, active ? " ACTIVE" : "", name);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
@@ -507,7 +516,7 @@ stock set_skin(id, weapon[], skin)
 
 stock get_skin_id(const name[], const weapon[])
 {
-	new skin[skinsInfo];
+	static skin[skinsInfo];
 
 	for (new i = 0; i < ArraySize(skins); i++) {
 		ArrayGetArray(skins, i, skin);
