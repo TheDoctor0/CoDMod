@@ -29,7 +29,7 @@ public cod_item_enabled(id, value)
 	cod_give_weapon(id, CSW_SMOKEGRENADE, itemValue[id]);
 }
 
-public cod_item_respawn(id, respawn)
+public cod_item_spawned(id, respawn)
 {
 	cod_give_weapon(id, CSW_FLASHBANG, itemValue[id]);
 	cod_give_weapon(id, CSW_HEGRENADE, itemValue[id]);

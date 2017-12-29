@@ -24,7 +24,7 @@ public plugin_init()
 	
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 
-	register_forward(FM_AddToFullPack, "add_to_full_pack", 1)
+	register_forward(FM_AddToFullPack, "add_to_full_pack", 1);
 }
 
 public cod_class_enabled(id, promotion)
@@ -35,9 +35,9 @@ public cod_class_disabled(id)
 
 public add_to_full_pack(handle, e, ent, host, hostFlags, player, pSet)
 {
-	if(!is_user_alive(host) || !get_bit(host, classActive)) return;
+	if (!is_user_alive(host) || !get_bit(host, classActive)) return;
 	
-	if(is_user_alive(ent)) set_es(handle, ES_RenderAmt, 255.0);
+	if (is_user_alive(ent)) set_es(handle, ES_RenderAmt, 255.0);
 	else {
 		static className[5];
 

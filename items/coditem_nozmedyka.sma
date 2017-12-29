@@ -29,7 +29,11 @@ public cod_item_enabled(id, value)
 }
 
 public cod_item_disabled(id)
+{
 	cod_repeat_damage(id, id);
+
+	rem_bit(id, itemActive);
+}
 
 public cod_weapon_deploy(id, weapon, ent)
 {

@@ -114,9 +114,7 @@ public cod_player_prethink(id)
 		static flashlightR, flashlightG, flashlightB;
 		
 		if ((flashlightR += 1 + random_num(0, 2)) > 250) flashlightR -= 245;
-		
 		if ((flashlightG += 1 + random_num(-1, 1)) > 250) flashlightG -= 245;
-		
 		if ((flashlightB += -1 + random_num(-1, 1)) < 5) flashlightB += 240;
 		
 		static origin[3];
@@ -140,7 +138,7 @@ public cod_player_prethink(id)
 
 		get_user_aiming(id, target, bodyPart);
 
-		if(target && get_user_team(id) != get_user_team(target)) {
+		if(is_user_alive(target) && get_user_team(id) != get_user_team(target)) {
 			render = pev(target, pev_renderamt);
 
 			if(render < 255) cod_set_user_glow(target, kRenderFxGlowShell, flashlightR, flashlightG, flashlightB, kRenderNormal, 20, 5.0);

@@ -15,6 +15,10 @@
 #define STAMINA      5
 #define CONDITION    15
 
+#define TASK_CLASS 3487
+
+new classActive;
+
 public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
@@ -25,8 +29,29 @@ public plugin_init()
 public cod_class_enabled(id, promotion)
 	cod_set_user_rockets(id, 1, CLASS);
 
+public cod_class_disabled(id)
+	rem_bit(id, classActive);
+
 public cod_class_skill_used(id)
 	cod_use_user_rocket(id);
 
+public cod_class_spawned(id, respawn)
+{
+	remove_task(id + TASK_CLASS);
+
+	rem_bit(id, classActive);
+}
+
 public cod_class_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	cod_set_user_render(victim, 0, .timer = 1.0);
+{
+	if (!get_bit(victim, classActive)) {
+		cod_set_user_render(victim, 0, .timer = 1.0);
+
+		set_bit(victim, classActive);
+
+		set_task(1.0, "deactivate_class", victim + TASK_CLASS);
+	}
+}
+
+public deactivate_class(id)
+	rem_bit(id - TASK_CLASS, classActive);

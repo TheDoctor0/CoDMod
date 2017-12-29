@@ -8,9 +8,9 @@
 
 #define NAME        "Intelekt O'Zone"
 #define DESCRIPTION "Masz 1/%s szansy na zmiane trajektorii lotu kuli na glowe przy trafieniu"
-#define RANDOM_MIN  4
-#define RANDOM_MAX  5
-#define VALUE_MIN   2
+#define RANDOM_MIN  5
+#define RANDOM_MAX  6
+#define VALUE_MIN   3
 
 new itemValue[MAX_PLAYERS + 1], itemActive;
 

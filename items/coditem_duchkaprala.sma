@@ -36,7 +36,7 @@ public cod_item_disabled(id)
 	cod_set_user_noclip(id, false, ITEM);
 
 public cod_item_upgrade(id)
-	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
+	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, .valueMax = VALUE_MAX);
 	
 public cod_item_value(id)
 	return itemValue[id];
