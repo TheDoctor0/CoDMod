@@ -29,7 +29,7 @@ enum _:statsInfo { ADMIN, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE, SILVER, 
 enum _:winers { THIRD, SECOND, FIRST };
 
 new playerName[MAX_PLAYERS + 1][64], playerStats[MAX_PLAYERS + 1][statsInfo], playerDamage[MAX_PLAYERS + 1][MAX_PLAYERS + 1],
-	Handle:sql, bool:sqlConnected, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo;
+	Handle:sql, Handle:connection, bool:sqlConnected, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo;
 
 new cvarGoldMedalExp, cvarSilverMedalExp, cvarBronzeMedalExp, cvarAssistEnabled, cvarAssistDamage, cvarAssistExp;
 
@@ -70,7 +70,10 @@ public plugin_cfg()
 	sql_init();
 	
 public plugin_end()
+{
 	SQL_FreeHandle(sql);
+	SQL_FreeHandle(connection);
+}
 	
 public plugin_natives()
 {
@@ -920,28 +923,27 @@ public sql_init()
 	
 	sql = SQL_MakeDbTuple(host, user, pass, db);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	connection = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
 	if (errorNum) {
 		log_to_file("cod_mod.log", "[CoD Stats] SQL Error: %s", error);
 
-		set_task(3.0, "sql_init");
+		set_task(1.0, "sql_init");
 		
 		return;
 	}
-
-	sqlConnected = true;
 	
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_stats` (`name` varchar(35) NOT NULL, `admin` INT NOT NULL, `kills` INT NOT NULL, `time` INT NOT NULL, ");
 	add(queryData, charsmax(queryData), "`firstvisit` INT NOT NULL, `lastvisit` INT NOT NULL, `bestkills` INT NOT NULL, `bestdeaths` INT NOT NULL, `besths` INT NOT NULL, ");
 	add(queryData, charsmax(queryData), "`beststats` INT NOT NULL, `bronze` INT NOT NULL, `silver` INT NOT NULL, `gold` INT NOT NULL, `medals` INT NOT NULL, PRIMARY KEY (`name`));");
 
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
+	new Handle:query = SQL_PrepareQuery(connection, queryData);
 
 	SQL_Execute(query);
 	
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
+
+	sqlConnected = true;
 }
 
 public load_stats(id)
@@ -1020,19 +1022,9 @@ stock save_stats(id, end = 0)
 	switch (end) {
 		case 0: SQL_ThreadQuery(sql, "ignore_handle", queryData);
 		case 1: {
-			new error[128], errorNum, Handle:sqlConnection, Handle:query;
-			
-			sqlConnection = SQL_Connect(sql, errorNum, error, charsmax(error));
+			new error[128], errorNum, Handle:query;
 
-			if (!sqlConnection) {
-				log_to_file("cod_mod.log", "[CoD Stats] Save - Could not connect to SQL database.  [%d] %s", error, error);
-				
-				SQL_FreeHandle(sqlConnection);
-				
-				return;
-			}
-			
-			query = SQL_PrepareQuery(sqlConnection, queryData);
+			query = SQL_PrepareQuery(connection, queryData);
 			
 			if (!SQL_Execute(query)) {
 				errorNum = SQL_QueryError(query, error, charsmax(error));
@@ -1040,13 +1032,9 @@ stock save_stats(id, end = 0)
 				log_to_file("cod_mod.log", "[CoD Stats] Save Query Nonthreaded failed. [%d] %s", errorNum, error);
 				
 				SQL_FreeHandle(query);
-				SQL_FreeHandle(sqlConnection);
-				
-				return;
 			}
 
 			SQL_FreeHandle(query);
-			SQL_FreeHandle(sqlConnection);
 		}
 	}
 	

@@ -9,7 +9,7 @@
 
 new cvarMinPlayers, cvarKill, cvarKillHS, cvarWinRound, cvarBombPlanted, cvarBombDefused, cvarRescueHostage, cvarKillHostage;
 
-new playerName[MAX_PLAYERS + 1][64], playerHonor[MAX_PLAYERS + 1], Handle:sql, bool:sqlConnected, dataLoaded;
+new playerName[MAX_PLAYERS + 1][64], playerHonor[MAX_PLAYERS + 1], Handle:sql, Handle:connection, bool:sqlConnected, dataLoaded;
 
 public plugin_init()
 {	
@@ -44,7 +44,10 @@ public plugin_natives()
 }
 
 public plugin_end()
+{
 	SQL_FreeHandle(sql);
+	SQL_FreeHandle(connection);
+}
 
 public client_putinserver(id)
 {
@@ -160,26 +163,25 @@ public sql_init()
 	
 	sql = SQL_MakeDbTuple(host, user, pass, db);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	connection = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
 	if (errorNum) {
 		log_to_file("cod_mod.log", "[CoD Honor] SQL Error: %s", error);
 
-		set_task(3.0, "sql_init");
+		set_task(1.0, "sql_init");
 		
 		return;
 	}
-
-	sqlConnected = true;
 	
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_honor` (`name` VARCHAR(35), `honor` INT(11) NOT NULL, PRIMARY KEY(`name`));");
 
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
+	new Handle:query = SQL_PrepareQuery(connection, queryData);
 
 	SQL_Execute(query);
 	
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
+
+	sqlConnected = true;
 }
 
 public load_honor(id)
@@ -231,33 +233,17 @@ stock save_honor(id, end = 0)
 	switch (end) {
 		case 0: SQL_ThreadQuery(sql, "ignore_handle", queryData);
 		case 1: {
-			new error[128], errorNum, Handle:sqlConnection, Handle:query;
+			new error[128], errorNum, Handle:query;
 			
-			sqlConnection = SQL_Connect(sql, errorNum, error, charsmax(error));
-
-			if (!sqlConnection) {
-				log_to_file("cod_mod.log", "Save - Could not connect to SQL database. [%d] %s", error, error);
-				
-				SQL_FreeHandle(sqlConnection);
-				
-				return;
-			}
-			
-			query = SQL_PrepareQuery(sqlConnection, queryData);
+			query = SQL_PrepareQuery(connection, queryData);
 			
 			if (!SQL_Execute(query)) {
 				errorNum = SQL_QueryError(query, error, charsmax(error));
 				
-				log_to_file("cod_mod.log", "Save Query Nonthreaded failed. [%d] %s", errorNum, error);
-				
-				SQL_FreeHandle(query);
-				SQL_FreeHandle(sqlConnection);
-				
-				return;
+				log_to_file("cod_mod.log", "Save Query Nonthreaded failed. [%d] %s", errorNum, error);                                                            
 			}
 
 			SQL_FreeHandle(query);
-			SQL_FreeHandle(sqlConnection);
 		}
 	}
 	

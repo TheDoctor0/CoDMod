@@ -111,7 +111,8 @@ new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpDamagePer, cvarExpWinRound
 
 new Array:codItems, Array:codClasses, Array:codPromotions, Array:codFractions, Array:codPlayerClasses[MAX_PLAYERS + 1], Array:codPlayerRender[MAX_PLAYERS + 1], codForwards[forwards];
 
-new Handle:sql, bool:sqlConneted, bool:freezeTime, bool:skillsBlocked, bool:nightExp, bool:mapChange, hudInfo, hudSync, hudSync2, playersNum, dataLoaded, hudLoaded, resetStats, userConnected, renderTimer, glowActive, roundStart, lastInfo;
+new Handle:sql, Handle:connection, bool:sqlConnected, bool:freezeTime, bool:skillsBlocked, bool:nightExp, bool:mapChange, hudInfo, 
+	hudSync, hudSync2, playersNum, dataLoaded, hudLoaded, resetStats, userConnected, renderTimer, glowActive, roundStart, lastInfo;
 
 public plugin_init() 
 {
@@ -421,6 +422,7 @@ public plugin_cfg()
 public plugin_end()
 {
 	SQL_FreeHandle(sql);
+	SQL_FreeHandle(connection);
 
 	for (new i = 0; i < sizeof codForwards; i++) DestroyForward(i);
 	for (new i = 0; i < ArraySize(codItems); i++) for (new j = ITEM_GIVE; j <= ITEM_UPGRADE; j++) DestroyForward(get_item_info(i, j));
@@ -3157,32 +3159,31 @@ public sql_init()
 	
 	sql = SQL_MakeDbTuple(host, user, pass, db);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	connection = SQL_Connect(sql, errorNum, error, charsmax(error));
 	
 	if (errorNum) {
 		log_to_file("cod_mod.log", "Error: %s", error);
 
-		set_task(3.0, "sql_init");
+		set_task(1.0, "sql_init");
 		
 		return;
 	}
-
-	sqlConneted = true;
 	
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_mod` (`name` VARCHAR(35) NOT NULL, `class` VARCHAR(64) NOT NULL, `exp` INT UNSIGNED NOT NULL DEFAULT 0, `level` INT UNSIGNED NOT NULL DEFAULT 1, `intelligence` INT UNSIGNED NOT NULL DEFAULT 0, ");
 	add(queryData,  charsmax(queryData), "`health` INT UNSIGNED NOT NULL DEFAULT 0, `stamina` INT UNSIGNED NOT NULL DEFAULT 0, `condition` INT UNSIGNED NOT NULL DEFAULT 0, `strength` INT UNSIGNED NOT NULL DEFAULT 0, PRIMARY KEY(`name`, `class`));");   
 
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
+	new Handle:query = SQL_PrepareQuery(connection, queryData);
 
 	SQL_Execute(query);
 	
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
+
+	sqlConnected = true;
 }
 
 public load_data(id)
 {
-	if (!sqlConneted) {
+	if (!sqlConnected) {
 		set_task(1.0, "load_data", id);
 
 		return;
@@ -3254,33 +3255,17 @@ public save_data(id, end)
 	codPlayer[id][PLAYER_GAINED_EXP], codPlayer[id][PLAYER_GAINED_LEVEL], codPlayer[id][PLAYER_INT], codPlayer[id][PLAYER_HEAL], codPlayer[id][PLAYER_STAM], codPlayer[id][PLAYER_STR], codPlayer[id][PLAYER_COND], codPlayer[id][PLAYER_NAME], className);
 
 	if (end == MAP_END) {
-		new error[128], errorNum, Handle:connect, Handle:query;
-			
-		connect = SQL_Connect(sql, errorNum, error, charsmax(error));
+		new error[128], errorNum, Handle:query;
 
-		if (!connect) {
-			log_to_file("addons/amxmodx/logs/cod_stats.txt", "Save - Could not connect to SQL database. [%d] %s", error, error);
-			
-			SQL_FreeHandle(connect);
-			
-			return;
-		}
-		
-		query = SQL_PrepareQuery(connect, queryData);
+		query = SQL_PrepareQuery(connection, queryData);
 		
 		if (!SQL_Execute(query)) {
 			errorNum = SQL_QueryError(query, error, charsmax(error));
 			
-			log_to_file("addons/amxmodx/logs/cod_stats.txt", "Save Query Nonthreaded failed. [%d] %s", errorNum, error);
-			
-			SQL_FreeHandle(query);
-			SQL_FreeHandle(connect);
-			
-			return;
+			log_to_file("cod_mod.log", "Save Query Nonthreaded failed. [%d] %s", errorNum, error);
 		}
 
 		SQL_FreeHandle(query);
-		SQL_FreeHandle(connect);
 	} else SQL_ThreadQuery(sql, "ignore_handle", queryData);
 	
 	codPlayer[id][PLAYER_EXP] += codPlayer[id][PLAYER_GAINED_EXP];

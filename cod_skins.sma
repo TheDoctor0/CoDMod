@@ -414,7 +414,7 @@ public sql_init()
 	if (errorNum) {
 		log_to_file("cod_mod.log", "[CoD Skins] SQL Error: %s", error);
 
-		set_task(3.0, "sql_init");
+		set_task(1.0, "sql_init");
 		
 		return;
 	}
