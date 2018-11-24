@@ -146,6 +146,8 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_max_damage_durability", "25"), cvarMaxDamageDurability);
 	bind_pcvar_float(create_cvar("cod_block_skills_time", "5"), cvarBlockSkillsTime);
 
+	register_cvar("cod_version", VERSION, FCVAR_SERVER);
+
 	for (new i; i < sizeof commandClass; i++) register_clcmd(commandClass[i], "select_fraction");
 	for (new i; i < sizeof commandClasses; i++) register_clcmd(commandClasses[i], "display_classes_description");
 	for (new i; i < sizeof commandItem; i++) register_clcmd(commandItem[i], "display_item_description");
