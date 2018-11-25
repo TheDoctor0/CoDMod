@@ -78,7 +78,7 @@ native cod_check_account(id);
 /*------------------------------
 Return if player has a VIP.
 ------------------------------*/
-native cod_get_user_vip(id);
+native bool:cod_get_user_vip(id);
 
 /*------------------------------
 Return player's honor amount.
@@ -814,17 +814,17 @@ native cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:time
 /*------------------------------
 Print message to player with [CoD] prefix.
 Color formaters are allowed.
-*/
+------------------------------*/
 native cod_print_chat(id, const text[], any:...);
 
 /*------------------------------
 Execute command on player with bypassing protectors (most of them)
-*/
+------------------------------*/
 native cod_cmd_execute(id, const text[], any:...);
 
 /*------------------------------
 Prepare safe sql string for query.
-*/
+------------------------------*/
 native cod_sql_string(const source[], dest[], length);
 
 /*------------------------------
@@ -937,18 +937,18 @@ native cod_random_upgrade(&value, upgradeMin = -1, upgradeMax = 1, valueMin = NO
 
 /*------------------------------
 Return true/false result for given percent chance.
-*/
-native cod_percent_chance(percent);
+------------------------------*/
+native bool:cod_percent_chance(percent);
 
 /*------------------------------
 Return if there is enough space for ent (or origin) with defined minimum distance.
-*/
-native cod_is_enough_space(ent, Float:distance = 120.0);
+------------------------------*/
+native bool:cod_is_enough_space(ent, Float:distance = 120.0);
 
 /*------------------------------
 Remove all ents with specified className.
 If id > 0 will remove only ents owned by that player.
-*/
+------------------------------*/
 native cod_remove_ents(id = 0, className[]);
 
 /*------------------------------
