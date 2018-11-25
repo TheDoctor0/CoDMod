@@ -56,7 +56,7 @@ public cod_class_enabled(id, promotion)
 }
 
 public cod_class_skill_used(id)
-    cod_use_user_thunder(id);
+    cod_use_user_mine(id);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
