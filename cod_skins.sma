@@ -14,42 +14,42 @@ enum _:skinsInfo { SKIN_NAME[64], SKIN_WEAPON[32], SKIN_MODEL[64], SKIN_PRICE };
 
 new playerData[MAX_PLAYERS + 1][playerInfo], Array:playerSkins[MAX_PLAYERS + 1], Array:skins, Array:weapons, Handle:sql, bool:sqlConnected, loaded;
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	for (new i; i < sizeof commandSkins; i++) register_clcmd(commandSkins[i], "skins_menu");
 
 	register_event("SetFOV", "set_fov" , "be");
 }
 
-public plugin_precache() 
+public plugin_precache()
 {
 	skins = ArrayCreate(skinsInfo);
 	weapons = ArrayCreate(64, 16);
-	
+
 	new file[128];
-	
+
 	get_localinfo("amxx_configsdir", file, charsmax(file));
 	format(file, charsmax(file), "%s/cod_skins.ini", file);
-	
+
 	if (!file_exists(file)) set_fail_state("[CoD] Brak pliku cod_skins.ini!");
-	
+
 	new skin[skinsInfo], lineData[256], tempValue[3][64], bool:error, fileOpen = fopen(file, "r");
-	
+
 	while (!feof(fileOpen)) {
 		fgets(fileOpen, lineData, charsmax(lineData)); trim(lineData);
-		
+
 		if (lineData[0] == ';' || lineData[0] == '^0' || lineData[0] == '/') continue;
-		
+
 		if (lineData[0] == '[') {
 			parse(lineData, skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]));
-			
+
 			replace_all(skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]), "[", "");
 			replace_all(skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]), "]", "");
 
 			ArrayPushString(weapons, skin[SKIN_WEAPON]);
-			
+
 			continue;
 		} else {
 			parse(lineData, tempValue[0], charsmax(tempValue[]), tempValue[1], charsmax(tempValue[]), tempValue[2], charsmax(tempValue[]));
@@ -61,32 +61,36 @@ public plugin_precache()
 
 			if (!file_exists(skin[SKIN_MODEL])) {
 				log_to_file("cod_mod.log", "[CoD] Plik %s nie istnieje!", skin[SKIN_MODEL]);
-			
+
 				error = true;
 			} else precache_model(skin[SKIN_MODEL]);
 
 			ArrayPushArray(skins, skin);
 		}
 	}
-	
+
 	fclose(fileOpen);
-	
+
 	if (error) set_fail_state("[CoD] Nie zaladowano wszystkich skinow. Sprawdz logi bledow!");
 
 	if (!ArraySize(skins)) set_fail_state("[CoD] Nie zaladowano zadnego skina. Sprawdz plik konfiguracyjny cod_skins.ini!");
-	
+
 	for (new i = 1; i <= MAX_PLAYERS; i++) playerSkins[i] = ArrayCreate();
 }
 
 public plugin_cfg()
+{
 	sql_init();
+
+	log_amx("Zaladowano %i skinow dla %i broni.", ArraySize(skins), ArraySize(weapons));
+}
 
 public plugin_end()
 {
 	SQL_FreeHandle(sql);
-	
+
 	ArrayDestroy(skins);
-	
+
 	for (new i = 1; i <= MAX_PLAYERS; i++) ArrayDestroy(playerSkins[i]);
 }
 
@@ -96,17 +100,17 @@ public client_disconnected(id)
 public client_putinserver(id)
 {
 	rem_bit(id, loaded);
-	
+
 	for (new i = 0; i <= CSW_P90; i++) playerData[id][ACTIVE][i] = NONE;
 
 	ArrayClear(playerSkins[id]);
 
 	if (is_user_hltv(id) || is_user_bot(id)) return;
-	
+
 	get_user_name(id, playerData[id][NAME], charsmax(playerData[][NAME]));
-	
+
 	cod_sql_string(playerData[id][NAME], playerData[id][NAME], charsmax(playerData[][NAME]));
-	
+
 	set_task(0.1, "load_skins", id);
 }
 
@@ -123,21 +127,21 @@ public skins_menu(id)
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
 	new menu = menu_create("\yMenu \rSkinow\w:", "skins_menu_handle");
-		
+
 	menu_additem(menu, "\wUstaw \ySkin");
 	menu_additem(menu, "\wKup \ySkin");
-	
+
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	
+
 	menu_display(id, menu);
-	
+
 	return PLUGIN_HANDLED;
 }
 
 public skins_menu_handle(id, menu, item)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
-	
+
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
@@ -166,20 +170,20 @@ public choose_weapon_menu(id, type)
 
 		menu_additem(menu, menuData, tempType);
 	}
-	
+
 	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
 	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	
+
 	menu_display(id, menu);
-	
+
 	return PLUGIN_HANDLED;
 }
 
 public choose_weapon_menu_handle(id, menu, item)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
-	
+
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
@@ -189,7 +193,7 @@ public choose_weapon_menu_handle(id, menu, item)
 	}
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-	
+
 	new itemData[32], itemType[2], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, itemType, charsmax(itemType), itemData, charsmax(itemData), itemCallback);
@@ -223,11 +227,11 @@ public set_weapon_skin(id, weapon[])
 			count++;
 		}
 	}
-	
+
 	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
 	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	
+
 	if (!count) {
 		cod_print_chat(id, "Nie posiadasz^x03 zadnych^x01 skinow tej broni.");
 
@@ -238,7 +242,7 @@ public set_weapon_skin(id, weapon[])
 public set_weapon_skin_handle(id, menu, item)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
-	
+
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
@@ -248,7 +252,7 @@ public set_weapon_skin_handle(id, menu, item)
 	}
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-	
+
 	new itemData[32], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
@@ -273,7 +277,7 @@ public set_weapon_skin_handle(id, menu, item)
 
 		cod_print_chat(id, "Przywrociles domyslny skin broni^x03 %s^x01.", itemData);
 	}
-	
+
 	return PLUGIN_HANDLED;
 }
 
@@ -294,11 +298,11 @@ public buy_weapon_skin(id, weapon[])
 			count++;
 		}
 	}
-	
+
 	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
 	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	
+
 	if (!count) {
 		cod_print_chat(id, "Do kupienia nie ma^x03 zadnych^x01 skinow tej broni.");
 
@@ -309,7 +313,7 @@ public buy_weapon_skin(id, weapon[])
 public buy_weapon_skin_handle(id, menu, item)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
-	
+
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
@@ -319,7 +323,7 @@ public buy_weapon_skin_handle(id, menu, item)
 	}
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-	
+
 	new itemData[32], itemAccess, itemCallback, skinId;
 
 	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
@@ -350,7 +354,7 @@ public buy_weapon_skin_handle(id, menu, item)
 		remove_active_skin(id, skin[SKIN_WEAPON]);
 
 		add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME], 1);
-		
+
 		set_skin(id, skin[SKIN_WEAPON], skinId);
 	} else add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
 
@@ -389,9 +393,9 @@ public change_skin(id, weapon)
 
 	if (playerData[id][ACTIVE][weapon] > NONE) {
 		static skin[skinsInfo];
-		
+
 		ArrayGetArray(skins, playerData[id][ACTIVE][weapon], skin);
-		
+
 		set_pev(id, pev_viewmodel2, skin[SKIN_MODEL]);
 
 		playerData[id][SKIN] = playerData[id][ACTIVE][weapon];
@@ -401,32 +405,32 @@ public change_skin(id, weapon)
 public sql_init()
 {
 	new host[32], user[32], pass[32], db[32], queryData[192], error[128], errorNum;
-	
+
 	get_cvar_string("cod_sql_host", host, charsmax(host));
 	get_cvar_string("cod_sql_user", user, charsmax(user));
 	get_cvar_string("cod_sql_pass", pass, charsmax(pass));
 	get_cvar_string("cod_sql_db", db, charsmax(db));
-	
+
 	sql = SQL_MakeDbTuple(host, user, pass, db);
 
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
-	
+
 	if (errorNum) {
 		log_to_file("cod_mod.log", "[CoD Skins] SQL Error: %s", error);
 
 		set_task(1.0, "sql_init");
-		
+
 		return;
 	}
 
 	sqlConnected = true;
-	
+
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_skins` (name VARCHAR(35), weapon VARCHAR(35), skin VARCHAR(64), PRIMARY KEY(name, weapon, skin))");
 
 	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
 
 	SQL_Execute(query);
-	
+
 	SQL_FreeHandle(query);
 	SQL_FreeHandle(connectHandle);
 }
@@ -440,11 +444,11 @@ public load_skins(id)
 	}
 
 	new playerId[1], queryData[128];
-	
+
 	playerId[0] = id;
-	
+
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_skins` WHERE name = '%s'", playerData[id][NAME]);
-	
+
 	SQL_ThreadQuery(sql, "load_skins_handle", queryData, playerId, sizeof(playerId));
 }
 
@@ -452,12 +456,12 @@ public load_skins_handle(failState, Handle:query, error[], errorNum, playerId[],
 {
 	if (failState) {
 		log_to_file("cod_mod.log", "[CoD Skins] SQL Error: %s (%d)", error, errorNum);
-		
+
 		return;
 	}
-	
+
 	new id = playerId[0], skin[skinsInfo];
-	
+
 	while (SQL_MoreResults(query)) {
 		SQL_ReadResult(query, SQL_FieldNameToNum(query, "skin"), skin[SKIN_NAME], charsmax(skin[SKIN_NAME]));
 		SQL_ReadResult(query, SQL_FieldNameToNum(query, "weapon"), skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]));
@@ -474,7 +478,7 @@ public load_skins_handle(failState, Handle:query, error[], errorNum, playerId[],
 
 		SQL_NextRow(query);
 	}
-	
+
 	set_bit(id, loaded);
 }
 
@@ -530,15 +534,15 @@ stock get_skin_id(const name[], const weapon[])
 stock get_skin_info(skinId, info, dataReturn[] = "", dataLength = 0)
 {
 	static skin[skinsInfo];
-	
+
 	ArrayGetArray(skins, skinId, skin);
-	
+
 	if (info == SKIN_NAME || info == SKIN_WEAPON || info == SKIN_MODEL) {
 		copy(dataReturn, dataLength, skin[info]);
-		
+
 		return 0;
 	}
-	
+
 	return skin[info];
 }
 
@@ -548,6 +552,6 @@ public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSiz
 		if (failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "[CoD Skins] Could not connect to SQL database. [%d] %s", errorNum, error);
 		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "[CoD Skins] Query failed. [%d] %s", errorNum, error);
 	}
-	
+
 	return PLUGIN_CONTINUE;
 }

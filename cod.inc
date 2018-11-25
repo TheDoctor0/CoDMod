@@ -3,6 +3,10 @@
 #endif
 #define _cod_included
 
+#if !defined client_print_color || !defined MAX_NAME_LENGTH
+    #error NOTSUPPORT AMXX < 1.8.3!
+#endif
+
 #pragma unused codSounds
 
 #define is_user_valid(%1) (1 <= %1 <= MAX_PLAYERS)
@@ -35,7 +39,7 @@
 #define RENDER_DUCK   (1<<4)
 #define RENDER_SHIFT  (1<<5)
 
-enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_DEPLOY, SOUND_ACTIVATE, 
+enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_DEPLOY, SOUND_ACTIVATE,
 	SOUND_CHARGE, SOUND_PICKUP, SOUND_THUNDER, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_APPLAUSE, SOUND_LAUGH };
 enum _:icons { BOMBSITE_A, BOMBSITE_B, BOMB_DROPPED, BOMB_PLANTED, BOMB_EXPLODE, BOX };
 enum _:promotions { PROMOTION_NONE, PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION_THIRD };
@@ -246,7 +250,7 @@ Return user item name.
 native cod_get_user_item_name(id, dataReturn[], dataLength);
 
 /*------------------------------
-Set player's item. 
+Set player's item.
 If item = RANDOM (-3) an item will be random.
 If value = RANDOM (-3) item value will be random.
 ------------------------------*/
@@ -835,7 +839,7 @@ Display screen fade.
 Duration and holdtime are time seconds.
 Fadetype is fade display type:
 - FFADE_IN 0x0000
-- FFADE_OUT 0x0001 
+- FFADE_OUT 0x0001
 - FFADE_MODULATE 0x0002
 - FFADE_STAYOUT 0x0004
 Red, green, blue is fade color in RGB

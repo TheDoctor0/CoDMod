@@ -15,7 +15,7 @@
 
 #pragma dynamic 65536
 
-#define MAX_NAME 64
+#define MAX_NAME MAX_NAME_LENGTH
 #define MAX_DESC 256
 
 #define TASK_SHOW_INFO 3357
@@ -39,7 +39,7 @@ new const commandDrop[][] = { "wyrzuc", "say /wyrzuc", "say_team /wyrzuc", "say 
 new const commandReset[][] = { "resetuj", "say /resetuj", "say_team /resetuj", "say /r", "say_team /r" };
 new const commandPoints[][] = { "punkty", "say /statystyki", "say_team /statystyki", "say /punkty", "say_team /punkty", "say /s", "say_team /s", "say /p", "say_team /p" };
 new const commandHud[][] = { "hud", "say /hud", "say_team /hud", "say /zmienhud", "say_team /zmienhud", "say /change_hud", "say_team /change_hud" };
-new const commandBinds[][] = { "bindy", "say /bind", "say_team /bind", "say /bindy", "say_team /bindy", "say /binds", "say_team /binds" };
+new const commandBinds[][] = { "bindy", "binny", "say /bind", "say_team /bind", "say /bindy", "say_team /bindy", "say /binds", "say_team /binds" };
 new const commandTop[][] = { "top", "say /toplvl", "say_team /toplvl", "say /toplevel", "say_team /toplevel", "say /toppoziom", "say_team /toppoziom", "say /ltop15", "say_team /ltop15", "say /ptop15", "say_team /ptop15" };
 new const commandBlock[][] = { "fullupdate", "cl_autobuy", "cl_rebuy", "cl_setautobuy", "rebuy", "autobuy", "hegren", "sgren", "flash", "-rocket", "-mine", "-dynamite", "-medkit", "-teleport", "-class", "-item" };
 
@@ -417,8 +417,8 @@ public plugin_cfg()
 		set_task(240.0, "night_exp_info", _, _, _, "b");
 	}
 
-	log_amx("%s by %s v%s.", PLUGIN, AUTHOR, VERSION);
-	log_amx("Loaded %i classes and %i items.", ArraySize(codClasses) - 1, ArraySize(codItems) - 1);
+	log_amx("Call of Duty Mod autorstwa O'Zone (v%s).", VERSION);
+	log_amx("Zaladowano %i klas i %i przedmiotow.", ArraySize(codClasses) - 1, ArraySize(codItems) - 1);
 }
 
 public plugin_end()
@@ -1273,6 +1273,8 @@ public show_binds(id, sound)
 	menu_addtext(menu, "\yWystarczy, ze wpiszesz np. \rbind ^"z^" ^"+rocket;+mine;+dynamite^"\y.", 0);
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 
 	menu_display(id, menu);
 
@@ -2553,7 +2555,7 @@ public show_advertisement(id)
 {
 	id -= TASK_SHOW_AD;
 
-	chat_print(id, "Witaj na serwerze Call of Duty Mod stworzonym przez^x03 O'Zone^x01.");
+	chat_print(id, "Witaj na serwerze^x03  Call of Duty Mod^x01 stworzonym przez^x03 O'Zone^x01.");
 	chat_print(id, "W celu uzyskania informacji o komendach wpisz^x03 /menu^x01 (klawisz^x03 ^"v^"^x01).");
 }
 
