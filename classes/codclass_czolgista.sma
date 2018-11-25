@@ -21,17 +21,17 @@
 #define MISSILES     10
 
 new const classModels[][] = { "models/CoDMod/bazooka.mdl", "models/CoDMod/bazooka2.mdl", "models/CoDMod/missile.mdl" };
-new const classSprites[][] = { "sprites/steam1.spr", "sprites/smoke.spr", "sprites/explosion.spr" };
+new const classSprites[][] = { "sprites/smoke.spr", "sprites/CoDMod/steam1.spr", "sprites/CoDMod/explosion.spr" };
 
 enum _:models { V_BAZOOKA, P_BAZOOKA, MISSILE };
-enum _:sprites { SMOKE, TRAIL, EXPLOSION }
+enum _:sprites { TRAIL, SMOKE, EXPLOSION }
 
 new bazookaMissiles[MAX_PLAYERS + 1], lastBazookaMissile[MAX_PLAYERS + 1], sprite[sprites], bazookaActive, classActive;
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 
 	register_touch("missile", "*" , "touch_missile");
@@ -101,13 +101,13 @@ public cod_cmd_start(id, button, oldButton, playerState)
 public shoot_missile(id)
 {
 	if (!is_user_alive(id)) return;
-	
+
 	if (!bazookaMissiles[id]) {
 		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Wykorzystales juz wszystkie pociski bazooki!");
 
 		return;
 	}
-	
+
 	if (lastBazookaMissile[id] + 5.0 > get_gametime()) {
 		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Pocisk mozesz wystrzelic raz na 5 sekund!");
 
@@ -115,7 +115,7 @@ public shoot_missile(id)
 	}
 
 	rem_bit(id, bazookaActive);
-	
+
 	lastBazookaMissile[id] = floatround(get_gametime());
 	bazookaMissiles[id]--;
 
@@ -123,12 +123,12 @@ public shoot_missile(id)
 
 	pev(id, pev_origin, origin);
 	pev(id, pev_v_angle, angle);
-	
+
 	new ent = create_entity("info_target");
 
 	set_pev(ent, pev_classname, "rocket");
 	engfunc(EngFunc_SetModel, ent, classModels[MISSILE]);
-	
+
 	set_pev(ent, pev_solid, SOLID_BBOX);
 	set_pev(ent, pev_movetype, MOVETYPE_TOSS);
 	set_pev(ent, pev_owner, id);
@@ -137,20 +137,20 @@ public shoot_missile(id)
 	set_pev(ent, pev_gravity, 0.3);
 
 	velocity_by_aim(id, 1000, velocity);
-	
+
 	angle[0] *= -1.0;
-	
+
 	set_pev(ent, pev_origin, origin);
 	set_pev(ent, pev_velocity, velocity);
 	set_pev(ent, pev_angles, angle);
-	
+
 	message_begin(MSG_BROADCAST, SVC_TEMPENTITY);
 	write_byte(TE_BEAMFOLLOW);
 	write_short(ent);
 	write_short(sprite[TRAIL]);
 	write_byte(6);
 	write_byte(3);
-	write_byte(224);	
+	write_byte(224);
 	write_byte(224);
 	write_byte(255);
 	write_byte(100);
@@ -162,30 +162,30 @@ public shoot_missile(id)
 public touch_missile(ent)
 {
 	if (!is_valid_ent(ent)) return;
-	
+
 	new origin[3];
 
 	get_user_origin(ent, origin);
 
 	origin[2] += 1.0;
-	
+
 	cod_make_explosion(ent, 0, 1, 250.0, 125.0, 0.5);
 
-	message_begin(MSG_BROADCAST,SVC_TEMPENTITY); 
+	message_begin(MSG_BROADCAST,SVC_TEMPENTITY);
 	write_byte(TE_EXPLOSION);
 	write_coord(origin[0]);
 	write_coord(origin[1]);
 	write_coord(origin[2]);
-	write_short(sprite[EXPLOSION]); 
-	write_byte(40); 
-	write_byte(30); 
-	write_byte(14); 
-	message_end(); 
-	
+	write_short(sprite[EXPLOSION]);
+	write_byte(40);
+	write_byte(30);
+	write_byte(14);
+	message_end();
+
 	message_begin(MSG_BROADCAST, SVC_TEMPENTITY);
 	write_byte(5);
-	write_coord(origin[0]); 
-	write_coord(origin[1]); 
+	write_coord(origin[0]);
+	write_coord(origin[1]);
 	write_coord(origin[2]);
 	write_short(sprite[SMOKE]);
 	write_byte(35);
