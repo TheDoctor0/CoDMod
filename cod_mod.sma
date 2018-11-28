@@ -10,26 +10,25 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 #define AUTHOR "O'Zone"
 
-#pragma dynamic 65536
+#pragma dynamic              65536
 
-#define MAX_NAME MAX_NAME_LENGTH
-#define MAX_DESC 256
-
-#define TASK_SHOW_INFO 3357
-#define TASK_SHOW_AD 4268
-#define TASK_SHOW_HELP 5456
-#define TASK_SPEED_LIMIT 6144
-#define TASK_SET_SPEED 7532
+#define TASK_SHOW_INFO       3357
+#define TASK_SHOW_AD         4268
+#define TASK_SHOW_HELP       5456
+#define TASK_SPEED_LIMIT     6144
+#define TASK_SET_SPEED       7532
 #define TASK_END_KILL_STREAK 8779
-#define TASK_RENDER 9611
-#define TASK_GLOW 10932
-#define TASK_DAMAGE 11342
-#define TASK_BLOCK 12731
-#define TASK_BLOCK_INFO 13935
-#define TASK_RESPAWN 14294
+#define TASK_RENDER          9611
+#define TASK_GLOW            10932
+#define TASK_DAMAGE          11342
+#define TASK_BLOCK           12731
+#define TASK_BLOCK_INFO      13935
+#define TASK_RESPAWN         14294
+
+#define LOG_FILE             "cod_mod.log"
 
 new const commandClass[][] = { "klasa", "say /klasa", "say_team /klasa", "say /class", "say_team /class", "say /k", "say_team /k", "say /c", "say_team /c" };
 new const commandClasses[][] = { "klasy", "say /klasy", "say_team /klasy", "say /classes", "say_team /classes", "say /ky", "say_team /ky", "say /cs", "say_team /cs" };
@@ -82,8 +81,8 @@ enum _:repeatingData { ATTACKER, VICTIM, DAMAGE, COUNTER, FLAGS };
 
 enum _:weaponSlots { PRIMARY = 1, SECONDARY, KNIFE, GRENADES, C4 };
 
-enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, SPEED_CHANGED, DAMAGE_PRE, DAMAGE_POST, WEAPON_DEPLOY, CUR_WEAPON, KILLED,
-	SPAWNED, CMD_START, PRETHINK, NEW_ROUND, START_ROUND, END_ROUND, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH, TELEPORT_USED };
+enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, SPEED_CHANGED, DAMAGE_PRE, DAMAGE_POST, WEAPON_DEPLOY, CUR_WEAPON, KILLED, SPAWNED,
+	CMD_START, PRETHINK, NEW_ROUND, START_ROUND, END_ROUND, END_MAP, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH, TELEPORT_USED };
 
 enum _:itemInfo { ITEM_NAME[MAX_NAME], ITEM_DESC[MAX_DESC], ITEM_PLUGIN, ITEM_RANDOM_MIN, ITEM_RANDOM_MAX, ITEM_GIVE, ITEM_DROP,
 	ITEM_SPAWNED, ITEM_KILL, ITEM_KILLED, ITEM_SKILL_USED, ITEM_UPGRADE, ITEM_VALUE, ITEM_DAMAGE_ATTACKER, ITEM_DAMAGE_VICTIM };
@@ -102,7 +101,7 @@ enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_
 	Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY,
 	PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1],
 	PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_RESISTANCE[ALL + 1], PLAYER_GODMODE[ALL + 1], PLAYER_NOCLIP[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1],
-	PLAYER_ELIMINATOR[ALL + 1], PLAYER_ELIMINATOR_WEAPONS[ALL + 1], PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_NAME] };
+	PLAYER_ELIMINATOR[ALL + 1], PLAYER_ELIMINATOR_WEAPONS[ALL + 1], PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_SAFE_NAME] };
 
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 
@@ -227,6 +226,7 @@ public plugin_init()
 	codForwards[NEW_ROUND] = CreateMultiForward("cod_new_round", ET_IGNORE);
 	codForwards[START_ROUND] = CreateMultiForward("cod_start_round", ET_IGNORE);
 	codForwards[END_ROUND] = CreateMultiForward("cod_end_round", ET_IGNORE);
+	codForwards[END_MAP] = CreateMultiForward("cod_end_map", ET_IGNORE);
 	codForwards[MEDKIT_HEAL] = CreateMultiForward("cod_medkit_heal", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
 	codForwards[ROCKET_EXPLODE] = CreateMultiForward("cod_rocket_explode", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
 	codForwards[MINE_EXPLODE] = CreateMultiForward("cod_mine_explode", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
@@ -375,6 +375,7 @@ public plugin_natives()
 	register_native("cod_set_user_glow", "_cod_set_user_glow", 1);
 
 	register_native("cod_print_chat", "_cod_print_chat", 1);
+	register_native("cod_log_error", "_cod_log_error", 1);
 	register_native("cod_show_hud", "_cod_show_hud", 1);
 	register_native("cod_cmd_execute", "_cod_cmd_execute", 1);
 	register_native("cod_sql_string", "_cod_sql_string", 1);
@@ -1241,10 +1242,10 @@ public save_hud(id)
 	new tempData[256];
 
 	if (!get_bit(id, hudLoaded)) {
-		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`, `level`, `exp`, `intelligence`, `health`, `stamina`) VALUES ('%s', 'hud', '%i', '%i', '%i', '%i', '%i')",
+		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`, `level`, `exp`, `intelligence`, `health`, `stamina`) VALUES (^"%s^", 'hud', '%i', '%i', '%i', '%i', '%i')",
 			codPlayer[id][PLAYER_NAME], codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], codPlayer[id][PLAYER_HUD_POSX], codPlayer[id][PLAYER_HUD_POSY]);
 	} else {
-		formatex(tempData, charsmax(tempData), "UPDATE `cod_mod` SET `level` = '%i', `exp` = '%i', `intelligence` = '%i', `health` = '%i', `stamina` = '%i' WHERE class = 'hud' AND name = '%s'",
+		formatex(tempData, charsmax(tempData), "UPDATE `cod_mod` SET `level` = '%i', `exp` = '%i', `intelligence` = '%i', `health` = '%i', `stamina` = '%i' WHERE `class` = 'hud' AND `name` = ^"%s^"",
 			codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], codPlayer[id][PLAYER_HUD_POSX], codPlayer[id][PLAYER_HUD_POSY], codPlayer[id][PLAYER_NAME]);
 	}
 
@@ -1317,7 +1318,8 @@ public level_top(id)
 public show_level_top(failState, Handle:query, error[], errorNum, tempData[], dataSize)
 {
 	if (failState)  {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		if (failState == TQUERY_CONNECT_FAILED) log_to_file(LOG_FILE, "[%s] Could not connect to SQL database. Error: %s (%d)", PLUGIN, error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) log_to_file(LOG_FILE, "[%s] Threaded query failed. Error: %s (%d)", PLUGIN, error, errorNum);
 
 		return PLUGIN_HANDLED;
 	}
@@ -2482,9 +2484,11 @@ public message_ammo(msgId, msgDest, id)
 
 public message_intermission()
 {
-	set_task(0.25, "save_players");
-
 	mapChange = true;
+
+	execute_forward_ignore(codForwards[END_MAP]);
+
+	set_task(1.0, "save_players");
 }
 
 public save_players()
@@ -2583,9 +2587,9 @@ public show_help(id)
 		case 15: show_dhudmessage(id, "Jesli chcesz kupic VIPa, klasy premium, exp lub honor zajrzyj do /sklepsms.");
 		case 16: show_dhudmessage(id, "Jest wiele dodatkowych statystyk, ktore znajdziesz pod komenda /statymenu.");
 		case 17: {
-			static info[64];
+			static info[128];
 
-			formatex(info, charsmax(info), "Doswiadczenie i misje sa naliczane, jesli na serwerze gra co najmniej %i graczy.", cvarMinPlayers - 1);
+			formatex(info, charsmax(info), "Doswiadczenie i misje sa naliczane, jesli na serwerze gra co najmniej %i graczy.", cvarMinPlayers);
 
 			show_dhudmessage(id, info);
 		}
@@ -3154,7 +3158,7 @@ stock get_condition(id, class_condition = 1, stats_condition = 1, bonus_conditio
 
 public sql_init()
 {
-	new host[32], user[32], pass[32], db[32], queryData[512], error[128], errorNum;
+	new host[64], user[64], pass[64], db[64], queryData[512], error[128], errorNum;
 
 	get_cvar_string("cod_sql_host", host, charsmax(host));
 	get_cvar_string("cod_sql_user", user, charsmax(user));
@@ -3166,14 +3170,14 @@ public sql_init()
 	connection = SQL_Connect(sql, errorNum, error, charsmax(error));
 
 	if (errorNum) {
-		log_to_file("cod_mod.log", "Error: %s", error);
+		log_to_file(LOG_FILE, "[%s] SQL Error: %s (%d)", PLUGIN, error, errorNum);
 
-		set_task(1.0, "sql_init");
+		set_task(5.0, "sql_init");
 
 		return;
 	}
 
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_mod` (`name` VARCHAR(35) NOT NULL, `class` VARCHAR(64) NOT NULL, `exp` INT UNSIGNED NOT NULL DEFAULT 0, `level` INT UNSIGNED NOT NULL DEFAULT 1, `intelligence` INT UNSIGNED NOT NULL DEFAULT 0, ");
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_mod` (`name` VARCHAR(%i) NOT NULL, `class` VARCHAR(64) NOT NULL, `exp` INT UNSIGNED NOT NULL DEFAULT 0, `level` INT UNSIGNED NOT NULL DEFAULT 1, `intelligence` INT UNSIGNED NOT NULL DEFAULT 0, ", MAX_SAFE_NAME);
 	add(queryData,  charsmax(queryData), "`health` INT UNSIGNED NOT NULL DEFAULT 0, `stamina` INT UNSIGNED NOT NULL DEFAULT 0, `condition` INT UNSIGNED NOT NULL DEFAULT 0, `strength` INT UNSIGNED NOT NULL DEFAULT 0, PRIMARY KEY(`name`, `class`));");
 
 	new Handle:query = SQL_PrepareQuery(connection, queryData);
@@ -3197,7 +3201,7 @@ public load_data(id)
 
 	playerId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_mod` WHERE name = '%s'", codPlayer[id][PLAYER_NAME]);
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_mod` WHERE name = ^"%s^"", codPlayer[id][PLAYER_NAME]);
 
 	SQL_ThreadQuery(sql, "load_data_handle", queryData, playerId, sizeof playerId);
 }
@@ -3205,7 +3209,8 @@ public load_data(id)
 public load_data_handle(failState, Handle:query, error[], errorNum, playerId[], dataSize)
 {
 	if (failState) {
-		log_to_file("cod_mod.log", "SQL Error: %s (%d)", error, errorNum);
+		if (failState == TQUERY_CONNECT_FAILED) log_to_file(LOG_FILE, "[%s] Could not connect to SQL database. Error: %s (%d)", PLUGIN, error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) log_to_file(LOG_FILE, "[%s] Threaded query failed. Error: %s (%d)", PLUGIN, error, errorNum);
 
 		return;
 	}
@@ -3255,7 +3260,7 @@ public save_data(id, end)
 
 	get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
-	formatex(queryData, charsmax(queryData), "UPDATE `cod_mod` SET `exp` = (`exp` + %d), `level` = (`level` + %d), `intelligence` = '%d', `health` = '%d', `stamina` = '%d', `strength` = '%d', `condition` = '%d' WHERE `name` = '%s' AND `class` = '%s'",
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_mod` SET `exp` = (`exp` + %d), `level` = (`level` + %d), `intelligence` = '%d', `health` = '%d', `stamina` = '%d', `strength` = '%d', `condition` = '%d' WHERE `name` = ^"%s^" AND `class` = '%s'",
 	codPlayer[id][PLAYER_GAINED_EXP], codPlayer[id][PLAYER_GAINED_LEVEL], codPlayer[id][PLAYER_INT], codPlayer[id][PLAYER_HEAL], codPlayer[id][PLAYER_STAM], codPlayer[id][PLAYER_STR], codPlayer[id][PLAYER_COND], codPlayer[id][PLAYER_NAME], className);
 
 	if (end == MAP_END) {
@@ -3266,7 +3271,7 @@ public save_data(id, end)
 		if (!SQL_Execute(query)) {
 			errorNum = SQL_QueryError(query, error, charsmax(error));
 
-			log_to_file("cod_mod.log", "Save Query Nonthreaded failed. [%d] %s", errorNum, error);
+			log_to_file(LOG_FILE, "[%s] Non-threaded query failed. Error: %s (%d)", PLUGIN, error, errorNum);
 		}
 
 		SQL_FreeHandle(query);
@@ -3324,7 +3329,7 @@ public load_class(id, class)
 
 		get_class_info(class, CLASS_NAME, className, charsmax(className));
 
-		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`) VALUES ('%s', '%s')", codPlayer[id][PLAYER_NAME], className);
+		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`) VALUES (^"%s^", '%s')", codPlayer[id][PLAYER_NAME], className);
 
 		SQL_ThreadQuery(sql, "ignore_handle", tempData);
 	}
@@ -3335,8 +3340,8 @@ public load_class(id, class)
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
 	if (failState) {
-		if (failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "Could not connect to SQL database. [%d] %s", errorNum, error);
-		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "Query failed. [%d] %s", errorNum, error);
+		if (failState == TQUERY_CONNECT_FAILED) log_to_file(LOG_FILE, "[%s] Could not connect to SQL database. Error: %s (%d)", PLUGIN, error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) log_to_file(LOG_FILE, "[%s] Threaded query failed. Error: %s (%d)", PLUGIN, error, errorNum);
 	}
 
 	return PLUGIN_CONTINUE;
@@ -3803,7 +3808,9 @@ public _cod_add_user_armor(id, value)
 	cs_set_user_armor(id, max(0, cs_get_user_armor(id) + value), CS_ARMOR_KEVLAR);
 
 public _cod_add_user_money(id, value)
+{
 	cs_set_user_money(id, max(0, min(cs_get_user_money(id) + value, MAX_MONEY)));
+}
 
 public _cod_use_user_rocket(id)
 	use_rocket(id);
@@ -4127,9 +4134,7 @@ public _cod_print_chat(id, const text[], any:...)
 {
 	static message[192];
 
-	param_convert(2);
-
-	for (new i = 3; i <= numargs(); i++) param_convert(i);
+	for (new i = 2; i <= numargs(); i++) param_convert(i);
 
 	if (numargs() == 2) copy(message, charsmax(message), text);
 	else vformat(message, charsmax(message), text, 3);
@@ -4137,13 +4142,23 @@ public _cod_print_chat(id, const text[], any:...)
 	chat_print(id, message);
 }
 
+public _cod_log_error(const plugin[], const text[], any:...)
+{
+	static error[512];
+
+	for (new i = 1; i <= numargs(); i++) param_convert(i);
+
+	if (numargs() == 2) copy(error, charsmax(error), text);
+	else vformat(error, charsmax(error), text, 3);
+
+	log_to_file(LOG_FILE, "[%s] %s", plugin, error);
+}
+
 public _cod_show_hud(id, type, red, green, blue, Float:x, Float:y, effects, Float:fxtime, Float:holdtime, Float:fadeintime, Float:fadeouttime, const text[], any:...)
 {
-	static message[128];
+	static message[192];
 
-	param_convert(13);
-
-	for (new i = 14; i <= numargs(); i++) param_convert(i);
+	for (new i = 13; i <= numargs(); i++) param_convert(i);
 
 	if (numargs() == 13) copy(message, charsmax(message), text);
 	else vformat(message, charsmax(message), text, 14);
@@ -4155,9 +4170,10 @@ public _cod_cmd_execute(id, const text[], any:...)
 {
 	static message[192];
 
-	param_convert(2);
+	for (new i = 2; i <= numargs(); i++) param_convert(i);
 
-	for (new i = 3; i <= numargs(); i++) param_convert(i);
+	if (numargs() == 2) copy(message, charsmax(message), text);
+	else vformat(message, charsmax(message), text, 3);
 
 	cmd_execute(id, message);
 }
@@ -5135,13 +5151,13 @@ stock find_free_spawn(team, Float:spawnOrigin[3], Float:spawnAngle[3])
 
 	new spawnPoints[maxSpawns], bool:spawnChecked[maxSpawns], entList[1], spawnPoint, spawnNum, ent = -1, spawnsFound = 0, i;
 
-	while((ent = find_ent_by_class(ent, spawnEntString[team == 2 ? 0 : 1])) && spawnsFound < maxSpawns) spawnPoints[spawnsFound++] = ent;
+	while ((ent = find_ent_by_class(ent, spawnEntString[team == 2 ? 0 : 1])) && spawnsFound < maxSpawns) spawnPoints[spawnsFound++] = ent;
 
 	for (i = 0; i < maxSpawns; i++) spawnChecked[i] = false;
 
 	i = 0;
 
-	while(i++ < spawnsFound * 10) {
+	while (i++ < spawnsFound * 10) {
 		spawnNum = random(spawnsFound);
 		spawnPoint = spawnPoints[spawnNum];
 

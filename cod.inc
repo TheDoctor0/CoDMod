@@ -15,12 +15,15 @@
 #define set_bit(%2,%1) (%1 |= (1<<(%2&31)))
 #define rem_bit(%2,%1) (%1 &= ~(1 <<(%2&31)))
 
+#define MAX_NAME      MAX_NAME_LENGTH
+#define MAX_SAFE_NAME MAX_NAME * 2
+#define MAX_DESC      256
+#define MAX_MONEY     16000
+
 #define COD_STOP      4
 #define COD_CONTINUE  0
 #define COD_BLOCK     -1.0
 #define COD_FREEZE    0.1
-
-#define MAX_MONEY     99999
 
 #define FL_WATERJUMP  (1<<11)
 #define FL_ONGROUND   (1<<9)
@@ -818,6 +821,12 @@ Color formaters are allowed.
 native cod_print_chat(id, const text[], any:...);
 
 /*------------------------------
+Log error to cod_mod.log file.
+For plugin param __BINARY__ or PLUGIN constants should be used.
+------------------------------*/
+native cod_log_error(const plugin[], const text[], any:...);
+
+/*------------------------------
 Execute command on player with bypassing protectors (most of them)
 ------------------------------*/
 native cod_cmd_execute(id, const text[], any:...);
@@ -1060,6 +1069,11 @@ forward cod_start_round();
 Multiforward executed on round end event.
 ------------------------------*/
 forward cod_end_round();
+
+/*------------------------------
+Multiforward executed on map end (message intermission) event.
+------------------------------*/
+forward cod_end_map();
 
 /*------------------------------
 Multiforward executed on medkit player heal.
