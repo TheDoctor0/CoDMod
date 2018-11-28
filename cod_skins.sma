@@ -9,8 +9,8 @@
 
 new const commandSkins[][] = { "skiny", "say /skins", "say_team /skins", "say /skin", "say_team /skin", "say /skiny", "say_team /skiny", "say /modele", "say_team /modele", "say /model", "say_team /model" };
 
-enum _:playerInfo { NAME[32], ACTIVE[CSW_P90 + 1], WEAPON, SKIN };
-enum _:skinsInfo { SKIN_NAME[64], SKIN_WEAPON[32], SKIN_MODEL[64], SKIN_PRICE };
+enum _:playerInfo { NAME[MAX_NAME], ACTIVE[CSW_P90 + 1], WEAPON, SKIN };
+enum _:skinsInfo { SKIN_NAME[MAX_NAME], SKIN_WEAPON[32], SKIN_MODEL[128], SKIN_PRICE };
 
 new playerData[MAX_PLAYERS + 1][playerInfo], Array:playerSkins[MAX_PLAYERS + 1], Array:skins, Array:weapons, Handle:sql, bool:sqlConnected, loaded;
 
@@ -26,16 +26,16 @@ public plugin_init()
 public plugin_precache()
 {
 	skins = ArrayCreate(skinsInfo);
-	weapons = ArrayCreate(64, 16);
+	weapons = ArrayCreate(MAX_NAME, 16);
 
 	new file[128];
 
 	get_localinfo("amxx_configsdir", file, charsmax(file));
 	format(file, charsmax(file), "%s/cod_skins.ini", file);
 
-	if (!file_exists(file)) set_fail_state("[CoD] Brak pliku cod_skins.ini!");
+	if (!file_exists(file)) set_fail_state("[CoD Skins] Brak pliku cod_skins.ini!");
 
-	new skin[skinsInfo], lineData[256], tempValue[3][64], bool:error, fileOpen = fopen(file, "r");
+	new skin[skinsInfo], lineData[256], tempValue[3][128], bool:error, fileOpen = fopen(file, "r");
 
 	while (!feof(fileOpen)) {
 		fgets(fileOpen, lineData, charsmax(lineData)); trim(lineData);
@@ -60,7 +60,7 @@ public plugin_precache()
 			skin[SKIN_PRICE] = str_to_num(tempValue[2]);
 
 			if (!file_exists(skin[SKIN_MODEL])) {
-				log_to_file("cod_mod.log", "[CoD] Plik %s nie istnieje!", skin[SKIN_MODEL]);
+				cod_log_error(PLUGIN, "Plik %s nie istnieje!", skin[SKIN_MODEL]);
 
 				error = true;
 			} else precache_model(skin[SKIN_MODEL]);
@@ -71,9 +71,9 @@ public plugin_precache()
 
 	fclose(fileOpen);
 
-	if (error) set_fail_state("[CoD] Nie zaladowano wszystkich skinow. Sprawdz logi bledow!");
+	if (error) set_fail_state("[CoD Skins] Nie zaladowano wszystkich skinow. Sprawdz logi bledow!");
 
-	if (!ArraySize(skins)) set_fail_state("[CoD] Nie zaladowano zadnego skina. Sprawdz plik konfiguracyjny cod_skins.ini!");
+	if (!ArraySize(skins)) set_fail_state("[CoD Skins] Nie zaladowano zadnego skina. Sprawdz plik konfiguracyjny cod_skins.ini!");
 
 	for (new i = 1; i <= MAX_PLAYERS; i++) playerSkins[i] = ArrayCreate();
 }
@@ -210,7 +210,7 @@ public choose_weapon_menu_handle(id, menu, item)
 
 public set_weapon_skin(id, weapon[])
 {
-	new menuData[32], skin[skinsInfo], tempId[5], count, menu = menu_create("\yWybierz \rSkin\w:", "set_weapon_skin_handle");
+	new menuData[MAX_NAME], skin[skinsInfo], tempId[5], count, menu = menu_create("\yWybierz \rSkin\w:", "set_weapon_skin_handle");
 
 	menu_additem(menu, "Domyslny", weapon);
 
@@ -253,7 +253,7 @@ public set_weapon_skin_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new itemData[32], itemAccess, itemCallback;
+	new itemData[5], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
 
@@ -283,7 +283,7 @@ public set_weapon_skin_handle(id, menu, item)
 
 public buy_weapon_skin(id, weapon[])
 {
-	new menuData[64], skin[skinsInfo], tempId[5], count, menu = menu_create("\yWybierz \rSkin\w:", "buy_weapon_skin_handle");
+	new menuData[96], skin[skinsInfo], tempId[5], count, menu = menu_create("\yWybierz \rSkin\w:", "buy_weapon_skin_handle");
 
 	for (new i = 0; i < ArraySize(skins); i++) {
 		ArrayGetArray(skins, i, skin);
@@ -324,7 +324,7 @@ public buy_weapon_skin_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new itemData[32], itemAccess, itemCallback, skinId;
+	new itemData[5], itemAccess, itemCallback, skinId;
 
 	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
 
@@ -404,7 +404,7 @@ public change_skin(id, weapon)
 
 public sql_init()
 {
-	new host[32], user[32], pass[32], db[32], queryData[192], error[128], errorNum;
+	new host[64], user[64], pass[64], db[64], queryData[192], error[128], errorNum;
 
 	get_cvar_string("cod_sql_host", host, charsmax(host));
 	get_cvar_string("cod_sql_user", user, charsmax(user));
@@ -416,16 +416,16 @@ public sql_init()
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 
 	if (errorNum) {
-		log_to_file("cod_mod.log", "[CoD Skins] SQL Error: %s", error);
+		cod_log_error(PLUGIN, "SQL Error: %s", error);
 
-		set_task(1.0, "sql_init");
+		set_task(5.0, "sql_init");
 
 		return;
 	}
 
 	sqlConnected = true;
 
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_skins` (name VARCHAR(35), weapon VARCHAR(35), skin VARCHAR(64), PRIMARY KEY(name, weapon, skin))");
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_skins` (name VARCHAR(%i), weapon VARCHAR(32), skin VARCHAR(64), PRIMARY KEY(name, weapon, skin))", MAX_SAFE_NAME);
 
 	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
 
@@ -447,7 +447,7 @@ public load_skins(id)
 
 	playerId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_skins` WHERE name = '%s'", playerData[id][NAME]);
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_skins` WHERE name = ^"%s^"", playerData[id][NAME]);
 
 	SQL_ThreadQuery(sql, "load_skins_handle", queryData, playerId, sizeof(playerId));
 }
@@ -497,7 +497,7 @@ stock remove_active_skin(id, weapon[])
 {
 	static queryData[256];
 
-	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_skins` WHERE name = '%s' AND weapon = '%s ACTIVE'", playerData[id][NAME], weapon);
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_skins` WHERE name = ^"%s^" AND weapon = '%s ACTIVE'", playerData[id][NAME], weapon);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
@@ -506,7 +506,7 @@ stock add_skin(id, weapon[], name[], active = 0)
 {
 	static queryData[256];
 
-	formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES ('%s', '%s%s', '%s')", playerData[id][NAME], weapon, active ? " ACTIVE" : "", name);
+	formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES (^"%s^", '%s%s', '%s')", playerData[id][NAME], weapon, active ? " ACTIVE" : "", name);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
@@ -548,9 +548,9 @@ stock get_skin_info(skinId, info, dataReturn[] = "", dataLength = 0)
 
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
-	if (failState) {
-		if (failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "[CoD Skins] Could not connect to SQL database. [%d] %s", errorNum, error);
-		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "[CoD Skins] Query failed. [%d] %s", errorNum, error);
+	if (failState)  {
+		if (failState == TQUERY_CONNECT_FAILED) cod_log_error(PLUGIN, "Could not connect to SQL database. Error: %s (%d)", error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) cod_log_error(PLUGIN, "Threaded query failed. Error: %s (%d)", error, errorNum);
 	}
 
 	return PLUGIN_CONTINUE;
