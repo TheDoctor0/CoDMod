@@ -14,8 +14,8 @@
 			* 1 HE co rundę<br>
 			* 2 Flashe co rundę<br>
 			* 1 Smoke co rundę<br>
-			* O 25% zwiększone zdobywane doświadczenie
-			* O 50% zwiększony zdobywany Honor
+			* O 50% więcej zdobywanego Honoru
+			* O 25% więcej zdobywanego Expa
 			* O 5% zwiększone zadawane obrażenia
 			* Dodatkowa kasa za podłożenie bomby (500$)<br>
 			* Dodatkowa kasa za rozbrojenie bomby (500$)<br>
