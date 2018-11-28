@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Knives"
-#define VERSION "1.0.6"
+#define VERSION "1.1.0"
 #define AUTHOR "O'Zone"
 
 new const knifeModels[][][] =
@@ -17,26 +17,26 @@ new const knifeModels[][][] =
 	{ "Katana", "(+10 Kondycji)", "models/CoDMod/katana.mdl" }
 };
 
-new const commandKnives[][] = { "say /noz", "say_team /noz", "say /noze", "say_team /noze", "say /knife", "say_team /knife", 
-"say /knifes", "say_team /knifes", "say /kosa", "say_team /kosa", "say /kosy", "say_team /kosy", "noze" };
+new const commandKnives[][] = { "noze", "say /noz", "say_team /noz", "say /noze", "say_team /noze", "say /knife", "say_team /knife",
+"say /knifes", "say_team /knifes", "say /kosa", "say_team /kosa", "say /kosy", "say_team /kosy" };
 
 enum _:knifeInfo { NAME, BONUS, MODEL };
 enum _:knifeTypes { DEFAULT, HEALTH, INTELLIGENCE, STAMINA, STRENGTH, CONDITION };
 
-new playerName[MAX_PLAYERS + 1][32], playerKnife[MAX_PLAYERS + 1], knives;
+new playerName[MAX_PLAYERS + 1][MAX_NAME], playerKnife[MAX_PLAYERS + 1], knives;
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
- 
+
 	for (new i; i < sizeof commandKnives; i++) register_clcmd(commandKnives[i], "change_knife");
-	
+
 	knives = nvault_open("cod_knives");
-	
+
 	if (knives == INVALID_HANDLE) set_fail_state("[COD] Nie mozna otworzyc pliku cod_knives.vault");
 }
 
-public plugin_precache() 
+public plugin_precache()
 	for (new i = 1; i < sizeof(knifeModels); i++) precache_model(knifeModels[i][MODEL]);
 
 public plugin_end()
@@ -47,7 +47,7 @@ public client_putinserver(id)
 	if (is_user_bot(id) || is_user_hltv(id)) return;
 
 	playerKnife[id] = DEFAULT;
-	
+
 	load_knife(id);
 }
 
@@ -58,28 +58,28 @@ public change_knife(id)
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
 	new knifeData[64], knifeId[3], menu = menu_create("\yWybierz \rModel Noza\w:", "change_knife_handle");
-	
+
 	for (new i = 0; i < sizeof(knifeModels); i++) {
 		formatex(knifeData, charsmax(knifeData), "%s \y%s", knifeModels[i][NAME], knifeModels[i][BONUS]);
 
 		num_to_str(i, knifeId, charsmax(knifeId));
-		
+
 		menu_additem(menu, knifeData, knifeId);
 	}
-	
+
 	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
 	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	
+
 	menu_display(id, menu);
-	
+
 	return PLUGIN_HANDLED;
 }
 
 public change_knife_handle(id, menu, item)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
-	
+
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
@@ -89,15 +89,15 @@ public change_knife_handle(id, menu, item)
 	}
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-	
+
 	new knifeId[3], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, knifeId, charsmax(knifeId), _, _, itemCallback);
 
 	set_bonus(id, playerKnife[id], str_to_num(knifeId));
-	
+
 	save_knife(id);
-	
+
 	cod_print_chat(id, "Twoj nowy noz to:^x03 %s %s^x01.", knifeModels[playerKnife[id]][NAME], knifeModels[playerKnife[id]][BONUS]);
 
 	menu_destroy(menu);
@@ -116,8 +116,8 @@ public cod_spawn(id)
 stock set_knife(id, check = 0)
 {
 	if (!is_user_alive(id) || (check && get_user_weapon(id) != CSW_KNIFE)) return PLUGIN_CONTINUE;
-	
-	set_pev(id, pev_viewmodel2, knifeModels[playerKnife[id]][MODEL]); 
+
+	set_pev(id, pev_viewmodel2, knifeModels[playerKnife[id]][MODEL]);
 
 	return PLUGIN_CONTINUE;
 }
@@ -131,8 +131,7 @@ public set_bonus(id, oldKnife, newKnife)
 			cod_add_user_bonus_stamina(id, -2);
 			cod_add_user_bonus_strength(id, -2);
 			cod_add_user_bonus_condition(id, -2);
-		}
-		case HEALTH: cod_add_user_bonus_health(id, -10);
+		} case HEALTH: cod_add_user_bonus_health(id, -10);
 		case INTELLIGENCE: cod_add_user_bonus_intelligence(id, -10);
 		case STAMINA: cod_add_user_bonus_stamina(id, -10);
 		case STRENGTH: cod_add_user_bonus_strength(id, -10);
@@ -146,8 +145,7 @@ public set_bonus(id, oldKnife, newKnife)
 			cod_add_user_bonus_stamina(id, 2);
 			cod_add_user_bonus_strength(id, 2);
 			cod_add_user_bonus_condition(id, 2);
-		}
-		case HEALTH: cod_add_user_bonus_health(id, 10);
+		} case HEALTH: cod_add_user_bonus_health(id, 10);
 		case INTELLIGENCE: cod_add_user_bonus_intelligence(id, 10);
 		case STAMINA: cod_add_user_bonus_stamina(id, 10);
 		case STRENGTH: cod_add_user_bonus_strength(id, 10);
@@ -161,24 +159,24 @@ public set_bonus(id, oldKnife, newKnife)
 
 public save_knife(id)
 {
-	new vaultKey[64], vaultData[3];
-	
+	new vaultKey[MAX_NAME], vaultData[3];
+
 	formatex(vaultKey, charsmax(vaultKey), "%s-cod_knife", playerName[id]);
 	formatex(vaultData, charsmax(vaultData), "%d", playerKnife[id]);
-	
+
 	nvault_set(knives, vaultKey, vaultData);
-	
+
 	return PLUGIN_CONTINUE;
 }
 
 public load_knife(id)
 {
-	new vaultKey[64], vaultData[3];
+	new vaultKey[MAX_NAME], vaultData[3];
 
 	get_user_name(id, playerName[id], charsmax(playerName[]));
-	
+
 	formatex(vaultKey, charsmax(vaultKey), "%s-cod_knife", playerName[id]);
-	
+
 	if (nvault_get(knives, vaultKey, vaultData, charsmax(vaultData))) {
 		playerKnife[id] = str_to_num(vaultData);
 
@@ -186,4 +184,4 @@ public load_knife(id)
 	} else set_bonus(id, NONE, DEFAULT);
 
 	return PLUGIN_CONTINUE;
-} 
+}

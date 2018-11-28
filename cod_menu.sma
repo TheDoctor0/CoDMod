@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Menu"
-#define VERSION "1.0.16"
+#define VERSION "1.1.0"
 #define AUTHOR "O'Zone"
 
 new const commandMenu[][] = { "say /help", "say_team /help", "say /pomoc", "say_team /pomoc", "say /komendy", "say_team /komendy", "say /menu", "say_team /menu", "menu" };
@@ -26,7 +26,7 @@ public plugin_cfg()
 	get_localinfo("amxx_configsdir", menuFile, charsmax(menuFile));
 	format(menuFile, charsmax(menuFile), "%s/cod_menu.ini", menuFile);
 
-	if (!file_exists(menuFile)) set_fail_state("[CoD] Brak pliku cod_menu.ini z zawartoscia glownego menu!");
+	if (!file_exists(menuFile)) set_fail_state("[CoD Menu] Brak pliku cod_menu.ini z zawartoscia glownego menu!");
 
 	new lineContent[128], menuTitle[64], menuCommand[64], file = fopen(menuFile, "r");
 
@@ -86,7 +86,7 @@ public display_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	new menuCommand[32];
+	new menuCommand[64];
 
 	ArrayGetString(menuCommands, item, menuCommand, charsmax(menuCommand));
 

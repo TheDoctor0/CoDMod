@@ -1,21 +1,13 @@
-#include <amxmodx>  
-#include <cstrike>  
-#include <fakemeta>  
+#include <amxmodx>
+#include <cstrike>
+#include <fakemeta>
 
 #define PLUGIN "CoD Unprecacher"
-#define VERSION "1.0.0"
-#define AUTHOR "O'Zone" 
+#define VERSION "1.1.0"
+#define AUTHOR "O'Zone"
 
-public plugin_precache()  
-{   
-	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
-	register_forward(FM_PrecacheModel, "unprecache_models"); 
-	register_forward(FM_PrecacheSound, "unprecache_sounds");      
-}  
-
-new const unprecacheSounds[][] =  
-{ 
+new const unprecacheSounds[][] =
+{
 	"ambience\3dmbridge.wav",
 	"ambience\3dmeagle.wav",
 	"ambience\3dmstart.wav",
@@ -330,7 +322,7 @@ new const unprecacheSounds[][] =
 	"weapons/usp_sliderelease.wav",
 	"weapons/usp_unsil-1.wav",
 	"weapons/xm1014-1.wav",
-	"weapons/scout_clipin.wav", 
+	"weapons/scout_clipin.wav",
 	"weapons/scout_bolt.wav",
 	"weapons/scout_clipout.wav",
 	"weapons/scout_fire-1.wav",
@@ -596,10 +588,10 @@ new const unprecacheSounds[][] =
 	"weapons/ric_metal-2.wav",
 	"weapons/ric_conc-1.wav",
 	"weapons/ric_conc-2.wav"
-} 
+}
 
-new const unprecacheModels[][] =  
-{ 
+new const unprecacheModels[][] =
+{
 	"bag.mdl",
 	"bigtree.mdl",
 	"bush.mdl",
@@ -611,30 +603,38 @@ new const unprecacheModels[][] =
 	"pshell.mdl",
 	"rshell.mdl",
 	"rshell_big.mdl"
-} 
+}
 
-public unprecache_models(const model[])  
-{  
-	for (new i = 0; i < sizeof(unprecacheModels); i++) { 
-		if (containi(model, unprecacheModels[i]) != -1) {  
-			forward_return(FMV_CELL, 0); 
+public plugin_precache()
+{
+	register_plugin(PLUGIN, VERSION, AUTHOR);
 
-			return FMRES_SUPERCEDE ; 
-		}  
-	} 
-	
-	return FMRES_IGNORED;  
-}  
+	register_forward(FM_PrecacheModel, "unprecache_models");
+	register_forward(FM_PrecacheSound, "unprecache_sounds");
+}
 
-public unprecache_sounds(const sound[])  
-{  
-	for (new i = 0; i < sizeof(unprecacheSounds); i++) { 
-		if (containi(sound, unprecacheSounds[i]) != -1) {  
-			forward_return(FMV_CELL, 0); 
-			
-			return FMRES_SUPERCEDE;  
-		}  
-	} 
-	
-	return FMRES_IGNORED; 
-} 
+public unprecache_models(const model[])
+{
+	for (new i = 0; i < sizeof(unprecacheModels); i++) {
+		if (containi(model, unprecacheModels[i]) != -1) {
+			forward_return(FMV_CELL, 0);
+
+			return FMRES_SUPERCEDE ;
+		}
+	}
+
+	return FMRES_IGNORED;
+}
+
+public unprecache_sounds(const sound[])
+{
+	for (new i = 0; i < sizeof(unprecacheSounds); i++) {
+		if (containi(sound, unprecacheSounds[i]) != -1) {
+			forward_return(FMV_CELL, 0);
+
+			return FMRES_SUPERCEDE;
+		}
+	}
+
+	return FMRES_IGNORED;
+}

@@ -4,11 +4,11 @@
 #include <cod>
 
 #define PLUGIN "CoD HE Block"
-#define VERSION "1.0.5"
+#define VERSION "1.1.0"
 #define AUTHOR "O'Zone"
 
 #define TASK_BLOCK 7526
-#define TASK_INFO 8432
+#define TASK_INFO  8432
 
 new Float:cvarBlockTime, Float:roundStart, bool:block;
 
@@ -65,7 +65,7 @@ public show_info(id)
 
 public block_he(weapon)
 {
-	if (block) { 
+	if (block) {
 		new id = pev(weapon, pev_owner);
 
 		if (!task_exists(id + TASK_INFO)) set_task(0.1, "show_info", id + TASK_INFO, .flags = "b");

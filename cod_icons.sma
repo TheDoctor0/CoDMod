@@ -6,21 +6,19 @@
 #include <cod>
 
 #define PLUGIN  "CoD Icons"
-#define VERSION "1.0.9"
+#define VERSION "1.1.0"
 #define AUTHOR  "O'Zone"
 
-#define TASK_PLANT 6583
-#define TASK_PLANTED 7603
-#define TASK_DROPPED 8931
-#define TASK_REMOVE 9548
+#define TASK_PLANT      6583
+#define TASK_PLANTED    7603
+#define TASK_DROPPED    8931
+#define TASK_REMOVE     9548
 
-#define UNITS_METER 39.37
+#define UNITS_PER_METER 39.37
 
-new const commandIcons[][] = { "say /ikona", "say_team /ikona", "say /ikony", "say_team /ikony", "say /icon", "say_team /icon",
-	"say /icons", "say_team /icons", "say /sprite", "say_team /sprite", "say /wkaznik", "say_team /wskaznik", "ikony" };
+new const commandIcons[][] = { "ikony", "say /ikona", "say_team /ikona", "say /ikony", "say_team /ikony", "say /icon", "say_team /icon", "say /icons", "say_team /icons" };
 
-new const iconSprite[icons][] =
-{
+new const iconSprite[icons][] = {
 	"sprites/CoDMod/bombsite_a.spr",
 	"sprites/CoDMod/bombsite_b.spr",
 	"sprites/CoDMod/dropped.spr",
@@ -29,7 +27,7 @@ new const iconSprite[icons][] =
 	"sprites/CoDMod/box.spr"
 };
 
-new playerName[MAX_PLAYERS + 1][32], bombEntity[icons], iconEntity[icons], playerTeam[MAX_PLAYERS + 1],
+new playerName[MAX_PLAYERS + 1][MAX_NAME], bombEntity[icons], iconEntity[icons], playerTeam[MAX_PLAYERS + 1],
 	bool:roundStarted, iconBombSites, iconDropped, iconPlanted, iconBox, bombTimer, cvarC4, iconsVault;
 
 public plugin_init()
@@ -267,7 +265,7 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 
 	pev(host, pev_origin, hostOrigin);
 
-	distance = get_distance_f(hostOrigin, targetOrigin) / UNITS_METER;
+	distance = get_distance_f(hostOrigin, targetOrigin) / UNITS_PER_METER;
 
 	if (distance > 1.0 && distance <= 100.0) set_es(es, ES_Frame, 100.0 - floatround(distance));
 	else set_es(es, ES_Frame, 100.0);
@@ -350,7 +348,7 @@ public change_icons_handle(id, menu, item)
 
 public save_icons(id)
 {
-	new vaultKey[64], vaultData[16];
+	new vaultKey[MAX_NAME], vaultData[16];
 
 	formatex(vaultKey, charsmax(vaultKey), "%s-cod_icons", playerName[id]);
 	formatex(vaultData, charsmax(vaultData), "%d %d %d %d", get_bit(id, iconBombSites), get_bit(id, iconDropped), get_bit(id, iconPlanted), get_bit(id, iconBox));
@@ -362,7 +360,7 @@ public save_icons(id)
 
 public load_icons(id)
 {
-	new vaultKey[64], vaultData[16], iconsData[4][4];
+	new vaultKey[MAX_NAME], vaultData[16], iconsData[4][4];
 
 	get_user_name(id, playerName[id], charsmax(playerName[]));
 

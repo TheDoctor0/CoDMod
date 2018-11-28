@@ -2,21 +2,21 @@
 #include <cod>
 
 #define PLUGIN "CoD Shop"
-#define VERSION "1.0.9"
+#define VERSION "1.1.0"
 #define AUTHOR "O'Zone"
 
-new const commandShopMenu[][] = { "say /shop", "say_team /shop", "say /sklep", "say_team /sklep", "sklep" };
+new const commandShopMenu[][] = { "sklep", "say /shop", "say_team /shop", "say /sklep", "say_team /sklep" };
 
 enum _:shopInfo { EXCHANGE, REPAIR, BUY, UPGRADE, SMALL_BANDAGE, BIG_BANDAGE, SMALL_EXP, MEDIUM_EXP, BIG_EXP, RANDOM_EXP, ARMOR };
 
-new cvarCostRepair, cvarCostItem, cvarCostUpgrade, cvarCostSmallBandage, cvarCostBigBandage, cvarCostSmallExp, cvarCostMediumExp, 
-	cvarCostBigExp, cvarCostRandomExp, cvarCostArmor, cvarExchangeRatio, cvarDurabilityAmount, cvarSmallExp, cvarMediumExp, 
-	cvarBigExp, cvarMinRandomExp, cvarMaxRandomExp, cvarSmallBandageHP, cvarBigBandageHP, cvarArmorAmount;
+new cvarCostRepair, cvarCostItem, cvarCostUpgrade, cvarCostSmallBandage, cvarCostBigBandage, cvarCostSmallExp, cvarCostMediumExp,
+	cvarCostBigExp, cvarCostRandomExp, cvarCostArmor, cvarExchangeRatio, cvarDurabilityAmount, cvarSmallExp, cvarMediumExp,
+	cvarBigExp, cvarMinRandomExp, cvarMaxRandomExp, cvarSmallBandageHP, cvarBigBandageHP, cvarArmorAmount, bool:mapEnd;
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	for (new i; i < sizeof commandShopMenu; i++) register_clcmd(commandShopMenu[i], "shop_menu");
 
 	register_clcmd("KUPNO_HONORU", "buy_honor_handle");
@@ -43,13 +43,16 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_shop_random_exp_max", "200"), cvarMaxRandomExp);
 	bind_pcvar_num(create_cvar("cod_shop_armor_amount", "100"), cvarArmorAmount);
 }
-	
+
+public cod_end_map()
+	mapEnd = true;
+
 public shop_menu(id)
 {
-	if (!cod_check_account(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
-	
+
 	new menuData[128], menuPrice[10], menu = menu_create("\ySklep \rCoD Mod", "shop_menu_handle");
 
 	formatex(menuData, charsmax(menuData), "Kantor Walutowy \r[\yWymiana Kasy na Honor\r] \wKoszt:\r %i$/1H", cvarExchangeRatio);
@@ -98,7 +101,7 @@ public shop_menu(id)
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
-	
+
 	menu_display(id, menu);
 
 	return PLUGIN_HANDLED;
@@ -106,8 +109,8 @@ public shop_menu(id)
 
 public shop_menu_handle(id, menu, item)
 {
-	if (!is_user_connected(id)) return PLUGIN_HANDLED;
-	
+	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
@@ -145,7 +148,7 @@ public shop_menu_handle(id, menu, item)
 
 		return PLUGIN_HANDLED;
 	}
-	
+
 	if (item == UPGRADE) {
 		if (!cod_get_user_item(id)) {
 			cod_print_chat(id, "Nie masz zadnego przedmiotu!");
@@ -159,23 +162,23 @@ public shop_menu_handle(id, menu, item)
 			return PLUGIN_HANDLED;
 		}
 	}
-	
+
 	new itemPrice[10], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, itemPrice, charsmax(itemPrice), _, _, itemCallback);
-	
+
 	new price = str_to_num(itemPrice);
-	
+
 	if (cod_get_user_honor(id) < price) {
 		cod_print_chat(id, "Nie masz wystarczajaco duzo^x03 Honoru^x01!");
 
 		return PLUGIN_HANDLED;
 	}
-	
+
 	switch (item) {
 		case REPAIR: {
 			cod_print_chat(id, "Kupiles^x03 +%i^x01 wytrzymalosci przedmiotu!", cvarDurabilityAmount);
-			
+
 			if (cod_get_item_durability(id) + cvarDurabilityAmount >= cod_max_item_durability()) {
 				cod_set_item_durability(id, cod_max_item_durability());
 
@@ -185,13 +188,11 @@ public shop_menu_handle(id, menu, item)
 
 				cod_print_chat(id, "Wytrzymalosc twojego przedmiotu wynosi^x03 %i^x01!", cod_get_item_durability(id));
 			}
-		}
-		case BUY: {
+		} case BUY: {
 			cod_print_chat(id, "Kupiles^x03 Losowy Przedmiot^x01!");
-			
+
 			cod_set_user_item(id, RANDOM, RANDOM);
-		}
-		case UPGRADE: {
+		} case UPGRADE: {
 			cod_print_chat(id, "Kupiles^x03 Ulepszenie Przedmiotu^x01!");
 
 			if (!cod_upgrade_user_item(id)) {
@@ -199,50 +200,43 @@ public shop_menu_handle(id, menu, item)
 
 				return PLUGIN_HANDLED;
 			}
-		}
-		case SMALL_BANDAGE: {
+		} case SMALL_BANDAGE: {
 			cod_set_user_health(id, cod_get_user_health(id, 1) + cvarSmallBandageHP);
-			
+
 			cod_print_chat(id, "Kupiles^x03 Maly Bandarz^x01!");
-		}
-		case BIG_BANDAGE: {
+		} case BIG_BANDAGE: {
 			cod_set_user_health(id, cod_get_user_health(id, 1) + cvarBigBandageHP);
-			
+
 			cod_print_chat(id, "Kupiles^x03 Duzy Bandarz^x01!");
-		}
-		case SMALL_EXP: {
+		} case SMALL_EXP: {
 			cod_print_chat(id, "Kupiles^x03 Male Doswiadczenie^x01!");
 
 			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", cvarSmallExp);
-			
+
 			cod_set_user_exp(id, cvarSmallExp);
-		}
-		case MEDIUM_EXP: {
+		} case MEDIUM_EXP: {
 			cod_print_chat(id, "Kupiles^x03 Srednie Doswiadczenie^x01!");
 
 			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", cvarMediumExp);
-			
+
 			cod_set_user_exp(id, cvarMediumExp);
-		}
-		case BIG_EXP: {
+		} case BIG_EXP: {
 			cod_print_chat(id, "Kupiles^x03 Duze Doswiadczenie^x01!");
 
 			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", cvarBigExp);
-			
+
 			cod_set_user_exp(id, cvarBigExp);
-		}
-		case RANDOM_EXP: {
+		} case RANDOM_EXP: {
 			new randomExp = random_num(cvarMinRandomExp, cvarMaxRandomExp);
 
 			cod_print_chat(id, "Kupiles^x03 Losowe Doswiadczenie^x01!");
 
 			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", randomExp);
-			
+
 			cod_set_user_exp(id, randomExp);
-		}
-		case ARMOR: {
+		} case ARMOR: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Armor^x01!");
-			
+
 			cod_add_user_armor(id, cvarArmorAmount);
 		}
 	}
@@ -256,33 +250,33 @@ public shop_menu_handle(id, menu, item)
 
 public buy_honor_handle(id)
 {
-	if (!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
-	
+
 	new honorData[16], honorAmount;
-	
+
 	read_args(honorData, charsmax(honorData));
 	remove_quotes(honorData);
 
 	honorAmount = str_to_num(honorData);
-	
-	if (honorAmount <= 0) { 
+
+	if (honorAmount <= 0) {
 		cod_print_chat(id, "Nie mozesz kupic mniej niz^x03 1 Honoru^x01!");
 
 		return PLUGIN_HANDLED;
 	}
-	
-	if (cod_get_user_money(id) < honorAmount * cvarExchangeRatio) { 
+
+	if (cod_get_user_money(id) < honorAmount * cvarExchangeRatio) {
 		cod_print_chat(id, "Nie masz wystarczajaco^x03 kasy^x01, aby kupic tyle^x03 Honoru^x01!");
 
 		return PLUGIN_HANDLED;
 	}
-	
+
 	cod_add_user_money(id, -honorAmount * cvarExchangeRatio);
 	cod_add_user_honor(id, honorAmount);
-	
+
 	cod_print_chat(id, "Wymieniles^x03 %i$^x01 na ^x03%i Honoru^x01.", honorAmount * cvarExchangeRatio, honorAmount);
-	
+
 	return PLUGIN_HANDLED;
 }
