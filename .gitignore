@@ -57,3 +57,4 @@ codmod.sublime-project
 codmod.sublime-workspace
 cod.txt
 include
+!resources/addons/amxmodx/scripting/include
