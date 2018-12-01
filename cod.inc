@@ -34,6 +34,12 @@
 #define DMG_FALL      (1<<5)
 #define DMG_NERVEGAS  (1<<16)
 #define DMG_HEGRENADE (1<<24)
+#define DMG_DYNAMITE  (1<<25)
+#define DMG_MINE      (1<<26)
+#define DMG_ROCKET    (1<<27)
+#define DMG_THUNDER   (1<<28)
+#define DMG_KILL      (1<<29)
+#define DMG_REPEAT    (1<<30)
 #define DMG_CODSKILL  (1<<31)
 
 #define RENDER_ALWAYS (1<<1)
@@ -1006,13 +1012,23 @@ forward cod_speed_changed(id, Float:speed);
 
 /*------------------------------
 Multiforward executed on damage event before armor reduce.
+Damage will be blocked if COD_BLOCK is returned.
 ------------------------------*/
 forward cod_damage_pre(attacker, victim, weapon, Float:damage, damageBits, hitPlace);
 
 /*------------------------------
 Multiforward executed on damage event after armor reduce.
+Damage will be blocked if COD_BLOCK is returned.
 ------------------------------*/
 forward cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace);
+
+/*------------------------------
+Multiforward executed on cod_damage_inflict use which is not registered by HamTakeDamage.
+Flags param will contain sum with custom DMG_ flags: DMG_DYNAMITE, DMG_MINE, DMG_ROCKET, DMG_THUNDER, DMG_KIll
+so damage type can be easily identified.
+Damage will be blocked if COD_BLOCK is returned.
+------------------------------*/
+forward cod_damage_inflict(attacker, victim, Float:damage, Float:factor, flags);
 
 /*------------------------------
 Multiforward executed on weapon deploy event.

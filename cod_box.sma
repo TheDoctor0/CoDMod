@@ -9,6 +9,8 @@
 #define VERSION "1.1.0"
 #define AUTHOR "O'Zone"
 
+#define ICON
+
 new const boxClass[] = "cod_box", boxModel[] = "models/CoDMod/box.mdl";
 
 new cvarBoxChance, spriteGreen, spriteAcid;
@@ -67,7 +69,9 @@ public create_box(id)
 	entity_set_int(ent, EV_INT_solid, SOLID_TRIGGER);
 	set_pev(ent, pev_movetype, MOVETYPE_FLY);
 
+	#if defined ICON
 	cod_spawn_icon(ent);
+	#endif
 
 	return PLUGIN_CONTINUE;
 }

@@ -81,7 +81,7 @@ enum _:repeatingData { ATTACKER, VICTIM, DAMAGE, COUNTER, FLAGS };
 
 enum _:weaponSlots { PRIMARY = 1, SECONDARY, KNIFE, GRENADES, C4 };
 
-enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, SPEED_CHANGED, DAMAGE_PRE, DAMAGE_POST, WEAPON_DEPLOY, CUR_WEAPON, KILLED, SPAWNED,
+enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, SPEED_CHANGED, DAMAGE_PRE, DAMAGE_POST, DAMAGE_INFLICT, WEAPON_DEPLOY, CUR_WEAPON, KILLED, SPAWNED,
 	CMD_START, PRETHINK, NEW_ROUND, START_ROUND, END_ROUND, END_MAP, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH, TELEPORT_USED };
 
 enum _:itemInfo { ITEM_NAME[MAX_NAME], ITEM_DESC[MAX_DESC], ITEM_PLUGIN, ITEM_RANDOM_MIN, ITEM_RANDOM_MAX, ITEM_GIVE, ITEM_DROP,
@@ -217,6 +217,7 @@ public plugin_init()
 	codForwards[SPEED_CHANGED] = CreateMultiForward("cod_speed_changed", ET_IGNORE, FP_CELL, FP_FLOAT);
 	codForwards[DAMAGE_PRE] = CreateMultiForward ("cod_damage_pre", ET_CONTINUE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL, FP_CELL);
 	codForwards[DAMAGE_POST] = CreateMultiForward ("cod_damage_post", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL, FP_CELL);
+	codForwards[DAMAGE_INFLICT] = CreateMultiForward ("cod_damage_inflict", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT, FP_FLOAT, FP_CELL);
 	codForwards[WEAPON_DEPLOY] = CreateMultiForward("cod_weapon_deploy", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[CUR_WEAPON] = CreateMultiForward("cod_cur_weapon", ET_IGNORE, FP_CELL, FP_CELL);
 	codForwards[KILLED] = CreateMultiForward("cod_killed", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_CELL);
@@ -1691,7 +1692,7 @@ public use_thunder(id)
 
 	if (float(ret) == COD_BLOCK) return PLUGIN_CONTINUE;
 
-	cod_inflict_damage(id, victim, 65.0, 0.5, DMG_CODSKILL);
+	cod_inflict_damage(id, victim, 65.0, 0.5, DMG_CODSKILL | DMG_THUNDER);
 
 	codPlayer[id][PLAYER_LAST_THUNDER] += ret;
 
@@ -4266,13 +4267,11 @@ public repeat_damage(data[])
 			display_fade(data[VICTIM], (1<<12), (1<<12), 0x0000, 255, 165, 0, 80);
 
 			data[FLAGS] = DMG_BURN;
-		}
-		case POISON: {
+		} case POISON: {
 			display_fade(data[VICTIM], (1<<12), (1<<12), 0x0000, 0, 150, 60, 120);
 
 			data[FLAGS] = DMG_NERVEGAS;
-		}
-		case HEAL: {
+		} case HEAL: {
 			if (get_user_health(data[VICTIM]) < cod_get_user_max_health(data[VICTIM])) {
 				display_fade(data[VICTIM], (1<<12), (1<<12), 0x0000, 250, 0, 0, 40);
 
@@ -4283,18 +4282,28 @@ public repeat_damage(data[])
 		}
 	}
 
-	cod_inflict_damage(data[ATTACKER], data[VICTIM], float(data[DAMAGE]), 0.0, data[FLAGS]);
+	cod_inflict_damage(data[ATTACKER], data[VICTIM], float(data[DAMAGE]), 0.0, data[FLAGS] | DMG_CODSKILL | DMG_REPEAT);
 }
 
 public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
-	if (!codPlayer[victim][PLAYER_RESISTANCE][ALL] || (codPlayer[victim][PLAYER_RESISTANCE][ALL] && !(flags & DMG_CODSKILL))) ExecuteHam(Ham_TakeDamage, victim, attacker, attacker, damage + get_intelligence(attacker) * factor, DMG_CODSKILL | flags);
+{
+	if (!codPlayer[victim][PLAYER_RESISTANCE][ALL] || (codPlayer[victim][PLAYER_RESISTANCE][ALL] && !(flags & DMG_CODSKILL))) {
+		new ret;
+
+		ExecuteForward(codForwards[DAMAGE_INFLICT], ret, attacker, victim, Float:damage, Float:factor, flags);
+
+		if (float(ret) == COD_BLOCK) return;
+
+		ExecuteHam(Ham_TakeDamage, victim, attacker, attacker, damage + get_intelligence(attacker) * factor, DMG_CODSKILL | flags);
+	}
+}
 
 public Float:_cod_kill_player(killer, victim, flags)
 {
 	if (is_user_alive(victim)) {
 		cs_set_user_armor(victim, 0, CS_ARMOR_NONE);
 
-		cod_inflict_damage(killer, victim, float(get_user_health(victim) + 1), 0.0, flags);
+		cod_inflict_damage(killer, victim, float(get_user_health(victim) + 1), 0.0, flags | DMG_KILL);
 	}
 
 	return COD_BLOCK;
@@ -4843,7 +4852,7 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 	}
 
 	if (damage_distance > 0.0) {
-		new entList[33], foundPlayers = find_sphere_class(ent, "player", damage_distance, entList, MAX_PLAYERS), player, ret;
+		new entList[33], foundPlayers = find_sphere_class(ent, "player", damage_distance, entList, MAX_PLAYERS), player, ret, flag;
 
 		for (new i = 0; i < foundPlayers; i++) {
 			player = entList[i];
@@ -4855,7 +4864,7 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 
 				if (float(ret) == COD_BLOCK) continue;
 
-				switch(type) {
+				switch (type) {
 					case MEDKIT_HEAL: codPlayer[id][PLAYER_LAST_MEDKIT] += ret;
 					case MINE_EXPLODE: codPlayer[id][PLAYER_LAST_MINE] += ret;
 					case ROCKET_EXPLODE: codPlayer[id][PLAYER_LAST_ROCKET] += ret;
@@ -4864,7 +4873,15 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 			}
 
 			if (damage < 0.0) cod_add_user_health(player, floatround(floatabs(damage) + codPlayer[id][PLAYER_INT] * factor), 1);
-			else cod_inflict_damage(id, player, damage, factor, DMG_CODSKILL);
+			else {
+				switch (type) {
+					case MINE_EXPLODE: flag = DMG_MINE;
+					case ROCKET_EXPLODE: flag = DMG_ROCKET;
+					case DYNAMITE_EXPLODE: flag = DMG_DYNAMITE;
+				}
+
+				cod_inflict_damage(id, player, damage, factor, DMG_CODSKILL | flag);
+			}
 		}
 	}
 
