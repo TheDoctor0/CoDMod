@@ -4309,11 +4309,11 @@ public Float:_cod_kill_player(killer, victim, flags)
 	return COD_BLOCK;
 }
 
-public _cod_respawn_player(id, enemy)
+public _cod_respawn_player(id, enemy, Float:time)
 {
 	if (!is_user_alive(id)) {
-		if (enemy) set_task(0.1, "respawn_player_enemy_spawn", id + TASK_RESPAWN);
-		else set_task(0.1, "respawn_player", id + TASK_RESPAWN);
+		if (enemy) set_task(time, "respawn_player_enemy_spawn", id + TASK_RESPAWN);
+		else set_task(time, "respawn_player", id + TASK_RESPAWN);
 	}
 }
 

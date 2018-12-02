@@ -105,17 +105,18 @@ Add value to player's honor amount.
 native cod_add_user_honor(id, value);
 
 /*------------------------------
-Return clan.
+Return clan id.
 ------------------------------*/
 native cod_get_user_clan(id);
 
 /*------------------------------
-Return clan's name.
+Return clan's name by clan id.
 ------------------------------*/
 native cod_get_clan_name(clan, dataReturn[], dataLength);
 
 /*------------------------------
-Return player's mission id. NONE (-1) if player have no mission in progress.
+Return player's mission id.
+NONE (-1) if player have no mission in progress.
 ------------------------------*/
 native cod_get_user_mission(id);
 
@@ -136,12 +137,12 @@ Icon entity will be saved in ent pev_user1.
 native cod_spawn_icon(ent, type = BOX);
 
 /*------------------------------
-Return player's time in seconds
+Return player's gametime in seconds.
 ------------------------------*/
 native cod_get_user_time(id);
 
 /*------------------------------
-Return player's time as text with hours, minutes, seconds
+Return player's gametime as text with hours, minutes, seconds.
 ------------------------------*/
 native cod_get_user_time_text(id, dataReturn[], dataLength);
 
@@ -266,7 +267,7 @@ If value = RANDOM (-3) item value will be random.
 native cod_set_user_item(id, item = 0, value = 0);
 
 /*------------------------------
-Upgrades player's item
+Upgrades player's item.
 If check = 1 Return if item is upgradable.
 ------------------------------*/
 native cod_upgrade_user_item(id, check = 0);
@@ -558,7 +559,7 @@ Set player's speed bonus - can be lower than 0. Alternative to Condition bonus.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 Player speed is calculated from base speed, condition bonus and speed bonus.
 Higher speed bonus has priority, but still will be reduced by bonuses lower than 0.
-Set to COD_FREEZE (0.1) to prevent player from moving.
+Set value to COD_FREEZE (0.1) to prevent player from moving.
 ------------------------------*/
 native cod_set_user_speed(id, Float:value, type = ROUND);
 
@@ -667,57 +668,57 @@ Use player's teleport.
 native cod_use_user_teleport(id);
 
 /*------------------------------
-Return if player have resistance for powers.
+Return if player has resistance for cod skills.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
 ------------------------------*/
 native cod_get_user_resistance(id, type = ALL);
 
 /*------------------------------
-Return if player have god mode.
+Return if player has god mode.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
 ------------------------------*/
 native cod_get_user_godmode(id, type = ALL);
 
 /*------------------------------
-Return if player have noclip.
+Return if player has noclip.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
 ------------------------------*/
 native cod_get_user_noclip(id, type = ALL);
 
 /*------------------------------
-Return if player have bunnyhop.
+Return if player has bunnyhop.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
 ------------------------------*/
 native cod_get_user_bunnyhop(id, type = ALL);
 
 /*------------------------------
-Return if player have silent walk.
+Return if player has silent walk.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 ------------------------------*/
 native cod_get_user_footsteps(id, type = ALL);
 
 /*------------------------------
-Return if player have model of the opponent.
+Return if player has model of the opponent.
 Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 ------------------------------*/
 native cod_get_user_model(id, type = ALL);
 
 /*------------------------------
-Return if player have clip unlimited ammo.
+Return if player has clip unlimited ammo.
 Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 Weapon defines if defined weapons condition has to be checked.
 ------------------------------*/
 native cod_get_user_unlimited_ammo(id, type = ALL, weapon = 0);
 
 /*------------------------------
-Return if player have recoil eliminator.
+Return if player has recoil eliminator.
 Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 Weapon defines if defined weapons condition has to be checked.
 ------------------------------*/
 native cod_get_user_recoil_eliminator(id, type = ALL, weapon = 0);
 
 /*------------------------------
-Return if player have recoil reducer.
+Return if player has recoil reducer.
 Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
 Weapon defines if defined weapons condition has to be checked.
 ------------------------------*/
@@ -782,12 +783,12 @@ native cod_set_user_recoil_reducer(id, value, type = ROUND, weapon = FULL);
 
 /*------------------------------
 Give player a weapon and allows player to own it.
-Amount is for adding multiple nades at once.
+Amount is only for adding multiple nades at once and is not used for normal weapons.
 ------------------------------*/
 native cod_give_weapon(id, weapon, amount = 0);
 
 /*------------------------------
-Remove player a weapon and disallows player to own it.
+Remove a weapon from player's inventory and disallows to own it.
 ------------------------------*/
 native cod_take_weapon(id, weapon);
 
@@ -806,7 +807,8 @@ native cod_get_user_render(id, type = NONE);
 Set player's render.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 There can be only one render for CLASS, ITEM, ADDITIONAL, but multiple for ROUND - every set adds new render record.
-Value is number from -255 to 255 (256 to disable), but for CLASS type must be 0 or more (negative numbers substract it from player's current render value, positive and 0 sets it to this value).
+Value is number from -255 to 255 (256 to disable), but for CLASS type must be 0 or more
+(negative numbers substract it from player's current render value, positive and 0 sets it to this value).
 Status is player state for render. It can be a bitsum of RENDER_ALWAYS, RENDER_STAND, RENDER_MOVE, RENDER_DUCK, RENDER_SHIFT.
 Weapon is weapon id (1<<CSW_ format) or FULL for all weapons.
 Timer sets render value for certain amount of time - it ignores type, status and weapon.
@@ -821,8 +823,8 @@ Timer sets glow for certain amount of time.
 native cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:timer = 0.0);
 
 /*------------------------------
-Print message to player with [CoD] prefix.
-Color formaters are allowed.
+Print chat message with [CoD] prefix.
+Color formaters are allowed as in client_print_color.
 ------------------------------*/
 native cod_print_chat(id, const text[], any:...);
 
@@ -830,10 +832,10 @@ native cod_print_chat(id, const text[], any:...);
 Log error to cod_mod.log file.
 For plugin param __BINARY__ or PLUGIN constants should be used.
 ------------------------------*/
-native cod_log_error(const plugin[], const text[], any:...);
+native cod_log_error(const plugin[] = "CoD Mod", const text[], any:...);
 
 /*------------------------------
-Execute command on player with bypassing protectors (most of them)
+Execute command on player with bypassing protectors (most of them).
 ------------------------------*/
 native cod_cmd_execute(id, const text[], any:...);
 
@@ -865,7 +867,7 @@ native cod_display_fade(id, duration, holdTime, fadeType, red, green, blue, alph
 /*------------------------------
 Display status icon.
 Red, green, blue is status color in RGB - not required if hiding icon.
-Icon is status icon name - all icons can be found here https://forums.alliedmods.net/showthread.php?t=52529.
+Icon is status icon name - all icons can be found here: https://forums.alliedmods.net/showthread.php?t=52529.
 Enable defines if show or hide icon.
 ------------------------------*/
 native cod_display_icon(id, const icon[], enable = 0, red = 0, green = 0, blue = 0);
@@ -908,7 +910,7 @@ Victim is player that is receiving damage.
 Damage is damage amount. If damage = 0.0 previous task will be removed and no task created.
 Time is interval between damage. If time = 0.0 previous task will be removed and no task created.
 Counter is how many times make damage. If counter = 0 effect will last till player death or round end - usefull for constant healing.
-Flags is damage flag (DMG_).
+Flags is damage flag (DMG_ format).
 Flags can also be FIRE, POISON or HEAL (healing player instead of huring) if want to use custom effects out of the box.
 Instant makes first damage immediately.
 ------------------------------*/
@@ -928,10 +930,10 @@ Return COD_BLOCK.
 native Float:cod_kill_player(attacker, victim, damageBits);
 
 /*------------------------------
-Immediately respawn player.
+Respawn player after defined time (0.1 for immediate respawn).
 If enemy is true will respawn player on enemy spawn.
 ------------------------------*/
-native cod_respawn_player(id, enemy = 0);
+native cod_respawn_player(id, enemy = 0, Float:time = 0.1);
 
 /*------------------------------
 Teleport player to spawn.
@@ -956,7 +958,7 @@ Return true/false result for given percent chance.
 native bool:cod_percent_chance(percent);
 
 /*------------------------------
-Return if there is enough space for ent (or origin) with defined minimum distance.
+Return if there is enough space for ent (or origin) with defined minimum distance in units.
 ------------------------------*/
 native bool:cod_is_enough_space(ent, Float:distance = 120.0);
 
@@ -1023,7 +1025,7 @@ Damage will be blocked if COD_BLOCK is returned.
 forward cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace);
 
 /*------------------------------
-Multiforward executed on cod_damage_inflict use which is not registered by HamTakeDamage.
+Multiforward executed on cod_inflict_damage use which is not registered by HamTakeDamage.
 Flags param will contain sum with custom DMG_ flags: DMG_DYNAMITE, DMG_MINE, DMG_ROCKET, DMG_THUNDER, DMG_KIll
 so damage type can be easily identified.
 Damage will be blocked if COD_BLOCK is returned.
@@ -1061,8 +1063,7 @@ Multiforward executed on cmd start event.
 Id is player id.
 Button is button pressed right now.
 Oldbutton is last pressed button.
-Player state have types RENDER_ALWAYS, RENDER_STAND, RENDER_MOVE, RENDER_DUCK, RENDER_SHIFT
-and can be used as additional information.
+Player state have types RENDER_ALWAYS, RENDER_STAND, RENDER_MOVE, RENDER_DUCK, RENDER_SHIFT.
 ------------------------------*/
 forward cod_cmd_start(id, button, oldButton, playerState);
 
