@@ -9,11 +9,9 @@
 #define VERSION "1.1.0"
 #define AUTHOR "O'Zone"
 
-#define ICON
-
 new const boxClass[] = "cod_box", boxModel[] = "models/CoDMod/box.mdl";
 
-new cvarBoxChance, spriteGreen, spriteAcid;
+new cvarBoxChance, spriteGreen, spriteAcid, boxDroppedForward;
 
 public plugin_init()
 {
@@ -22,6 +20,8 @@ public plugin_init()
 	register_touch(boxClass, "player", "touch_box");
 
 	bind_pcvar_num(create_cvar("cod_box_chance", "5"), cvarBoxChance);
+
+	boxDroppedForward = CreateMultiForward("cod_box_dropped", ET_IGNORE, FP_CELL);
 }
 
 public plugin_precache()
@@ -69,9 +69,7 @@ public create_box(id)
 	entity_set_int(ent, EV_INT_solid, SOLID_TRIGGER);
 	set_pev(ent, pev_movetype, MOVETYPE_FLY);
 
-	#if defined ICON
-	cod_spawn_icon(ent);
-	#endif
+	execute_forward_ignore_one_param(boxDroppedForward, ent);
 
 	return PLUGIN_CONTINUE;
 }
@@ -204,4 +202,11 @@ stock Float:distance_to_floor(Float:start[3], ignoremonsters = 1)
 	new Float:ret = start[2] - end[2];
 
 	return ret > 0 ? ret : 0.0;
+}
+
+stock execute_forward_ignore_one_param(forwardHandle, param)
+{
+	static ret;
+
+	return ExecuteForward(forwardHandle, ret, param);
 }
