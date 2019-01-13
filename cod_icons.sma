@@ -28,7 +28,7 @@ new const iconSprite[icons][] = {
 };
 
 new playerName[MAX_PLAYERS + 1][MAX_NAME], bombEntity[icons], iconEntity[icons], playerTeam[MAX_PLAYERS + 1],
-	bool:roundStarted, iconBombSites, iconDropped, iconPlanted, iconBox, bombTimer, cvarC4, iconsVault;
+	bool:roundStarted, bool:noBombsites, iconBombSites, iconDropped, iconPlanted, iconBox, bombTimer, cvarC4, iconsVault;
 
 public plugin_init()
 {
@@ -54,12 +54,16 @@ public plugin_init()
 		bombEntity[bsBombSiteB] = find_ent_by_class(bombEntity[bsBombSiteA], "info_bomb_target");
 	}
 
+	if (pev_valid(bombEntity[bsBombSiteA])) {
+		noBombsites = true;
+	} else {
+		spawn_sprite(bombEntity[bsBombSiteA], bsBombSiteA);
+		spawn_sprite(bombEntity[bsBombSiteB], bsBombSiteB);
+	}
+
 	iconsVault = nvault_open("cod_icons");
 
 	if (iconsVault == INVALID_HANDLE) set_fail_state("[COD] Nie mozna otworzyc pliku cod_icons.vault");
-
-	spawn_sprite(bombEntity[bsBombSiteA], bsBombSiteA);
-	spawn_sprite(bombEntity[bsBombSiteB], bsBombSiteB);
 
 	for (new i; i < sizeof(commandIcons); i++) register_clcmd(commandIcons[i], "change_icons");
 
@@ -79,7 +83,11 @@ public plugin_natives()
 	register_native("cod_spawn_icon", "_cod_spawn_icon", 1);
 
 public plugin_precache()
-	for (new i; i < sizeof(iconSprite); i++) precache_model(iconSprite[i]);
+{
+	for (new i; i < sizeof(iconSprite); i++) {
+		if (!noBombsites || i == BOX) precache_model(iconSprite[i]);
+	}
+}
 
 public client_putinserver(id)
 {
