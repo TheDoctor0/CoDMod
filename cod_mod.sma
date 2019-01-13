@@ -215,9 +215,9 @@ public plugin_init()
 	codForwards[RENDER_CHANGED] = CreateMultiForward("cod_render_changed", ET_IGNORE, FP_CELL, FP_CELL);
 	codForwards[GRAVITY_CHANGED] = CreateMultiForward("cod_gravity_changed", ET_IGNORE, FP_CELL, FP_FLOAT);
 	codForwards[SPEED_CHANGED] = CreateMultiForward("cod_speed_changed", ET_IGNORE, FP_CELL, FP_FLOAT);
-	codForwards[DAMAGE_PRE] = CreateMultiForward ("cod_damage_pre", ET_CONTINUE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL, FP_CELL);
-	codForwards[DAMAGE_POST] = CreateMultiForward ("cod_damage_post", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL, FP_CELL);
-	codForwards[DAMAGE_INFLICT] = CreateMultiForward ("cod_damage_inflict", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT, FP_FLOAT, FP_CELL);
+	codForwards[DAMAGE_PRE] = CreateMultiForward("cod_damage_pre", ET_CONTINUE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL, FP_CELL);
+	codForwards[DAMAGE_POST] = CreateMultiForward("cod_damage_post", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_FLOAT, FP_CELL, FP_CELL);
+	codForwards[DAMAGE_INFLICT] = CreateMultiForward("cod_damage_inflict", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT, FP_FLOAT, FP_CELL);
 	codForwards[WEAPON_DEPLOY] = CreateMultiForward("cod_weapon_deploy", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[CUR_WEAPON] = CreateMultiForward("cod_cur_weapon", ET_IGNORE, FP_CELL, FP_CELL);
 	codForwards[KILLED] = CreateMultiForward("cod_killed", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_CELL);
@@ -1406,7 +1406,7 @@ public use_rocket(id)
 	entity_set_int(ent, EV_INT_movetype, MOVETYPE_FLY);
 	entity_set_edict(ent, EV_ENT_owner, id);
 
-	get_velocity_by_aim(id, 1000, velocity);
+	VelocityByAim(id, 1000, velocity);
 
 	entity_set_vector(ent, EV_VEC_velocity, velocity);
 
