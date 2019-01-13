@@ -156,6 +156,9 @@ public bomb_timer()
 	}
 }
 
+public cod_box_dropped(ent)
+	spawn_sprite(ent, BOX);
+
 public cod_new_round()
 {
 	remove_icon(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
