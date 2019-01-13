@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Exchange"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 #define AUTHOR "O'Zone"
 
 new const commandExchange[][] = { "wymien", "say /exchange", "say_team /exchange", "say /zamien", "say_team /zamien", "say /wymien", "say_team /wymien" };

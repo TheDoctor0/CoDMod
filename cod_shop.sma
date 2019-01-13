@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Shop"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 #define AUTHOR "O'Zone"
 
 new const commandShopMenu[][] = { "sklep", "say /shop", "say_team /shop", "say /sklep", "say_team /sklep" };

@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Skins"
-#define VERSION "1.0.14"
+#define VERSION "1.1.1"
 #define AUTHOR "O'Zone"
 
 new const commandSkins[][] = { "skiny", "say /skins", "say_team /skins", "say /skin", "say_team /skin", "say /skiny", "say_team /skiny", "say /modele", "say_team /modele", "say /model", "say_team /model" };

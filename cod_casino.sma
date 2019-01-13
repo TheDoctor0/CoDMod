@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Casino"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 #define AUTHOR "O'Zone"
 
 new const commandCasino[][] = { "kasyno", "say /kasyno", "say_team /kasyno", "say /casino", "say_team /casino" };

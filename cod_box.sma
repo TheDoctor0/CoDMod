@@ -6,7 +6,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Box"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 #define AUTHOR "O'Zone"
 
 new const boxClass[] = "cod_box", boxModel[] = "models/CoDMod/box.mdl";

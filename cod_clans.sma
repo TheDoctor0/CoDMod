@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Clans"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 #define AUTHOR "O'Zone"
 
 new const commandClan[][] = { "klan", "say /clan", "say_team /clan", "say /clans", "say_team /clans", "say /klany", "say_team /klany", "say /klan", "say_team /klan" };

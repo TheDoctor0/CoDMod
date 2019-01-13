@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD HE Block"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 #define AUTHOR "O'Zone"
 
 #define TASK_BLOCK 7526

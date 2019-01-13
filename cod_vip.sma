@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD VIP"
-#define VERSION "1.1.0"
+#define VERSION "1.1.1"
 #define AUTHOR "O'Zone"
 
 new Array:listVIPs, vip;
