@@ -269,7 +269,7 @@ public set_weapon_skin_handle(id, menu, item)
 	if (item) {
 		set_skin(id, skin[SKIN_WEAPON], skinId);
 
-		add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME], 1);
+		set_active_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
 
 		cod_print_chat(id, "Twoj nowy skin^x03 %s^x01 to^x03 %s^x01.", skin[SKIN_WEAPON], skin[SKIN_NAME]);
 	} else {
@@ -350,13 +350,15 @@ public buy_weapon_skin_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
+	add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
+
 	if (playerData[id][ACTIVE][get_weaponid(skin[SKIN_WEAPON])] == NONE) {
 		remove_active_skin(id, skin[SKIN_WEAPON]);
 
-		add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME], 1);
+		set_active_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
 
 		set_skin(id, skin[SKIN_WEAPON], skinId);
-	} else add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
+	}
 
 	cod_add_user_honor(id, -skin[SKIN_PRICE]);
 
@@ -504,11 +506,20 @@ stock remove_active_skin(id, weapon[])
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
 
-stock add_skin(id, weapon[], name[], active = 0)
+stock set_active_skin(id, weapon[], name[])
 {
 	static queryData[256];
 
-	formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES (^"%s^", '%s%s', '%s')", playerData[id][NAME], weapon, active ? " ACTIVE" : "", name);
+	formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES (^"%s^", '%s ACTIVE', '%s')", playerData[id][NAME], weapon, name);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+}
+
+stock add_skin(id, weapon[], name[])
+{
+	static queryData[256];
+
+	formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES (^"%s^", '%s', '%s')", playerData[id][NAME], weapon, name);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
