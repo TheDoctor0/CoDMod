@@ -358,6 +358,8 @@ public buy_weapon_skin_handle(id, menu, item)
 		set_skin(id, skin[SKIN_WEAPON], skinId);
 	} else add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
 
+	cod_add_user_honor(id, -skin[SKIN_PRICE]);
+
 	ArrayPushCell(playerSkins[id], skinId);
 
 	cod_print_chat(id, "Pomyslnie zakupiles skin^x03 %s^x01 do broni^x03 %s^x01.", skin[SKIN_NAME], skin[SKIN_WEAPON]);
