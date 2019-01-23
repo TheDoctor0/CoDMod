@@ -879,7 +879,7 @@ public change_name_handle(id)
 		return PLUGIN_HANDLED;
 	}
 
-	set_clan_info(clan[id], CLAN_NAME, _, clanName, charsmax(clanName));
+	update_clan_name(clan[id], clanName, charsmax(clanName));
 
 	cod_print_chat(id, "Zmieniles nazwe klanu na^x03 %s^x01.", clanName);
 
@@ -1332,11 +1332,11 @@ public clans_top15(id)
 {
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	new queryData[128], tempId[1];
+	new queryData[256], tempId[1];
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT name, members, honor, kills, level, health, gravity, weapondrop, damage FROM `cod_clans` ORDER BY kills DESC LIMIT 15");
+	formatex(queryData, charsmax(queryData), "SELECT a.name, a.honor, a.kills, a.level, a.health, a.gravity, a.weapondrop, a.damage, (SELECT COUNT(id) FROM `cod_clans_members` WHERE clan = a.id) as members FROM `cod_clans` a ORDER BY kills DESC LIMIT 15");
 
 	SQL_ThreadQuery(sql, "show_clans_top15", queryData, tempId, sizeof(tempId));
 
@@ -1370,14 +1370,14 @@ public show_clans_top15(failState, Handle:query, error[], errorNum, tempId[], da
 		replace_all(clanName, charsmax(clanName), "<", "");
 		replace_all(clanName,charsmax(clanName), ">", "");
 
-		members = SQL_ReadResult(query, 1);
-		honor = SQL_ReadResult(query, 2);
-		kills = SQL_ReadResult(query, 3);
-		level = SQL_ReadResult(query, 4);
-		health = SQL_ReadResult(query, 5);
-		gravity = SQL_ReadResult(query, 6);
-		drop = SQL_ReadResult(query, 7);
-		damage = SQL_ReadResult(query, 8);
+		honor = SQL_ReadResult(query, 1);
+		kills = SQL_ReadResult(query, 2);
+		level = SQL_ReadResult(query, 3);
+		health = SQL_ReadResult(query, 4);
+		gravity = SQL_ReadResult(query, 5);
+		drop = SQL_ReadResult(query, 6);
+		damage = SQL_ReadResult(query, 7);
+		members = SQL_ReadResult(query, 8);
 
 		if (rank >= 10) motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %22.22s %5d %8d %10d %8d %7d %10d %14d^n", rank, clanName, members, level, kills, honor, health, gravity, drop, damage);
 		else motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %22.22s %6d %8d %10d %8d %7d %10d %14d^n", rank, clanName, members, level, kills, honor, health, gravity, drop, damage);
@@ -1948,6 +1948,21 @@ stock check_clan_name(const clanName[])
 	SQL_FreeHandle(connectHandle);
 
 	return foundClan;
+}
+
+public update_clan_name(clan, clanName[], clanNameLength)
+{
+	new queryData[512], oldClanName[MAX_NAME], safeOldClanName[MAX_SAFE_NAME], safeClanName[MAX_SAFE_NAME];
+
+	get_clan_info(clan, CLAN_NAME, oldClanName, charsmax(oldClanName));
+	set_clan_info(clan, CLAN_NAME, _, clanName, clanNameLength);
+
+	cod_sql_string(oldClanName, safeOldClanName, charsmax(safeOldClanName));
+	cod_sql_string(clanName, safeClanName, charsmax(safeClanName));
+
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET `name` = ^"%s^" WHERE `name` = ^"%s^"", safeClanName, safeOldClanName);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
 
 stock check_user_clan(const userName[])
