@@ -879,7 +879,7 @@ public change_name_handle(id)
 		return PLUGIN_HANDLED;
 	}
 
-	set_clan_info(clan[id], CLAN_NAME, _, clanName, charsmax(clanName));
+	update_clan_name(clan[id], clanName, charsmax(clanName));
 
 	cod_print_chat(id, "Zmieniles nazwe klanu na^x03 %s^x01.", clanName);
 
@@ -1948,6 +1948,21 @@ stock check_clan_name(const clanName[])
 	SQL_FreeHandle(connectHandle);
 
 	return foundClan;
+}
+
+public update_clan_name(clan, clanName[], clanNameLength)
+{
+	new queryData[512], oldClanName[MAX_NAME], safeOldClanName[MAX_SAFE_NAME], safeClanName[MAX_SAFE_NAME];
+
+	get_clan_info(clan, CLAN_NAME, oldClanName, charsmax(oldClanName));
+	set_clan_info(clan, CLAN_NAME, _, clanName, clanNameLength);
+
+	cod_sql_string(oldClanName, safeOldClanName, charsmax(safeOldClanName));
+	cod_sql_string(clanName, safeClanName, charsmax(safeClanName));
+
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET `name` = ^"%s^" WHERE `name` = ^"%s^"", safeClanName, safeOldClanName);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
 
 stock check_user_clan(const userName[])
