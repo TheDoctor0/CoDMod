@@ -105,7 +105,7 @@ enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_
 
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 
-new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpDamagePer, cvarExpWinRound, cvarExpPlant, cvarExpDefuse, cvarExpRescue, cvarNightExpEnabled, cvarNightExpFrom, cvarNightExpTo,
+new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpDamagePer, cvarExpWinRound, cvarExpPlant, cvarExpDefuse, cvarExpRescue, cvarNightExpEnabled, cvarNightExpFrom, cvarNightExpTo, Float:cvarNightExpMultiplier,
 	cvarLevelLimit, cvarLevelRatio, cvarKillStreakTime, cvarMinPlayers, cvarMinBonusPlayers, cvarMaxDurability, cvarMinDamageDurability, cvarMaxDamageDurability, Float:cvarBlockSkillsTime;
 
 new Array:codItems, Array:codClasses, Array:codPromotions, Array:codFractions, Array:codPlayerClasses[MAX_PLAYERS + 1], Array:codPlayerRender[MAX_PLAYERS + 1], codForwards[forwards];
@@ -135,6 +135,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_night_exp", "1"), cvarNightExpEnabled);
 	bind_pcvar_num(create_cvar("cod_night_exp_from", "22"), cvarNightExpFrom);
 	bind_pcvar_num(create_cvar("cod_night_exp_to", "8"), cvarNightExpTo);
+	bind_pcvar_float(create_cvar("cod_night_exp_multiplier", "1.0"), cvarNightExpMultiplier);
 	bind_pcvar_num(create_cvar("cod_max_level", "501"), cvarLevelLimit);
 	bind_pcvar_num(create_cvar("cod_level_ratio", "20"), cvarLevelRatio);
 	bind_pcvar_num(create_cvar("cod_killstreak_time", "15"), cvarKillStreakTime);
@@ -416,7 +417,7 @@ public plugin_cfg()
 
 	if (cvarNightExpEnabled) {
 		set_task(5.0, "check_time", _, _, _, "b");
-		set_task(240.0, "night_exp_info", _, _, _, "b");
+		set_task(300.0, "night_exp_info", _, _, _, "b");
 	}
 
 	log_amx("Call of Duty Mod autorstwa O'Zone (v%s).", VERSION);
@@ -2611,8 +2612,8 @@ public check_time()
 
 public night_exp_info()
 {
-	if (nightExp) chat_print(0, "Na serwerze wlaczony jest nocny^x03 EXP x 2^x01!");
-	else chat_print(0, "Od godziny^x03 %i:00^x01 do^x03 %i:00^x01 na serwerze jest^x03 EXP x 2^x01!", cvarNightExpFrom, cvarNightExpTo);
+	if (nightExp) chat_print(0, "Na serwerze wlaczony jest nocny^x03 EXP x %.2f^x01!", cvarNightExpMultiplier);
+	else chat_print(0, "Od godziny^x03 %i:00^x01 do^x03 %i:00^x01 na serwerze jest^x03 EXP x %.2f^x01!", cvarNightExpFrom, cvarNightExpTo, cvarNightExpMultiplier);
 }
 
 public set_speed_limit(id)
@@ -4481,7 +4482,7 @@ stock get_exp_bonus(id, exp)
 
 	if (cod_get_user_vip(id)) bonus += 0.25;
 
-	if (nightExp) bonus += 1.0;
+	if (nightExp) bonus += cvarNightExpMultiplier;
 
 	bonus += floatmin(codPlayer[id][PLAYER_KS] * 0.2, 1.0);
 	bonus += get_players_amount() * 0.1;
