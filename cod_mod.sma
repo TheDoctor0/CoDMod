@@ -135,7 +135,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_night_exp", "1"), cvarNightExpEnabled);
 	bind_pcvar_num(create_cvar("cod_night_exp_from", "22"), cvarNightExpFrom);
 	bind_pcvar_num(create_cvar("cod_night_exp_to", "8"), cvarNightExpTo);
-	bind_pcvar_float(create_cvar("cod_night_exp_multiplier", "1.0"), cvarNightExpMultiplier);
+	bind_pcvar_float(create_cvar("cod_night_exp_multiplier", "2.0"), cvarNightExpMultiplier);
 	bind_pcvar_num(create_cvar("cod_max_level", "501"), cvarLevelLimit);
 	bind_pcvar_num(create_cvar("cod_level_ratio", "20"), cvarLevelRatio);
 	bind_pcvar_num(create_cvar("cod_killstreak_time", "15"), cvarKillStreakTime);
@@ -4490,7 +4490,7 @@ stock get_exp_bonus(id, exp)
 
 	if (cod_get_user_vip(id)) bonus += 0.25;
 
-	if (nightExp) bonus += cvarNightExpMultiplier;
+	if (nightExp) bonus += (cvarNightExpMultiplier - 1.0);
 
 	bonus += floatmin(codPlayer[id][PLAYER_KS] * 0.2, 1.0);
 	bonus += get_players_amount() * 0.1;
