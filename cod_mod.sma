@@ -977,6 +977,7 @@ public show_item_description(id, item, info)
 
 	get_item_info(item, ITEM_DESC, itemDescription, charsmax(itemDescription));
 	get_item_info(item, ITEM_NAME, itemName, charsmax(itemName));
+
 	new valueMin = get_item_info(item, ITEM_RANDOM_MIN), valueMax = get_item_info(item, ITEM_RANDOM_MAX);
 
 	chat_print(id, "Przedmiot:^x03 %s^x01.", itemName);
@@ -2750,7 +2751,14 @@ public check_level(id)
 	}
 
 	if (codPlayer[id][PLAYER_GAINED_LEVEL] < 0) {
-		reset_points(id);
+		codPlayer[id][PLAYER_POINTS] = (codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] - 1);
+		codPlayer[id][PLAYER_INT] = 0;
+		codPlayer[id][PLAYER_HEAL] = 0;
+		codPlayer[id][PLAYER_COND] = 0;
+		codPlayer[id][PLAYER_STR] = 0;
+		codPlayer[id][PLAYER_STAM] = 0;
+
+		if (codPlayer[id][PLAYER_POINTS]) assign_points(id, 0);
 
 		set_dhudmessage(212, 255, 85, -1.0, 0.24, 0, 0.0, 2.5, 0.0, 0.0);
 		show_dhudmessage(id, "Spadles do %i poziomu!", codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL]);
