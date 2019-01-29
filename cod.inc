@@ -264,7 +264,7 @@ Set player's item.
 If item = RANDOM (-3) an item will be random.
 If value = RANDOM (-3) item value will be random.
 ------------------------------*/
-native cod_set_user_item(id, item = 0, value = 0);
+native cod_set_user_item(id, item = 0, value = RANDOM);
 
 /*------------------------------
 Upgrades player's item.

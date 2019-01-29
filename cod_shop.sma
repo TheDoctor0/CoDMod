@@ -191,7 +191,7 @@ public shop_menu_handle(id, menu, item)
 		} case BUY: {
 			cod_print_chat(id, "Kupiles^x03 Losowy Przedmiot^x01!");
 
-			cod_set_user_item(id, RANDOM, RANDOM);
+			cod_set_user_item(id, RANDOM);
 		} case UPGRADE: {
 			cod_print_chat(id, "Kupiles^x03 Ulepszenie Przedmiotu^x01!");
 

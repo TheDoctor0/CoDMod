@@ -145,7 +145,7 @@ public get_box(id)
 				return PLUGIN_CONTINUE;
 			}
 
-			cod_set_user_item(id, RANDOM, RANDOM);
+			cod_set_user_item(id, RANDOM);
 
 			cod_print_chat(id, "Trafiles na^x04 losowy item^x01!");
 		} case 4: {
