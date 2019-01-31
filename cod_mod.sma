@@ -119,10 +119,10 @@ public plugin_init()
 
 	create_arrays();
 
-	create_cvar("cod_sql_host", "sql.pukawka.pl", FCVAR_SPONLY | FCVAR_PROTECTED);
-	create_cvar("cod_sql_user", "666263", FCVAR_SPONLY | FCVAR_PROTECTED);
-	create_cvar("cod_sql_pass", "3CK1CfKXSPjFMK0", FCVAR_SPONLY | FCVAR_PROTECTED);
-	create_cvar("cod_sql_db", "666263_cod", FCVAR_SPONLY | FCVAR_PROTECTED);
+	create_cvar("cod_sql_host", "127.0.0.1", FCVAR_SPONLY | FCVAR_PROTECTED);
+	create_cvar("cod_sql_user", "user", FCVAR_SPONLY | FCVAR_PROTECTED);
+	create_cvar("cod_sql_pass", "password", FCVAR_SPONLY | FCVAR_PROTECTED);
+	create_cvar("cod_sql_db", "database", FCVAR_SPONLY | FCVAR_PROTECTED);
 
 	bind_pcvar_num(create_cvar("cod_kill_exp", "30"), cvarExpKill);
 	bind_pcvar_num(create_cvar("cod_hs_exp", "10"), cvarExpKillHS);
