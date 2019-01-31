@@ -2056,8 +2056,6 @@ stock remove_clan(id)
 
 	ArrayDeleteItem(codClans, get_clan_id(clan[id]));
 
-	clan[id] = 0;
-
 	new queryData[128];
 
 	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans` WHERE id = '%i'", clan[id]);
@@ -2065,6 +2063,8 @@ stock remove_clan(id)
 
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET flag = '%i', clan = '0' WHERE clan = '%i'", STATUS_NONE, clan[id]);
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+
+	clan[id] = 0;
 }
 
 stock check_clan_loaded(clan)
