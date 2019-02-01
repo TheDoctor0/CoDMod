@@ -279,6 +279,8 @@ public show_top_time(failState, Handle:query, error[], errorNum, tempData[], dat
 		SQL_ReadResult(query, 0, userName, charsmax(userName));
 
 		seconds = SQL_ReadResult(query, 1);
+		minutes = 0;
+		hours = 0;
 
 		replace_all(userName, charsmax(userName), "<", "");
 		replace_all(userName, charsmax(userName), ">", "");
