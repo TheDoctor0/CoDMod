@@ -7,22 +7,33 @@
 #define AUTHOR	"O'Zone"
 #define VERSION	"1.1.1"
 
-new cvarMinPlayers, cvarKill, cvarKillHS, cvarWinRound, cvarBombPlanted, cvarBombDefused, cvarRescueHostage, cvarKillHostage, Float:cvarVIPMultiplier;
+#define OFFSET_CSMONEY	115
+#define OFFSET_LINUX	5
 
-new playerName[MAX_PLAYERS + 1][MAX_SAFE_NAME], playerHonor[MAX_PLAYERS + 1], Handle:sql, Handle:connection, bool:sqlConnected, dataLoaded;
+#define TASK_LOAD 	4721
+#define TASK_UPDATE 9501
+
+#define set_user_money(%1,%2)	set_pdata_int(%1, OFFSET_CSMONEY, %2, OFFSET_LINUX)
+
+new cvarMinPlayers, cvarKill, cvarKillHS, cvarKillFirst, cvarWinRound, cvarBombPlanted, cvarBombDefused,
+	cvarRescueHostage, cvarKillHostage, Float:cvarVIPMultiplier;
+
+new playerName[MAX_PLAYERS + 1][MAX_SAFE_NAME], playerHonor[MAX_PLAYERS + 1], playerHonorGained[MAX_PLAYERS + 1],
+	Handle:sql, Handle:connection, bool:sqlConnected, bool:firstKill, dataLoaded, msgMoney;
 
 public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
 	bind_pcvar_num(create_cvar("cod_honor_min_players", "4"), cvarMinPlayers);
-	bind_pcvar_num(create_cvar("cod_honor_kill", "1"), cvarKill);
-	bind_pcvar_num(create_cvar("cod_honor_killhs", "1"), cvarKillHS);
-	bind_pcvar_num(create_cvar("cod_honor_winround", "1"), cvarWinRound);
-	bind_pcvar_num(create_cvar("cod_honor_bombplanted", "2"), cvarBombPlanted);
-	bind_pcvar_num(create_cvar("cod_honor_bombdefused", "2"), cvarBombDefused);
-	bind_pcvar_num(create_cvar("cod_honor_rescuehostage", "2"), cvarRescueHostage);
-	bind_pcvar_num(create_cvar("cod_honor_killhostage", "4"), cvarKillHostage);
+	bind_pcvar_num(create_cvar("cod_honor_kill", "2"), cvarKill);
+	bind_pcvar_num(create_cvar("cod_honor_kill_hs", "1"), cvarKillHS);
+	bind_pcvar_num(create_cvar("cod_honor_kill_first", "1"), cvarKillFirst);
+	bind_pcvar_num(create_cvar("cod_honor_win_round", "1"), cvarWinRound);
+	bind_pcvar_num(create_cvar("cod_honor_bomb_planted", "5"), cvarBombPlanted);
+	bind_pcvar_num(create_cvar("cod_honor_bomb_defused", "5"), cvarBombDefused);
+	bind_pcvar_num(create_cvar("cod_honor_rescue_hostage", "5"), cvarRescueHostage);
+	bind_pcvar_num(create_cvar("cod_honor_kill_hostage", "5"), cvarKillHostage);
 	bind_pcvar_float(create_cvar("cod_honor_vip_multiplier", "1.5"), cvarVIPMultiplier);
 
 	register_event("SendAudio", "t_win_round" , "a", "2&%!MRAD_terwin");
@@ -30,6 +41,12 @@ public plugin_init()
 
 	register_logevent("hostage_rescued", 3, "1=triggered", "2=Rescued_A_Hostage");
 	register_logevent("hostage_killed", 3, "1=triggered", "2=Killed_A_Hostage");
+
+	register_event("Money", "money_update", "b");
+
+	register_message(get_user_msgid("Money"), "message_money");
+
+	msgMoney = get_user_msgid("Money");
 }
 
 public plugin_cfg()
@@ -51,8 +68,11 @@ public plugin_end()
 public client_putinserver(id)
 {
 	playerHonor[id] = 0;
+	playerHonorGained[id] = 0;
 
 	rem_bit(id, dataLoaded);
+
+	update_hud(id);
 
 	if (is_user_bot(id) || is_user_hltv(id)) return;
 
@@ -60,19 +80,34 @@ public client_putinserver(id)
 
 	cod_sql_string(playerName[id], playerName[id], charsmax(playerName[]));
 
-	set_task(0.1, "load_honor", id);
+	set_task(0.1, "load_honor", id + TASK_LOAD);
 }
 
 public client_disconnected(id)
-	remove_task(id);
+{
+	remove_task(id + TASK_LOAD);
+	remove_task(id + TASK_UPDATE);
+}
+
+public cod_new_round()
+	firstKill = false;
+
+public cod_spawned(id, respawn)
+	update_hud(id);
 
 public cod_killed(killer, victim, weaponId, hitPlace)
 {
 	if (get_playersnum() < cvarMinPlayers) return;
 
-	playerHonor[killer] += get_user_bonus(killer, cvarKill);
+	if (!firstKill) {
+		firstKill = true;
 
-	if (hitPlace == HIT_HEAD) playerHonor[killer] += get_user_bonus(killer, cvarKillHS);
+		playerHonorGained[killer] += get_user_bonus(killer, cvarKillFirst);
+	}
+
+	playerHonorGained[killer] += get_user_bonus(killer, cvarKill);
+
+	if (hitPlace == HIT_HEAD) playerHonorGained[killer] += get_user_bonus(killer, cvarKillHS);
 
 	save_honor(killer);
 }
@@ -90,7 +125,7 @@ public round_winner(team)
 	for (new id = 1; id < MAX_PLAYERS; id++) {
 		if (!cod_get_user_class(id) || get_user_team(id) != team) continue;
 
-		playerHonor[id] += get_user_bonus(id, cvarWinRound);
+		playerHonorGained[id] += get_user_bonus(id, cvarWinRound);
 
 		save_honor(id);
 	}
@@ -98,44 +133,54 @@ public round_winner(team)
 
 public bomb_planted(id)
 {
-	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) return;
+	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
+		set_task(0.1, "update_hud", id);
 
-	playerHonor[id] += get_user_bonus(id, cvarBombPlanted);
+		return;
+	}
+
+	playerHonorGained[id] += get_user_bonus(id, cvarBombPlanted);
 
 	save_honor(id);
 }
 
 public bomb_defused(id)
 {
-	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) return;
+	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
+		set_task(0.1, "update_hud", id);
 
-	playerHonor[id] += get_user_bonus(id, cvarBombDefused);
+		return;
+	}
+
+	playerHonorGained[id] += get_user_bonus(id, cvarBombDefused);
 
 	save_honor(id);
 }
 
 public hostage_rescued()
 {
-	if (get_playersnum() < cvarMinPlayers) return;
-
 	new id = get_loguser_index();
 
-	if (!cod_get_user_class(id)) return;
+	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
+		set_task(0.1, "update_hud", id);
 
-	playerHonor[id] += get_user_bonus(id, cvarRescueHostage);
+		return;
+	}
+
+	playerHonorGained[id] += get_user_bonus(id, cvarRescueHostage);
 
 	save_honor(id);
 }
 
 public hostage_killed()
 {
-	if (get_playersnum() < cvarMinPlayers) return;
-
 	new id = get_loguser_index();
 
-	if (!cod_get_user_class(id)) return;
+	set_task(0.1, "update_hud", id);
 
-	playerHonor[id] -= cod_get_user_vip(id) ? floatround(cvarKillHostage / cvarVIPMultiplier) : cvarKillHostage;
+	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) return;
+
+	playerHonorGained[id] -= cod_get_user_vip(id) ? floatround(cvarKillHostage / cvarVIPMultiplier) : cvarKillHostage;
 
 	save_honor(id);
 }
@@ -185,8 +230,10 @@ public sql_init()
 
 public load_honor(id)
 {
+	id -= TASK_LOAD;
+
 	if (!sqlConnected) {
-		set_task(1.0, "load_honor", id);
+		set_task(1.0, "load_honor", id + TASK_LOAD);
 
 		return;
 	}
@@ -209,14 +256,17 @@ public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], d
 
 	new id = tempId[0];
 
-	if (SQL_MoreResults(query)) playerHonor[id] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
-	else {
+	if (SQL_MoreResults(query)) {
+		playerHonor[id] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
+	} else {
 		new queryData[128];
 
 		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_honor` (`name`) VALUES (^"%s^")", playerName[id]);
 
 		SQL_ThreadQuery(sql, "ignore_handle", queryData);
 	}
+
+	update_hud(id, playerHonor[id]);
 
 	set_bit(id, dataLoaded);
 }
@@ -225,7 +275,17 @@ stock save_honor(id, end = 0)
 {
 	if (!get_bit(id, dataLoaded)) return;
 
-	new queryData[128];
+	new queryData[128], data[2];
+
+	data[0] = id;
+	data[1] = playerHonorGained[id];
+
+	playerHonor[id] += playerHonorGained[id];
+	playerHonorGained[id] = 0;
+
+	if (task_exists(id + TASK_UPDATE)) remove_task(id + TASK_UPDATE);
+
+	set_task(0.1, "update_hud_task", id + TASK_UPDATE, data, sizeof(data));
 
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_honor` SET honor = '%i' WHERE name = ^"%s^"", playerHonor[id], playerName[id]);
 
@@ -249,6 +309,38 @@ stock save_honor(id, end = 0)
 	if (end) rem_bit(id, dataLoaded);
 }
 
+public money_update(id)
+	update_hud(id);
+
+public message_money(msgId, msgDest, msgEnt)
+{
+	if (!is_user_connected(msgEnt)) return;
+
+	set_msg_arg_int(1, get_msg_argtype(1), playerHonor[msgEnt]);
+
+	update_hud(msgEnt);
+}
+
+public update_hud_task(data[])
+	update_hud(data[0], data[1]);
+
+stock update_hud(id, gained = 0)
+{
+	if (!is_user_connected(id)) return;
+
+	set_user_money(id, playerHonor[id]);
+
+	message_begin(MSG_ONE, msgMoney, _, id);
+	write_long(playerHonor[id] - gained);
+	write_byte(0);
+	message_end();
+
+	message_begin(MSG_ONE, msgMoney, _, id);
+	write_long(playerHonor[id]);
+	write_byte(1);
+	message_end();
+}
+
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
 	if (failState)  {
@@ -262,16 +354,16 @@ public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSiz
 public _cod_get_user_honor(id)
 	return playerHonor[id];
 
-public _cod_set_user_honor(id, amount)
+public _cod_set_user_honor(id, amount, bonus)
 {
-	playerHonor[id] = max(0, amount);
+	playerHonor[id] = max(0, bonus ? get_user_bonus(id, amount) : amount);
 
 	save_honor(id);
 }
 
-public _cod_add_user_honor(id, amount)
+public _cod_add_user_honor(id, amount, bonus)
 {
-	playerHonor[id] = max(0, playerHonor[id] + amount);
+	playerHonorGained[id] += max(-playerHonor[id], bonus ? get_user_bonus(id, amount) : amount);
 
 	save_honor(id);
 }
