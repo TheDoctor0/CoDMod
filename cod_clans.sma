@@ -14,7 +14,7 @@ enum _:statusInfo { STATUS_NONE, STATUS_MEMBER, STATUS_DEPUTY, STATUS_LEADER };
 new cvarCreateLevel, cvarMembersStart, cvarLevelMax, cvarSkillMax, cvarChatPrefix, cvarLevelCost, cvarNextLevelCost, cvarSkillCost,
 	cvarNextSkillCost, cvarMembersPerLevel, cvarHealthPerLevel, cvarGravityPerLevel, cvarDamagePerLevel, cvarWeaponDropPerLevel;
 
-new playerName[MAX_PLAYERS + 1][MAX_NAME], chosenName[MAX_PLAYERS + 1][MAX_NAME], clan[MAX_PLAYERS + 1], chosenId[MAX_PLAYERS + 1], Handle:sql, bool:sqlConnected, Array:codClans, bool:mapEnd;
+new playerName[MAX_PLAYERS + 1][MAX_NAME], chosenName[MAX_PLAYERS + 1][MAX_NAME], clan[MAX_PLAYERS + 1], chosenId[MAX_PLAYERS + 1], Handle:sql, Handle:connection, bool:sqlConnected, Array:codClans, bool:mapEnd;
 
 public plugin_init()
 {
@@ -66,6 +66,7 @@ public plugin_cfg()
 public plugin_end()
 {
 	SQL_FreeHandle(sql);
+	SQL_FreeHandle(connection);
 
 	ArrayDestroy(codClans);
 }
@@ -275,9 +276,8 @@ public create_clan_handle(id)
 		return PLUGIN_HANDLED;
 	}
 
-	create_clan(id, clanName);
-
-	cod_print_chat(id, "Pomyslnie zalozyles klan^x03 %s^01.", clanName);
+	if (create_clan(id, clanName)) cod_print_chat(id, "Pomyslnie zalozyles klan^x03 %s^01.", clanName);
+	else cod_print_chat(id, "Podczas tworzenia klanu wystapil nieoczekiwany blad.");
 
 	return PLUGIN_HANDLED;
 }
@@ -1633,7 +1633,7 @@ public sql_init()
 
 	sql = SQL_MakeDbTuple(host, user, pass, db);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	connection = SQL_Connect(sql, errorNum, error, charsmax(error));
 
 	if (errorNum) {
 		cod_log_error(PLUGIN, "SQL Error: %s", error);
@@ -1649,24 +1649,23 @@ public sql_init()
 	add(queryData, charsmax(queryData), "`honor` INT NOT NULL, `kills` INT NOT NULL, `level` INT NOT NULL, `health` INT NOT NULL, ");
 	add(queryData, charsmax(queryData), "`gravity` INT NOT NULL, `damage` INT NOT NULL, `weapondrop` INT NOT NULL, PRIMARY KEY (`id`));");
 
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
+	new Handle:query = SQL_PrepareQuery(connection, queryData);
 
 	SQL_Execute(query);
 
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_members` (`name` varchar(%i) NOT NULL, `clan` INT NOT NULL, `flag` INT NOT NULL, `honor` INT NOT NULL, PRIMARY KEY (`name`));", MAX_SAFE_NAME);
 
-	query = SQL_PrepareQuery(connectHandle, queryData);
+	query = SQL_PrepareQuery(connection, queryData);
 
 	SQL_Execute(query);
 
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_applications` (`name` varchar(%i) NOT NULL, `clan` INT NOT NULL, PRIMARY KEY (`name`, `clan`));", MAX_SAFE_NAME);
 
-	query = SQL_PrepareQuery(connectHandle, queryData);
+	query = SQL_PrepareQuery(connection, queryData);
 
 	SQL_Execute(query);
 
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
 }
 
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
@@ -1812,26 +1811,21 @@ stock add_application(id, clanId)
 
 stock check_applications(id, clanId)
 {
-	new queryData[192], error[128], errorNum, bool:foundApplication;
+	new queryData[192], error[128], errorNum, Handle:query, bool:foundApplication;
 
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_applications` WHERE `name` = ^"%s^" AND clan = '%i'", playerName[id], clanId);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	query = SQL_PrepareQuery(connection, queryData);
 
-	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+	if (SQL_Execute(query)) {
+		if (SQL_NumResults(query)) foundApplication = true;
+	} else {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
 
-		return false;
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 	}
 
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
-
-	SQL_Execute(query);
-
-	if (SQL_NumResults(query)) foundApplication = true;
-
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
 
 	return foundApplication;
 }
@@ -1894,58 +1888,48 @@ stock remove_applications(id, const name[] = "")
 
 stock get_applications_count(clan)
 {
-	new queryData[128], error[128], errorNum, applicationsCount = 0;
+	new queryData[128], error[128], errorNum, Handle:query, applicationsCount = 0;
 
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_applications` WHERE `clan` = '%i'", clan);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	query = SQL_PrepareQuery(connection, queryData);
 
-	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+	if (SQL_Execute(query)) {
+		while (SQL_MoreResults(query)) {
+			applicationsCount++;
 
-		return 0;
-	}
+			SQL_NextRow(query);
+		}
+	} else {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
 
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
-
-	SQL_Execute(query);
-
-	while (SQL_MoreResults(query)) {
-		applicationsCount++;
-
-		SQL_NextRow(query);
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 	}
 
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
 
 	return applicationsCount;
 }
 
 stock check_clan_name(const clanName[])
 {
-	new queryData[192], safeClanName[MAX_SAFE_NAME], error[128], errorNum, bool:foundClan;
+	new queryData[192], safeClanName[MAX_SAFE_NAME], error[128], errorNum, Handle:query, bool:foundClan;
 
 	cod_sql_string(clanName, safeClanName, charsmax(safeClanName));
 
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans` WHERE `name` = ^"%s^"", safeClanName);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	query = SQL_PrepareQuery(connection, queryData);
 
-	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+	if (SQL_Execute(query)) {
+		if (SQL_NumResults(query)) foundClan = true;
+	} else {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
 
-		return false;
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 	}
 
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
-
-	SQL_Execute(query);
-
-	if (SQL_NumResults(query)) foundClan = true;
-
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
 
 	return foundClan;
 }
@@ -1967,79 +1951,71 @@ public update_clan_name(clan, clanName[], clanNameLength)
 
 stock check_user_clan(const userName[])
 {
-	new queryData[192], safeUserName[MAX_SAFE_NAME], error[128], errorNum, bool:foundClan;
+	new queryData[192], safeUserName[MAX_SAFE_NAME], error[128], errorNum, Handle:query, bool:foundClan;
 
 	cod_sql_string(userName, safeUserName, charsmax(safeUserName));
 
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_members` WHERE `name` = ^"%s^" AND clan > 0", userName);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	query = SQL_PrepareQuery(connection, queryData);
 
-	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+	if (SQL_Execute(query)) {
+		if (SQL_NumResults(query)) foundClan = true;
+	} else {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
 
-		return false;
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 	}
 
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
-
-	SQL_Execute(query);
-
-	if (SQL_NumResults(query)) foundClan = true;
-
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
 
 	return foundClan;
 }
 
 stock create_clan(id, const clanName[])
 {
-	new codClan[clanInfo], queryData[192], safeClanName[MAX_SAFE_NAME], error[128], errorNum;
+	new codClan[clanInfo], queryData[192], safeClanName[MAX_SAFE_NAME], error[128], errorNum, Handle:query, bool:success;
 
 	cod_sql_string(clanName, safeClanName, charsmax(safeClanName));
 
 	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_clans` (`name`) VALUES (^"%s^");", safeClanName);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	query = SQL_PrepareQuery(connection, queryData);
 
-	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+	if (!SQL_Execute(query)) {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
 
-		return;
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 	}
-
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
-
-	SQL_Execute(query);
 
 	formatex(queryData, charsmax(queryData), "SELECT id FROM `cod_clans` WHERE name = ^"%s^";", safeClanName);
 
-	connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	query = SQL_PrepareQuery(connection, queryData);
 
-	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+	if (SQL_Execute(query)) {
+		if (SQL_NumResults(query)) {
+			clan[id] = SQL_ReadResult(query, 0);
 
-		return;
+			copy(codClan[CLAN_NAME], charsmax(codClan[CLAN_NAME]), clanName);
+			codClan[CLAN_STATUS] = _:TrieCreate();
+			codClan[CLAN_ID] = clan[id];
+
+			ArrayPushArray(codClans, codClan);
+
+			set_user_clan(id, clan[id], 1);
+			set_user_status(id, STATUS_LEADER);
+
+			success = true;
+		}
+	} else {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
+
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 	}
 
-	query = SQL_PrepareQuery(connectHandle, queryData);
-
-	SQL_Execute(query);
-
-	if (SQL_NumResults(query)) clan[id] = SQL_ReadResult(query, 0);
-
-	copy(codClan[CLAN_NAME], charsmax(codClan[CLAN_NAME]), clanName);
-	codClan[CLAN_STATUS] = _:TrieCreate();
-	codClan[CLAN_ID] = clan[id];
-
-	ArrayPushArray(codClans, codClan);
-
-	set_user_clan(id, clan[id], 1);
-	set_user_status(id, STATUS_LEADER);
-
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
+
+	return success;
 }
 
 stock remove_clan(id)
