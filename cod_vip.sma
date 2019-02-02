@@ -35,7 +35,13 @@ public plugin_natives()
 public plugin_end()
 	ArrayDestroy(listVIPs);
 
+public amxbans_admin_connect(id)
+	client_authorized_post(id);
+
 public client_authorized(id)
+	client_authorized_post(id);
+
+public client_authorized_post(id)
 {
 	if (get_user_flags(id) & ADMIN_LEVEL_H) {
 		set_bit(id, vip);
@@ -218,9 +224,6 @@ public say_text(msgId, msgDest, msgEnt)
 
 	return PLUGIN_CONTINUE;
 }
-
-public amxbans_admin_connect(id)
-	client_authorized(id, "");
 
 public _cod_get_user_vip(id)
 	return get_bit(id, vip);

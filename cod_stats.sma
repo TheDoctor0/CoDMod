@@ -26,7 +26,7 @@ new const commandMedals[][] = { "medale", "say /medal", "say_team /medal", "say 
 new const commandTopMedals[][] = { "medale", "topmedale", "say /mtop15", "say_team /mtop15", "say /topmedals", "say_team /topmedals", "say /topmedale", "say_team /topmedale" };
 new const commandSounds[][] = { "dzwieki", "say /dzwiek", "say_team /dzwiek", "say /dzwieki", "say_team /dzwieki", "say /sound", "say_team /sound" };
 
-enum _:statsInfo { REVENGE, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE, SILVER, GOLD, MEDALS, BEST_STATS, BEST_KILLS,
+enum _:statsInfo { ADMIN, REVENGE, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE, SILVER, GOLD, MEDALS, BEST_STATS, BEST_KILLS,
 	BEST_HS_KILLS, BEST_DEATHS, CURRENT_STATS, CURRENT_KILLS, CURRENT_HS_KILLS, CURRENT_DEATHS, ROUND_KILLS, ROUND_HS_KILLS };
 enum _:winers { THIRD, SECOND, FIRST };
 
@@ -37,6 +37,8 @@ new cvarGoldMedalExp, cvarSilverMedalExp, cvarBronzeMedalExp, cvarAssistEnabled,
 	cvarRevengeEnabled, cvarRevengeHonor, cvarRevengeExp;
 
 new soundsVault, soundMayTheForce, soundOneAndOnly, soundPrepare, soundHumiliation, soundLastLeft;
+
+forward amxbans_admin_connect(id);
 
 public plugin_init()
 {
@@ -110,6 +112,15 @@ public client_putinserver(id)
 	set_task(0.1, "load_stats", id);
 }
 
+public amxbans_admin_connect(id)
+    client_authorized_post(id);
+
+public client_authorized(id)
+    client_authorized_post(id);
+
+public client_authorized_post(id)
+    playerStats[id][ADMIN] = (get_user_flags(id) & ADMIN_FLAG) ? 1 : 0;
+
 public client_disconnected(id)
 {
 	remove_task(id);
@@ -127,7 +138,7 @@ public stats_menu(id)
 
 	menu_additem(menu, "\wMoj \rCzas \y(/czas)", "1");
 
-	if (get_user_flags(id) & ADMIN_FLAG) menu_additem(menu, "\wCzas \rAdminow \y(/adminczas)", "2");
+	if (playerStats[id][ADMIN]) menu_additem(menu, "\wCzas \rAdminow \y(/adminczas)", "2");
 
 	menu_additem(menu, "\wTop \rCzasu \y(/ctop15)", "3");
 	menu_additem(menu, "\wNajlepsze \rStaty \y(/staty)", "4");
@@ -226,7 +237,7 @@ public show_time(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 
 public command_time_admin(id)
 {
-	if (!is_user_connected(id) || !(get_user_flags(id) & ADMIN_FLAG)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || !playerStats[id][ADMIN]) return PLUGIN_HANDLED;
 
 	new queryData[128], tempData[2];
 
@@ -1045,7 +1056,7 @@ stock save_stats(id, end = 0)
 	}
 
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_stats` SET `admin` = %i, `kills` = %i, `time` = %i, `lastvisit` = %i%s%s WHERE `name` = ^"%s^" AND `time` <= %i",
-	get_user_flags(id) & ADMIN_FLAG, playerStats[id][KILLS], playerStats[id][TIME] + get_user_time(id), get_systime(), queryStats, queryMedals, playerName[id], playerStats[id][TIME] + get_user_time(id));
+	playerStats[id][ADMIN], playerStats[id][KILLS], playerStats[id][TIME] + get_user_time(id), get_systime(), queryStats, queryMedals, playerName[id], playerStats[id][TIME] + get_user_time(id));
 
 	switch (end) {
 		case 0: SQL_ThreadQuery(sql, "ignore_handle", queryData);
