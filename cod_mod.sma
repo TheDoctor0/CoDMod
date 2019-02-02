@@ -106,7 +106,8 @@ enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 
 new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpDamagePer, cvarExpWinRound, cvarExpPlant, cvarExpDefuse, cvarExpRescue, cvarNightExpEnabled, cvarNightExpFrom, cvarNightExpTo,
-	cvarLevelLimit, cvarLevelRatio, cvarKillStreakTime, cvarMinPlayers, cvarMinBonusPlayers, cvarMaxDurability, cvarMinDamageDurability, cvarMaxDamageDurability, Float:cvarBlockSkillsTime;
+	Float:cvarNightExpMultiplier, cvarLevelLimit, cvarLevelRatio, cvarPointsPerLevel, cvarPointsLimitEnabled, cvarKillStreakTime, cvarMinPlayers, cvarMinBonusPlayers, cvarMaxDurability,
+	cvarMinDamageDurability, cvarMaxDamageDurability, Float:cvarBlockSkillsTime;
 
 new Array:codItems, Array:codClasses, Array:codPromotions, Array:codFractions, Array:codPlayerClasses[MAX_PLAYERS + 1], Array:codPlayerRender[MAX_PLAYERS + 1], codForwards[forwards];
 
@@ -119,10 +120,10 @@ public plugin_init()
 
 	create_arrays();
 
-	create_cvar("cod_sql_host", "sql.pukawka.pl", FCVAR_SPONLY | FCVAR_PROTECTED);
-	create_cvar("cod_sql_user", "666263", FCVAR_SPONLY | FCVAR_PROTECTED);
-	create_cvar("cod_sql_pass", "3CK1CfKXSPjFMK0", FCVAR_SPONLY | FCVAR_PROTECTED);
-	create_cvar("cod_sql_db", "666263_cod", FCVAR_SPONLY | FCVAR_PROTECTED);
+	create_cvar("cod_sql_host", "127.0.0.1", FCVAR_SPONLY | FCVAR_PROTECTED);
+	create_cvar("cod_sql_user", "user", FCVAR_SPONLY | FCVAR_PROTECTED);
+	create_cvar("cod_sql_pass", "password", FCVAR_SPONLY | FCVAR_PROTECTED);
+	create_cvar("cod_sql_db", "database", FCVAR_SPONLY | FCVAR_PROTECTED);
 
 	bind_pcvar_num(create_cvar("cod_kill_exp", "30"), cvarExpKill);
 	bind_pcvar_num(create_cvar("cod_hs_exp", "10"), cvarExpKillHS);
@@ -135,8 +136,11 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_night_exp", "1"), cvarNightExpEnabled);
 	bind_pcvar_num(create_cvar("cod_night_exp_from", "22"), cvarNightExpFrom);
 	bind_pcvar_num(create_cvar("cod_night_exp_to", "8"), cvarNightExpTo);
+	bind_pcvar_float(create_cvar("cod_night_exp_multiplier", "2.0"), cvarNightExpMultiplier);
 	bind_pcvar_num(create_cvar("cod_max_level", "501"), cvarLevelLimit);
 	bind_pcvar_num(create_cvar("cod_level_ratio", "20"), cvarLevelRatio);
+	bind_pcvar_num(create_cvar("cod_points_per_level", "1"), cvarPointsPerLevel);
+	bind_pcvar_num(create_cvar("cod_points_limit", "1"), cvarPointsLimitEnabled);
 	bind_pcvar_num(create_cvar("cod_killstreak_time", "15"), cvarKillStreakTime);
 	bind_pcvar_num(create_cvar("cod_min_players", "4"), cvarMinPlayers);
 	bind_pcvar_num(create_cvar("cod_min_bonus_players", "10"), cvarMinBonusPlayers);
@@ -314,7 +318,6 @@ public plugin_natives()
 	register_native("cod_get_user_gravity", "_cod_get_user_gravity", 1);
 	register_native("cod_get_user_speed", "_cod_get_user_speed", 1);
 	register_native("cod_get_user_armor", "_cod_get_user_armor", 1);
-	register_native("cod_get_user_money", "_cod_get_user_money", 1);
 
 	register_native("cod_set_user_rockets", "_cod_set_user_rockets", 1);
 	register_native("cod_set_user_mines", "_cod_set_user_mines", 1);
@@ -326,7 +329,6 @@ public plugin_natives()
 	register_native("cod_set_user_gravity", "_cod_set_user_gravity", 1);
 	register_native("cod_set_user_speed", "_cod_set_user_speed", 1);
 	register_native("cod_set_user_armor", "_cod_set_user_armor", 1);
-	register_native("cod_set_user_money", "_cod_set_user_money", 1);
 
 	register_native("cod_add_user_rockets", "_cod_add_user_rockets", 1);
 	register_native("cod_add_user_mines", "_cod_add_user_mines", 1);
@@ -338,7 +340,6 @@ public plugin_natives()
 	register_native("cod_add_user_gravity", "_cod_add_user_gravity", 1);
 	register_native("cod_add_user_speed", "_cod_add_user_speed", 1);
 	register_native("cod_add_user_armor", "_cod_add_user_armor", 1);
-	register_native("cod_add_user_money", "_cod_add_user_money", 1);
 
 	register_native("cod_use_user_rocket", "_cod_use_user_rocket", 1);
 	register_native("cod_use_user_mine", "_cod_use_user_mine", 1);
@@ -412,11 +413,13 @@ public plugin_cfg()
 
 	server_cmd("sv_maxspeed 500");
 
+	if (get_level_exp(cvarLevelLimit - 1) < 0) set_fail_state("Przekroczono mozliwa wartosc doswiadczenia dla maksymalnego poziomu. Zmniejsz wartosc cvaru cod_level_ratio lub cod_level_ratio.");
+
 	sql_init();
 
 	if (cvarNightExpEnabled) {
 		set_task(5.0, "check_time", _, _, _, "b");
-		set_task(240.0, "night_exp_info", _, _, _, "b");
+		set_task(300.0, "night_exp_info", _, _, _, "b");
 	}
 
 	log_amx("Call of Duty Mod autorstwa O'Zone (v%s).", VERSION);
@@ -976,6 +979,7 @@ public show_item_description(id, item, info)
 
 	get_item_info(item, ITEM_DESC, itemDescription, charsmax(itemDescription));
 	get_item_info(item, ITEM_NAME, itemName, charsmax(itemName));
+
 	new valueMin = get_item_info(item, ITEM_RANDOM_MIN), valueMax = get_item_info(item, ITEM_RANDOM_MAX);
 
 	chat_print(id, "Przedmiot:^x03 %s^x01.", itemName);
@@ -1041,7 +1045,7 @@ public reset_points(id)
 
 	rem_bit(id, resetStats);
 
-	codPlayer[id][PLAYER_POINTS] = (codPlayer[id][PLAYER_LEVEL] - 1);
+	codPlayer[id][PLAYER_POINTS] = (codPlayer[id][PLAYER_LEVEL] - 1) * cvarPointsPerLevel;
 	codPlayer[id][PLAYER_INT] = 0;
 	codPlayer[id][PLAYER_HEAL] = 0;
 	codPlayer[id][PLAYER_COND] = 0;
@@ -1108,7 +1112,7 @@ public assign_points_handler(id, menu, item)
 
 	if (!codPlayer[id][PLAYER_POINTS]) return PLUGIN_CONTINUE;
 
-	new statsLimit = cvarLevelLimit / 5;
+	new statsLimit = cvarPointsLimitEnabled ? (cvarLevelLimit * cvarPointsPerLevel / 5) : 0;
 
 	new pointsDistributionAmount = (pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]] == FULL) ? codPlayer[id][PLAYER_POINTS] :
 		(pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]] > codPlayer[id][PLAYER_POINTS] ? codPlayer[id][PLAYER_POINTS] : pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]]);
@@ -1116,16 +1120,16 @@ public assign_points_handler(id, menu, item)
 	switch (item) {
 		case 0: if (++codPlayer[id][PLAYER_POINTS_SPEED] >= sizeof pointsDistribution) codPlayer[id][PLAYER_POINTS_SPEED] = 0;
 		case 1: {
-			if (codPlayer[id][PLAYER_HEAL] < statsLimit) {
-				if (pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_HEAL]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_HEAL];
+			if (!statsLimit || codPlayer[id][PLAYER_HEAL] < statsLimit) {
+				if (statsLimit && pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_HEAL]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_HEAL];
 
 				codPlayer[id][PLAYER_HEAL] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
 			} else chat_print(id, "Maksymalny poziom sily osiagniety!");
 		}
 		case 2: {
-			if (codPlayer[id][PLAYER_INT] < statsLimit) {
-				if (pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_INT]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_INT];
+			if (!statsLimit || codPlayer[id][PLAYER_INT] < statsLimit) {
+				if (statsLimit && pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_INT]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_INT];
 
 				codPlayer[id][PLAYER_INT] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
@@ -1133,24 +1137,24 @@ public assign_points_handler(id, menu, item)
 			} else chat_print(id, "Maksymalny poziom inteligencji osiagniety!");
 		}
 		case 3: {
-			if (codPlayer[id][PLAYER_STR] < statsLimit) {
-				if (pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_STR]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_STR];
+			if (!statsLimit || codPlayer[id][PLAYER_STR] < statsLimit) {
+				if (statsLimit && pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_STR]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_STR];
 
 				codPlayer[id][PLAYER_STR] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
 			} else chat_print(id, "Maksymalny poziom sily osiagniety!");
 		}
 		case 4: {
-			if (codPlayer[id][PLAYER_STAM] < statsLimit) {
-				if (pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_STAM]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_STAM];
+			if (!statsLimit || codPlayer[id][PLAYER_STAM] < statsLimit) {
+				if (statsLimit && pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_STAM]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_STAM];
 
 				codPlayer[id][PLAYER_STAM] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
 			} else chat_print(id, "Maksymalny poziom wytrzymalosci osiagniety!");
 		}
 		case 5: {
-			if (codPlayer[id][PLAYER_COND] < statsLimit) {
-				if (pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_COND]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_COND];
+			if (!statsLimit || codPlayer[id][PLAYER_COND] < statsLimit) {
+				if (statsLimit && pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_COND]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_COND];
 
 				codPlayer[id][PLAYER_COND] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
@@ -2611,8 +2615,8 @@ public check_time()
 
 public night_exp_info()
 {
-	if (nightExp) chat_print(0, "Na serwerze wlaczony jest nocny^x03 EXP x 2^x01!");
-	else chat_print(0, "Od godziny^x03 %i:00^x01 do^x03 %i:00^x01 na serwerze jest^x03 EXP x 2^x01!", cvarNightExpFrom, cvarNightExpTo);
+	if (nightExp) chat_print(0, "Na serwerze^x03 aktywny^x01 jest nocny exp^x03 wiekszy o %i procent^x01!", floatround((cvarNightExpMultiplier - 1.0) * 100));
+	else chat_print(0, "Od godziny^x03 %i:00^x01 do^x03 %i:00^x01 na serwerze exp jest^x03 wiekszy o %i procent^x01!", cvarNightExpFrom, cvarNightExpTo, floatround((cvarNightExpMultiplier - 1.0) * 100));
 }
 
 public set_speed_limit(id)
@@ -2729,12 +2733,18 @@ public check_level(id)
 {
 	if (!is_user_connected(id) || !codPlayer[id][PLAYER_CLASS]) return;
 
+	if (codPlayer[id][PLAYER_GAINED_EXP] && (codPlayer[id][PLAYER_EXP] + codPlayer[id][PLAYER_GAINED_EXP]) < 0) {
+		codPlayer[id][PLAYER_GAINED_EXP] = 0;
+
+		return;
+	}
+
 	while ((codPlayer[id][PLAYER_GAINED_EXP] + codPlayer[id][PLAYER_EXP]) >= get_level_exp(codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL]) && codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] < cvarLevelLimit) codPlayer[id][PLAYER_GAINED_LEVEL]++;
 
 	if (!codPlayer[id][PLAYER_GAINED_LEVEL]) while ((codPlayer[id][PLAYER_GAINED_EXP] + codPlayer[id][PLAYER_EXP]) < get_level_exp(codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] - 1)) codPlayer[id][PLAYER_GAINED_LEVEL]--;
 
 	if (codPlayer[id][PLAYER_GAINED_LEVEL]) {
-		codPlayer[id][PLAYER_POINTS] = (codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] - 1) - codPlayer[id][PLAYER_INT] - codPlayer[id][PLAYER_HEAL] - codPlayer[id][PLAYER_STAM] - codPlayer[id][PLAYER_STR] - codPlayer[id][PLAYER_COND];
+		codPlayer[id][PLAYER_POINTS] = (codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] - 1) * cvarPointsPerLevel - codPlayer[id][PLAYER_INT] - codPlayer[id][PLAYER_HEAL] - codPlayer[id][PLAYER_STAM] - codPlayer[id][PLAYER_STR] - codPlayer[id][PLAYER_COND];
 
 		set_dhudmessage(212, 255, 85, -1.0, 0.24, 0, 0.0, 2.5, 0.0, 0.0);
 		show_dhudmessage(id, "Awansowales do %i poziomu!", codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL]);
@@ -2749,7 +2759,14 @@ public check_level(id)
 	}
 
 	if (codPlayer[id][PLAYER_GAINED_LEVEL] < 0) {
-		reset_points(id);
+		codPlayer[id][PLAYER_POINTS] = (codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] - 1) * cvarPointsPerLevel;
+		codPlayer[id][PLAYER_INT] = 0;
+		codPlayer[id][PLAYER_HEAL] = 0;
+		codPlayer[id][PLAYER_COND] = 0;
+		codPlayer[id][PLAYER_STR] = 0;
+		codPlayer[id][PLAYER_STAM] = 0;
+
+		if (codPlayer[id][PLAYER_POINTS]) assign_points(id, 0);
 
 		set_dhudmessage(212, 255, 85, -1.0, 0.24, 0, 0.0, 2.5, 0.0, 0.0);
 		show_dhudmessage(id, "Spadles do %i poziomu!", codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL]);
@@ -3091,7 +3108,7 @@ public show_bonus_info()
 		else {
 			new playersToFull = cvarMinBonusPlayers - get_players_amount();
 
-			chat_print(0, "Do pelnego serwera brakuj%s^x03 %i osob%s^x01. Exp jest wiekszy o^x03 %i%s^x01!", playersToFull > 1 ? (playersToFull < 5 ? "a" : "e") : "e", playersToFull, playersToFull == 1 ? "a" : (playersToFull < 5 ? "y" : ""), get_players_amount() * 10, "%%");
+			chat_print(0, "Do pelnego serwera brakuj%s^x03 %i osob%s^x01. Exp jest^x03 wiekszy o %i procent^x01!", playersToFull > 1 ? (playersToFull < 5 ? "a" : "e") : "e", playersToFull, playersToFull == 1 ? "a" : (playersToFull < 5 ? "y" : ""), get_players_amount() * 10);
 		}
 
 		lastInfo = floatround(get_gametime());
@@ -3335,7 +3352,28 @@ public load_class(id, class)
 		SQL_ThreadQuery(sql, "ignore_handle", tempData);
 	}
 
-	codPlayer[id][PLAYER_POINTS] = (codPlayer[id][PLAYER_LEVEL] - 1) - codPlayer[id][PLAYER_INT] - codPlayer[id][PLAYER_HEAL] - codPlayer[id][PLAYER_STAM] - codPlayer[id][PLAYER_STR] - codPlayer[id][PLAYER_COND];
+	codPlayer[id][PLAYER_POINTS] = (codPlayer[id][PLAYER_LEVEL] - 1) * cvarPointsPerLevel - codPlayer[id][PLAYER_INT] - codPlayer[id][PLAYER_HEAL] - codPlayer[id][PLAYER_STAM] - codPlayer[id][PLAYER_STR] - codPlayer[id][PLAYER_COND];
+
+	if (codPlayer[id][PLAYER_POINTS] < 0) {
+		reset_points(id);
+
+		return;
+	}
+
+	if (cvarPointsLimitEnabled) {
+		new statsLimit = cvarLevelLimit * cvarPointsPerLevel / 5;
+
+		if (codPlayer[id][PLAYER_INT] >= statsLimit
+			|| codPlayer[id][PLAYER_HEAL] >= statsLimit
+			|| codPlayer[id][PLAYER_STAM] >= statsLimit
+			|| codPlayer[id][PLAYER_STR] >= statsLimit
+			|| codPlayer[id][PLAYER_COND] >= statsLimit
+		) {
+			reset_points(id);
+
+			return;
+		}
+	}
 }
 
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
@@ -3666,9 +3704,6 @@ public Float:_cod_get_user_speed(id, type)
 public _cod_get_user_armor(id, value)
 	return cs_get_user_armor(id);
 
-public _cod_get_user_money(id, value)
-	return cs_get_user_money(id);
-
 public _cod_set_user_rockets(id, value, type)
 {
 	codPlayer[id][PLAYER_ROCKETS][type] = max(0, value);
@@ -3737,9 +3772,6 @@ public _cod_set_user_speed(id, Float:value, type)
 public _cod_set_user_armor(id, value)
 	cs_set_user_armor(id, max(0, value), CS_ARMOR_KEVLAR);
 
-public _cod_set_user_money(id, value)
-	cs_set_user_money(id, max(0, min(value, MAX_MONEY)));
-
 public _cod_add_user_rockets(id, value, type)
 {
 	codPlayer[id][PLAYER_ROCKETS][type] = max(0, codPlayer[id][PLAYER_ROCKETS][type] + value);
@@ -3807,11 +3839,6 @@ public _cod_add_user_speed(id, Float:value, type)
 
 public _cod_add_user_armor(id, value)
 	cs_set_user_armor(id, max(0, cs_get_user_armor(id) + value), CS_ARMOR_KEVLAR);
-
-public _cod_add_user_money(id, value)
-{
-	cs_set_user_money(id, max(0, min(cs_get_user_money(id) + value, MAX_MONEY)));
-}
 
 public _cod_use_user_rocket(id)
 	use_rocket(id);
@@ -4481,7 +4508,7 @@ stock get_exp_bonus(id, exp)
 
 	if (cod_get_user_vip(id)) bonus += 0.25;
 
-	if (nightExp) bonus += 1.0;
+	if (nightExp) bonus += (cvarNightExpMultiplier - 1.0);
 
 	bonus += floatmin(codPlayer[id][PLAYER_KS] * 0.2, 1.0);
 	bonus += get_players_amount() * 0.1;

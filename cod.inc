@@ -18,7 +18,6 @@
 #define MAX_NAME      MAX_NAME_LENGTH
 #define MAX_SAFE_NAME MAX_NAME * 2
 #define MAX_DESC      256
-#define MAX_MONEY     16000
 
 #define COD_STOP      4
 #define COD_CONTINUE  0
@@ -96,13 +95,15 @@ native cod_get_user_honor(id);
 
 /*------------------------------
 Set player's honor amount.
+If bonus is true honor bonus will be calculated.
 ------------------------------*/
-native cod_set_user_honor(id, value);
+native cod_set_user_honor(id, value, bonus = false);
 
 /*------------------------------
 Add value to player's honor amount.
+If bonus is true honor bonus will be calculated.
 ------------------------------*/
-native cod_add_user_honor(id, value);
+native cod_add_user_honor(id, value, bonus = false);
 
 /*------------------------------
 Return clan id.
@@ -264,7 +265,7 @@ Set player's item.
 If item = RANDOM (-3) an item will be random.
 If value = RANDOM (-3) item value will be random.
 ------------------------------*/
-native cod_set_user_item(id, item = 0, value = 0);
+native cod_set_user_item(id, item = 0, value = RANDOM);
 
 /*------------------------------
 Upgrades player's item.
@@ -501,11 +502,6 @@ Return player's armor amount.
 native cod_get_user_armor(id);
 
 /*------------------------------
-Return player's money amount.
-------------------------------*/
-native cod_get_user_money(id);
-
-/*------------------------------
 Set player's rockets amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
@@ -569,11 +565,6 @@ Set player's armor amount.
 native cod_set_user_armor(id, value);
 
 /*------------------------------
-Set player's money amount.
-------------------------------*/
-native cod_set_user_money(id, value);
-
-/*------------------------------
 Add value to player's rockets amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
 ------------------------------*/
@@ -631,11 +622,6 @@ native cod_add_user_speed(id, Float:value, type = ROUND);
 Add value to player's armor amount.
 ------------------------------*/
 native cod_add_user_armor(id, value);
-
-/*------------------------------
-Add value to player's money amount.
-------------------------------*/
-native cod_add_user_money(id, value);
 
 /*------------------------------
 Use player's rocket.

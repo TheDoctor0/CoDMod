@@ -1,32 +1,44 @@
 #include <amxmodx>
 #include <sqlx>
+#include <fakemeta>
 #include <cod>
 
 #define PLUGIN "CoD Clans"
-#define VERSION "1.1.1"
+#define VERSION "1.2.0"
 #define AUTHOR "O'Zone"
+
+#define TASK_INFO 9843
 
 new const commandClan[][] = { "klan", "say /clan", "say_team /clan", "say /clans", "say_team /clans", "say /klany", "say_team /klany", "say /klan", "say_team /klan" };
 
-enum _:clanInfo { CLAN_ID, CLAN_LEVEL, CLAN_HONOR, CLAN_HEALTH, CLAN_GRAVITY, CLAN_DAMAGE, CLAN_DROP, CLAN_KILLS, CLAN_MEMBERS, Trie:CLAN_STATUS, CLAN_NAME[MAX_NAME] };
+enum _:clanInfo { CLAN_ID, CLAN_LEVEL, CLAN_HONOR, CLAN_HEALTH, CLAN_GRAVITY, CLAN_DAMAGE, CLAN_DROP, CLAN_KILLS, CLAN_WINS, CLAN_MEMBERS, Trie:CLAN_STATUS, CLAN_NAME[MAX_NAME] };
+enum _:warInfo { WAR_ID, WAR_CLAN, WAR_CLAN2, WAR_PROGRESS, WAR_PROGRESS2, WAR_DURATION, WAR_REWARD };
 enum _:statusInfo { STATUS_NONE, STATUS_MEMBER, STATUS_DEPUTY, STATUS_LEADER };
 
-new cvarCreateLevel, cvarMembersStart, cvarLevelMax, cvarSkillMax, cvarChatPrefix, cvarLevelCost, cvarNextLevelCost, cvarSkillCost,
-	cvarNextSkillCost, cvarMembersPerLevel, cvarHealthPerLevel, cvarGravityPerLevel, cvarDamagePerLevel, cvarWeaponDropPerLevel;
+new cvarCreateLevel, cvarCreateFee, cvarJoinFee, cvarMembersStart, cvarLevelMax, cvarSkillMax, cvarChatPrefix, cvarLevelCost, cvarNextLevelCost,
+	cvarSkillCost, cvarNextSkillCost, cvarMembersPerLevel, cvarHealthPerLevel, cvarGravityPerLevel, cvarDamagePerLevel, cvarWeaponDropPerLevel;
 
-new playerName[MAX_PLAYERS + 1][MAX_NAME], chosenName[MAX_PLAYERS + 1][MAX_NAME], clan[MAX_PLAYERS + 1], chosenId[MAX_PLAYERS + 1], Handle:sql, bool:sqlConnected, Array:codClans, bool:mapEnd;
+new playerName[MAX_PLAYERS + 1][MAX_NAME], chosenName[MAX_PLAYERS + 1][MAX_NAME], clan[MAX_PLAYERS + 1], chosenId[MAX_PLAYERS + 1], warFrags[MAX_PLAYERS + 1],
+	warReward[MAX_PLAYERS + 1], Handle:sql, Handle:connection, bool:sqlConnected, Array:codClans, Array:codWars, bool:mapEnd, info, loaded;
 
 public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
+
+	codClans = ArrayCreate(clanInfo);
+	codWars = ArrayCreate(warInfo);
 
 	for (new i; i < sizeof commandClan; i++) register_clcmd(commandClan[i], "show_clan_menu");
 
 	register_clcmd("PODAJ_NAZWE_KLANU", "create_clan_handle");
 	register_clcmd("PODAJ_NOWA_NAZWE_KLANU", "change_name_handle");
 	register_clcmd("WPISZ_ILOSC_HONORU", "deposit_honor_handle");
+	register_clcmd("PODAJ_LICZBE_FRAGOW", "set_war_frags_handle");
+	register_clcmd("PODAJ_WYSOKOSC_NAGRODY", "set_war_reward_handle");
 
 	bind_pcvar_num(create_cvar("cod_clans_create_level", "25"), cvarCreateLevel);
+	bind_pcvar_num(create_cvar("cod_clans_create_fee", "250"), cvarCreateFee);
+	bind_pcvar_num(create_cvar("cod_clans_join_fee", "100"), cvarJoinFee);
 	bind_pcvar_num(create_cvar("cod_clans_members_start", "3"), cvarMembersStart);
 	bind_pcvar_num(create_cvar("cod_clans_level_max", "10"), cvarLevelMax);
 	bind_pcvar_num(create_cvar("cod_clans_skill_max", "10"), cvarSkillMax);
@@ -43,7 +55,7 @@ public plugin_init()
 
 	register_message(get_user_msgid("SayText"), "say_text");
 
-	codClans = ArrayCreate(clanInfo);
+	register_forward(FM_AddToFullPack, "add_to_full_pack", 1);
 }
 
 public plugin_natives()
@@ -66,6 +78,7 @@ public plugin_cfg()
 public plugin_end()
 {
 	SQL_FreeHandle(sql);
+	SQL_FreeHandle(connection);
 
 	ArrayDestroy(codClans);
 }
@@ -75,6 +88,8 @@ public client_putinserver(id)
 	if (is_user_bot(id) || is_user_hltv(id)) return;
 
 	clan[id] = 0;
+	warFrags[id] = 25;
+	warReward[id] = 100;
 
 	get_user_name(id, playerName[id], charsmax(playerName));
 
@@ -86,6 +101,10 @@ public client_putinserver(id)
 public client_disconnected(id)
 {
 	remove_task(id);
+	remove_task(id + TASK_INFO);
+
+	rem_bit(id, loaded);
+	rem_bit(id, info);
 
 	clan[id] = 0;
 }
@@ -96,6 +115,8 @@ public cod_end_map()
 public cod_spawned(id, respawn)
 {
 	if (!clan[id]) return PLUGIN_CONTINUE;
+
+	if (!get_bit(id, info) && is_user_alive(id)) set_task(5.0, "show_clan_info", id + TASK_INFO);
 
 	cod_add_user_gravity(id, -cvarGravityPerLevel * get_clan_info(clan[id], CLAN_GRAVITY) / 800.0, ROUND);
 
@@ -117,7 +138,9 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 {
 	if (!clan[killer]) return PLUGIN_CONTINUE;
 
-	set_clan_info(clan[killer], CLAN_KILLS, get_clan_info(clan[killer], CLAN_KILLS) + 1);
+	set_clan_info(clan[killer], CLAN_KILLS, 1);
+
+	if (clan[victim]) check_war(killer, victim);
 
 	return PLUGIN_CONTINUE;
 }
@@ -145,7 +168,9 @@ public show_clan_menu(id, sound)
 	} else {
 		menu = menu_create("\yMenu \rKlanu^n\wAktualny Klan:\y Brak", "show_clan_menu_handle");
 
-		formatex(menuData, charsmax(menuData), "\wStworz \yKlan \r(Wymagany %i Poziom)", cvarCreateLevel);
+		if (cvarCreateLevel && cvarCreateFee) formatex(menuData, charsmax(menuData), "\wZaloz \yKlan \r(Wymagany %i Poziom i %i Honoru)", cvarCreateLevel, cvarCreateFee);
+		else if (cvarCreateLevel) formatex(menuData, charsmax(menuData), "\wZaloz \yKlan \r(Wymagany %i Poziom)", cvarCreateLevel);
+		else if (cvarCreateFee) formatex(menuData, charsmax(menuData), "\wZaloz \yKlan \r(Wymagane %i Honoru)", cvarCreateFee);
 
 		menu_additem(menu, menuData, "0", _, callback);
 
@@ -203,7 +228,13 @@ public show_clan_menu_handle(id, menu, item)
 			}
 
 			if (cod_get_user_highest_level(id) < cvarCreateLevel) {
-				cod_print_chat(id, "Nie masz wystarczajacego poziomu by zalozyc klan (Wymagany^x03 %i^x01)!", cvarCreateLevel);
+				cod_print_chat(id, "Nie masz wystarczajacego poziomu, aby zalozyc klan (Wymagany^x03 %i poziom^x01)!", cvarCreateLevel);
+
+				return PLUGIN_HANDLED;
+			}
+
+			if (cod_get_user_honor(id) < cvarCreateFee) {
+				cod_print_chat(id, "Nie masz wystarczajaco duzo honoru, aby zalozyc klan (Wymagane^x03 %i honoru^x01)!", cvarCreateFee);
 
 				return PLUGIN_HANDLED;
 			}
@@ -240,7 +271,13 @@ public create_clan_handle(id)
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 	if (cod_get_user_highest_level(id) < cvarCreateLevel) {
-		cod_print_chat(id, "Nie masz wystarczajacego poziomu by zalozyc klan (Wymagany^x03 %i^x01)!", cvarCreateLevel);
+		cod_print_chat(id, "Nie masz wystarczajacego poziomu, aby zalozyc klan (Wymagany^x03 %i poziom^x01)!", cvarCreateLevel);
+
+		return PLUGIN_HANDLED;
+	}
+
+	if (cod_get_user_honor(id) < cvarCreateFee) {
+		cod_print_chat(id, "Nie masz wystarczajaco duzo honoru, aby zalozyc klan (Wymagane^x03 %i honoru^x01)!", cvarCreateFee);
 
 		return PLUGIN_HANDLED;
 	}
@@ -275,9 +312,8 @@ public create_clan_handle(id)
 		return PLUGIN_HANDLED;
 	}
 
-	create_clan(id, clanName);
-
-	cod_print_chat(id, "Pomyslnie zalozyles klan^x03 %s^01.", clanName);
+	if (create_clan(id, clanName)) cod_print_chat(id, "Pomyslnie zalozyles klan^x03 %s^01.", clanName);
+	else cod_print_chat(id, "Podczas tworzenia klanu wystapil nieoczekiwany blad.");
 
 	return PLUGIN_HANDLED;
 }
@@ -401,6 +437,7 @@ public leader_menu(id)
 	menu_additem(menu, "\wZapros \yGracza", _, _, callback);
 	menu_additem(menu, "\wZarzadzaj \yCzlonkami", _, _, callback);
 	menu_additem(menu, "\wRozpatrz \yPodania", _, _, callback);
+	menu_additem(menu, "\wWojny \yKlanu", _, _, callback);
 	menu_additem(menu, "\wZmien \yNazwe Klanu^n", _, _, callback);
 	menu_additem(menu, "\wWroc", _, _, callback);
 
@@ -444,8 +481,9 @@ public leader_menu_handle(id, menu, item)
 		case 2: invite_menu(id);
 		case 3: members_menu(id);
 		case 4: applications_menu(id);
-		case 5: client_cmd(id, "messagemode PODAJ_NOWA_NAZWE_KLANU");
-		case 6: show_clan_menu(id, 1);
+		case 5: wars_menu(id);
+		case 6: client_cmd(id, "messagemode PODAJ_NOWA_NAZWE_KLANU");
+		case 7: show_clan_menu(id, 1);
 	}
 
 	return PLUGIN_HANDLED;
@@ -1085,8 +1123,7 @@ public update_member(id, status)
 	if (!playerOnline) {
 		save_member(id, status, _, chosenName[id]);
 
-		if (status == STATUS_NONE) set_clan_info(clan[id], CLAN_MEMBERS, get_clan_info(clan[id], CLAN_MEMBERS) - 1);
-
+		if (status == STATUS_NONE) set_clan_info(clan[id], CLAN_MEMBERS, -1);
 		if (status == STATUS_LEADER) set_user_status(id, STATUS_DEPUTY);
 	}
 
@@ -1177,7 +1214,8 @@ public applications_confirm_menu(id, menu, item)
 
 	new menu = menu_create(menuData, "applications_confirm_handle");
 
-	menu_additem(menu, "Przymij", userName);
+	menu_additem(menu, "Przymij - \rWpisowe z banku klanu", userName);
+	menu_additem(menu, "Przymij - \yWpisowe z konta gracza", userName);
 	menu_additem(menu, "Odrzuc");
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
@@ -1189,9 +1227,9 @@ public applications_confirm_menu(id, menu, item)
 
 public applications_confirm_handle(id, menu, item)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
 
-	if (item == MENU_EXIT || item) {
+	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);
@@ -1199,7 +1237,7 @@ public applications_confirm_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	new userName[MAX_NAME], itemAccess, itemCallback;
+	new userName[32], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, userName, charsmax(userName), _, _, itemCallback);
 
@@ -1207,31 +1245,693 @@ public applications_confirm_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	switch (item) {
-		case 0: {
-			if (check_user_clan(userName)) {
-				cod_print_chat(id, "Gracz dolaczyl juz do innego klanu!");
+	if (item == 2) {
+		remove_application(id, userName);
 
-				show_clan_menu(id, 1);
+		cod_print_chat(id, "Odrzuciles podanie gracza^x03 %s^01 o dolaczenie do klanu.", userName);
+
+		return PLUGIN_HANDLED;
+	}
+
+	if (check_user_clan(userName)) {
+		cod_print_chat(id, "Gracz dolaczyl juz do innego klanu!");
+
+		show_clan_menu(id, 1);
+
+		return PLUGIN_HANDLED;
+	}
+
+	if (((get_clan_info(clan[id], CLAN_LEVEL) * cvarMembersPerLevel) + cvarMembersStart) <= get_clan_info(clan[id], CLAN_MEMBERS)) {
+		cod_print_chat(id, "Klan osiagnal maksymalna na ten moment liczbe czlonkow!");
+
+		return PLUGIN_HANDLED;
+	}
+
+	if (!item) {
+		if (get_clan_honor(clan[id]) < cvarJoinFee) {
+			cod_print_chat(id, "W banku klanu nie ma wystarczajaco pieniedzy na oplate wpisowa (^x04Wymagane %i Honoru^x01).", cvarJoinFee);
+
+			return PLUGIN_HANDLED;
+		}
+
+		set_clan_info(clan[id], CLAN_HONOR, -cvarJoinFee);
+	} else {
+		new userId = get_user_index(userName);
+
+		if (is_user_connected(userId)) {
+			if (cod_get_user_honor(id) < cvarJoinFee) {
+				cod_print_chat(id, "Gracz nie ma wystarczajaco honoru na oplate wpisowa (^x04Wymagane %i Honoru^x01).", cvarJoinFee);
 
 				return PLUGIN_HANDLED;
 			}
 
-			if (((get_clan_info(clan[id], CLAN_LEVEL) * cvarMembersPerLevel) + cvarMembersStart) <= get_clan_info(clan[id], CLAN_MEMBERS)) {
-				cod_print_chat(id, "Klan osiagnal maksymalna na ten moment liczbe czlonkow!");
+			cod_add_user_honor(id, -cvarJoinFee);
+		} else {
+			new queryData[128], error[128], safeName[64], Handle:query, honor, errorNum;
+
+			cod_sql_string(userName, safeName, charsmax(safeName));
+
+			formatex(queryData, charsmax(queryData), "SELECT honor FROM `cod_honor` WHERE `name` = ^"%s^"", safeName);
+
+			query = SQL_PrepareQuery(connection, queryData);
+
+			if (SQL_Execute(query)) {
+				if (SQL_MoreResults(query)) honor = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
+			} else {
+				errorNum = SQL_QueryError(query, error, charsmax(error));
+
+				cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
+			}
+
+			SQL_FreeHandle(query);
+
+			if (honor < cvarJoinFee) {
+				cod_print_chat(id, "Gracz nie ma wystarczajaco honoru na oplate wpisowa (^x04Wymagane %i Honoru^x01).", cvarJoinFee);
 
 				return PLUGIN_HANDLED;
 			}
 
-			accept_application(id, userName);
+			formatex(queryData, charsmax(queryData), "UPDATE `cod_honor` SET honor = honor - %i WHERE `name` = ^"%s^"", cvarJoinFee, safeName);
 
-			cod_print_chat(id, "Zaakceptowales podanie gracza^x03 %s^01 o dolaczenie do klanu.", userName);
-		} case 1: {
-			remove_application(id, userName);
+			query = SQL_PrepareQuery(connection, queryData);
 
-			cod_print_chat(id, "Odrzuciles podanie gracza^x03 %s^01 o dolaczenie do klanu.", userName);
+			if (!SQL_Execute(query)) {
+				errorNum = SQL_QueryError(query, error, charsmax(error));
+
+				cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
+			}
+
+			SQL_FreeHandle(query);
 		}
 	}
+
+	accept_application(id, userName);
+
+	cod_print_chat(id, "Zaakceptowales podanie gracza^x03 %s^01 o dolaczenie do klanu.", userName);
+
+	return PLUGIN_HANDLED;
+}
+
+public wars_menu(id)
+{
+	if (!is_user_connected(id) || !clan[id] || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+
+	new menu = menu_create("\yWojny \rKlanow\w", "wars_menu_handle"), callback = menu_makecallback("wars_menu_callback");
+
+	menu_additem(menu, "Lista \yWojen", _, _, callback);
+	menu_additem(menu, "Wypowiedz \yWojne", _, _, callback);
+	menu_additem(menu, "Zaakceptuj \yWojne", _, _, callback);
+	menu_additem(menu, "Anuluj \yWojne", _, _, callback);
+
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+
+	menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public wars_menu_callback(id, menu, item)
+{
+	switch (item) {
+		case 0: return get_wars_count(clan[id], 1) ? ITEM_ENABLED : ITEM_DISABLED;
+		case 2: return get_wars_count(clan[id], 0) ? ITEM_ENABLED : ITEM_DISABLED;
+		case 3: return get_wars_count(clan[id], 0, 1) ? ITEM_ENABLED : ITEM_DISABLED;
+	}
+
+	return ITEM_ENABLED;
+}
+
+public wars_menu_handle(id, menu, item)
+{
+	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
+
+	if (item == MENU_EXIT) {
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	switch(item) {
+		case 0: war_list_menu(id);
+		case 1: declare_war_menu(id);
+		case 2: accept_war_menu(id);
+		case 3: remove_war_menu(id);
+	}
+
+	return PLUGIN_HANDLED;
+}
+
+public war_list_menu(id)
+{
+	if (!is_user_connected(id) || !clan[id] || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+
+	new queryData[256], tempId[1];
+
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT a.*, (SELECT name FROM `cod_clans` WHERE id = a.clan) as name, (SELECT name FROM `cod_clans` WHERE id = a.clan2) as name2 FROM `cod_clans_wars` a WHERE (clan = '%i' OR clan2 = '%i') AND started = '1'", clan[id], clan[id]);
+
+	SQL_ThreadQuery(sql, "show_war_list_menu", queryData, tempId, sizeof(tempId));
+
+	return PLUGIN_HANDLED;
+}
+
+public show_war_list_menu(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if (failState) {
+		if (failState == TQUERY_CONNECT_FAILED) cod_log_error(PLUGIN, "Could not connect to SQL database. Error: %s (%d)", error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) cod_log_error(PLUGIN, "Threaded query failed. Error: %s (%d)", error, errorNum);
+
+		return PLUGIN_HANDLED;
+	}
+
+	new id = tempId[0];
+
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	new itemName[128], clanName[2][MAX_NAME], progress[2], warsCount = 0, clanId, ownClan, enemyClan, duration, reward, menu = menu_create("\yLista \rWojen\w:", "show_war_list_menu_handle");
+
+	while (SQL_MoreResults(query)) {
+		clanId = SQL_ReadResult(query, SQL_FieldNameToNum(query, "clan"));
+
+		if (clanId == clan[id]) {
+			ownClan = 0;
+			enemyClan = 1;
+		} else {
+			ownClan = 1;
+			enemyClan = 0;
+		}
+
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), clanName[0], charsmax(clanName[]));
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name2"), clanName[1], charsmax(clanName[]));
+
+		progress[0] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "progress"));
+		progress[1] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "progress2"));
+
+		duration = SQL_ReadResult(query, SQL_FieldNameToNum(query, "duration"));
+		reward = SQL_ReadResult(query, SQL_FieldNameToNum(query, "reward"));
+
+		formatex(itemName, charsmax(itemName), "\w%s \y(\r%i\y) \rvs \w%s \y(\r%i\y) (Fragi: \r%i\y | Nagroda: \r%i Honoru\y)", clanName[ownClan], progress[ownClan], clanName[enemyClan], progress[enemyClan], duration, reward);
+
+		menu_additem(menu, itemName);
+
+		SQL_NextRow(query);
+
+		warsCount++;
+	}
+
+	menu_setprop(menu, MPROP_PERPAGE, 6);
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+
+	if (!warsCount) {
+		menu_destroy(menu);
+
+		cod_print_chat(id, "Twoj klan aktualnie nie prowadzi zadnych wojen!");
+	} else menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public show_war_list_menu_handle(id, menu, item)
+{
+	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
+
+	menu_destroy(menu);
+
+	if (item == MENU_EXIT) {
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	wars_menu(id);
+
+	return PLUGIN_HANDLED;
+}
+
+public declare_war_menu(id)
+{
+	if (!is_user_connected(id) || !clan[id] || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+
+	new itemData[64], menu = menu_create("\yUstaw parametry \rwojny\w:", "declare_war_menu_handle");
+
+	formatex(itemData, charsmax(itemData), "Liczba \rFragow\w: \y%i", warFrags[id]);
+	menu_additem(menu, itemData);
+
+	formatex(itemData, charsmax(itemData), "Wysokosc \rNagrody\w: \y%i Euro^n", warReward[id]);
+	menu_additem(menu, itemData);
+
+	menu_addtext(menu, "\wWybierz jeden z powyzszych \rparametrow\w, aby zmienic jego \ywartosc\w.^nKlan, ktoremu wypowiedzona zostanie wojna musi ja \rzaakceptowac\w, aby sie rozpoczela.^nW momencie rozpoczenia wojny z banku kazdego klanu pobierana jest \ypolowa nagrody\w.^nPo jej zakonczeniu zwycieski klan otrzymuje \ycala nagrode\w.^n", 0);
+
+	menu_additem(menu, "Wypowiedz \rWojne");
+
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+
+	menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public declare_war_menu_handle(id, menu, item)
+{
+	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
+
+	menu_destroy(menu);
+
+	if (item == MENU_EXIT) {
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	switch (item) {
+		case 0: client_cmd(id, "messagemode PODAJ_LICZBE_FRAGOW");
+		case 1: client_cmd(id, "messagemode PODAJ_WYSOKOSC_NAGRODY");
+		case 2: {
+			new queryData[256], tempId[1];
+
+			tempId[0] = id;
+
+			formatex(queryData, charsmax(queryData), "SELECT a.id, a.name, a.honor, (SELECT COUNT(id) FROM `cod_clans_members` WHERE clan = a.id) as members FROM `cod_clans` a WHERE id != '%i' AND NOT EXISTS (SELECT id FROM `cod_clans_wars` WHERE (clan = '%i' AND clan2 = a.id) OR (clan2 = '%i' AND clan = a.id)) ORDER BY a.name ASC", clan[id], clan[id], clan[id]);
+
+			SQL_ThreadQuery(sql, "declare_war_select", queryData, tempId, sizeof(tempId));
+		}
+	}
+
+	return PLUGIN_HANDLED;
+}
+
+public declare_war_select(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if (failState) {
+		if (failState == TQUERY_CONNECT_FAILED) cod_log_error(PLUGIN, "Could not connect to SQL database. Error: %s (%d)", error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) cod_log_error(PLUGIN, "Threaded query failed. Error: %s (%d)", error, errorNum);
+
+		return PLUGIN_HANDLED;
+	}
+
+	new id = tempId[0];
+
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	new itemName[128], tempData[MAX_NAME], clanName[MAX_NAME], clansCount = 0, honor, members, clanId, menu = menu_create("\wWybierz \rklan\w, ktoremu chcesz wypowiedziec \ywojne\w:", "declare_war_confirm");
+
+	while (SQL_MoreResults(query)) {
+		clanId = SQL_ReadResult(query, SQL_FieldNameToNum(query, "id"));
+		members = SQL_ReadResult(query, SQL_FieldNameToNum(query, "members"));
+		honor = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
+
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), clanName, charsmax(clanName));
+
+		formatex(tempData, charsmax(tempData), "%s#%i", clanName, clanId);
+		formatex(itemName, charsmax(itemName), "\w%s \y(Czlonkowie: \r%i\y | Honor: \r%.2f\y)", clanName, members, honor);
+
+		menu_additem(menu, itemName, tempData);
+
+		SQL_NextRow(query);
+
+		clansCount++;
+	}
+
+	menu_setprop(menu, MPROP_PERPAGE, 6);
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+
+	if (!clansCount) {
+		menu_destroy(menu);
+
+		cod_print_chat(id, "Nie ma klanu, ktoremu mozna by wypowiedziec wojne!");
+	} else menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public declare_war_confirm(id, menu, item)
+{
+	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
+
+	if (item == MENU_EXIT) {
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	new tempData[192], itemData[MAX_NAME], clanName[MAX_NAME], tempClanId[6], itemAccess, menuCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, menuCallback);
+
+	menu_destroy(menu);
+
+	strtok(itemData, clanName, charsmax(clanName), tempClanId, charsmax(tempClanId), '#');
+
+	formatex(tempData, charsmax(tempData), "\yPotwierdzasz wypowiedzenie wojny klanowi \r%s\y?^n\wLiczba \rFragow\w: \y%i^n\wWysokosc \rNagrody\w: \y%i Honoru", clanName, warFrags[id], warReward[id]);
+
+	new menu = menu_create(tempData, "declare_war_confirm_handle");
+
+	menu_additem(menu, "\yTak", itemData);
+	menu_additem(menu, "Nie");
+
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+
+	menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public declare_war_confirm_handle(id, menu, item)
+{
+	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
+
+	if (item == MENU_EXIT) {
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	if (item) {
+		menu_destroy(menu);
+
+		declare_war_menu(id);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	new itemData[MAX_NAME], clanName[MAX_NAME], tempClanId[6], itemAccess, menuCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, menuCallback);
+
+	menu_destroy(menu);
+
+	strtok(itemData, clanName, charsmax(clanName), tempClanId, charsmax(tempClanId), '#');
+
+	declare_war(id, str_to_num(tempClanId));
+
+	cod_print_chat(id, "Twoj klan wypowiedzial wojne klanowi^x03 %s^x01.", clanName);
+
+	return PLUGIN_HANDLED;
+}
+
+public accept_war_menu(id)
+{
+	if (!is_user_connected(id) || !clan[id] || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+
+	new queryData[256], tempId[1];
+
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT id, clan, duration, reward, (SELECT name FROM `cod_clans` WHERE id = a.clan2) as name, (SELECT name FROM `cod_clans` WHERE id = a.clan) as name2 FROM `cod_clans_wars` a WHERE clan2 = '%i' AND started = '0'", clan[id]);
+
+	SQL_ThreadQuery(sql, "accept_war_menu_handle", queryData, tempId, sizeof(tempId));
+
+	return PLUGIN_HANDLED;
+}
+
+public accept_war_menu_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if (failState) {
+		if (failState == TQUERY_CONNECT_FAILED) cod_log_error(PLUGIN, "Could not connect to SQL database. Error: %s (%d)", error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) cod_log_error(PLUGIN, "Threaded query failed. Error: %s (%d)", error, errorNum);
+
+		return PLUGIN_HANDLED;
+	}
+
+	new id = tempId[0];
+
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	new itemName[128], clanName[2][MAX_NAME], tempData[MAX_NAME], warsCount = 0, ownClan = 0, enemyClan = 1, warId, clanId, duration, reward, menu = menu_create("\yWybierz deklaracje \rwojny\w:", "accept_war_confirm");
+
+	while (SQL_MoreResults(query)) {
+		warId = SQL_ReadResult(query, SQL_FieldNameToNum(query, "id"));
+		clanId = SQL_ReadResult(query, SQL_FieldNameToNum(query, "clan"));
+
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), clanName[0], charsmax(clanName[]));
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name2"), clanName[1], charsmax(clanName[]));
+
+		duration = SQL_ReadResult(query, SQL_FieldNameToNum(query, "duration"));
+		reward = SQL_ReadResult(query, SQL_FieldNameToNum(query, "reward"));
+
+		formatex(itemName, charsmax(itemName), "\w%s \rvs \w%s \y(Fragi: \r%i\y | Nagroda: \r%i Honoru\y)", clanName[ownClan], clanName[enemyClan], duration, reward);
+		formatex(tempData, charsmax(tempData), "%s#%i#%i#%i#%i", clanName[enemyClan], clanId, warId, duration, reward);
+
+		menu_additem(menu, itemName, tempData);
+
+		SQL_NextRow(query);
+
+		warsCount++;
+	}
+
+	menu_setprop(menu, MPROP_PERPAGE, 6);
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+
+	if (!warsCount) {
+		menu_destroy(menu);
+
+		cod_print_chat(id, "Nie ma zadnych deklaracji wojen do zaakceptowania!");
+	} else menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public accept_war_confirm(id, menu, item)
+{
+	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
+
+	if (item == MENU_EXIT) {
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	new dataParts[5][32], tempData[192], itemData[MAX_NAME], itemAccess, menuCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, menuCallback);
+
+	explode(itemData, '#', dataParts, sizeof(dataParts), charsmax(dataParts[]));
+
+	formatex(tempData, charsmax(tempData), "\wCzy chcesz zaakceptowac \rwojne\w z klanem \y%s\w?^n\wLiczba \rFragow\w: \y%s^n\wWysokosc \rNagrody\w: \y%s Honoru", dataParts[0], dataParts[3], dataParts[4]);
+
+	new menu = menu_create(tempData, "accept_war_confirm_handle");
+
+	menu_additem(menu, "\yAkceptuj", itemData);
+	menu_additem(menu, "Odrzuc");
+
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+
+	menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public accept_war_confirm_handle(id, menu, item)
+{
+	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
+
+	if (item == MENU_EXIT) {
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	new dataParts[5][32], itemData[96], itemAccess, menuCallback, warId;
+
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, menuCallback);
+
+	menu_destroy(menu);
+
+	explode(itemData, '#', dataParts, sizeof(dataParts), charsmax(dataParts[]));
+
+	warId = str_to_num(dataParts[2]);
+
+	if (item) {
+		remove_war(warId);
+
+		wars_menu(id);
+
+		return PLUGIN_HANDLED;
+	}
+
+	new clanId = str_to_num(dataParts[1]), halfReward = str_to_num(dataParts[4]) / 2;
+
+	if (get_clan_honor(clan[id]) < halfReward) {
+		cod_print_chat(id, "W banku klanu nie ma wystarczajaco^x03 Honoru^x01, aby pokryc polowe^x04 nagrody^x01!");
+
+		wars_menu(id);
+
+		return PLUGIN_HANDLED;
+	}
+
+	if (get_clan_honor(clanId) < halfReward) {
+		cod_print_chat(id, "W banku klanu^x03 %s^x01 nie ma wystarczajaco^x03 Honoru^x01, aby pokryc polowe^x04 nagrody^x01!", dataParts[0]);
+
+		wars_menu(id);
+
+		return PLUGIN_HANDLED;
+	}
+
+	accept_war(id, warId, clanId, str_to_num(dataParts[3]), halfReward, dataParts[0]);
+
+	return PLUGIN_HANDLED;
+}
+
+public remove_war_menu(id)
+{
+	if (!is_user_connected(id) || !clan[id] || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+
+	new queryData[256], tempId[1];
+
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT id, duration, reward, (SELECT name FROM `cod_clans` WHERE id = a.clan) as name, (SELECT name FROM `cod_clans` WHERE id = a.clan2) as name2 FROM `cod_clans_wars` a WHERE clan = '%i' AND started = '0'", clan[id]);
+
+	SQL_ThreadQuery(sql, "remove_war_menu_handle", queryData, tempId, sizeof(tempId));
+
+	return PLUGIN_HANDLED;
+}
+
+public remove_war_menu_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if (failState) {
+		if (failState == TQUERY_CONNECT_FAILED) cod_log_error(PLUGIN, "Could not connect to SQL database. Error: %s (%d)", error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) cod_log_error(PLUGIN, "Threaded query failed. Error: %s (%d)", error, errorNum);
+
+		return PLUGIN_HANDLED;
+	}
+
+	new id = tempId[0];
+
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	new itemName[128], clanName[2][32], tempData[MAX_NAME], warsCount = 0, ownClan = 0, enemyClan = 1, warId, duration, reward, menu = menu_create("\yWybierz deklaracje \rwojny\w do anulowania:", "remove_war_confirm");
+
+	while (SQL_MoreResults(query)) {
+		warId = SQL_ReadResult(query, SQL_FieldNameToNum(query, "id"));
+
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), clanName[0], charsmax(clanName[]));
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name2"), clanName[1], charsmax(clanName[]));
+
+		duration = SQL_ReadResult(query, SQL_FieldNameToNum(query, "duration"));
+		reward = SQL_ReadResult(query, SQL_FieldNameToNum(query, "reward"));
+
+		formatex(itemName, charsmax(itemName), "\w%s \rvs \w%s \y(Fragi: \r%i\y | Nagroda: \r%i Honoru\y)", clanName[ownClan], clanName[enemyClan], duration, reward);
+		formatex(tempData, charsmax(tempData), "%s#%i#%i#%i", clanName[enemyClan], warId, duration, reward);
+
+		menu_additem(menu, itemName, tempData);
+
+		SQL_NextRow(query);
+
+		warsCount++;
+	}
+
+	menu_setprop(menu, MPROP_PERPAGE, 6);
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+
+	if (!warsCount) {
+		menu_destroy(menu);
+
+		cod_print_chat(id, "Nie ma zadnych deklaracji wojen do anulowania!");
+	} else menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public remove_war_confirm(id, menu, item)
+{
+	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
+
+	if (item == MENU_EXIT) {
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	new dataParts[4][32], tempData[192], itemData[MAX_NAME], itemAccess, menuCallback;
+
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, menuCallback);
+
+	explode(itemData, '#', dataParts, sizeof(dataParts), charsmax(dataParts[]));
+
+	formatex(tempData, charsmax(tempData), "\wCzy chcesz anulowac \rdeklaracje wojny\w z klanem \y%s\w?^n\wLiczba \rFragow\w: \y%s^n\wWysokosc \rNagrody\w: \y%s Honoru", dataParts[0], dataParts[2], dataParts[3]);
+
+	new menu = menu_create(tempData, "remove_war_confirm_handle");
+
+	menu_additem(menu, "\yTak", itemData);
+	menu_additem(menu, "Nie");
+
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+
+	menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public remove_war_confirm_handle(id, menu, item)
+{
+	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
+
+	if (item == MENU_EXIT) {
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	new dataParts[4][32], itemData[64], itemAccess, menuCallback, warId;
+
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, menuCallback);
+
+	menu_destroy(menu);
+
+	explode(itemData, '#', dataParts, sizeof(dataParts), charsmax(dataParts[]));
+
+	warId = str_to_num(dataParts[1]);
+
+	if (item) {
+		wars_menu(id);
+
+		return PLUGIN_HANDLED;
+	}
+
+	if (remove_war(warId)) cod_print_chat(id, "Anulowales deklaracje wojny z klanem^x03 %s^x01.", dataParts[0]);
+	else cod_print_chat(id, "Wojna z klanem^x03 %s^x01 juz sie rozpoczela!", dataParts[0]);
 
 	return PLUGIN_HANDLED;
 }
@@ -1263,12 +1963,66 @@ public deposit_honor_handle(id)
 
 	cod_add_user_honor(id, -honorAmount);
 
-	set_clan_info(clan[id], CLAN_HONOR, get_clan_info(clan[id], CLAN_HONOR) + honorAmount);
+	set_clan_info(clan[id], CLAN_HONOR, honorAmount);
 
 	add_deposited_honor(id, honorAmount);
 
 	cod_print_chat(id, "Wplaciles^x03 %i^x01 Honoru na rzecz klanu.", honorAmount);
 	cod_print_chat(id, "Aktualnie twoj klan ma^x03 %i^x01 Honoru.", get_clan_info(clan[id], CLAN_HONOR));
+
+	return PLUGIN_HANDLED;
+}
+
+public set_war_frags_handle(id)
+{
+	if (!is_user_connected(id) || !clan[id] || !cod_check_account(id) || get_user_status(id) <= STATUS_MEMBER || mapEnd) return PLUGIN_HANDLED;
+
+	new fragsData[16], frags;
+
+	read_args(fragsData, charsmax(fragsData));
+	remove_quotes(fragsData);
+
+	frags = str_to_num(fragsData);
+
+	if (frags <= 0) {
+		cod_print_chat(id, "Liczba fragow w wojnie nie moze byc mniejsza od^x03 jednego^x01!");
+
+		return PLUGIN_HANDLED;
+	}
+
+	warFrags[id] = frags;
+
+	declare_war_menu(id);
+
+	return PLUGIN_HANDLED;
+}
+
+public set_war_reward_handle(id)
+{
+	if (!is_user_connected(id) || !clan[id] || !cod_check_account(id) || get_user_status(id) <= STATUS_MEMBER || mapEnd) return PLUGIN_HANDLED;
+
+	new rewardData[16], reward;
+
+	read_args(rewardData, charsmax(rewardData));
+	remove_quotes(rewardData);
+
+	reward = str_to_num(rewardData);
+
+	if (reward <= 0) {
+		cod_print_chat(id, "Nagroda za wygrana nie moze byc mniejsza niz^x03 1 Honor^x01!");
+
+		return PLUGIN_HANDLED;
+	}
+
+	if (reward % 2 != 0) {
+		cod_print_chat(id, "Nagroda musi byc^x03 liczba podzielna przez 2^x01.");
+
+		return PLUGIN_HANDLED;
+	}
+
+	warReward[id] = reward;
+
+	declare_war_menu(id);
 
 	return PLUGIN_HANDLED;
 }
@@ -1336,7 +2090,7 @@ public clans_top15(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT a.name, a.honor, a.kills, a.level, a.health, a.gravity, a.weapondrop, a.damage, (SELECT COUNT(id) FROM `cod_clans_members` WHERE clan = a.id) as members FROM `cod_clans` a ORDER BY kills DESC LIMIT 15");
+	formatex(queryData, charsmax(queryData), "SELECT a.name, a.honor, a.kills, a.level, a.wins, (SELECT COUNT(id) FROM `cod_clans_members` WHERE clan = a.id) as members FROM `cod_clans` a ORDER BY kills DESC LIMIT 15");
 
 	SQL_ThreadQuery(sql, "show_clans_top15", queryData, tempId, sizeof(tempId));
 
@@ -1356,31 +2110,28 @@ public show_clans_top15(failState, Handle:query, error[], errorNum, tempId[], da
 
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	static motdData[2048], clanName[MAX_NAME], motdLength, rank, members, honor, kills, level, health, gravity, drop, damage;
+	static motdData[2048], clanName[MAX_NAME], motdLength, rank, members, honor, kills, level, wins;
 
 	rank = 0;
 
 	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
-	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %4s %8s %6s %8s %9s %12s %11s^n", "#", "Nazwa", "Czlonkowie", "Poziom", "Zabicia", "Honor", "Zycie", "Grawitacja", "Obezwladnienie", "Obrazenia");
+	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %4s %8s %6s %8s %6s^n", "#", "Nazwa", "Czlonkowie", "Poziom", "Zabicia", "Wygrane Wojny", "Honor");
 
 	while (SQL_MoreResults(query)) {
 		rank++;
 
 		SQL_ReadResult(query, 0, clanName, charsmax(clanName));
 		replace_all(clanName, charsmax(clanName), "<", "");
-		replace_all(clanName,charsmax(clanName), ">", "");
+		replace_all(clanName, charsmax(clanName), ">", "");
 
 		honor = SQL_ReadResult(query, 1);
 		kills = SQL_ReadResult(query, 2);
 		level = SQL_ReadResult(query, 3);
-		health = SQL_ReadResult(query, 4);
-		gravity = SQL_ReadResult(query, 5);
-		drop = SQL_ReadResult(query, 6);
-		damage = SQL_ReadResult(query, 7);
-		members = SQL_ReadResult(query, 8);
+		wins = SQL_ReadResult(query, 4);
+		members = SQL_ReadResult(query, 5);
 
-		if (rank >= 10) motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %22.22s %5d %8d %10d %8d %7d %10d %14d^n", rank, clanName, members, level, kills, honor, health, gravity, drop, damage);
-		else motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %22.22s %6d %8d %10d %8d %7d %10d %14d^n", rank, clanName, members, level, kills, honor, health, gravity, drop, damage);
+		if (rank >= 10) motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %22.22s %5d %8d %10d %8d %10d^n", rank, clanName, members, level, kills, wins, honor);
+		else motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %22.22s %6d %8d %10d %8d %10d^n", rank, clanName, members, level, kills, wins, honor);
 
 		SQL_NextRow(query);
 	}
@@ -1426,6 +2177,16 @@ public say_text(msgId, msgDest, msgEnt)
 	}
 
 	return PLUGIN_CONTINUE;
+}
+
+public add_to_full_pack(esHandle, e, ent, host, hostFlags, player, pSet)
+{
+	if (!is_user_alive(host) || !is_user_alive(ent) || !clan[host] || !clan[ent] || !check_war_enemy(host, ent)) return;
+
+	set_es(esHandle, ES_RenderFx, kRenderFxGlowShell);
+	set_es(esHandle, ES_RenderColor, 255, 0, 0);
+	set_es(esHandle, ES_RenderMode, kRenderNormal);
+	set_es(esHandle, ES_RenderAmt, 20);
 }
 
 public application_menu(id)
@@ -1584,7 +2345,7 @@ stock set_user_clan(id, playerClan = 0, owner = 0)
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return;
 
 	if (playerClan == 0) {
-		set_clan_info(clan[id], CLAN_MEMBERS, get_clan_info(clan[id], CLAN_MEMBERS) - 1);
+		set_clan_info(clan[id], CLAN_MEMBERS, -1);
 
 		TrieDeleteKey(Trie:get_clan_info(clan[id], CLAN_STATUS), playerName[id]);
 
@@ -1594,7 +2355,7 @@ stock set_user_clan(id, playerClan = 0, owner = 0)
 	} else {
 		clan[id] = playerClan;
 
-		set_clan_info(clan[id], CLAN_MEMBERS, get_clan_info(clan[id], CLAN_MEMBERS) + 1);
+		set_clan_info(clan[id], CLAN_MEMBERS, 1);
 
 		TrieSetCell(Trie:get_clan_info(clan[id], CLAN_STATUS), playerName[id], owner ? STATUS_LEADER : STATUS_MEMBER);
 
@@ -1633,7 +2394,7 @@ public sql_init()
 
 	sql = SQL_MakeDbTuple(host, user, pass, db);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	connection = SQL_Connect(sql, errorNum, error, charsmax(error));
 
 	if (errorNum) {
 		cod_log_error(PLUGIN, "SQL Error: %s", error);
@@ -1646,27 +2407,33 @@ public sql_init()
 	sqlConnected = true;
 
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans` (`id` INT NOT NULL AUTO_INCREMENT, `name` varchar(%i) NOT NULL, ", MAX_SAFE_NAME);
-	add(queryData, charsmax(queryData), "`honor` INT NOT NULL, `kills` INT NOT NULL, `level` INT NOT NULL, `health` INT NOT NULL, ");
+	add(queryData, charsmax(queryData), "`honor` INT NOT NULL, `kills` INT NOT NULL, `level` INT NOT NULL, `wins` INT NOT NULL, `health` INT NOT NULL, ");
 	add(queryData, charsmax(queryData), "`gravity` INT NOT NULL, `damage` INT NOT NULL, `weapondrop` INT NOT NULL, PRIMARY KEY (`id`));");
 
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
+	new Handle:query = SQL_PrepareQuery(connection, queryData);
 
 	SQL_Execute(query);
 
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_members` (`name` varchar(%i) NOT NULL, `clan` INT NOT NULL, `flag` INT NOT NULL, `honor` INT NOT NULL, PRIMARY KEY (`name`));", MAX_SAFE_NAME);
 
-	query = SQL_PrepareQuery(connectHandle, queryData);
+	query = SQL_PrepareQuery(connection, queryData);
 
 	SQL_Execute(query);
 
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_applications` (`name` varchar(%i) NOT NULL, `clan` INT NOT NULL, PRIMARY KEY (`name`, `clan`));", MAX_SAFE_NAME);
 
-	query = SQL_PrepareQuery(connectHandle, queryData);
+	query = SQL_PrepareQuery(connection, queryData);
+
+	SQL_Execute(query);
+
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_wars` (`id` INT NOT NULL AUTO_INCREMENT, `clan` INT NOT NULL, `clan2` INT NOT NULL, ");
+	add(queryData, charsmax(queryData), "`progress` INT NOT NULL, `progress2` INT NOT NULL, `duration` INT NOT NULL, `reward` INT NOT NULL, `started` INT NOT NULL, PRIMARY KEY (`id`));");
+
+	query = SQL_PrepareQuery(connection, queryData);
 
 	SQL_Execute(query);
 
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
 }
 
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
@@ -1687,8 +2454,8 @@ public save_clan(clan)
 
 	cod_sql_string(codClan[CLAN_NAME], safeClanName, charsmax(safeClanName));
 
-	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET level = '%i', honor = '%i', kills = '%i', health = '%i', gravity = '%i', weapondrop = '%i', damage = '%i' WHERE name = ^"%s^"",
-		codClan[CLAN_LEVEL], codClan[CLAN_HONOR], codClan[CLAN_KILLS], codClan[CLAN_HEALTH], codClan[CLAN_GRAVITY], codClan[CLAN_DROP], codClan[CLAN_DAMAGE], safeClanName);
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET level = '%i', honor = '%i', kills = '%i', wins = '%i', health = '%i', gravity = '%i', weapondrop = '%i', damage = '%i' WHERE name = ^"%s^"",
+		codClan[CLAN_LEVEL], codClan[CLAN_HONOR], codClan[CLAN_KILLS], codClan[CLAN_WINS], codClan[CLAN_HEALTH], codClan[CLAN_GRAVITY], codClan[CLAN_DROP], codClan[CLAN_DAMAGE], safeClanName);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
@@ -1735,10 +2502,17 @@ public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], da
 			codClan[CLAN_DROP] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "weapondrop"));
 			codClan[CLAN_DAMAGE] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "damage"));
 			codClan[CLAN_KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "kills"));
+			codClan[CLAN_WINS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "wins"));
 			codClan[CLAN_MEMBERS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "members"));
 			codClan[CLAN_STATUS] = _:TrieCreate();
 
 			ArrayPushArray(codClans, codClan);
+
+			new queryData[128];
+
+			formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_wars` WHERE clan = '%i' AND started = '1'", codClan[CLAN_ID]);
+
+			SQL_ThreadQuery(sql, "load_wars_data_handle", queryData);
 		}
 
 		clan[id] = codClan[CLAN_ID];
@@ -1754,6 +2528,57 @@ public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], da
 		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_clans_members` (`name`) VALUES (^"%s^");", playerName[id]);
 
 		SQL_ThreadQuery(sql, "ignore_handle", queryData);
+	}
+
+	set_bit(id, loaded);
+}
+
+public show_clan_info(id)
+{
+	id -= TASK_INFO;
+
+	if (get_bit(id, info)) return;
+
+	if (!get_bit(id, loaded)) {
+		set_task(5.0, "show_clan_info", id + TASK_INFO);
+
+		return;
+	}
+
+	set_bit(id, info);
+
+	if (get_user_status(id) > STATUS_MEMBER) {
+		new applications = get_applications_count(clan[id]), wars = get_wars_count(clan[id], 0);
+
+		if (applications > 0 && wars > 0) cod_print_chat(id, "Masz do rozpatrzenia^x03 %i podania o dolaczenie^x01 i^x03 %i deklaracje wojny^x01 w^x04 klanie^x01.", applications, wars);
+		else if(applications > 0) cod_print_chat(id, "Masz do rozpatrzenia^x03 %i podania o dolaczenie^x01 w^x04 klanie^x01.", applications);
+		else if(wars > 0) cod_print_chat(id, "Masz do rozpatrzenia^x03 %i deklaracje wojny^x01 w^x04 klanie^x01.", wars);
+	}
+}
+
+public load_wars_data_handle(failState, Handle:query, error[], errorNum)
+{
+	if (failState) {
+		if (failState == TQUERY_CONNECT_FAILED) cod_log_error(PLUGIN, "Could not connect to SQL database. Error: %s (%d)", error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) cod_log_error(PLUGIN, "Threaded query failed. Error: %s (%d)", error, errorNum);
+
+		return;
+	}
+
+	new codWar[warInfo];
+
+	while (SQL_MoreResults(query)) {
+		codWar[WAR_ID] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "id"));
+		codWar[WAR_CLAN] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "clan"));
+		codWar[WAR_CLAN2] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "clan2"));
+		codWar[WAR_PROGRESS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "progress"));
+		codWar[WAR_PROGRESS2] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "progress2"));
+		codWar[WAR_DURATION] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "duration"));
+		codWar[WAR_REWARD] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "reward"));
+
+		ArrayPushArray(codWars, codWar);
+
+		SQL_NextRow(query);
 	}
 }
 
@@ -1784,6 +2609,193 @@ stock save_member(id, status = 0, change = 0, const name[] = "")
 	if (change) remove_applications(id, safeName);
 }
 
+stock declare_war(id, clanId)
+{
+	new queryData[192], clanName[32];
+
+	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_clans_wars` (`clan`, `clan2`, `duration`, `reward`) VALUES ('%i', '%i', '%i', '%i')", clan[id], clanId, warFrags[id], warReward[id]);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+
+	get_clan_info(clan[id], CLAN_NAME, clanName, charsmax(clanName));
+
+	for (new i = 1; i <= MAX_PLAYERS; i++) {
+		if (!is_user_connected(i) || is_user_bot(i) || is_user_hltv(i) || clan[i] != clanId || get_user_status(i) <= STATUS_MEMBER) continue;
+
+		cod_print_chat(i, "Klan^x03 %s^x01 wypowiedzial^x04 wojne^x01 twojemu klanowi! Zaakceptuj lub odrzuc wojne.", clanName);
+	}
+}
+
+stock accept_war(id, warId, clanId, duration, honor, const enemyClanName[])
+{
+	new queryData[192], codWar[warInfo], clanName[MAX_NAME];
+
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_wars` SET started = '1' WHERE id = '%i'", warId);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+
+	if (!get_clan_id(clanId)) {
+		formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET honor = honor - %i WHERE id = '%i'", honor, clanId);
+
+		SQL_ThreadQuery(sql, "ignore_handle", queryData);
+	} else set_clan_info(clanId, CLAN_HONOR, -honor);
+
+	set_clan_info(clan[id], CLAN_HONOR, -honor);
+	get_clan_info(clan[id], CLAN_NAME, clanName, charsmax(clanName));
+
+	codWar[WAR_ID] = warId;
+	codWar[WAR_CLAN] = clanId;
+	codWar[WAR_CLAN2] = clan[id];
+	codWar[WAR_DURATION] = duration;
+	codWar[WAR_REWARD] = honor * 2;
+
+	ArrayPushArray(codWars, codWar);
+
+	for (new i = 1; i <= MAX_PLAYERS; i++) {
+		if (!is_user_connected(i) || is_user_bot(i) || is_user_hltv(i) || !clan[i] || (clan[i] != clan[id] && clan[i] != clanId)) continue;
+
+		cod_print_chat(i, "Twoj klan rozpoczal wojne z klanem^x03 %s^x01 (Fragi:^x04 %i^x01 | Nagroda:^x04 %i Honoru^x01).", clan[i] == clan[id] ? clanName : enemyClanName, codWar[WAR_DURATION], codWar[WAR_REWARD]);
+	}
+}
+
+stock remove_war(warId, started = 0)
+{
+	new queryData[128], error[128], Handle:query, bool:result, errorNum;
+
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_wars` WHERE id = '%i' AND started = '%i'", warId, started);
+
+	query = SQL_PrepareQuery(connection, queryData);
+
+	if (SQL_Execute(query)) {
+		if (SQL_AffectedRows(query)) result = true;
+	} else {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
+
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
+	}
+
+	SQL_FreeHandle(query);
+
+	return result;
+}
+
+public remove_clan_wars(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if (failState) {
+		if (failState == TQUERY_CONNECT_FAILED) cod_log_error(PLUGIN, "Could not connect to SQL database. Error: %s (%d)", error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) cod_log_error(PLUGIN, "Threaded query failed. Error: %s (%d)", error, errorNum);
+
+		return;
+	}
+
+	new id = tempId[0], queryData[128], clanName[32], clanId[2], reward, enemyClan;
+
+	while (SQL_MoreResults(query)) {
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), clanName, charsmax(clanName));
+
+		clanId[0] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "clan"));
+		clanId[1] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "clan2"));
+
+		reward = SQL_ReadResult(query, SQL_FieldNameToNum(query, "reward"));
+
+		enemyClan = id == clanId[0] ? clanId[1] : clanId[0];
+
+		if (get_clan_id(enemyClan)) {
+			set_clan_info(enemyClan, CLAN_HONOR, reward);
+			set_clan_info(enemyClan, CLAN_WINS, 1);
+
+			for (new i = 1; i <= MAX_PLAYERS; i++) {
+				if (!is_user_connected(i) || is_user_bot(i) || is_user_hltv(i) || clan[i] != enemyClan) continue;
+
+				cod_print_chat(i, "Klan^x03 %s^x01 zostal rozwiazany, a to konczy z nim wojne. Zwyciestwo!", clanName);
+			}
+		} else {
+			formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET money = money + %i WHERE id = '%i'", reward, enemyClan);
+
+			SQL_ThreadQuery(sql, "ignore_handle", queryData);
+		}
+
+		SQL_NextRow(query);
+	}
+
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_wars` WHERE clan = '%i' OR clan2 = '%i'", id, id);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+}
+
+public save_war(warId)
+{
+	static queryData[128], codWar[warInfo];
+
+	ArrayGetArray(codWars, warId, codWar);
+
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_wars` SET progress = '%i', progress2 = '%i' WHERE id = '%i'", codWar[WAR_PROGRESS], codWar[WAR_PROGRESS2], codWar[WAR_ID]);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+}
+
+stock check_war(killer, victim)
+{
+	static codWar[warInfo], killerClan[32], victimClan[32], killerName[32], victimName[32];
+
+	for (new i = 0; i < ArraySize(codWars); i++) {
+		ArrayGetArray(codWars, i, codWar);
+
+		if ((clan[killer] == codWar[WAR_CLAN] && clan[victim] == codWar[WAR_CLAN2]) || (clan[killer] == codWar[WAR_CLAN2] && clan[victim] == codWar[WAR_CLAN])) {
+			new progress = clan[killer] == codWar[WAR_CLAN] ? WAR_PROGRESS : WAR_PROGRESS2;
+
+			codWar[progress]++;
+
+			get_clan_info(clan[victim], CLAN_NAME, victimClan, charsmax(victimClan));
+			get_user_name(victim, victimName, charsmax(victimName));
+
+			if (codWar[progress] == codWar[WAR_DURATION]) {
+				get_clan_info(clan[killer], CLAN_NAME, killerClan, charsmax(killerClan));
+				get_user_name(killer, killerName, charsmax(killerName));
+
+				cod_print_chat(i, "Zabijajac^x03 %s^x01 zakonczyles wojne z klanem^x03 %s^x01. Zwyciestwo!", victimName, victimClan);
+				cod_print_chat(i, "Ginac z rak^x03 %s^x01 zakonczyles wojne z klanem^x03 %s^x01. Porazka...", killerName, killerClan);
+
+				for (new i = 1; i <= MAX_PLAYERS; i++) {
+					if (!is_user_connected(i) || is_user_bot(i) || is_user_hltv(i) || !clan[i] || i == killer || i == victim) continue;
+
+					if (clan[i] == clan[killer]) cod_print_chat(i, "^x03 %s^x01 zabijajac^x03 %s^x01 zakonczyl wojne z klanem^x03 %s^x01. Zwyciestwo!", killerName, victimName, victimClan);
+					if (clan[i] == clan[victim]) cod_print_chat(i, "^x03 %s^x01 ginac z rak^x03 %s^x01 zakonczyl wojne z klanem^x03 %s^x01. Porazka...", victimName, killerName, killerClan);
+				}
+
+				set_clan_info(clan[killer], CLAN_HONOR, codWar[WAR_REWARD]);
+				set_clan_info(clan[killer], CLAN_WINS, 1);
+
+				remove_war(codWar[WAR_ID], 1);
+
+				ArrayDeleteItem(codWars, i);
+
+			} else {
+				cod_print_chat(i, "Zabijajac^x03 %s^x01 zdobyles fraga w wojnie z klanem^x03 %s^x01. Wynik:^x04 %i - %i / %i^x01.", victimName, victimClan, codWar[progress], codWar[progress == WAR_PROGRESS ? WAR_PROGRESS2 : WAR_PROGRESS], codWar[WAR_DURATION]);
+
+				ArraySetArray(codWars, i, codWar);
+
+				save_war(i);
+			}
+
+			break;
+		}
+	}
+}
+
+stock check_war_enemy(id, enemy)
+{
+	static codWar[warInfo];
+
+	for (new i = 0; i < ArraySize(codWars); i++) {
+		ArrayGetArray(codWars, i, codWar);
+
+		if ((clan[id] == codWar[WAR_CLAN] && clan[enemy] == codWar[WAR_CLAN2]) || (clan[id] == codWar[WAR_CLAN2] && clan[enemy] == codWar[WAR_CLAN])) return true;
+	}
+
+	return false;
+}
+
 stock add_deposited_honor(id, honor)
 {
 	new queryData[192];
@@ -1812,26 +2824,21 @@ stock add_application(id, clanId)
 
 stock check_applications(id, clanId)
 {
-	new queryData[192], error[128], errorNum, bool:foundApplication;
+	new queryData[192], error[128], errorNum, Handle:query, bool:foundApplication;
 
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_applications` WHERE `name` = ^"%s^" AND clan = '%i'", playerName[id], clanId);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	query = SQL_PrepareQuery(connection, queryData);
 
-	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+	if (SQL_Execute(query)) {
+		if (SQL_NumResults(query)) foundApplication = true;
+	} else {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
 
-		return false;
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 	}
 
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
-
-	SQL_Execute(query);
-
-	if (SQL_NumResults(query)) foundApplication = true;
-
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
 
 	return foundApplication;
 }
@@ -1894,58 +2901,74 @@ stock remove_applications(id, const name[] = "")
 
 stock get_applications_count(clan)
 {
-	new queryData[128], error[128], errorNum, applicationsCount = 0;
+	new queryData[128], error[128], errorNum, Handle:query, applicationsCount = 0;
 
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_applications` WHERE `clan` = '%i'", clan);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	query = SQL_PrepareQuery(connection, queryData);
 
-	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+	if (SQL_Execute(query)) {
+		while (SQL_MoreResults(query)) {
+			applicationsCount++;
 
-		return 0;
-	}
+			SQL_NextRow(query);
+		}
+	} else {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
 
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
-
-	SQL_Execute(query);
-
-	while (SQL_MoreResults(query)) {
-		applicationsCount++;
-
-		SQL_NextRow(query);
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 	}
 
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
 
 	return applicationsCount;
 }
 
+stock get_wars_count(clanId, started = 1, initiated = 0)
+{
+	new queryData[128], error[128], Handle:query, warsCount = 0, errorNum;
+
+	if(started) formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_wars` WHERE (clan = '%i' OR clan2 = '%i') AND started = '1'", clanId, clanId);
+	else formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_wars` WHERE %s = '%i' AND started = '0'", initiated ? "clan" : "clan2", clanId);
+
+	query = SQL_PrepareQuery(connection, queryData);
+
+	if (SQL_Execute(query)) {
+		while (SQL_MoreResults(query)) {
+			warsCount++;
+
+			SQL_NextRow(query);
+		}
+	} else {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
+
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
+	}
+
+	SQL_FreeHandle(query);
+
+	return warsCount;
+}
+
 stock check_clan_name(const clanName[])
 {
-	new queryData[192], safeClanName[MAX_SAFE_NAME], error[128], errorNum, bool:foundClan;
+	new queryData[192], safeClanName[MAX_SAFE_NAME], error[128], errorNum, Handle:query, bool:foundClan;
 
 	cod_sql_string(clanName, safeClanName, charsmax(safeClanName));
 
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans` WHERE `name` = ^"%s^"", safeClanName);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	query = SQL_PrepareQuery(connection, queryData);
 
-	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+	if (SQL_Execute(query)) {
+		if (SQL_NumResults(query)) foundClan = true;
+	} else {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
 
-		return false;
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 	}
 
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
-
-	SQL_Execute(query);
-
-	if (SQL_NumResults(query)) foundClan = true;
-
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
 
 	return foundClan;
 }
@@ -1967,79 +2990,73 @@ public update_clan_name(clan, clanName[], clanNameLength)
 
 stock check_user_clan(const userName[])
 {
-	new queryData[192], safeUserName[MAX_SAFE_NAME], error[128], errorNum, bool:foundClan;
+	new queryData[192], safeUserName[MAX_SAFE_NAME], error[128], errorNum, Handle:query, bool:foundClan;
 
 	cod_sql_string(userName, safeUserName, charsmax(safeUserName));
 
 	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_members` WHERE `name` = ^"%s^" AND clan > 0", userName);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	query = SQL_PrepareQuery(connection, queryData);
 
-	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+	if (SQL_Execute(query)) {
+		if (SQL_NumResults(query)) foundClan = true;
+	} else {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
 
-		return false;
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 	}
 
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
-
-	SQL_Execute(query);
-
-	if (SQL_NumResults(query)) foundClan = true;
-
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
 
 	return foundClan;
 }
 
 stock create_clan(id, const clanName[])
 {
-	new codClan[clanInfo], queryData[192], safeClanName[MAX_SAFE_NAME], error[128], errorNum;
+	new codClan[clanInfo], queryData[192], safeClanName[MAX_SAFE_NAME], error[128], errorNum, Handle:query, bool:success;
 
 	cod_sql_string(clanName, safeClanName, charsmax(safeClanName));
 
 	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_clans` (`name`) VALUES (^"%s^");", safeClanName);
 
-	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	query = SQL_PrepareQuery(connection, queryData);
 
-	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+	if (!SQL_Execute(query)) {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
 
-		return;
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 	}
-
-	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
-
-	SQL_Execute(query);
 
 	formatex(queryData, charsmax(queryData), "SELECT id FROM `cod_clans` WHERE name = ^"%s^";", safeClanName);
 
-	connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
+	query = SQL_PrepareQuery(connection, queryData);
 
-	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+	if (SQL_Execute(query)) {
+		if (SQL_NumResults(query)) {
+			clan[id] = SQL_ReadResult(query, 0);
 
-		return;
+			copy(codClan[CLAN_NAME], charsmax(codClan[CLAN_NAME]), clanName);
+			codClan[CLAN_STATUS] = _:TrieCreate();
+			codClan[CLAN_ID] = clan[id];
+
+			ArrayPushArray(codClans, codClan);
+
+			set_user_clan(id, clan[id], 1);
+			set_user_status(id, STATUS_LEADER);
+
+			cod_add_user_honor(id, -cvarCreateFee);
+
+			success = true;
+		}
+	} else {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
+
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 	}
 
-	query = SQL_PrepareQuery(connectHandle, queryData);
-
-	SQL_Execute(query);
-
-	if (SQL_NumResults(query)) clan[id] = SQL_ReadResult(query, 0);
-
-	copy(codClan[CLAN_NAME], charsmax(codClan[CLAN_NAME]), clanName);
-	codClan[CLAN_STATUS] = _:TrieCreate();
-	codClan[CLAN_ID] = clan[id];
-
-	ArrayPushArray(codClans, codClan);
-
-	set_user_clan(id, clan[id], 1);
-	set_user_status(id, STATUS_LEADER);
-
 	SQL_FreeHandle(query);
-	SQL_FreeHandle(connectHandle);
+
+	return success;
 }
 
 stock remove_clan(id)
@@ -2056,15 +3073,23 @@ stock remove_clan(id)
 
 	ArrayDeleteItem(codClans, get_clan_id(clan[id]));
 
-	clan[id] = 0;
+	new queryData[192], tempId[1];
 
-	new queryData[128];
+	tempId[0] = clan[id];
+
+	formatex(queryData, charsmax(queryData), "SELECT a.*, (SELECT name FROM `cod_clans` WHERE id = '%i') as name FROM `cod_clans_wars` a WHERE (clan = '%i' OR clan2 = '%i') AND started = '1'", clan[id], clan[id], clan[id]);
+	SQL_ThreadQuery(sql, "remove_clan_wars", queryData, tempId, sizeof(tempId));
 
 	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans` WHERE id = '%i'", clan[id]);
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_applications` WHERE clan = '%i'", clan[id]);
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET flag = '%i', clan = '0' WHERE clan = '%i'", STATUS_NONE, clan[id]);
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+
+	clan[id] = 0;
 }
 
 stock check_clan_loaded(clan)
@@ -2091,6 +3116,35 @@ stock get_clan_id(clan)
 	}
 
 	return 0;
+}
+
+stock get_clan_honor(clanId)
+{
+	if (get_clan_id(clanId)) {
+		new codClan[clanInfo];
+
+		ArrayGetArray(codClans, get_clan_id(clanId), codClan);
+
+		return codClan[CLAN_HONOR];
+	}
+
+	new queryData[128], error[128], Handle:query, honor, errorNum;
+
+	formatex(queryData, charsmax(queryData), "SELECT honor FROM `cod_clans` WHERE id = '%i'", clanId);
+
+	query = SQL_PrepareQuery(connection, queryData);
+
+	if (SQL_Execute(query)) {
+		if (SQL_NumResults(query)) honor = SQL_ReadResult(query, 0);
+	} else {
+		errorNum = SQL_QueryError(query, error, charsmax(error));
+
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
+	}
+
+	SQL_FreeHandle(query);
+
+	return honor;
 }
 
 stock get_clan_info(clan, info, dataReturn[] = "", dataLength = 0)
@@ -2124,7 +3178,7 @@ stock set_clan_info(clan, info, value = 0, dataSet[] = "", dataLength = 0)
 		if (codClan[CLAN_ID] != clan) continue;
 
 		if (info == CLAN_NAME) formatex(codClan[info], dataLength, dataSet);
-		else codClan[info] = value;
+		else codClan[info] += value;
 
 		ArraySetArray(codClans, i, codClan);
 
@@ -2132,4 +3186,13 @@ stock set_clan_info(clan, info, value = 0, dataSet[] = "", dataLength = 0)
 
 		break;
 	}
+}
+
+stock explode(const string[], const character, output[][], const maxParts, const maxLength)
+{
+	new currentPart = 0, stringLength = strlen(string), currentLength = 0;
+
+	do {
+		currentLength += (1 + copyc(output[currentPart++], maxLength, string[currentLength], character));
+	} while(currentLength < stringLength && currentPart < maxParts);
 }

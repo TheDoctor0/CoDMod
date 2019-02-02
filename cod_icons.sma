@@ -6,8 +6,14 @@
 #include <cod>
 
 #define PLUGIN  "CoD Icons"
-#define VERSION "1.1.1"
+#define VERSION "1.2.0"
 #define AUTHOR  "O'Zone"
+
+// Uncomment to enable lite version of icons.
+// Plugin will use sprites with smaller size.
+// This will prevent server crashes on maps with big .bsp files.
+// Those sprites have no distance indicator that are used in full version.
+//#define LITE
 
 #define TASK_PLANT      6583
 #define TASK_PLANTED    7603
@@ -18,17 +24,28 @@
 
 new const commandIcons[][] = { "ikony", "say /ikona", "say_team /ikona", "say /ikony", "say_team /ikony", "say /icon", "say_team /icon", "say /icons", "say_team /icons" };
 
+#if defined LITE
 new const iconSprite[icons][] = {
-	"sprites/CoDMod/bombsite_a.spr",
-	"sprites/CoDMod/bombsite_b.spr",
+	"sprites/CoDMod/bs_a_lite.spr",
+	"sprites/CoDMod/bs_b_lite.spr",
+	"sprites/CoDMod/dropped_lite.spr",
+	"sprites/CoDMod/planted_lite.spr",
+	"sprites/CoDMod/explode_lite.spr",
+	"sprites/CoDMod/box_lite.spr"
+};
+#else
+new const iconSprite[icons][] = {
+	"sprites/CoDMod/bs_a.spr",
+	"sprites/CoDMod/bs_b.spr",
 	"sprites/CoDMod/dropped.spr",
 	"sprites/CoDMod/planted.spr",
 	"sprites/CoDMod/explode.spr",
 	"sprites/CoDMod/box.spr"
 };
+#endif
 
 new playerName[MAX_PLAYERS + 1][MAX_NAME], bombEntity[icons], iconEntity[icons], playerTeam[MAX_PLAYERS + 1],
-	bool:roundStarted, bool:noBombsites, iconBombSites, iconDropped, iconPlanted, iconBox, bombTimer, cvarC4, iconsVault;
+	bool:roundStarted, iconBombSites, iconDropped, iconPlanted, iconBox, bombTimer, cvarC4, iconsVault;
 
 public plugin_init()
 {
@@ -55,8 +72,6 @@ public plugin_init()
 	}
 
 	if (pev_valid(bombEntity[bsBombSiteA])) {
-		noBombsites = true;
-	} else {
 		spawn_sprite(bombEntity[bsBombSiteA], bsBombSiteA);
 		spawn_sprite(bombEntity[bsBombSiteB], bsBombSiteB);
 	}
@@ -83,11 +98,7 @@ public plugin_natives()
 	register_native("cod_spawn_icon", "_cod_spawn_icon", 1);
 
 public plugin_precache()
-{
-	for (new i; i < sizeof(iconSprite); i++) {
-		if (!noBombsites || i == BOX) precache_model(iconSprite[i]);
-	}
-}
+	for (new i; i < sizeof(iconSprite); i++) precache_model(iconSprite[i]);
 
 public client_putinserver(id)
 {
@@ -278,8 +289,10 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 
 	distance = get_distance_f(hostOrigin, targetOrigin) / UNITS_PER_METER;
 
+	#if !defined LITE
 	if (distance > 1.0 && distance <= 100.0) set_es(es, ES_Frame, 100.0 - floatround(distance));
 	else set_es(es, ES_Frame, 100.0);
+	#endif
 
 	xs_vec_sub(targetOrigin, hostOrigin, middleOirgin);
 
