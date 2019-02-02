@@ -10,6 +10,8 @@
 #define OFFSET_CSMONEY	115
 #define OFFSET_LINUX	5
 
+#define MAX_MONEY	99999
+
 #define TASK_LOAD 	4721
 #define TASK_UPDATE 9501
 
@@ -328,15 +330,17 @@ stock update_hud(id, gained = 0)
 {
 	if (!is_user_connected(id)) return;
 
-	set_user_money(id, playerHonor[id]);
+	new tempHonor = min(playerHonor[id], MAX_MONEY);
+
+	set_user_money(id, tempHonor);
 
 	message_begin(MSG_ONE, msgMoney, _, id);
-	write_long(playerHonor[id] - gained);
+	write_long(tempHonor - gained);
 	write_byte(0);
 	message_end();
 
 	message_begin(MSG_ONE, msgMoney, _, id);
-	write_long(playerHonor[id]);
+	write_long(tempHonor);
 	write_byte(1);
 	message_end();
 }
