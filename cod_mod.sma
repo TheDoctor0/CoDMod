@@ -318,7 +318,6 @@ public plugin_natives()
 	register_native("cod_get_user_gravity", "_cod_get_user_gravity", 1);
 	register_native("cod_get_user_speed", "_cod_get_user_speed", 1);
 	register_native("cod_get_user_armor", "_cod_get_user_armor", 1);
-	register_native("cod_get_user_money", "_cod_get_user_money", 1);
 
 	register_native("cod_set_user_rockets", "_cod_set_user_rockets", 1);
 	register_native("cod_set_user_mines", "_cod_set_user_mines", 1);
@@ -330,7 +329,6 @@ public plugin_natives()
 	register_native("cod_set_user_gravity", "_cod_set_user_gravity", 1);
 	register_native("cod_set_user_speed", "_cod_set_user_speed", 1);
 	register_native("cod_set_user_armor", "_cod_set_user_armor", 1);
-	register_native("cod_set_user_money", "_cod_set_user_money", 1);
 
 	register_native("cod_add_user_rockets", "_cod_add_user_rockets", 1);
 	register_native("cod_add_user_mines", "_cod_add_user_mines", 1);
@@ -342,7 +340,6 @@ public plugin_natives()
 	register_native("cod_add_user_gravity", "_cod_add_user_gravity", 1);
 	register_native("cod_add_user_speed", "_cod_add_user_speed", 1);
 	register_native("cod_add_user_armor", "_cod_add_user_armor", 1);
-	register_native("cod_add_user_money", "_cod_add_user_money", 1);
 
 	register_native("cod_use_user_rocket", "_cod_use_user_rocket", 1);
 	register_native("cod_use_user_mine", "_cod_use_user_mine", 1);
@@ -3707,9 +3704,6 @@ public Float:_cod_get_user_speed(id, type)
 public _cod_get_user_armor(id, value)
 	return cs_get_user_armor(id);
 
-public _cod_get_user_money(id, value)
-	return cs_get_user_money(id);
-
 public _cod_set_user_rockets(id, value, type)
 {
 	codPlayer[id][PLAYER_ROCKETS][type] = max(0, value);
@@ -3778,9 +3772,6 @@ public _cod_set_user_speed(id, Float:value, type)
 public _cod_set_user_armor(id, value)
 	cs_set_user_armor(id, max(0, value), CS_ARMOR_KEVLAR);
 
-public _cod_set_user_money(id, value)
-	cs_set_user_money(id, max(0, min(value, MAX_MONEY)));
-
 public _cod_add_user_rockets(id, value, type)
 {
 	codPlayer[id][PLAYER_ROCKETS][type] = max(0, codPlayer[id][PLAYER_ROCKETS][type] + value);
@@ -3848,11 +3839,6 @@ public _cod_add_user_speed(id, Float:value, type)
 
 public _cod_add_user_armor(id, value)
 	cs_set_user_armor(id, max(0, cs_get_user_armor(id) + value), CS_ARMOR_KEVLAR);
-
-public _cod_add_user_money(id, value)
-{
-	cs_set_user_money(id, max(0, min(cs_get_user_money(id) + value, MAX_MONEY)));
-}
 
 public _cod_use_user_rocket(id)
 	use_rocket(id);
