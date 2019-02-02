@@ -413,6 +413,8 @@ public plugin_cfg()
 
 	server_cmd("sv_maxspeed 500");
 
+	if (get_level_exp(cvarLevelLimit - 1) < 0) set_fail_state("Przekroczono mozliwa wartosc doswiadczenia dla maksymalnego poziomu. Zmniejsz wartosc cvaru cod_level_ratio lub cod_level_ratio.");
+
 	sql_init();
 
 	if (cvarNightExpEnabled) {
@@ -2730,6 +2732,12 @@ stock set_item(id, item = 0, value = 0)
 public check_level(id)
 {
 	if (!is_user_connected(id) || !codPlayer[id][PLAYER_CLASS]) return;
+
+	if (codPlayer[id][PLAYER_GAINED_EXP] && (codPlayer[id][PLAYER_EXP] + codPlayer[id][PLAYER_GAINED_EXP]) < 0) {
+		codPlayer[id][PLAYER_GAINED_EXP] = 0;
+
+		return;
+	}
 
 	while ((codPlayer[id][PLAYER_GAINED_EXP] + codPlayer[id][PLAYER_EXP]) >= get_level_exp(codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL]) && codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] < cvarLevelLimit) codPlayer[id][PLAYER_GAINED_LEVEL]++;
 
