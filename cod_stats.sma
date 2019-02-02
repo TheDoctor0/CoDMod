@@ -26,14 +26,15 @@ new const commandMedals[][] = { "medale", "say /medal", "say_team /medal", "say 
 new const commandTopMedals[][] = { "medale", "topmedale", "say /mtop15", "say_team /mtop15", "say /topmedals", "say_team /topmedals", "say /topmedale", "say_team /topmedale" };
 new const commandSounds[][] = { "dzwieki", "say /dzwiek", "say_team /dzwiek", "say /dzwieki", "say_team /dzwieki", "say /sound", "say_team /sound" };
 
-enum _:statsInfo { TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE, SILVER, GOLD, MEDALS, BEST_STATS, BEST_KILLS,
+enum _:statsInfo { REVENGE, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE, SILVER, GOLD, MEDALS, BEST_STATS, BEST_KILLS,
 	BEST_HS_KILLS, BEST_DEATHS, CURRENT_STATS, CURRENT_KILLS, CURRENT_HS_KILLS, CURRENT_DEATHS, ROUND_KILLS, ROUND_HS_KILLS };
 enum _:winers { THIRD, SECOND, FIRST };
 
 new playerName[MAX_PLAYERS + 1][MAX_SAFE_NAME], playerStats[MAX_PLAYERS + 1][statsInfo], playerDamage[MAX_PLAYERS + 1][MAX_PLAYERS + 1],
 	Handle:sql, Handle:connection, bool:sqlConnected, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo;
 
-new cvarGoldMedalExp, cvarSilverMedalExp, cvarBronzeMedalExp, cvarAssistEnabled, cvarAssistDamage, cvarAssistMoney, cvarAssistExp;
+new cvarGoldMedalExp, cvarSilverMedalExp, cvarBronzeMedalExp, cvarAssistEnabled, cvarAssistDamage, cvarAssistHonor, cvarAssistExp,
+	cvarRevengeEnabled, cvarRevengeHonor, cvarRevengeExp;
 
 new soundsVault, soundMayTheForce, soundOneAndOnly, soundPrepare, soundHumiliation, soundLastLeft;
 
@@ -46,8 +47,11 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_medal_bronze_exp", "100"), cvarBronzeMedalExp);
 	bind_pcvar_num(create_cvar("cod_assist_enabled", "1"), cvarAssistEnabled);
 	bind_pcvar_num(create_cvar("cod_assist_damage", "65"), cvarAssistDamage);
-	bind_pcvar_num(create_cvar("cod_assist_money", "300"), cvarAssistMoney);
+	bind_pcvar_num(create_cvar("cod_assist_honor", "1"), cvarAssistHonor);
 	bind_pcvar_num(create_cvar("cod_assist_exp", "15"), cvarAssistExp);
+	bind_pcvar_num(create_cvar("cod_revenge_enabled", "1"), cvarRevengeEnabled);
+	bind_pcvar_num(create_cvar("cod_revenge_honor", "1"), cvarRevengeHonor);
+	bind_pcvar_num(create_cvar("cod_revenge_exp", "15"), cvarRevengeExp);
 
 	for (new i; i < sizeof commandMenu; i++) register_clcmd(commandMenu[i], "stats_menu");
 	for (new i; i < sizeof commandTime; i++) register_clcmd(commandTime[i], "command_time");
@@ -670,6 +674,7 @@ public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPl
 public cod_killed(killer, victim, weaponId, hitPlace)
 {
 	playerStats[victim][CURRENT_DEATHS]++;
+	playerStats[victim][REVENGE] = killer;
 
 	playerStats[killer][CURRENT_KILLS]++;
 	playerStats[killer][ROUND_KILLS]++;
@@ -688,8 +693,23 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 		}
 	}
 
-	if (cvarAssistEnabled)
-	{
+	if (cvarRevengeEnabled && playerStats[killer][REVENGE] == victim) {
+		set_user_frags(killer, get_user_frags(killer) + 1);
+
+		cs_set_user_deaths(killer, cs_get_user_deaths(killer));
+
+		cod_add_user_honor(killer, cvarRevengeHonor, true);
+
+		new nameVictim[MAX_NAME], exp = cod_get_user_bonus_exp(killer, cvarRevengeExp);
+
+		cod_set_user_exp(killer, exp);
+
+		get_user_name(victim, nameVictim, charsmax(nameVictim));
+
+		cod_print_chat(killer, "Zemsciles sie na^x03 %s^x01. Dostajesz fraga i^x03 %i^x01 expa!", nameVictim, exp);
+	}
+
+	if (cvarAssistEnabled) {
 		new assist = 0, damage = 0;
 
 		for (new id = 1; id <= MAX_PLAYERS; id++) {
@@ -708,7 +728,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 			cs_set_user_deaths(assist, cs_get_user_deaths(assist));
 
-			cod_add_user_money(assist, cvarAssistMoney);
+			cod_add_user_honor(assist, cvarAssistHonor, true);
 
 			new nameVictim[MAX_NAME], nameKiller[MAX_NAME], exp = cod_get_user_bonus_exp(assist, cvarAssistExp);
 

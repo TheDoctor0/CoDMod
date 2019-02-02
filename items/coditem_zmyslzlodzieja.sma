@@ -6,11 +6,11 @@
 #define AUTHOR "O'Zone"
 
 #define NAME        "Zmysl Zlodzieja"
-#define DESCRIPTION "20 procent szansy na kradziez %s$ po trafieniu przeciwnika. Uzyj, aby zamienic pieniadze na zycie"
-#define RANDOM_MIN  500
-#define RANDOM_MAX  1000
-#define UPGRADE_MIN -75
-#define UPGRADE_MAX 150
+#define DESCRIPTION "20 procent szansy na kradziez %s honoru po trafieniu przeciwnika. Uzyj, aby zamienic honor na zycie."
+#define RANDOM_MIN  1
+#define RANDOM_MAX  3
+#define UPGRADE_MIN -1
+#define UPGRADE_MAX 1
 
 new itemValue[MAX_PLAYERS + 1];
 
@@ -32,15 +32,11 @@ public cod_item_upgrade(id)
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if (cod_percent_chance(20) && cod_get_user_money(attacker) < MAX_MONEY) {
-		new money = min(cod_get_user_money(victim), itemValue[attacker]), neededMoney = MAX_MONEY - cod_get_user_money(attacker);
+	if (cod_percent_chance(20) && cod_get_user_honor(victim)) {
+		new honor = min(cod_get_user_honor(victim), itemValue[attacker]);
 
-		if (neededMoney < money) money = neededMoney;
-
-		if (money) {
-			cod_add_user_money(attacker, money);
-			cod_add_user_money(victim, -money);
-		}
+		cod_add_user_honor(attacker, honor);
+		cod_add_user_honor(victim, -honor);
 	}
 }
 
@@ -48,16 +44,14 @@ public cod_item_skill_used(id)
 {
 	if (cod_get_user_health(id) >= cod_get_user_max_health(id)) return;
 
-	if (cod_get_user_money(id) < 1000)
-	{
-		cod_show_hud(id, TYPE_DHUD, 255, 0, 0, -1.0, 0.45, 0, 0.0, 1.25, 0.0, 0.0, "Nie masz wystarczajaco pieniedzy na ich wymiane na zycie.");
+	if (!cod_get_user_honor(id)) {
+		cod_show_hud(id, TYPE_DHUD, 255, 0, 0, -1.0, 0.45, 0, 0.0, 1.25, 0.0, 0.0, "Nie masz wystarczajaco honoru na wymiane go na zycie.");
 
 		return;
 	}
 
-	cod_add_user_money(id, -1000);
-		
-	cod_add_user_health(id, 10);	
-	
+	cod_add_user_honor(id, -1);
+	cod_add_user_health(id, 25);
+
 	cod_display_fade(id, 1, 1, 0x0000, 255, 0, 0, 15);
 }
