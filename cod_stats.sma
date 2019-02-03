@@ -91,7 +91,7 @@ public plugin_natives()
 
 public client_putinserver(id)
 {
-	for (new i = 0; i <= ROUND_HS_KILLS; i++) playerStats[id][i] = 0;
+	for (new i = REVENGE; i <= ROUND_HS_KILLS; i++) playerStats[id][i] = 0;
 
 	rem_bit(id, dataLoaded);
 	rem_bit(id, visitInfo);
