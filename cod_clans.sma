@@ -643,7 +643,7 @@ public skills_menu_handle(id, menu, item)
 
 			cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + get_clan_info(clan[id], CLAN_HEALTH) * cvarHealthPerLevel);
 
-			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Predkosc^x01 na^x03 %i^x01 poziom!", codClan[CLAN_HEALTH]);
+			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Zycie^x01 na^x03 %i^x01 poziom!", codClan[CLAN_HEALTH]);
 		} case 2: {
 			if (codClan[CLAN_GRAVITY] == cvarSkillMax) {
 				cod_print_chat(id, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
