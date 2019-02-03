@@ -607,7 +607,7 @@ public sql_init()
 	new Handle:connection = SQL_Connect(sql, errorNum, error, charsmax(error));
 
 	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 
 		sql = Empty_Handle;
 
@@ -707,9 +707,9 @@ public account_query(id, type)
 
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
-	if (failState) {
-		if (failState == TQUERY_CONNECT_FAILED) log_to_file("cod_mod.log", "[CoD Accounts] Could not connect to SQL database. [%d] %s", errorNum, error);
-		else if (failState == TQUERY_QUERY_FAILED) log_to_file("cod_mod.log", "[CoD Accounts] Query failed. [%d] %s", errorNum, error);
+	if (failState)  {
+		if (failState == TQUERY_CONNECT_FAILED) cod_log_error(PLUGIN, "Could not connect to SQL database. Error: %s (%d)", error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) cod_log_error(PLUGIN, "Threaded query failed. Error: %s (%d)", error, errorNum);
 	}
 
 	return PLUGIN_CONTINUE;

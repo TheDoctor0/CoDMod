@@ -5,7 +5,7 @@
 
 #define PLUGIN	"CoD Honor System"
 #define AUTHOR	"O'Zone"
-#define VERSION	"1.1.1"
+#define VERSION	"1.2.0"
 
 #define OFFSET_CSMONEY	115
 #define OFFSET_LINUX	5
@@ -136,7 +136,7 @@ public round_winner(team)
 public bomb_planted(id)
 {
 	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
-		set_task(0.1, "update_hud", id);
+		delayed_hud_update(id, 0);
 
 		return;
 	}
@@ -149,7 +149,7 @@ public bomb_planted(id)
 public bomb_defused(id)
 {
 	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
-		set_task(0.1, "update_hud", id);
+		delayed_hud_update(id, 0);
 
 		return;
 	}
@@ -164,7 +164,7 @@ public hostage_rescued()
 	new id = get_loguser_index();
 
 	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
-		set_task(0.1, "update_hud", id);
+		delayed_hud_update(id, 0);
 
 		return;
 	}
@@ -178,9 +178,11 @@ public hostage_killed()
 {
 	new id = get_loguser_index();
 
-	set_task(0.1, "update_hud", id);
+	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
+		delayed_hud_update(id, 0);
 
-	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) return;
+		return;
+	}
 
 	playerHonorGained[id] -= cod_get_user_vip(id) ? floatround(cvarKillHostage / cvarVIPMultiplier) : cvarKillHostage;
 
@@ -212,7 +214,7 @@ public sql_init()
 	connection = SQL_Connect(sql, errorNum, error, charsmax(error));
 
 	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 
 		set_task(5.0, "sql_init");
 
@@ -250,8 +252,9 @@ public load_honor(id)
 
 public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 {
-	if (failState) {
-		log_to_file("cod_mod.log", "[CoD Honor] SQL Error: %s (%d)", error, errorNum);
+	if (failState)  {
+		if (failState == TQUERY_CONNECT_FAILED) cod_log_error(PLUGIN, "Could not connect to SQL database. Error: %s (%d)", error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) cod_log_error(PLUGIN, "Threaded query failed. Error: %s (%d)", error, errorNum);
 
 		return;
 	}
@@ -277,17 +280,12 @@ stock save_honor(id, end = 0)
 {
 	if (!get_bit(id, dataLoaded)) return;
 
-	new queryData[128], data[2];
+	new queryData[128];
 
-	data[0] = id;
-	data[1] = playerHonorGained[id];
+	delayed_hud_update(id, playerHonorGained[id]);
 
 	playerHonor[id] += playerHonorGained[id];
 	playerHonorGained[id] = 0;
-
-	if (task_exists(id + TASK_UPDATE)) remove_task(id + TASK_UPDATE);
-
-	set_task(0.1, "update_hud_task", id + TASK_UPDATE, data, sizeof(data));
 
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_honor` SET honor = '%i' WHERE name = ^"%s^"", playerHonor[id], playerName[id]);
 
@@ -301,7 +299,7 @@ stock save_honor(id, end = 0)
 			if (!SQL_Execute(query)) {
 				errorNum = SQL_QueryError(query, error, charsmax(error));
 
-				cod_log_error(PLUGIN, "Non-threaded query failed. Error: %s (%d)", PLUGIN, error, errorNum);
+				cod_log_error(PLUGIN, "Non-threaded query failed. Error: [%d] %s", errorNum, error);
 			}
 
 			SQL_FreeHandle(query);
@@ -321,6 +319,18 @@ public message_money(msgId, msgDest, msgEnt)
 	set_msg_arg_int(1, get_msg_argtype(1), playerHonor[msgEnt]);
 
 	update_hud(msgEnt);
+}
+
+public delayed_hud_update(id, gained)
+{
+	new data[2];
+
+	data[0] = id;
+	data[1] = gained;
+
+	if (task_exists(id + TASK_UPDATE)) remove_task(id + TASK_UPDATE);
+
+	set_task(0.1, "update_hud_task", id + TASK_UPDATE, data, sizeof(data));
 }
 
 public update_hud_task(data[])

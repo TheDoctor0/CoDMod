@@ -2397,7 +2397,7 @@ public sql_init()
 	connection = SQL_Connect(sql, errorNum, error, charsmax(error));
 
 	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 
 		set_task(5.0, "sql_init");
 

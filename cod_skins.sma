@@ -420,7 +420,7 @@ public sql_init()
 	new Handle:connectHandle = SQL_Connect(sql, errorNum, error, charsmax(error));
 
 	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 
 		set_task(5.0, "sql_init");
 
@@ -458,8 +458,9 @@ public load_skins(id)
 
 public load_skins_handle(failState, Handle:query, error[], errorNum, playerId[], dataSize)
 {
-	if (failState) {
-		log_to_file("cod_mod.log", "[CoD Skins] SQL Error: %s (%d)", error, errorNum);
+	if (failState)  {
+		if (failState == TQUERY_CONNECT_FAILED) cod_log_error(PLUGIN, "Could not connect to SQL database. Error: %s (%d)", error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) cod_log_error(PLUGIN, "Threaded query failed. Error: %s (%d)", error, errorNum);
 
 		return;
 	}

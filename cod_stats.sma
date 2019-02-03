@@ -9,7 +9,7 @@
 #include <nvault>
 
 #define PLUGIN "CoD Stats"
-#define VERSION "1.1.1"
+#define VERSION "1.2.0"
 #define AUTHOR "O'Zone"
 
 #define TASK_TIME 9054
@@ -964,7 +964,7 @@ public sql_init()
 	connection = SQL_Connect(sql, errorNum, error, charsmax(error));
 
 	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s (%i)", error, errorNum);
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 
 		set_task(5.0, "sql_init");
 
@@ -1068,7 +1068,7 @@ stock save_stats(id, end = 0)
 			if (!SQL_Execute(query)) {
 				errorNum = SQL_QueryError(query, error, charsmax(error));
 
-				cod_log_error(PLUGIN, "Non-threaded query failed. Error: %s (%d)", error, errorNum);
+				cod_log_error(PLUGIN, "Non-threaded query failed. Error: [%d] %s", errorNum, error);
 
 				SQL_FreeHandle(query);
 			}

@@ -359,8 +359,8 @@ public give_item_handle(id, menu, item)
 	cod_set_item_durability(player, itemDurability);
 	cod_set_user_item(id);
 
-	cod_print_chat(id, "Oddales przedmiot^x03 %s^x01 graczowi^x03 %s^x01.", name, itemName);
-	cod_print_chat(player, "Dostales przedmiot^x03 %s^x01 od gracza^x03 %s^x01.", playerName, itemName);
+	cod_print_chat(id, "Oddales przedmiot^x03 %s^x01 graczowi^x03 %s^x01.", itemName, name);
+	cod_print_chat(player, "Dostales przedmiot^x03 %s^x01 od gracza^x03 %s^x01.", itemName, playerName);
 
 	return PLUGIN_HANDLED;
 }
