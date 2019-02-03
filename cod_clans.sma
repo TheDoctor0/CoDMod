@@ -127,7 +127,7 @@ public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPl
 {
 	if (!clan[attacker]) return PLUGIN_CONTINUE;
 
-	cod_inflict_damage(attacker, victim, damage * cvarGravityPerLevel * get_clan_info(clan[attacker], CLAN_DAMAGE) / 100.0, 0.0, damageBits);
+	cod_inflict_damage(attacker, victim, damage * cvarDamagePerLevel * get_clan_info(clan[attacker], CLAN_DAMAGE) / 100.0, 0.0, damageBits);
 
 	if (get_clan_info(clan[attacker], CLAN_DROP) && random_num(1, (cvarSkillMax * 1.6 - (get_clan_info(clan[attacker], CLAN_DROP) * cvarWeaponDropPerLevel)) == 1)) engclient_cmd(victim, "drop");
 
