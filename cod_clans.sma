@@ -1486,7 +1486,7 @@ public declare_war_menu(id)
 	formatex(itemData, charsmax(itemData), "Liczba \rFragow\w: \y%i", warFrags[id]);
 	menu_additem(menu, itemData);
 
-	formatex(itemData, charsmax(itemData), "Wysokosc \rNagrody\w: \y%i Euro^n", warReward[id]);
+	formatex(itemData, charsmax(itemData), "Wysokosc \rNagrody\w: \y%i Honoru^n", warReward[id]);
 	menu_additem(menu, itemData);
 
 	menu_addtext(menu, "\wWybierz jeden z powyzszych \rparametrow\w, aby zmienic jego \ywartosc\w.^nKlan, ktoremu wypowiedzona zostanie wojna musi ja \rzaakceptowac\w, aby sie rozpoczela.^nW momencie rozpoczenia wojny z banku kazdego klanu pobierana jest \ypolowa nagrody\w.^nPo jej zakonczeniu zwycieski klan otrzymuje \ycala nagrode\w.^n", 0);

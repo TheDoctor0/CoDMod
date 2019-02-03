@@ -964,7 +964,7 @@ public sql_init()
 	connection = SQL_Connect(sql, errorNum, error, charsmax(error));
 
 	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Error: %s", error);
+		cod_log_error(PLUGIN, "SQL Error: %s (%i)", error, errorNum);
 
 		set_task(5.0, "sql_init");
 
@@ -1068,7 +1068,7 @@ stock save_stats(id, end = 0)
 			if (!SQL_Execute(query)) {
 				errorNum = SQL_QueryError(query, error, charsmax(error));
 
-				cod_log_error(PLUGIN, "Non-threaded query failed. Error: %s (%d)", PLUGIN, error, errorNum);
+				cod_log_error(PLUGIN, "Non-threaded query failed. Error: %s (%d)", error, errorNum);
 
 				SQL_FreeHandle(query);
 			}
