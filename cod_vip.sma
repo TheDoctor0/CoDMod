@@ -1,9 +1,8 @@
 #include <amxmodx>
-#include <cstrike>
 #include <cod>
 
 #define PLUGIN "CoD VIP"
-#define VERSION "1.1.1"
+#define VERSION "1.2.1"
 #define AUTHOR "O'Zone"
 
 new Array:listVIPs, vip;
@@ -170,19 +169,11 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 	cod_add_user_health(killer, hs ? 15 : 10);
 
-	cs_set_user_money(killer, cs_get_user_money(killer) + (hs ? 1000 : 500));
-
 	if (hs) cod_show_hud(killer, TYPE_DHUD, 38, 218, 116, -1.0, 0.35, 0, 0.0, 1.0, 0.0, 0.0, "HeadShot! +15HP");
 	else cod_show_hud(killer, TYPE_DHUD, 255, 212, 0, -1.0, 0.31, 0, 0.0, 1.0, 0.0, 0.0, "Zabiles! +10HP");
 
 	return PLUGIN_CONTINUE;
 }
-
-public bomb_planted(id)
-	if (get_bit(id, vip)) cs_set_user_money(id, cs_get_user_money(id) + 500);
-
-public bomb_defused(id)
-	if (get_bit(id, vip)) cs_set_user_money(id, cs_get_user_money(id) + 500);
 
 public vip_status()
 {

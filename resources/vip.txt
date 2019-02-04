@@ -17,10 +17,7 @@
 			* O 50% więcej zdobywanego Honoru
 			* O 25% więcej zdobywanego Expa
 			* O 5% zwiększone zadawane obrażenia
-			* Dodatkowa kasa za podłożenie bomby (500$)<br>
-			* Dodatkowa kasa za rozbrojenie bomby (500$)<br>
 			* Dodatkowe życie za zabójstwo ( 15HP - z HeadShotem | 10HP - Normalne )<br>
-			* Dodatkowa kasa za zabójstwo ( 1000$ - z HeadShotem | 500$ - Normalne )<br>
 			* Dodatkowy exp za zabójstwo ( 15HP - z HeadShotem | 10HP - Normalne )<br>
 			* Prefix [VIP] w czacie<br>
 			* Status VIP w tabeli punktów<br>
