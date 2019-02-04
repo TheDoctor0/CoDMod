@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Clans"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 #define AUTHOR "O'Zone"
 
 #define TASK_INFO 9843
@@ -1548,6 +1548,13 @@ public declare_war_select(failState, Handle:query, error[], errorNum, tempId[], 
 
 	while (SQL_MoreResults(query)) {
 		clanId = SQL_ReadResult(query, SQL_FieldNameToNum(query, "id"));
+
+		if (!clanId) {
+			SQL_NextRow(query);
+
+			continue;
+		}
+
 		members = SQL_ReadResult(query, SQL_FieldNameToNum(query, "members"));
 		honor = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
 
@@ -2090,7 +2097,7 @@ public clans_top15(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT a.name, a.honor, a.kills, a.level, a.wins, (SELECT COUNT(id) FROM `cod_clans_members` WHERE clan = a.id) as members FROM `cod_clans` a ORDER BY kills DESC LIMIT 15");
+	formatex(queryData, charsmax(queryData), "SELECT a.id, a.name, a.honor, a.kills, a.level, a.wins, (SELECT COUNT(id) FROM `cod_clans_members` WHERE clan = a.id) as members FROM `cod_clans` a ORDER BY kills DESC LIMIT 15");
 
 	SQL_ThreadQuery(sql, "show_clans_top15", queryData, tempId, sizeof(tempId));
 
@@ -2110,7 +2117,7 @@ public show_clans_top15(failState, Handle:query, error[], errorNum, tempId[], da
 
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	static motdData[2048], clanName[MAX_NAME], motdLength, rank, members, honor, kills, level, wins;
+	static motdData[2048], clanName[MAX_NAME], motdLength, clanId, rank, members, honor, kills, level, wins;
 
 	rank = 0;
 
@@ -2118,6 +2125,14 @@ public show_clans_top15(failState, Handle:query, error[], errorNum, tempId[], da
 	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %4s %8s %6s %8s %6s^n", "#", "Nazwa", "Czlonkowie", "Poziom", "Zabicia", "Wygrane Wojny", "Honor");
 
 	while (SQL_MoreResults(query)) {
+		clanId = SQL_ReadResult(query, SQL_FieldNameToNum(query, "id"));
+
+		if (!clanId) {
+			SQL_NextRow(query);
+
+			continue;
+		}
+
 		rank++;
 
 		SQL_ReadResult(query, 0, clanName, charsmax(clanName));
