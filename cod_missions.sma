@@ -1,14 +1,15 @@
 #include <amxmodx>
-#include <cstrike>
 #include <nvault>
 #include <cod>
 
 #define PLUGIN "CoD Missions"
-#define VERSION "1.1.1"
+#define VERSION "1.2.1"
 #define AUTHOR "O'Zone"
 
-new missionDescription[][] =
-{
+new const commandMission[][] = { "misje", "say /quest", "say_team /quest", "say /misja", "say_team /misja", "say /misje", "say_team /misje", "say /questy", "say_team /questy" };
+new const commandProgress[][] = { "postep", "say /progress", "say_team /progress", "say /progres", "say_team /progres", "say /postep", "say_team /postep" };
+new const commandEnd[][] = { "przerwij", "say /koniec", "say_team /koniec", "say /zakoncz", "say_team /zakoncz", "zakoncz", "say_team /przerwij", "say /przerwij" };
+new const missionDescription[][] = {
 	"Brak misji %i",
 	"Musisz zabic jeszcze %i osob",
 	"Musisz zabic jeszcze %i osob headshotem",
@@ -19,10 +20,6 @@ new missionDescription[][] =
 	"Musisz zabic klase %s jeszcze %i razy",
 	"Musisz znalezc item %s jeszcze %i razy"
 };
-
-new const commandMission[][] = { "misje", "say /quest", "say_team /quest", "say /misja", "say_team /misja", "say /misje", "say_team /misje", "say /questy", "say_team /questy" };
-new const commandProgress[][] = { "postep", "say /progress", "say_team /progress", "say /progres", "say_team /progres", "say /postep", "say_team /postep" };
-new const commandEnd[][] = { "przerwij", "say /koniec", "say_team /koniec", "say /zakoncz", "say_team /zakoncz", "zakoncz", "say_team /przerwij", "say /przerwij" };
 
 enum _:missionType { TYPE_NONE, TYPE_KILL, TYPE_HEADSHOT, TYPE_PLANT, TYPE_DEFUSE, TYPE_RESCUE, TYPE_DAMAGE, TYPE_CLASS, TYPE_ITEM };
 enum _:playerInfo { PLAYER_ID, PLAYER_TYPE, PLAYER_ADDITIONAL, PLAYER_PROGRESS, PLAYER_CHAPTER };
@@ -40,8 +37,6 @@ public plugin_init()
 	for (new i; i < sizeof commandMission; i++) register_clcmd(commandMission[i], "mission_menu");
 	for (new i; i < sizeof commandProgress; i++) register_clcmd(commandProgress[i], "check_mission");
 	for (new i; i < sizeof commandEnd; i++) register_clcmd(commandEnd[i], "reset_mission");
-
-	register_logevent("log_event_mission", 3, "1=triggered");
 
 	missions = nvault_open("cod_missions");
 
@@ -409,25 +404,14 @@ public cod_item_changed(id, item)
 public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
 	if (playerData[attacker][PLAYER_TYPE] == TYPE_DAMAGE) add_progress(attacker, floatround(damage));
 
-public log_event_mission()
-{
-	new userLog[80], userAction[64], userName[MAX_NAME];
+public cod_bomb_planted(id)
+	if (playerData[id][PLAYER_TYPE] == TYPE_PLANT) add_progress(id);
 
-	read_logargv(0, userLog, charsmax(userLog));
-	read_logargv(2, userAction, charsmax(userAction));
+public cod_bomb_defused(id)
+	if (playerData[id][PLAYER_TYPE] == TYPE_DEFUSE) add_progress(id);
 
-	parse_loguser(userLog, userName, charsmax(userName));
-
-	new id = get_user_index(userName);
-
-	if (!is_user_connected(id) || playerData[id][PLAYER_TYPE] == TYPE_NONE) return PLUGIN_HANDLED;
-
-	if (equal(userAction, "Planted_The_Bomb") && playerData[id][PLAYER_TYPE] == TYPE_PLANT) add_progress(id);
-	if (equal(userAction, "Defused_The_Bomb") && playerData[id][PLAYER_TYPE] == TYPE_DEFUSE) add_progress(id);
-	if (equal(userAction, "Rescued_A_Hostage") && playerData[id][PLAYER_TYPE] == TYPE_RESCUE) add_progress(id);
-
-	return PLUGIN_HANDLED;
-}
+public cod_hostage_rescued(id)
+	if (playerData[id][PLAYER_TYPE] == TYPE_RESCUE) add_progress(id);
 
 public give_reward(id)
 {

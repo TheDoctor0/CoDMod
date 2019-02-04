@@ -5,17 +5,17 @@
 
 #define PLUGIN	"CoD Honor System"
 #define AUTHOR	"O'Zone"
-#define VERSION	"1.2.0"
+#define VERSION	"1.2.1"
+
+#define set_user_money(%1,%2)	set_pdata_int(%1, OFFSET_CSMONEY, %2, OFFSET_LINUX)
+
+#define MAX_MONEY		99999
 
 #define OFFSET_CSMONEY	115
 #define OFFSET_LINUX	5
 
-#define MAX_MONEY	99999
-
-#define TASK_LOAD 	4721
-#define TASK_UPDATE 9501
-
-#define set_user_money(%1,%2)	set_pdata_int(%1, OFFSET_CSMONEY, %2, OFFSET_LINUX)
+#define TASK_LOAD 		4721
+#define TASK_UPDATE 	9501
 
 new cvarMinPlayers, cvarKill, cvarKillHS, cvarKillFirst, cvarWinRound, cvarBombPlanted, cvarBombDefused,
 	cvarRescueHostage, cvarKillHostage, Float:cvarVIPMultiplier;
@@ -37,12 +37,6 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_honor_rescue_hostage", "5"), cvarRescueHostage);
 	bind_pcvar_num(create_cvar("cod_honor_kill_hostage", "5"), cvarKillHostage);
 	bind_pcvar_float(create_cvar("cod_honor_vip_multiplier", "1.5"), cvarVIPMultiplier);
-
-	register_event("SendAudio", "t_win_round" , "a", "2&%!MRAD_terwin");
-	register_event("SendAudio", "ct_win_round", "a", "2&%!MRAD_ct_win_round");
-
-	register_logevent("hostage_rescued", 3, "1=triggered", "2=Rescued_A_Hostage");
-	register_logevent("hostage_killed", 3, "1=triggered", "2=Killed_A_Hostage");
 
 	register_event("Money", "money_update", "b");
 
@@ -114,13 +108,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 	save_honor(killer);
 }
 
-public t_win_round()
-	round_winner(1);
-
-public ct_win_round()
-	round_winner(2);
-
-public round_winner(team)
+public cod_win_round(team)
 {
 	if (get_playersnum() < cvarMinPlayers) return;
 
@@ -133,7 +121,7 @@ public round_winner(team)
 	}
 }
 
-public bomb_planted(id)
+public cod_bomb_planted(id)
 {
 	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
 		delayed_hud_update(id, 0);
@@ -146,7 +134,7 @@ public bomb_planted(id)
 	save_honor(id);
 }
 
-public bomb_defused(id)
+public cod_bomb_defused(id)
 {
 	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
 		delayed_hud_update(id, 0);
@@ -159,10 +147,8 @@ public bomb_defused(id)
 	save_honor(id);
 }
 
-public hostage_rescued()
+public cod_hostage_rescued(id)
 {
-	new id = get_loguser_index();
-
 	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
 		delayed_hud_update(id, 0);
 
@@ -174,10 +160,8 @@ public hostage_rescued()
 	save_honor(id);
 }
 
-public hostage_killed()
+public cod_hostage_killed(id)
 {
-	new id = get_loguser_index();
-
 	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
 		delayed_hud_update(id, 0);
 
@@ -385,14 +369,4 @@ public _cod_add_user_honor(id, amount, bonus)
 stock get_user_bonus(id, bonus)
 {
 	return cod_get_user_vip(id) ? floatround(bonus * cvarVIPMultiplier) : bonus;
-}
-
-stock get_loguser_index()
-{
-	new userLog[96], userName[MAX_NAME];
-
-	read_logargv(0, userLog, charsmax(userLog));
-	parse_loguser(userLog, userName, charsmax(userName));
-
-	return get_user_index(userName);
 }

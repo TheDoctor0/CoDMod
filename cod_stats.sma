@@ -9,7 +9,7 @@
 #include <nvault>
 
 #define PLUGIN "CoD Stats"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 #define AUTHOR "O'Zone"
 
 #define TASK_TIME 9054
@@ -64,9 +64,6 @@ public plugin_init()
 	for (new i; i < sizeof commandMedals; i++) register_clcmd(commandMedals[i], "command_medals");
 	for (new i; i < sizeof commandTopMedals; i++) register_clcmd(commandTopMedals[i], "command_top_medals");
 	for (new i; i < sizeof commandSounds; i++) register_clcmd(commandSounds[i], "command_sounds");
-
-	register_event("TextMsg", "round_restart", "a", "2&#Game_C", "2&#Game_w");
-	register_event("TextMsg", "hostages_rescued", "a", "2&#All_Hostages_R");
 
 	register_message(get_user_msgid("SayText"), "say_text");
 
@@ -623,7 +620,7 @@ public cod_spawned(id, respawn)
 public first_round()
 	blockCount = false;
 
-public round_restart()
+public cod_restart_round()
 	round = 0;
 
 public cod_new_round()
@@ -813,7 +810,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 	}
 }
 
-public bomb_planted(planter)
+public cod_bomb_planted(planter)
 {
 	for (new i = 1; i <= MAX_PLAYERS; i++) {
 		if (!is_user_connected(i)) continue;
@@ -821,6 +818,15 @@ public bomb_planted(planter)
 		if (((is_user_alive(i) && get_user_team(i) == 2) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 2)) && get_bit(i, soundPrepare)) client_cmd(i, "spk %s", codSounds[SOUND_BOMB]);
 	}
 }
+
+public cod_bomb_explode(planter, defuser)
+	playerStats[planter][KILLS] += 3;
+
+public cod_bomb_defused(defuser)
+	playerStats[defuser][KILLS] += 3;
+
+public cod_hostages_rescued(id)
+	playerStats[id][KILLS] += 3;
 
 public cod_end_map()
 {
@@ -940,15 +946,6 @@ public say_text(msgId, msgDest, msgEnt)
 
 	return PLUGIN_CONTINUE;
 }
-
-public bomb_explode(planter, defuser)
-	playerStats[planter][KILLS] += 3;
-
-public bomb_defused(defuser)
-	playerStats[defuser][KILLS] += 3;
-
-public hostages_rescued()
-	playerStats[get_loguser_index()][KILLS] += 3;
 
 public sql_init()
 {
@@ -1159,15 +1156,4 @@ public _cod_get_user_time_text(id, dataReturn[], dataLength)
 	param_convert(2);
 
 	formatex(dataReturn, dataLength, "%i h %i min %i s", hours, minutes, seconds);
-}
-
-stock get_loguser_index()
-{
-	new userLog[80], userName[MAX_NAME];
-
-	read_logargv(0, userLog, charsmax(userLog));
-
-	parse_loguser(userLog, userName, charsmax(userName));
-
-	return get_user_index(userName);
 }

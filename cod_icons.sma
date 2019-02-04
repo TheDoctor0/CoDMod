@@ -6,7 +6,7 @@
 #include <cod>
 
 #define PLUGIN  "CoD Icons"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 #define AUTHOR  "O'Zone"
 
 // Uncomment to enable lite version of icons.
@@ -84,12 +84,6 @@ public plugin_init()
 
 	cvarC4 = get_cvar_pointer("mp_c4timer");
 
-	register_event("TeamInfo", "team_assign", "a");
-
-	register_logevent("bomb_plant", 3, "2=Planted_The_Bomb");
-	register_logevent("bomb_drop", 3, "2=Dropped_The_Bomb");
-	register_logevent("bomb_picked", 3, "2=Got_The_Bomb");
-
 	register_forward(FM_AddToFullPack, "fm_fullpack", 1);
 	register_forward(FM_CheckVisibility, "check_visible");
 }
@@ -112,52 +106,43 @@ public client_putinserver(id)
 	load_icons(id);
 }
 
-public team_assign()
-{
-	new teamName[16], id = read_data(1);
+public cod_team_assign(id, team)
+	playerTeam[id] = team;
 
-	read_data(2, teamName, charsmax(teamName));
-
-	if (equal(teamName, "UNASSIGNED")) playerTeam[id] = 0;
-	else if (equal(teamName, "TERRORIST")) playerTeam[id] = 1;
-	else if (equal(teamName, "CT")) playerTeam[id] = 2;
-	else if (equal(teamName, "SPECTATOR")) playerTeam[id] = 3;
-}
+public cod_bomb_dropped(id)
+	set_task(0.2, "bomb_drop", TASK_DROPPED, .flags = "a", .repeat = 5);
 
 public bomb_drop()
-	set_task(0.2, "bomb_dropped", TASK_DROPPED, .flags = "a", .repeat = 5);
-
-public bomb_dropped()
 {
-	remove_icon(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
+	remove_icon(iconEntity[BOMB_DROP], BOMB_DROP);
 
 	new bombEnt;
 
-	if ((bombEnt = fm_find_ent_by_model(NONE, "weaponbox", "models/w_backpack.mdl"))) spawn_sprite(bombEnt, BOMB_DROPPED);
+	if ((bombEnt = fm_find_ent_by_model(NONE, "weaponbox", "models/w_backpack.mdl"))) spawn_sprite(bombEnt, BOMB_DROP);
 }
 
-public bomb_picked()
+public cod_bomb_picked(id)
 {
 	remove_task(TASK_DROPPED);
 
-	remove_icon(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
+	remove_icon(iconEntity[BOMB_DROP], BOMB_DROP);
 }
 
-public bomb_plant()
+public cod_bomb_plant(id)
 {
 	bombTimer = get_pcvar_num(cvarC4);
 
 	set_task(1.0, "bomb_timer", TASK_PLANTED, "", 0, "b");
-	set_task(0.2, "bomb_planted", TASK_PLANT, .flags = "a", .repeat = 5);
+	set_task(0.2, "bomb_plant", TASK_PLANT, .flags = "a", .repeat = 5);
 }
 
-public bomb_planted()
+public bomb_plant()
 {
-	remove_icon(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
+	remove_icon(iconEntity[BOMB_PLANT], BOMB_PLANT);
 
 	new bombEnt;
 
-	if ((bombEnt = fm_find_ent_by_model(NONE, "grenade", "models/w_c4.mdl"))) spawn_sprite(bombEnt, BOMB_PLANTED);
+	if ((bombEnt = fm_find_ent_by_model(NONE, "grenade", "models/w_c4.mdl"))) spawn_sprite(bombEnt, BOMB_PLANT);
 }
 
 public bomb_timer()
@@ -169,9 +154,9 @@ public bomb_timer()
 	}
 
 	if (--bombTimer == 10) {
-		remove_icon(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
+		remove_icon(iconEntity[BOMB_PLANT], BOMB_PLANT);
 
-		spawn_sprite(bombEntity[BOMB_PLANTED], BOMB_EXPLODE);
+		spawn_sprite(bombEntity[BOMB_PLANT], BOMB_EXPLODE);
 	}
 }
 
@@ -180,8 +165,8 @@ public cod_box_dropped(ent)
 
 public cod_new_round()
 {
-	remove_icon(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
-	remove_icon(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
+	remove_icon(iconEntity[BOMB_DROP], BOMB_DROP);
+	remove_icon(iconEntity[BOMB_PLANT], BOMB_PLANT);
 	remove_icon(iconEntity[BOMB_EXPLODE], BOMB_EXPLODE);
 }
 
@@ -194,10 +179,10 @@ public cod_end_round()
 
 	roundStarted = false;
 
-	bombEntity[BOMB_PLANTED] = 0;
+	bombEntity[BOMB_PLANT] = 0;
 
-	remove_icon(iconEntity[BOMB_DROPPED], BOMB_DROPPED);
-	remove_icon(iconEntity[BOMB_PLANTED], BOMB_PLANTED);
+	remove_icon(iconEntity[BOMB_DROP], BOMB_DROP);
+	remove_icon(iconEntity[BOMB_PLANT], BOMB_PLANT);
 	remove_icon(iconEntity[BOMB_EXPLODE], BOMB_EXPLODE);
 
 	new ent = NONE;
@@ -225,7 +210,7 @@ public spawn_sprite(entity, sprite)
 	if (!pev_valid(ent)) return;
 
 	if (sprite != BOX) iconEntity[sprite] = ent;
-	if (sprite == BOMB_PLANTED) bombEntity[sprite] = entity;
+	if (sprite == BOMB_PLANT) bombEntity[sprite] = entity;
 	if (sprite != BOMBSITE_A && sprite != BOMBSITE_B) origin[2] += sprite == BOX ? 35.0 : 25.0;
 
 	set_pev(ent, pev_classname, iconSprite[sprite]);
@@ -272,9 +257,9 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 
 	if (!roundStarted || !is_user_alive(host)) return FMRES_IGNORED;
 
-	if ((equal(className, iconSprite[BOMBSITE_A]) || equal(className, iconSprite[BOMBSITE_B])) && (!get_bit(host, iconBombSites) || is_valid_ent(bombEntity[BOMB_PLANTED]))) return FMRES_IGNORED;
-	if ((equal(className, iconSprite[BOMB_PLANTED]) || equal(className, iconSprite[BOMB_EXPLODE])) && !get_bit(host, iconPlanted)) return FMRES_IGNORED;
-	if (equal(className, iconSprite[BOMB_DROPPED]) && (!get_bit(host, iconDropped) || playerTeam[host] != 1)) return FMRES_IGNORED;
+	if ((equal(className, iconSprite[BOMBSITE_A]) || equal(className, iconSprite[BOMBSITE_B])) && (!get_bit(host, iconBombSites) || is_valid_ent(bombEntity[BOMB_PLANT]))) return FMRES_IGNORED;
+	if ((equal(className, iconSprite[BOMB_PLANT]) || equal(className, iconSprite[BOMB_EXPLODE])) && !get_bit(host, iconPlanted)) return FMRES_IGNORED;
+	if (equal(className, iconSprite[BOMB_DROP]) && (!get_bit(host, iconDropped) || playerTeam[host] != 1)) return FMRES_IGNORED;
 	if (equal(className, iconSprite[BOX]) && !get_bit(host, iconBox)) return FMRES_IGNORED;
 
 	static Float:hostOrigin[3], Float:targetOrigin[3], Float:middleOirgin[3], Float:wallOffset[3], Float:spriteOffset[3], Float:hitPoint[3], Float:distanceToWall, Float:distance;
@@ -304,7 +289,7 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 
 	xs_vec_add(wallOffset, hostOrigin, spriteOffset);
 
-	if (equal(className, iconSprite[BOMB_DROPPED]) || equal(className, iconSprite[BOMB_PLANTED]) || equal(className, iconSprite[BOMB_EXPLODE])) spriteOffset[2] += 25.0;
+	if (equal(className, iconSprite[BOMB_DROP]) || equal(className, iconSprite[BOMB_PLANT]) || equal(className, iconSprite[BOMB_EXPLODE])) spriteOffset[2] += 25.0;
 	if (equal(className, iconSprite[BOX])) spriteOffset[2] += 35.0;
 
 	set_es(es, ES_Origin, spriteOffset);
