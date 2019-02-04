@@ -1125,7 +1125,7 @@ public assign_points_handler(id, menu, item)
 
 				codPlayer[id][PLAYER_HEAL] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
-			} else chat_print(id, "Maksymalny poziom sily osiagniety!");
+			} else chat_print(id, "Maksymalny poziom zycia osiagniety!");
 		}
 		case 2: {
 			if (!statsLimit || codPlayer[id][PLAYER_INT] < statsLimit) {
@@ -3363,11 +3363,11 @@ public load_class(id, class)
 	if (cvarPointsLimitEnabled) {
 		new statsLimit = cvarLevelLimit * cvarPointsPerLevel / 5;
 
-		if (codPlayer[id][PLAYER_INT] >= statsLimit
-			|| codPlayer[id][PLAYER_HEAL] >= statsLimit
-			|| codPlayer[id][PLAYER_STAM] >= statsLimit
-			|| codPlayer[id][PLAYER_STR] >= statsLimit
-			|| codPlayer[id][PLAYER_COND] >= statsLimit
+		if (codPlayer[id][PLAYER_INT] > statsLimit
+			|| codPlayer[id][PLAYER_HEAL] > statsLimit
+			|| codPlayer[id][PLAYER_STAM] > statsLimit
+			|| codPlayer[id][PLAYER_STR] > statsLimit
+			|| codPlayer[id][PLAYER_COND] > statsLimit
 		) {
 			reset_points(id);
 
