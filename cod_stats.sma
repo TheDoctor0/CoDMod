@@ -214,7 +214,10 @@ public show_time(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new rank = SQL_ReadResult(query, 0) + 1, players = SQL_ReadResult(query, 1), seconds = (playerStats[id][TIME] + get_user_time(id)), minutes, hours;
+	new rank, count, hours, minutes, seconds = (playerStats[id][TIME] + get_user_time(id));
+
+	rank = SQL_ReadResult(query, SQL_FieldNameToNum(query, "rank")) + 1;
+	count = SQL_ReadResult(query, SQL_FieldNameToNum(query, "count"));
 
 	while (seconds >= 60) {
 		seconds -= 60;
@@ -227,7 +230,7 @@ public show_time(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 	}
 
 	cod_print_chat(id, "Spedziles na serwerze lacznie^x04 %i h %i min %i s^x01.", hours, minutes, seconds);
-	cod_print_chat(id, "Zajmujesz^x04 %i/%i^x01 miejsce w rankingu czasu gry.", rank, players);
+	cod_print_chat(id, "Zajmujesz^x04 %i/%i^x01 miejsce w rankingu czasu gry.", rank, count);
 
 	return PLUGIN_HANDLED;
 }

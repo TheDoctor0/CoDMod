@@ -1364,11 +1364,11 @@ public show_level_top(failState, Handle:query, error[], errorNum, tempData[], da
 	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "<tr style=color:#000000;font-weight:bold;><td>#<td>Nick<td>Klasa<td>Poziom<td>Doswiadczenie");
 
 	while (SQL_MoreResults(query)) {
-		SQL_ReadResult(query, 0, name, charsmax(name));
-		SQL_ReadResult(query, 1, class, charsmax(class));
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), name, charsmax(name));
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "class"), class, charsmax(class));
 
-		level = SQL_ReadResult(query, 2);
-		exp = SQL_ReadResult(query, 3);
+		level = SQL_ReadResult(query, SQL_FieldNameToNum(query, "level"));
+		exp = SQL_ReadResult(query, SQL_FieldNameToNum(query, "exp"));
 
 		replace_all(name, charsmax(name), "<", "");
 		replace_all(name, charsmax(name), ">", "");

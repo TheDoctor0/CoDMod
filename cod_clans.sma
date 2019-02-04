@@ -2072,11 +2072,11 @@ public show_depositors_list(failState, Handle:query, error[], errorNum, tempId[]
 	while (SQL_MoreResults(query)) {
 		rank++;
 
-		SQL_ReadResult(query, 0, playerName, charsmax(playerName));
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), playerName, charsmax(playerName));
 		replace_all(playerName, charsmax(playerName), "<", "");
 		replace_all(playerName,charsmax(playerName), ">", "");
 
-		honor = SQL_ReadResult(query, 1);
+		honor = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
 
 		if (rank >= 10) motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %22.22s %5d^n", rank, playerName, honor);
 		else motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %22.22s %6d^n", rank, playerName, honor);
@@ -2135,15 +2135,15 @@ public show_clans_top15(failState, Handle:query, error[], errorNum, tempId[], da
 
 		rank++;
 
-		SQL_ReadResult(query, 0, clanName, charsmax(clanName));
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), clanName, charsmax(clanName));
 		replace_all(clanName, charsmax(clanName), "<", "");
 		replace_all(clanName, charsmax(clanName), ">", "");
 
-		honor = SQL_ReadResult(query, 1);
-		kills = SQL_ReadResult(query, 2);
-		level = SQL_ReadResult(query, 3);
-		wins = SQL_ReadResult(query, 4);
-		members = SQL_ReadResult(query, 5);
+		honor = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
+		kills = SQL_ReadResult(query, SQL_FieldNameToNum(query, "kills"));
+		level = SQL_ReadResult(query, SQL_FieldNameToNum(query, "level"));
+		wins = SQL_ReadResult(query, SQL_FieldNameToNum(query, "wins"));
+		members = SQL_ReadResult(query, SQL_FieldNameToNum(query, "members"));
 
 		if (rank >= 10) motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %22.22s %5d %8d %10d %8d %10d^n", rank, clanName, members, level, kills, wins, honor);
 		else motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1i %22.22s %6d %8d %10d %8d %10d^n", rank, clanName, members, level, kills, wins, honor);
@@ -3048,7 +3048,7 @@ stock create_clan(id, const clanName[])
 
 	if (SQL_Execute(query)) {
 		if (SQL_NumResults(query)) {
-			clan[id] = SQL_ReadResult(query, 0);
+			clan[id] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "id"));
 
 			copy(codClan[CLAN_NAME], charsmax(codClan[CLAN_NAME]), clanName);
 			codClan[CLAN_STATUS] = _:TrieCreate();
@@ -3150,7 +3150,7 @@ stock get_clan_honor(clanId)
 	query = SQL_PrepareQuery(connection, queryData);
 
 	if (SQL_Execute(query)) {
-		if (SQL_NumResults(query)) honor = SQL_ReadResult(query, 0);
+		if (SQL_NumResults(query)) honor = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
 	} else {
 		errorNum = SQL_QueryError(query, error, charsmax(error));
 
