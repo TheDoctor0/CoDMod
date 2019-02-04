@@ -10,7 +10,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.1.1"
+#define VERSION "1.2.1"
 #define AUTHOR "O'Zone"
 
 #pragma dynamic              65536
@@ -81,8 +81,10 @@ enum _:repeatingData { ATTACKER, VICTIM, DAMAGE, COUNTER, FLAGS };
 
 enum _:weaponSlots { PRIMARY = 1, SECONDARY, KNIFE, GRENADES, C4 };
 
-enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, SPEED_CHANGED, DAMAGE_PRE, DAMAGE_POST, DAMAGE_INFLICT, WEAPON_DEPLOY, CUR_WEAPON, KILLED, SPAWNED,
-	CMD_START, PRETHINK, NEW_ROUND, START_ROUND, END_ROUND, END_MAP, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH, TELEPORT_USED };
+enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, SPEED_CHANGED, DAMAGE_PRE, DAMAGE_POST, DAMAGE_INFLICT,
+	WEAPON_DEPLOY, CUR_WEAPON, KILLED, SPAWNED, CMD_START, PRETHINK, BOMB_DROPPED, BOMB_PICKED, BOMB_PLANTING, BOMB_PLANTED, BOMB_DEFUSING,
+	BOMB_DEFUSED, BOMB_EXPLODED, HOSTAGE_KILLED, HOSTAGE_RESCUED, HOSTAGES_RESCUED, TEAM_ASSIGN, NEW_ROUND, START_ROUND, RESTART_ROUND,
+	END_ROUND, WIN_ROUND, END_MAP, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH, TELEPORT_USED };
 
 enum _:itemInfo { ITEM_NAME[MAX_NAME], ITEM_DESC[MAX_DESC], ITEM_PLUGIN, ITEM_RANDOM_MIN, ITEM_RANDOM_MAX, ITEM_GIVE, ITEM_DROP,
 	ITEM_SPAWNED, ITEM_KILL, ITEM_KILLED, ITEM_SKILL_USED, ITEM_UPGRADE, ITEM_VALUE, ITEM_DAMAGE_ATTACKER, ITEM_DAMAGE_VICTIM };
@@ -111,7 +113,7 @@ new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpDamagePer, cvarExpWinRound
 
 new Array:codItems, Array:codClasses, Array:codPromotions, Array:codFractions, Array:codPlayerClasses[MAX_PLAYERS + 1], Array:codPlayerRender[MAX_PLAYERS + 1], codForwards[forwards];
 
-new Handle:sql, Handle:connection, bool:sqlConnected, bool:freezeTime, bool:skillsBlocked, bool:nightExp, bool:mapChange, hudInfo,
+new Handle:sql, Handle:connection, bool:sqlConnected, bool:skillsBlocked, bool:nightExp, bool:mapChange, bool:freezeTime = true, hudInfo,
 	hudSync, hudSync2, playersNum, dataLoaded, hudLoaded, resetStats, userConnected, renderTimer, glowActive, roundStart, lastInfo;
 
 public plugin_init()
@@ -191,15 +193,21 @@ public plugin_init()
 		if (weapons[i][0]) RegisterHam(Ham_Item_Deploy, weapons[i], "weapon_deploy_post", 1);
 	}
 
-	register_logevent("round_start", 2, "1=Round_Start");
-	register_logevent("round_end", 2, "1=Round_End");
+	register_logevent("start_round", 2, "1=Round_Start");
+	register_logevent("end_round", 2, "1=Round_End");
+	register_logevent("hostage_rescued", 3, "2=Rescued_A_Hostage");
+	register_logevent("hostage_killed", 3, "1=triggered", "2=Killed_A_Hostage");
+	register_logevent("bomb_dropped", 3, "2=Dropped_The_Bomb");
+	register_logevent("bomb_picked", 3, "2=Got_The_Bomb");
 
+	register_event("TeamInfo", "team_assign", "a");
 	register_event("HLTV", "new_round", "a", "1=0", "2=0");
 	register_event("Health", "message_health", "be", "1!255");
 	register_event("CurWeapon","cur_weapon", "be", "1=1");
 	register_event("SendAudio", "t_win_round" , "a", "2&%!MRAD_terwin");
 	register_event("SendAudio", "ct_win_round", "a", "2&%!MRAD_ct_win_round");
 	register_event("TextMsg", "hostages_rescued", "a", "2&#All_Hostages_R");
+	register_event("TextMsg", "restart_round", "a", "2&#Game_C", "2&#Game_w");
 
 	register_forward(FM_CmdStart, "cmd_start");
 	register_forward(FM_EmitSound, "sound_emit");
@@ -224,13 +232,26 @@ public plugin_init()
 	codForwards[DAMAGE_INFLICT] = CreateMultiForward("cod_damage_inflict", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT, FP_FLOAT, FP_CELL);
 	codForwards[WEAPON_DEPLOY] = CreateMultiForward("cod_weapon_deploy", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[CUR_WEAPON] = CreateMultiForward("cod_cur_weapon", ET_IGNORE, FP_CELL, FP_CELL);
+	codForwards[TEAM_ASSIGN] = CreateMultiForward("cod_team_assign", ET_IGNORE, FP_CELL, FP_CELL);
 	codForwards[KILLED] = CreateMultiForward("cod_killed", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[SPAWNED] = CreateMultiForward("cod_spawned", ET_IGNORE, FP_CELL, FP_CELL);
 	codForwards[CMD_START] = CreateMultiForward("cod_cmd_start", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[PRETHINK] = CreateMultiForward("cod_player_prethink", ET_IGNORE, FP_CELL);
+	codForwards[BOMB_PLANTING] = CreateMultiForward("cod_bomb_planting", ET_IGNORE, FP_CELL);
+	codForwards[BOMB_PLANTED] = CreateMultiForward("cod_bomb_planted", ET_IGNORE, FP_CELL);
+	codForwards[BOMB_DEFUSING] = CreateMultiForward("cod_bomb_defusing", ET_IGNORE, FP_CELL);
+	codForwards[BOMB_DEFUSED] = CreateMultiForward("cod_bomb_defused", ET_IGNORE, FP_CELL);
+	codForwards[BOMB_EXPLODED] = CreateMultiForward("cod_bomb_exploded", ET_IGNORE, FP_CELL, FP_CELL);
+	codForwards[BOMB_DROPPED] = CreateMultiForward("cod_bomb_dropped", ET_IGNORE, FP_CELL);
+	codForwards[BOMB_PICKED] = CreateMultiForward("cod_bomb_picked", ET_IGNORE, FP_CELL);
+	codForwards[HOSTAGE_KILLED] = CreateMultiForward("cod_hostage_killed", ET_IGNORE, FP_CELL);
+	codForwards[HOSTAGE_RESCUED] = CreateMultiForward("cod_hostage_rescued", ET_IGNORE, FP_CELL);
+	codForwards[HOSTAGES_RESCUED] = CreateMultiForward("cod_hostages_rescued", ET_IGNORE, FP_CELL);
 	codForwards[NEW_ROUND] = CreateMultiForward("cod_new_round", ET_IGNORE);
 	codForwards[START_ROUND] = CreateMultiForward("cod_start_round", ET_IGNORE);
+	codForwards[RESTART_ROUND] = CreateMultiForward("cod_restart_round", ET_IGNORE);
 	codForwards[END_ROUND] = CreateMultiForward("cod_end_round", ET_IGNORE);
+	codForwards[WIN_ROUND] = CreateMultiForward("cod_win_round", ET_IGNORE, FP_CELL);
 	codForwards[END_MAP] = CreateMultiForward("cod_end_map", ET_IGNORE);
 	codForwards[MEDKIT_HEAL] = CreateMultiForward("cod_medkit_heal", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
 	codForwards[ROCKET_EXPLODE] = CreateMultiForward("cod_rocket_explode", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
@@ -2143,13 +2164,26 @@ public weapon_deploy_post(ent)
 	return HAM_IGNORED;
 }
 
+public team_assign()
+{
+	new teamName[16], id = read_data(1), team = 0;
+
+	read_data(2, teamName, charsmax(teamName));
+
+	if (equal(teamName, "UNASSIGNED")) team = 0;
+	else if (equal(teamName, "TERRORIST")) team = 1;
+	else if (equal(teamName, "CT")) team = 2;
+	else if (equal(teamName, "SPECTATOR")) team = 3;
+
+	execute_forward_ignore_two_params(codForwards[TEAM_ASSIGN], id, team);
+}
+
 public new_round()
 {
-	remove_ents();
-
 	freezeTime = true;
-
 	skillsBlocked = true;
+
+	remove_ents();
 
 	for (new i = 1; i <= MAX_PLAYERS; i++) {
 		if (get_bit(i, glowActive)) reset_glow(i);
@@ -2162,7 +2196,7 @@ public new_round()
 	execute_forward_ignore(codForwards[NEW_ROUND]);
 }
 
-public round_start()
+public start_round()
 {
 	freezeTime = false;
 
@@ -2185,15 +2219,18 @@ public round_start()
 	execute_forward_ignore(codForwards[START_ROUND]);
 }
 
-public unblock_skills()
-	skillsBlocked = false;
+public restart_round()
+	execute_forward_ignore(codForwards[RESTART_ROUND]);
 
-public round_end()
+public end_round()
 {
 	execute_forward_ignore(codForwards[END_ROUND]);
 
 	remove_task(TASK_BLOCK);
 }
+
+public unblock_skills()
+	skillsBlocked = false;
 
 public message_health(id)
 {
@@ -2221,6 +2258,8 @@ public ct_win_round()
 
 public round_winner(team)
 {
+	execute_forward_ignore_one_param(codForwards[WIN_ROUND], team);
+
 	if (get_playersnum() < cvarMinPlayers) return;
 
 	for (new id = 1; id <= MAX_PLAYERS; id++) {
@@ -2236,8 +2275,13 @@ public round_winner(team)
 	}
 }
 
+public bomb_planting(id)
+	execute_forward_ignore_one_param(codForwards[BOMB_PLANTING], id);
+
 public bomb_planted(id)
 {
+	execute_forward_ignore_one_param(codForwards[BOMB_PLANTED], id);
+
 	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS]) return;
 
 	new exp = get_exp_bonus(id, cvarExpPlant);
@@ -2249,8 +2293,13 @@ public bomb_planted(id)
 	check_level(id);
 }
 
+public bomb_defusing(id)
+	execute_forward_ignore_one_param(codForwards[BOMB_DEFUSING], id);
+
 public bomb_defused(id)
 {
+	execute_forward_ignore_one_param(codForwards[BOMB_DEFUSED], id);
+
 	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS]) return;
 
 	new exp = get_exp_bonus(id, cvarExpDefuse);
@@ -2262,13 +2311,46 @@ public bomb_defused(id)
 	check_level(id);
 }
 
+public bomb_explode(planter, defuser)
+	execute_forward_ignore_two_params(codForwards[BOMB_EXPLODE], planter, defuser);
+
+public bomb_dropped()
+{
+	new id = get_loguser_index();
+
+	execute_forward_ignore_one_param(codForwards[BOMB_DROPPED], id);
+}
+
+public bomb_picked()
+{
+	new id = get_loguser_index();
+
+	execute_forward_ignore_one_param(codForwards[BOMB_PICKED], id);
+}
+
+public hostage_killed()
+{
+	new id = get_loguser_index();
+
+	execute_forward_ignore_one_param(codForwards[HOSTAGE_KILLED], id);
+}
+
+public hostage_rescued()
+{
+	new id = get_loguser_index();
+
+	execute_forward_ignore_one_param(codForwards[HOSTAGE_RESCUED], id);
+}
+
 public hostages_rescued()
 {
-	if (get_playersnum() < cvarMinPlayers) return;
+	new id = get_loguser_index();
 
-	new id = get_loguser_index(), exp = get_exp_bonus(id, cvarExpRescue);
+	execute_forward_ignore_one_param(codForwards[HOSTAGES_RESCUED], id);
 
-	if (!codPlayer[id][PLAYER_CLASS]) return;
+	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS]) return;
+
+	new exp = get_exp_bonus(id, cvarExpRescue);
 
 	codPlayer[id][PLAYER_GAINED_EXP] += exp;
 
@@ -4680,6 +4762,8 @@ stock calculate_teleports_left(id)
 
 stock execute_forward_ignore(forwardHandle)
 {
+	if (forwardHandle < COD_CONTINUE) return PLUGIN_HANDLED;
+
 	static ret;
 
 	return ExecuteForward(forwardHandle, ret);
@@ -4687,6 +4771,8 @@ stock execute_forward_ignore(forwardHandle)
 
 stock execute_forward_ignore_one_param(forwardHandle, param)
 {
+	if (forwardHandle < COD_CONTINUE) return PLUGIN_HANDLED;
+
 	static ret;
 
 	return ExecuteForward(forwardHandle, ret, param);
@@ -4694,6 +4780,8 @@ stock execute_forward_ignore_one_param(forwardHandle, param)
 
 stock execute_forward_ignore_two_params(forwardHandle, paramOne, paramTwo)
 {
+	if (forwardHandle < COD_CONTINUE) return PLUGIN_HANDLED;
+
 	static ret;
 
 	return ExecuteForward(forwardHandle, ret, paramOne, paramTwo);
@@ -4701,6 +4789,8 @@ stock execute_forward_ignore_two_params(forwardHandle, paramOne, paramTwo)
 
 stock execute_forward_ignore_three_params(forwardHandle, paramOne, paramTwo, paramThree)
 {
+	if (forwardHandle < COD_CONTINUE) return PLUGIN_HANDLED;
+
 	static ret;
 
 	return ExecuteForward(forwardHandle, ret, paramOne, paramTwo, paramThree);

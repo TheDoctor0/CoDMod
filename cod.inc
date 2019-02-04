@@ -49,7 +49,7 @@
 
 enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_DEPLOY, SOUND_ACTIVATE,
 	SOUND_CHARGE, SOUND_PICKUP, SOUND_THUNDER, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_APPLAUSE, SOUND_LAUGH };
-enum _:icons { BOMBSITE_A, BOMBSITE_B, BOMB_DROPPED, BOMB_PLANTED, BOMB_EXPLODE, BOX };
+enum _:icons { BOMBSITE_A, BOMBSITE_B, BOMB_DROP, BOMB_PLANT, BOMB_EXPLODE, BOX };
 enum _:promotions { PROMOTION_NONE, PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION_THIRD };
 enum _:types { RANDOM = -3, FULL, NONE, CLASS, ITEM, ADDITIONAL, ROUND, USED, ALL };
 enum _:repeating { FIRE, POISON, HEAL };
@@ -1034,6 +1034,17 @@ Weapon is CSW_ format.
 forward cod_cur_weapon(id, weapon);
 
 /*------------------------------
+Multiforward executed on team assign event.
+Id is player id.
+Team is player team.
+0 - unassigned
+1 - terrorist
+2 - counter-terrorist
+3 - spectator
+------------------------------*/
+forward cod_team_assign(id, team);
+
+/*------------------------------
 Multiforward executed on death event.
 ------------------------------*/
 forward cod_killed(killer, victim, weapon, hitPlace);
@@ -1059,6 +1070,67 @@ Multiforward executed on player prethink.
 forward cod_player_prethink(id);
 
 /*------------------------------
+Multiforward executed on bomb planting event.
+Id is player id.
+------------------------------*/
+forward cod_bomb_planting(id);
+
+/*------------------------------
+Multiforward executed on bomb planted event.
+Id is player id.
+------------------------------*/
+forward cod_bomb_planted(id);
+
+/*------------------------------
+Multiforward executed on bomb defusing event.
+Id is player id.
+------------------------------*/
+forward cod_bomb_defusing(id);
+
+/*------------------------------
+Multiforward executed on bomb defused event.
+Id is player id.
+------------------------------*/
+forward cod_bomb_defused(id);
+
+/*------------------------------
+Multiforward executed on bomb explode event.
+Planter is id for player that planted the bomb.
+Defuser is id for player that was defusing the bomb (can be empty).
+------------------------------*/
+forward cod_bomb_explode(planter, defuser);
+
+/*------------------------------
+Multiforward executed on bomb dropped event.
+Id is player id.
+------------------------------*/
+forward cod_bomb_dropped(id);
+
+/*------------------------------
+Multiforward executed on bomb picked event.
+Id is player id.
+------------------------------*/
+forward cod_bomb_picked(id);
+
+/*------------------------------
+Multiforward executed on hostage killed event.
+Id is player id.
+------------------------------*/
+forward cod_hostage_killed(id);
+
+/*------------------------------
+Multiforward executed on hostage rescued event.
+Id is player id.
+------------------------------*/
+forward cod_hostage_rescued(id);
+
+/*------------------------------
+Multiforward executed on hostages rescued event.
+Id is player id.
+------------------------------*/
+forward cod_hostages_rescued(id);
+
+/*------------------------------
 Multiforward executed on new round event.
 ------------------------------*/
 forward cod_new_round();
@@ -1069,9 +1141,22 @@ Multiforward executed on round start event.
 forward cod_start_round();
 
 /*------------------------------
+Multiforward executed on round restart event.
+------------------------------*/
+forward cod_restart_round();
+
+/*------------------------------
 Multiforward executed on round end event.
 ------------------------------*/
 forward cod_end_round();
+
+/*------------------------------
+Multiforward executed on round win event.
+Team is team that won this round.
+1 - terrorist
+2 - counter-terrorist
+------------------------------*/
+forward cod_win_round(team);
 
 /*------------------------------
 Multiforward executed on map end (message intermission) event.
