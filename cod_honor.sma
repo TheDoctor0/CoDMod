@@ -13,6 +13,7 @@
 
 #define OFFSET_CSMONEY	115
 #define OFFSET_LINUX	5
+#define	PDATA_SAFE		2
 
 #define TASK_LOAD 		4721
 #define TASK_UPDATE 	9501
@@ -67,8 +68,6 @@ public client_putinserver(id)
 	playerHonorGained[id] = 0;
 
 	rem_bit(id, dataLoaded);
-
-	update_hud(id);
 
 	if (is_user_bot(id) || is_user_hltv(id)) return;
 
@@ -322,7 +321,7 @@ public update_hud_task(data[])
 
 stock update_hud(id, gained = 0)
 {
-	if (!is_user_connected(id)) return;
+	if (!is_user_connected(id) || pev_valid(id) != PDATA_SAFE) return;
 
 	new tempHonor = min(playerHonor[id], MAX_MONEY);
 
