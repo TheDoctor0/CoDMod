@@ -1522,7 +1522,7 @@ public declare_war_menu_handle(id, menu, item)
 
 			tempId[0] = id;
 
-			formatex(queryData, charsmax(queryData), "SELECT a.id, a.name, a.honor, (SELECT COUNT(id) FROM `cod_clans_members` WHERE clan = a.id) as members FROM `cod_clans` a WHERE id != '%i' AND NOT EXISTS (SELECT id FROM `cod_clans_wars` WHERE (clan = '%i' AND clan2 = a.id) OR (clan2 = '%i' AND clan = a.id)) ORDER BY a.name ASC", clan[id], clan[id], clan[id]);
+			formatex(queryData, charsmax(queryData), "SELECT a.id, a.name, a.honor, (SELECT COUNT(clan) FROM `cod_clans_members` WHERE clan = a.id) as members FROM `cod_clans` a WHERE id != '%i' AND NOT EXISTS (SELECT id FROM `cod_clans_wars` WHERE (clan = '%i' AND clan2 = a.id) OR (clan2 = '%i' AND clan = a.id)) ORDER BY a.name ASC", clan[id], clan[id], clan[id]);
 
 			SQL_ThreadQuery(sql, "declare_war_select", queryData, tempId, sizeof(tempId));
 		}
