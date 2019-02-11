@@ -2097,7 +2097,7 @@ public clans_top15(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT a.id, a.name, a.honor, a.kills, a.level, a.wins, (SELECT COUNT(id) FROM `cod_clans_members` WHERE clan = a.id) as members FROM `cod_clans` a ORDER BY kills DESC LIMIT 15");
+	formatex(queryData, charsmax(queryData), "SELECT a.id, a.name, a.honor, a.kills, a.level, a.wins, (SELECT COUNT(clan) FROM `cod_clans_members` WHERE clan = a.id) as members FROM `cod_clans` a ORDER BY kills DESC LIMIT 15");
 
 	SQL_ThreadQuery(sql, "show_clans_top15", queryData, tempId, sizeof(tempId));
 
