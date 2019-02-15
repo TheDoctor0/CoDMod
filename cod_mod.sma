@@ -10,7 +10,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 #define AUTHOR "O'Zone"
 
 #pragma dynamic              65536
@@ -2253,7 +2253,7 @@ public weapon_primary_attack_post(ent)
 
 		pev(id, pev_punchangle, punchAngle);
 
-		for (new i = 0; i < 3; i++) punchAngle[i] *= 0.9;
+		for (new i = 0; i < 3; i++) punchAngle[i] *= 0.5;
 
 		set_pev(id, pev_punchangle, punchAngle);
 	}
