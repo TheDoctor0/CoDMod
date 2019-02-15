@@ -47,6 +47,9 @@ new const weapons[][] = { "", "weapon_p228", "", "weapon_scout", "weapon_hegrena
 		"weapon_famas", "weapon_usp", "weapon_glock18", "weapon_awp", "weapon_mp5navy", "weapon_m249", "weapon_m3", "weapon_m4a1",
 		"weapon_tmp", "weapon_g3sg1", "weapon_flashbang", "weapon_deagle", "weapon_sg552", "weapon_ak47", "weapon_knife", "weapon_p90" };
 
+new const excludedWeapons = (1<<CSW_HEGRENADE) | (1<<CSW_SMOKEGRENADE) | (1<<CSW_FLASHBANG) | (1<<CSW_KNIFE) | (1<<CSW_C4);
+new const allowedWeapons = (1<<CSW_KNIFE) | (1<<CSW_C4);
+
 new const maxClipAmmo[] = { -1, 13, -1, 10, 1, 7, 1, 30, 30, 1, 30, 20, 25, 30, 35, 25, 12, 20, 10, 30, 100, 8, 30, 30, 20, 2, 7, 30, 30, -1, 50 };
 new const maxBpAmmo[] = { -1, 52, -1, 90, 1, 32, 1, 100, 90, 1, 120, 100, 100, 90, 90, 90, 100, 120, 30, 120, 200, 32, 90, 120, 90, 1, 35, 90, 90, -1, 100 }
 
@@ -72,8 +75,6 @@ new const codSprites[sprites][] = {
 };
 
 new codSprite[sizeof codSprites];
-
-new allowedWeapons = 1<<CSW_KNIFE | 1<<CSW_C4;
 
 enum _:save { NORMAL, FINAL, MAP_END };
 
@@ -2640,7 +2641,7 @@ public message_ammo(msgId, msgDest, id)
 {
 	new weapon = get_user_weapon(id);
 
-	if (weapon && weapon != CSW_KNIFE && weapon != CSW_C4 && weapon != CSW_HEGRENADE && weapon != CSW_FLASHBANG && weapon != CSW_SMOKEGRENADE) cs_set_user_bpammo(id, weapon, maxBpAmmo[weapon]);
+	if (!(excludedWeapons & (1<<weapon))) cs_set_user_bpammo(id, weapon, maxBpAmmo[weapon]);
 }
 
 public message_intermission()
@@ -3085,9 +3086,9 @@ public set_attributes(id)
 	get_user_weapons(id, playerWeapons, weaponsNum);
 
 	for (new i = 0; i < weaponsNum; i++) {
-		if (playerWeapons[i] == CSW_KNIFE || playerWeapons[i] == CSW_C4 || playerWeapons[i] == CSW_HEGRENADE || playerWeapons[i] == CSW_FLASHBANG || playerWeapons[i] == CSW_SMOKEGRENADE) continue;
+		if (excludedWeapons & (1<<playerWeapons[i])) continue;
 
-		if (maxBpAmmo[playerWeapons[i]] > 0) cs_set_user_bpammo(id, playerWeapons[i], maxBpAmmo[playerWeapons[i]]);
+		cs_set_user_bpammo(id, playerWeapons[i], maxBpAmmo[playerWeapons[i]]);
 	}
 }
 
@@ -4219,7 +4220,7 @@ public _cod_give_weapon(id, weapon, amount)
 
 	if (amount > cs_get_user_bpammo(id, weapon)) cs_set_user_bpammo(id, weapon, amount);
 
-	if (weapon != CSW_KNIFE && weapon != CSW_C4 && weapon != CSW_HEGRENADE && weapon != CSW_FLASHBANG && weapon != CSW_SMOKEGRENADE) cs_set_user_bpammo(id, weapon, maxBpAmmo[weapon]);
+	if (!(excludedWeapons & (1<<weapon))) cs_set_user_bpammo(id, weapon, maxBpAmmo[weapon]);
 }
 
 public _cod_take_weapon(id, weapon)
