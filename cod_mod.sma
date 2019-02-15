@@ -2646,7 +2646,7 @@ public show_advertisement(id)
 {
 	id -= TASK_SHOW_AD;
 
-	chat_print(id, "Witaj na serwerze^x03  Call of Duty Mod^x01 stworzonym przez^x03 O'Zone^x01.");
+	chat_print(id, "Witaj na serwerze^x03 Call of Duty Mod^x01 stworzonym przez^x03 O'Zone^x01.");
 	chat_print(id, "W celu uzyskania informacji o komendach wpisz^x03 /menu^x01 (klawisz^x03 ^"v^"^x01).");
 }
 
@@ -4067,7 +4067,7 @@ public _cod_set_user_model(id, value, type)
 public _cod_set_user_unlimited_ammo(id, value, type, weapon)
 {
 	codPlayer[id][PLAYER_UNLIMITED_AMMO][type] = value;
-	codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] = weapon;
+	codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] |= (1<<weapon);
 
 	new bool:enabled, weapons;
 
@@ -4085,7 +4085,7 @@ public _cod_set_user_unlimited_ammo(id, value, type, weapon)
 public _cod_set_user_recoil_eliminator(id, value, type, weapon)
 {
 	codPlayer[id][PLAYER_ELIMINATOR][type] = value;
-	codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] = weapon;
+	codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] |= (1<<weapon);
 
 	new bool:enabled, weapons;
 
@@ -4103,7 +4103,7 @@ public _cod_set_user_recoil_eliminator(id, value, type, weapon)
 public _cod_set_user_recoil_reducer(id, value, type, weapon)
 {
 	codPlayer[id][PLAYER_REDUCER][type] = value;
-	codPlayer[id][PLAYER_REDUCER_WEAPONS][type] = weapon;
+	codPlayer[id][PLAYER_REDUCER_WEAPONS][type] |= (1<<weapon);
 
 	new bool:enabled, weapons;
 

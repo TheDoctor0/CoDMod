@@ -16,15 +16,15 @@
 #define STAMINA      0
 #define CONDITION    30
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
 public cod_class_enabled(id, promotion)
-	cod_set_user_render(id, 100, CLASS, RENDER_ALWAYS, 1<<CSW_KNIFE);
+	cod_set_user_render(id, 100, CLASS, RENDER_ALWAYS, CSW_KNIFE);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 	if ((weapon == CSW_KNIFE && !(pev(attacker, pev_button) & IN_ATTACK)) || (weapon == CSW_DEAGLE && damageBits & DMG_BULLET && cod_percent_chance(10))) damage = cod_kill_player(attacker, victim, damageBits);

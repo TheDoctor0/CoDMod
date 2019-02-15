@@ -19,7 +19,7 @@ public cod_item_enabled(id, value)
 {
 	cod_give_weapon(id, CSW_MAC10);
 
-	cod_set_user_render(id, 35, ITEM, RENDER_ALWAYS, 1<<CSW_MAC10);
+	cod_set_user_render(id, 35, ITEM, RENDER_ALWAYS, CSW_MAC10);
 }
 
 public cod_item_disabled(id)

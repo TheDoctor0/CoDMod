@@ -16,16 +16,16 @@
 #define CONDITION    20
 #define FLAG         ADMIN_LEVEL_E
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION, FLAG);
 }
 
 public cod_class_enabled(id)
 {
-	cod_set_user_render(id, 40, CLASS, RENDER_ALWAYS, 1<<CSW_KNIFE);
+	cod_set_user_render(id, 40, CLASS, RENDER_ALWAYS, CSW_KNIFE);
 
 	cod_set_user_multijumps(id, 1, CLASS);
 

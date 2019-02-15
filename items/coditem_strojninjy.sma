@@ -16,4 +16,4 @@ public plugin_init()
 }
 
 public cod_item_enabled(id, value)
-	cod_set_user_render(id, 0, ITEM, RENDER_STAND, 1<<CSW_KNIFE);
+	cod_set_user_render(id, 0, ITEM, RENDER_STAND, CSW_KNIFE);
