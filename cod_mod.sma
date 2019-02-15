@@ -2630,8 +2630,8 @@ public show_info(id)
 	exp = codPlayer[target][PLAYER_LEVEL] - 1 >= 0 ? get_level_exp(codPlayer[target][PLAYER_LEVEL] - 1) : 0;
 	levelPercent = codPlayer[target][PLAYER_LEVEL] < cvarLevelLimit ? (float((codPlayer[target][PLAYER_EXP] - exp)) / float((get_level_exp(codPlayer[target][PLAYER_LEVEL]) - exp))) * 100.0 : 0.0;
 
-	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot : %s (%i/%i)]%s^n[Zycie : %i]^n[Honor : %i]^n[Czas Gry : %s]",
-	className, clanName, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, codPlayer[target][PLAYER_ITEM_DURA], cvarMaxDurability, missionProgress, get_user_health(target), cod_get_user_honor(target), gameTime);
+	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot : %s (%0.0f%s)]%s^n[Zycie : %i]^n[Honor : %i]^n[Czas Gry : %s]",
+	className, clanName, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, float(codPlayer[target][PLAYER_ITEM_DURA] / cvarMaxDurability) * 100.0, "%%", missionProgress, get_user_health(target), cod_get_user_honor(target), gameTime);
 
 	if (get_exp_bonus(target, NONE)) format(hudData, charsmax(hudData), "%s^n[Exp Bonus : %i%s]", hudData, get_exp_bonus(target, NONE), "%%");
 
