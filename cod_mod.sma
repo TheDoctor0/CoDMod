@@ -4034,19 +4034,19 @@ public _cod_get_user_noclip(id, type)
 
 public _cod_get_user_unlimited_ammo(id, type, weapon)
 {
-	if (weapon) return (codPlayer[id][PLAYER_UNLIMITED_AMMO][type] && (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] <= 0 || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type]));
+	if (weapon) return (codPlayer[id][PLAYER_UNLIMITED_AMMO][type] && (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type]));
 	else return codPlayer[id][PLAYER_UNLIMITED_AMMO][type];
 }
 
 public _cod_get_user_recoil_eliminator(id, type, weapon)
 {
-	if (weapon) return (codPlayer[id][PLAYER_ELIMINATOR][type] && (codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] <= 0 || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type]));
+	if (weapon) return (codPlayer[id][PLAYER_ELIMINATOR][type] && (codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type]));
 	return codPlayer[id][PLAYER_ELIMINATOR][type];
 }
 
 public _cod_get_user_recoil_reducer(id, type, weapon)
 {
-	if (weapon) return (codPlayer[id][PLAYER_REDUCER][type] && (codPlayer[id][PLAYER_REDUCER_WEAPONS][type] <= 0|| 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_REDUCER_WEAPONS][type]));
+	if (weapon) return (codPlayer[id][PLAYER_REDUCER][type] && (codPlayer[id][PLAYER_REDUCER_WEAPONS][type] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_REDUCER_WEAPONS][type]));
 	return codPlayer[id][PLAYER_REDUCER][type];
 }
 
@@ -4141,7 +4141,12 @@ public _cod_set_user_model(id, value, type)
 public _cod_set_user_unlimited_ammo(id, value, type, weapon)
 {
 	codPlayer[id][PLAYER_UNLIMITED_AMMO][type] = value;
-	codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] |= (1<<weapon);
+
+	if (weapon > 0 && codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] != FULL) {
+		codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] |= weapon;
+	} else {
+		codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] = FULL;
+	}
 
 	new bool:enabled, weapons;
 
@@ -4159,7 +4164,12 @@ public _cod_set_user_unlimited_ammo(id, value, type, weapon)
 public _cod_set_user_recoil_eliminator(id, value, type, weapon)
 {
 	codPlayer[id][PLAYER_ELIMINATOR][type] = value;
-	codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] |= (1<<weapon);
+
+	if (weapon > 0 && codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] != FULL) {
+		codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] |= weapon;
+	} else {
+		codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] = FULL;
+	}
 
 	new bool:enabled, weapons;
 
@@ -4177,7 +4187,12 @@ public _cod_set_user_recoil_eliminator(id, value, type, weapon)
 public _cod_set_user_recoil_reducer(id, value, type, weapon)
 {
 	codPlayer[id][PLAYER_REDUCER][type] = value;
-	codPlayer[id][PLAYER_REDUCER_WEAPONS][type] |= (1<<weapon);
+
+	if (weapon > 0 && codPlayer[id][PLAYER_REDUCER_WEAPONS][type] != FULL) {
+		codPlayer[id][PLAYER_REDUCER_WEAPONS][type] |= weapon;
+	} else {
+		codPlayer[id][PLAYER_REDUCER_WEAPONS][type] = FULL;
+	}
 
 	new bool:enabled, weapons;
 

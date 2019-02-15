@@ -749,21 +749,21 @@ native cod_set_user_noclip(id, value, type = ROUND);
 /*------------------------------
 Set player's unlimited clip ammo.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
-Weapon is weapon id (CSW_ format) or FULL for all weapons.
+Weapon is weapon id (1<<CSW_ format - bitsums can be used) or FULL for all weapons.
 ------------------------------*/
 native cod_set_user_unlimited_ammo(id, value, type = ROUND, weapon = FULL);
 
 /*------------------------------
 Set player's recoil eliminator.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
-Weapon is weapon id (CSW_ format) or FULL for all weapons.
+Weapon is weapon id (1<<CSW_ format - bitsums can be used) or FULL for all weapons.
 ------------------------------*/
 native cod_set_user_recoil_eliminator(id, value, type = ROUND, weapon = FULL);
 
 /*------------------------------
 Set player's recoil reducer.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - bonus, ROUND - until round end.
-Weapon is weapon id (CSW_ format) or FULL for all weapons.
+Weapon is weapon id (1<<CSW_ format - bitsums can be used) or FULL for all weapons.
 ------------------------------*/
 native cod_set_user_recoil_reducer(id, value, type = ROUND, weapon = FULL);
 
@@ -796,7 +796,7 @@ There can be only one render for CLASS, ITEM, ADDITIONAL, but multiple for ROUND
 Value is number from -255 to 255 (256 to disable), but for CLASS type must be 0 or more
 (negative numbers substract it from player's current render value, positive and 0 sets it to this value).
 Status is player state for render. It can be a bitsum of RENDER_ALWAYS, RENDER_STAND, RENDER_MOVE, RENDER_DUCK, RENDER_SHIFT.
-Weapon is weapon id (CSW_ format) or FULL for all weapons.
+Weapon is weapon id (1<<CSW_ format - bitsums can be used) or FULL for all weapons.
 Timer sets render value for certain amount of time - it ignores type, status and weapon.
 ------------------------------*/
 native cod_set_user_render(id, value, type = ROUND, status = RENDER_ALWAYS, weapon = FULL, Float:timer = 0.0);

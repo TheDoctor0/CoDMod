@@ -28,7 +28,7 @@ public cod_item_enabled(id, value)
 
 	cod_add_user_bonus_health(id, itemValue[id]);
 
-	cod_set_user_render(id, 75, ITEM, RENDER_ALWAYS, CSW_AWP);
+	cod_set_user_render(id, 75, ITEM, RENDER_ALWAYS, 1<<CSW_AWP);
 
 	cod_give_weapon(id, CSW_AWP);
 }

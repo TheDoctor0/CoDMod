@@ -19,8 +19,8 @@ public cod_item_enabled(id, value)
 {
 	cod_give_weapon(id, CSW_P90);
 
-	cod_set_user_unlimited_ammo(id, true, ITEM, CSW_P90);
-	cod_set_user_recoil_eliminator(id, true, ITEM, CSW_P90);
+	cod_set_user_unlimited_ammo(id, true, ITEM, 1<<CSW_P90);
+	cod_set_user_recoil_eliminator(id, true, ITEM, 1<<CSW_P90);
 }
 
 public cod_item_disabled(id)

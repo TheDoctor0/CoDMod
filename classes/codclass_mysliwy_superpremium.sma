@@ -25,7 +25,7 @@ public plugin_init()
 
 public cod_class_enabled(id)
 {
-	cod_set_user_render(id, 40, CLASS, RENDER_ALWAYS, CSW_KNIFE);
+	cod_set_user_render(id, 40, CLASS, RENDER_ALWAYS, 1<<CSW_KNIFE);
 
 	cod_set_user_multijumps(id, 1, CLASS);
 

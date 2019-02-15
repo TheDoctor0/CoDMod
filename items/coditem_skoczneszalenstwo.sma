@@ -25,7 +25,7 @@ public cod_item_enabled(id, value)
 	itemValue[id] = value;
 
 	cod_set_user_bunnyhop(id, true, ITEM);
-	cod_set_user_render(id, 50, ITEM, CSW_KNIFE);
+	cod_set_user_render(id, 50, ITEM, 1<<CSW_KNIFE);
 }
 
 public cod_item_value(id)

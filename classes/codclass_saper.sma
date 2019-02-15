@@ -26,7 +26,7 @@ public cod_class_enabled(id, promotion)
 {
 	cod_set_user_mines(id, 2, CLASS);
 
-	cod_set_user_render(id, 120, CLASS, RENDER_ALWAYS, CSW_P90);
+	cod_set_user_render(id, 120, CLASS, RENDER_ALWAYS, 1<<CSW_P90);
 
 	cod_set_user_gravity(id, -0.3, CLASS);
 }

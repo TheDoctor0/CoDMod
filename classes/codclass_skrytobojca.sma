@@ -17,10 +17,10 @@
 
 new classUsed;
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
@@ -44,7 +44,7 @@ public cod_class_skill_used(id)
 
 	set_bit(id, classUsed);
 
-	cod_set_user_render(id, 40, CLASS, RENDER_ALWAYS, 0, 5.0);
+	cod_set_user_render(id, 40, CLASS, .timer = 5.0);
 
 	return PLUGIN_CONTINUE;
 }
