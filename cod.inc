@@ -4,7 +4,7 @@
 #define _cod_included
 
 #if !defined client_print_color || !defined MAX_NAME_LENGTH
-    #error NOTSUPPORT AMXX < 1.8.3!
+    #error THIS VERSION IS NOT SUPPORTED! PLEASE USE AMXX 1.8.3 OR 1.9!
 #endif
 
 #pragma unused codSounds
