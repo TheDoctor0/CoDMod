@@ -191,7 +191,11 @@ public plugin_init()
 	RegisterHam(Ham_Spawn, "func_buyzone", "block_buyzone");
 
 	for (new i = 1; i < sizeof weapons; i++) {
-		if (weapons[i][0]) RegisterHam(Ham_Item_Deploy, weapons[i], "weapon_deploy_post", 1);
+		if (weapons[i][0]) {
+			RegisterHam(Ham_Item_Deploy, weapons[i], "weapon_deploy_post", 1);
+
+			if (!(excludedWeapons & (1<<get_weaponid(weapons[i])))) RegisterHam(Ham_Weapon_PrimaryAttack, weapons[i], "weapon_primary_attack_post", 1);
+		}
 	}
 
 	register_logevent("start_round", 2, "1=Round_Start");
@@ -213,7 +217,6 @@ public plugin_init()
 	register_forward(FM_CmdStart, "cmd_start");
 	register_forward(FM_EmitSound, "sound_emit");
 	register_forward(FM_PlayerPreThink, "player_prethink");
-	register_forward(FM_UpdateClientData, "update_client_data", 1);
 
 	register_message(get_user_msgid("SayText"), "say_text");
 	register_message(get_user_msgid("AmmoX"), "message_ammo");
@@ -2220,6 +2223,8 @@ public block_buyzone()
 
 public weapon_deploy_post(ent)
 {
+	if (pev_valid(ent) != 2) return HAM_IGNORED;
+
 	new id = get_pdata_cbase(ent, 41, 4);
 
 	if (!is_user_alive(id)) return HAM_IGNORED;
@@ -2229,6 +2234,29 @@ public weapon_deploy_post(ent)
 	ExecuteForward(codForwards[WEAPON_DEPLOY], ret, id, weapon, ent);
 
 	render_change(id);
+
+	return HAM_IGNORED;
+}
+
+public weapon_primary_attack_post(ent)
+{
+	if (pev_valid(ent) != 2) return HAM_IGNORED;
+
+	new id = get_pdata_cbase(ent, 41, 4);
+
+	if (!is_user_alive(id)) return HAM_IGNORED;
+
+	if (codPlayer[id][PLAYER_ELIMINATOR][ALL] && (codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL])) {
+		set_pev(id, pev_punchangle, {0.0, 0.0, 0.0});
+	} else if (codPlayer[id][PLAYER_REDUCER][ALL] && (codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL])) {
+		new Float:punchAngle[3];
+
+		pev(id, pev_punchangle, punchAngle);
+
+		for (new i = 0; i < 3; i++) punchAngle[i] *= 0.9;
+
+		set_pev(id, pev_punchangle, punchAngle);
+	}
 
 	return HAM_IGNORED;
 }
@@ -2316,7 +2344,13 @@ public cur_weapon(id)
 
 	execute_forward_ignore_two_params(codForwards[CUR_WEAPON], id, get_user_weapon(id));
 
-	if (codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] && (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] <= 0 || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL])) set_user_clip(id);
+	new weapon = read_data(2);
+
+	if (excludedWeapons & (1<<weapon)) return;
+
+	if (codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] && (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL])) {
+		set_pdata_int(get_pdata_cbase(id, 373), 51, maxClipAmmo[weapon], 4);
+	}
 }
 
 public t_win_round()
@@ -2503,17 +2537,6 @@ public cmd_start(id, ucHandle)
 
 	if (get_user_maxspeed(id) > speed * 1.8) set_pev(id, pev_flTimeStepSound, 300);
 
-	if (codPlayer[id][PLAYER_REDUCER][ALL] && (codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] <= 0 || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL]) && button & IN_ATTACK)
-	{
-		new Float:punchAngle[3];
-
-		pev(id, pev_punchangle, punchAngle);
-
-		for (new i = 0; i < 3; i++) punchAngle[i] *= 0.9;
-
-		set_pev(id, pev_punchangle, punchAngle);
-	}
-
 	if (speed == 0.0) playerState |= RENDER_STAND;
 	else playerState |= RENDER_MOVE;
 
@@ -2573,8 +2596,6 @@ public player_prethink(id)
 
 	execute_forward_ignore_one_param(codForwards[PRETHINK], id);
 
-	if (codPlayer[id][PLAYER_ELIMINATOR][ALL] && (codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] <= 0 || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL])) set_pev(id, pev_punchangle, {0.0, 0.0, 0.0});
-
 	if (!codPlayer[id][PLAYER_BUNNYHOP][ALL]) return FMRES_IGNORED;
 
 	entity_set_float(id, EV_FL_fuser2, 0.0);
@@ -2597,9 +2618,6 @@ public player_prethink(id)
 
 	return FMRES_IGNORED;
 }
-
-public update_client_data(id, sendWeapons, cdHandle)
-	if (codPlayer[id][PLAYER_ELIMINATOR][ALL] && (codPlayer[id][PLAYER_ELIMINATOR][ALL] && codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] & codPlayer[id][PLAYER_WEAPON])) set_cd(cdHandle, CD_PunchAngle, {0.0, 0.0, 0.0});
 
 public say_text(msgId, msgDest, msgEnt)
 {
@@ -5203,12 +5221,12 @@ stock set_user_clip(id)
 {
 	if (!is_user_alive(id)) return;
 
-	new weaponName[32], weaponid = -1, weapon = codPlayer[id][PLAYER_WEAPON];
+	new weaponName[32], weaponId = -1, weapon = codPlayer[id][PLAYER_WEAPON];
 
 	get_weaponname(weapon, weaponName, charsmax(weaponName));
 
-	while ((weaponid = engfunc(EngFunc_FindEntityByString, weaponid, "classname", weaponName)) != 0) {
-		if (pev(weaponid, pev_owner) == id) set_pdata_int(weaponid, 51, maxClipAmmo[weapon], 4);
+	while ((weaponId = engfunc(EngFunc_FindEntityByString, weaponId, "classname", weaponName)) != 0) {
+		if (pev(weaponId, pev_owner) == id && !(excludedWeapons & (1<<weaponId))) set_pdata_int(weaponId, 51, maxClipAmmo[weapon], 4);
 	}
 }
 
@@ -5238,8 +5256,7 @@ stock cs_get_weaponbox_type(weaponTypeBox)
 
 stock strip_weapons(id, type, bool:switchIfActive = true)
 {
-	if (is_user_alive(id))
-	{
+	if (is_user_alive(id)) {
 		new ent, weapon;
 
 		while ((weapon = get_weapon_from_slot(id, type, ent)) > 0) ham_strip_user_weapon(id, weapon, type, switchIfActive);
