@@ -119,7 +119,7 @@ public cod_spawned(id, respawn)
 
 	if (!get_bit(id, info) && is_user_alive(id)) set_task(5.0, "show_clan_info", id + TASK_INFO);
 
-	cod_add_user_gravity(id, -cvarGravityPerLevel * get_clan_info(clan[id], CLAN_GRAVITY) / 800.0, ROUND);
+	cod_add_user_gravity(id, -800.0 * (cvarGravityPerLevel * get_clan_info(clan[id], CLAN_GRAVITY) / 100.0), ROUND);
 
 	return PLUGIN_CONTINUE;
 }
@@ -130,7 +130,7 @@ public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPl
 
 	cod_inflict_damage(attacker, victim, damage * cvarDamagePerLevel * get_clan_info(clan[attacker], CLAN_DAMAGE) / 100.0, 0.0, damageBits);
 
-	if (get_clan_info(clan[attacker], CLAN_DROP) && random_num(1, (cvarSkillMax * 1.6 - (get_clan_info(clan[attacker], CLAN_DROP) * cvarWeaponDropPerLevel)) == 1)) engclient_cmd(victim, "drop");
+	if (cod_percent_chance(get_clan_info(clan[attacker], CLAN_DROP) * cvarWeaponDropPerLevel)) engclient_cmd(victim, "drop");
 
 	return PLUGIN_CONTINUE;
 }
@@ -172,6 +172,7 @@ public show_clan_menu(id, sound)
 		if (cvarCreateLevel && cvarCreateFee) formatex(menuData, charsmax(menuData), "\wZaloz \yKlan \r(Wymagany %i Poziom i %i Honoru)", cvarCreateLevel, cvarCreateFee);
 		else if (cvarCreateLevel) formatex(menuData, charsmax(menuData), "\wZaloz \yKlan \r(Wymagany %i Poziom)", cvarCreateLevel);
 		else if (cvarCreateFee) formatex(menuData, charsmax(menuData), "\wZaloz \yKlan \r(Wymagane %i Honoru)", cvarCreateFee);
+		else formatex(menuData, charsmax(menuData), "\wZaloz \yKlan");
 
 		menu_additem(menu, menuData, "0", _, callback);
 
@@ -228,13 +229,13 @@ public show_clan_menu_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 
-			if (cod_get_user_highest_level(id) < cvarCreateLevel) {
+			if (cvarCreateLevel && cod_get_user_highest_level(id) < cvarCreateLevel) {
 				cod_print_chat(id, "Nie masz wystarczajacego poziomu, aby zalozyc klan (Wymagany^x03 %i poziom^x01)!", cvarCreateLevel);
 
 				return PLUGIN_HANDLED;
 			}
 
-			if (cod_get_user_honor(id) < cvarCreateFee) {
+			if (cvarCreateFee && cod_get_user_honor(id) < cvarCreateFee) {
 				cod_print_chat(id, "Nie masz wystarczajaco duzo honoru, aby zalozyc klan (Wymagane^x03 %i honoru^x01)!", cvarCreateFee);
 
 				return PLUGIN_HANDLED;
@@ -271,13 +272,13 @@ public create_clan_handle(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
-	if (cod_get_user_highest_level(id) < cvarCreateLevel) {
+	if (cvarCreateFee && cod_get_user_highest_level(id) < cvarCreateLevel) {
 		cod_print_chat(id, "Nie masz wystarczajacego poziomu, aby zalozyc klan (Wymagany^x03 %i poziom^x01)!", cvarCreateLevel);
 
 		return PLUGIN_HANDLED;
 	}
 
-	if (cod_get_user_honor(id) < cvarCreateFee) {
+	if (cvarCreateFee && cod_get_user_honor(id) < cvarCreateFee) {
 		cod_print_chat(id, "Nie masz wystarczajaco duzo honoru, aby zalozyc klan (Wymagane^x03 %i honoru^x01)!", cvarCreateFee);
 
 		return PLUGIN_HANDLED;
@@ -1273,8 +1274,18 @@ public applications_confirm_menu(id, menu, item)
 
 	new menu = menu_create(menuData, "applications_confirm_handle");
 
-	menu_additem(menu, "Przymij - \rWpisowe z banku klanu", userName);
-	menu_additem(menu, "Przymij - \yWpisowe z konta gracza", userName);
+	if (cvarJoinFee) {
+		formatex(menuData, charsmax(menuData), "Przymij - \rWpisowe %i honoru z banku klanu", cvarJoinFee);
+
+		menu_additem(menu, menuData, userName);
+
+		formatex(menuData, charsmax(menuData), "Przymij - \rWpisowe %i honoru z konta gracza", cvarJoinFee);
+
+		menu_additem(menu, menuData, userName);
+	} else {
+		menu_additem(menu, "Przymij", userName);
+	}
+
 	menu_additem(menu, "Odrzuc");
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
@@ -1326,61 +1337,63 @@ public applications_confirm_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	if (!item) {
-		if (get_clan_honor(clan[id]) < cvarJoinFee) {
-			cod_print_chat(id, "W banku klanu nie ma wystarczajaco honoru na oplate wpisowa (^x04Wymagane %i Honoru^x01).", cvarJoinFee);
-
-			return PLUGIN_HANDLED;
-		}
-
-		set_clan_info(clan[id], CLAN_HONOR, -cvarJoinFee);
-	} else {
-		new userId = get_user_index(userName);
-
-		if (is_user_connected(userId)) {
-			if (cod_get_user_honor(id) < cvarJoinFee) {
-				cod_print_chat(id, "Gracz nie ma wystarczajaco honoru na oplate wpisowa (^x04Wymagane %i Honoru^x01).", cvarJoinFee);
+	if (cvarJoinFee) {
+		if (!item) {
+			if (get_clan_honor(clan[id]) < cvarJoinFee) {
+				cod_print_chat(id, "W banku klanu nie ma wystarczajaco honoru na oplate wpisowa (^x04Wymagane %i Honoru^x01).", cvarJoinFee);
 
 				return PLUGIN_HANDLED;
 			}
 
-			cod_add_user_honor(id, -cvarJoinFee);
+			set_clan_info(clan[id], CLAN_HONOR, -cvarJoinFee);
 		} else {
-			new queryData[128], error[128], safeName[64], Handle:query, honor, errorNum;
+			new userId = get_user_index(userName);
 
-			cod_sql_string(userName, safeName, charsmax(safeName));
+			if (is_user_connected(userId)) {
+				if (cod_get_user_honor(id) < cvarJoinFee) {
+					cod_print_chat(id, "Gracz nie ma wystarczajaco honoru na oplate wpisowa (^x04Wymagane %i Honoru^x01).", cvarJoinFee);
 
-			formatex(queryData, charsmax(queryData), "SELECT honor FROM `cod_honor` WHERE `name` = ^"%s^"", safeName);
+					return PLUGIN_HANDLED;
+				}
 
-			query = SQL_PrepareQuery(connection, queryData);
-
-			if (SQL_Execute(query)) {
-				if (SQL_MoreResults(query)) honor = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
+				cod_add_user_honor(id, -cvarJoinFee);
 			} else {
-				errorNum = SQL_QueryError(query, error, charsmax(error));
+				new queryData[128], error[128], safeName[64], Handle:query, honor, errorNum;
 
-				cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
+				cod_sql_string(userName, safeName, charsmax(safeName));
+
+				formatex(queryData, charsmax(queryData), "SELECT honor FROM `cod_honor` WHERE `name` = ^"%s^"", safeName);
+
+				query = SQL_PrepareQuery(connection, queryData);
+
+				if (SQL_Execute(query)) {
+					if (SQL_MoreResults(query)) honor = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
+				} else {
+					errorNum = SQL_QueryError(query, error, charsmax(error));
+
+					cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
+				}
+
+				SQL_FreeHandle(query);
+
+				if (honor < cvarJoinFee) {
+					cod_print_chat(id, "Gracz nie ma wystarczajaco honoru na oplate wpisowa (^x04Wymagane %i Honoru^x01).", cvarJoinFee);
+
+					return PLUGIN_HANDLED;
+				}
+
+				formatex(queryData, charsmax(queryData), "UPDATE `cod_honor` SET honor = honor - %i WHERE `name` = ^"%s^"", cvarJoinFee, safeName);
+
+				query = SQL_PrepareQuery(connection, queryData);
+
+				if (!SQL_Execute(query)) {
+					errorNum = SQL_QueryError(query, error, charsmax(error));
+
+					cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
+				}
+
+				SQL_FreeHandle(query);
 			}
-
-			SQL_FreeHandle(query);
-
-			if (honor < cvarJoinFee) {
-				cod_print_chat(id, "Gracz nie ma wystarczajaco honoru na oplate wpisowa (^x04Wymagane %i Honoru^x01).", cvarJoinFee);
-
-				return PLUGIN_HANDLED;
-			}
-
-			formatex(queryData, charsmax(queryData), "UPDATE `cod_honor` SET honor = honor - %i WHERE `name` = ^"%s^"", cvarJoinFee, safeName);
-
-			query = SQL_PrepareQuery(connection, queryData);
-
-			if (!SQL_Execute(query)) {
-				errorNum = SQL_QueryError(query, error, charsmax(error));
-
-				cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
-			}
-
-			SQL_FreeHandle(query);
 		}
 	}
 
@@ -3118,7 +3131,7 @@ stock create_clan(id, const clanName[])
 			set_user_clan(id, clan[id], 1);
 			set_user_status(id, STATUS_LEADER);
 
-			cod_add_user_honor(id, -cvarCreateFee);
+			if (cvarCreateFee) cod_add_user_honor(id, -cvarCreateFee);
 
 			success = true;
 		}
