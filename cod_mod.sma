@@ -2106,20 +2106,22 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 	new playerName[MAX_NAME], className[MAX_NAME], itemName[MAX_NAME];
 
 	if (codPlayer[killer][PLAYER_CLASS] && get_playersnum() > cvarMinPlayers) {
-		new exp = get_exp_bonus(killer, hitPlace == HIT_HEAD ? (cvarExpKill + cvarExpKillHS) : cvarExpKill);
+		if (cvarExpKill || cvarExpKillHS) {
+			new exp = get_exp_bonus(killer, hitPlace == HIT_HEAD ? (cvarExpKill + cvarExpKillHS) : cvarExpKill);
 
-		if (codPlayer[victim][PLAYER_LEVEL] > codPlayer[killer][PLAYER_LEVEL]) exp += get_exp_bonus(killer, (codPlayer[victim][PLAYER_LEVEL] - codPlayer[killer][PLAYER_LEVEL]) * (cvarExpKill / 10));
+			if (codPlayer[victim][PLAYER_LEVEL] > codPlayer[killer][PLAYER_LEVEL]) exp += get_exp_bonus(killer, (codPlayer[victim][PLAYER_LEVEL] - codPlayer[killer][PLAYER_LEVEL]) * (cvarExpKill / 10));
 
-		codPlayer[killer][PLAYER_GAINED_EXP] += exp;
+			codPlayer[killer][PLAYER_GAINED_EXP] += exp;
 
-		get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
+			get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
-		get_user_name(victim, playerName, charsmax(playerName));
+			get_user_name(victim, playerName, charsmax(playerName));
 
-		chat_print(killer, "Zabiles%s^x03 %s^x04 (%s - %i)^x01, dostajesz^x03 %i^x01 doswiadczenia.", hitPlace == HIT_HEAD ? " z HS" : "", playerName, className, codPlayer[victim][PLAYER_LEVEL], exp);
+			chat_print(killer, "Zabiles%s^x03 %s^x04 (%s - %i)^x01, dostajesz^x03 %i^x01 doswiadczenia.", hitPlace == HIT_HEAD ? " z HS" : "", playerName, className, codPlayer[victim][PLAYER_LEVEL], exp);
 
-		set_dhudmessage(255, 206, 85, -1.0, 0.6, 0, 0.0, 2.0, 0.0, 0.0);
-		show_dhudmessage(killer, "+%i XP", exp);
+			set_dhudmessage(255, 206, 85, -1.0, 0.6, 0, 0.0, 2.0, 0.0, 0.0);
+			show_dhudmessage(killer, "+%i XP", exp);
+		}
 
 		if (cvarKillStreakTime) {
 			codPlayer[killer][PLAYER_KS]++;
@@ -2361,7 +2363,7 @@ public round_winner(team)
 {
 	execute_forward_ignore_one_param(codForwards[WIN_ROUND], team);
 
-	if (get_playersnum() < cvarMinPlayers) return;
+	if (get_playersnum() < cvarMinPlayers || !cvarExpWinRound) return;
 
 	for (new id = 1; id <= MAX_PLAYERS; id++) {
 		if (!codPlayer[id][PLAYER_CLASS] || get_user_team(id) != team) continue;
@@ -2383,7 +2385,7 @@ public bomb_planted(id)
 {
 	execute_forward_ignore_one_param(codForwards[BOMB_PLANTED], id);
 
-	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS]) return;
+	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS] || !cvarExpPlant) return;
 
 	new exp = get_exp_bonus(id, cvarExpPlant);
 
@@ -2401,7 +2403,7 @@ public bomb_defused(id)
 {
 	execute_forward_ignore_one_param(codForwards[BOMB_DEFUSED], id);
 
-	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS]) return;
+	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS] || !cvarExpDefuse) return;
 
 	new exp = get_exp_bonus(id, cvarExpDefuse);
 
@@ -2441,6 +2443,16 @@ public hostage_rescued()
 	new id = get_loguser_index();
 
 	execute_forward_ignore_one_param(codForwards[HOSTAGE_RESCUED], id);
+
+	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS] || !cvarExpRescue) return;
+
+	new exp = get_exp_bonus(id, cvarExpRescue);
+
+	codPlayer[id][PLAYER_GAINED_EXP] += exp;
+
+	chat_print(id, "Dostales^x03 %i^x01 doswiadczenia za uratowanie zakladnika.", exp);
+
+	check_level(id);
 }
 
 public hostages_rescued()
@@ -2448,16 +2460,6 @@ public hostages_rescued()
 	new id = get_loguser_index();
 
 	execute_forward_ignore_one_param(codForwards[HOSTAGES_RESCUED], id);
-
-	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS]) return;
-
-	new exp = get_exp_bonus(id, cvarExpRescue);
-
-	codPlayer[id][PLAYER_GAINED_EXP] += exp;
-
-	chat_print(id, "Dostales^x03 %i^x01 doswiadczenia za uratowanie zakladnikow.", exp);
-
-	check_level(id);
 }
 
 stock render_change(id, playerStatus = NONE)

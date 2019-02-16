@@ -50,7 +50,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_clans_next_skill_cost", "500"), cvarNextSkillCost);
 	bind_pcvar_num(create_cvar("cod_clans_members_per_level", "1"), cvarMembersPerLevel);
 	bind_pcvar_num(create_cvar("cod_clans_health_per_level", "1"), cvarHealthPerLevel);
-	bind_pcvar_num(create_cvar("cod_clans_gravity_per_level", "20"), cvarGravityPerLevel);
+	bind_pcvar_num(create_cvar("cod_clans_gravity_per_level", "2"), cvarGravityPerLevel);
 	bind_pcvar_num(create_cvar("cod_clans_damage_per_level", "1"), cvarDamagePerLevel);
 	bind_pcvar_num(create_cvar("cod_clans_weapondrop_per_level", "1"), cvarWeaponDropPerLevel);
 
