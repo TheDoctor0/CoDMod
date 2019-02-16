@@ -454,8 +454,8 @@ public plugin_cfg()
 
 public plugin_end()
 {
-	SQL_FreeHandle(sql);
-	SQL_FreeHandle(connection);
+	if (sql != Empty_Handle) SQL_FreeHandle(sql);
+	if (connection != Empty_Handle) SQL_FreeHandle(connection);
 
 	for (new i = 0; i < sizeof codForwards; i++) DestroyForward(i);
 	for (new i = 0; i < ArraySize(codItems); i++) for (new j = ITEM_GIVE; j <= ITEM_UPGRADE; j++) DestroyForward(get_item_info(i, j));
@@ -2346,7 +2346,7 @@ public cur_weapon(id)
 
 	new weapon = read_data(2);
 
-	if (excludedWeapons & (1<<weapon)) return;
+	if (!weapon || excludedWeapons & (1<<weapon)) return;
 
 	if (codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] && (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL])) {
 		set_pdata_int(get_pdata_cbase(id, 373), 51, maxClipAmmo[weapon], 4);
@@ -2659,7 +2659,7 @@ public message_ammo(msgId, msgDest, id)
 {
 	new weapon = get_user_weapon(id);
 
-	if (!(excludedWeapons & (1<<weapon))) cs_set_user_bpammo(id, weapon, maxBpAmmo[weapon]);
+	if (weapon && !(excludedWeapons & (1<<weapon))) cs_set_user_bpammo(id, weapon, maxBpAmmo[weapon]);
 }
 
 public message_intermission()
@@ -2705,6 +2705,16 @@ public show_info(id)
 	} else set_hudmessage(codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], float(codPlayer[id][PLAYER_HUD_POSX]) / 100.0, float(codPlayer[id][PLAYER_HUD_POSY]) / 100.0, 0, 0.0, 0.3, 0.0, 0.0, 4);
 
 	if (!target) return PLUGIN_CONTINUE;
+
+	if (sql == Empty_Handle) {
+		set_hudmessage(255, 15, 15, -1.0, 0.3, 0, 0.0, 0.3, 0.0, 0.0, 4);
+
+		formatex(hudData, charsmax(hudData), "Wystapil blad przy probie nawiazania polaczenia z baza danych!");
+
+		ShowSyncHudMsg(id, hudInfo, hudData);
+
+		return PLUGIN_CONTINUE;
+	}
 
 	get_user_class_info(target, codPlayer[target][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 	get_item_info(codPlayer[target][PLAYER_ITEM], ITEM_NAME, itemName, charsmax(itemName));
@@ -3368,6 +3378,8 @@ public sql_init()
 
 	if (errorNum) {
 		log_to_file(LOG_FILE, "[%s] SQL Error: %s (%d)", PLUGIN, error, errorNum);
+
+		sql = Empty_Handle;
 
 		set_task(5.0, "sql_init");
 

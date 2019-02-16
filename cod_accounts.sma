@@ -59,7 +59,7 @@ public plugin_cfg()
 	sql_init();
 
 public plugin_end()
-	SQL_FreeHandle(sql);
+	if (sql != Empty_Handle) SQL_FreeHandle(sql);
 
 public client_connect(id)
 {

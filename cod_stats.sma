@@ -77,8 +77,8 @@ public plugin_cfg()
 
 public plugin_end()
 {
-	SQL_FreeHandle(sql);
-	SQL_FreeHandle(connection);
+	if (sql != Empty_Handle) SQL_FreeHandle(sql);
+	if (connection != Empty_Handle) SQL_FreeHandle(connection);
 }
 
 public plugin_natives()
@@ -974,6 +974,8 @@ public sql_init()
 
 	if (errorNum) {
 		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
+
+		sql = Empty_Handle;
 
 		set_task(5.0, "sql_init");
 
