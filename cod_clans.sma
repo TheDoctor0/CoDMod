@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Clans"
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 #define AUTHOR "O'Zone"
 
 #define TASK_INFO 9843
@@ -15,7 +15,7 @@ enum _:clanInfo { CLAN_ID, CLAN_LEVEL, CLAN_HONOR, CLAN_HEALTH, CLAN_GRAVITY, CL
 enum _:warInfo { WAR_ID, WAR_CLAN, WAR_CLAN2, WAR_PROGRESS, WAR_PROGRESS2, WAR_DURATION, WAR_REWARD };
 enum _:statusInfo { STATUS_NONE, STATUS_MEMBER, STATUS_DEPUTY, STATUS_LEADER };
 
-new cvarCreateLevel, cvarCreateFee, cvarJoinFee, cvarMembersStart, cvarLevelMax, cvarSkillMax, cvarChatPrefix, cvarLevelCost, cvarNextLevelCost,
+new cvarCreateLevel, cvarCreateFee, cvarJoinFee, cvarNameChangeFee, cvarMembersStart, cvarLevelMax, cvarSkillMax, cvarChatPrefix, cvarLevelCost, cvarNextLevelCost,
 	cvarSkillCost, cvarNextSkillCost, cvarMembersPerLevel, cvarHealthPerLevel, cvarGravityPerLevel, cvarDamagePerLevel, cvarWeaponDropPerLevel;
 
 new playerName[MAX_PLAYERS + 1][MAX_NAME], chosenName[MAX_PLAYERS + 1][MAX_NAME], clan[MAX_PLAYERS + 1], chosenId[MAX_PLAYERS + 1], warFrags[MAX_PLAYERS + 1],
@@ -39,6 +39,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_clans_create_level", "25"), cvarCreateLevel);
 	bind_pcvar_num(create_cvar("cod_clans_create_fee", "250"), cvarCreateFee);
 	bind_pcvar_num(create_cvar("cod_clans_join_fee", "100"), cvarJoinFee);
+	bind_pcvar_num(create_cvar("cod_clans_name_change_fee", "100"), cvarNameChangeFee);
 	bind_pcvar_num(create_cvar("cod_clans_members_start", "3"), cvarMembersStart);
 	bind_pcvar_num(create_cvar("cod_clans_level_max", "10"), cvarLevelMax);
 	bind_pcvar_num(create_cvar("cod_clans_skill_max", "10"), cvarSkillMax);
@@ -147,7 +148,7 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 public show_clan_menu(id, sound)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
@@ -203,7 +204,7 @@ public show_clan_menu_callback(id, menu, item)
 
 public show_clan_menu_handle(id, menu, item)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -320,7 +321,7 @@ public create_clan_handle(id)
 
 public leave_confim_menu(id)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	new menu = menu_create("\wJestes \ypewien\w, ze chcesz \ropuscic \wklan?", "leave_confim_menu_handle");
 
@@ -336,7 +337,7 @@ public leave_confim_menu(id)
 
 public leave_confim_menu_handle(id, menu, item)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -371,7 +372,7 @@ public leave_confim_menu_handle(id, menu, item)
 
 public members_online_menu(id)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	new clanName[MAX_NAME], playersAvailable = 0;
 
@@ -405,7 +406,7 @@ public members_online_menu(id)
 
 public members_online_menu_handle(id, menu, item)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -428,7 +429,7 @@ public members_online_menu_handle(id, menu, item)
 
 public leader_menu(id)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	new menu = menu_create("\yZarzadzaj \rKlanem", "leader_menu_handle"), callback = menu_makecallback("leader_menu_callback");
 
@@ -461,7 +462,7 @@ public leader_menu_callback(id, menu, item)
 
 public leader_menu_handle(id, menu, item)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -482,8 +483,56 @@ public leader_menu_handle(id, menu, item)
 		case 3: members_menu(id);
 		case 4: applications_menu(id);
 		case 5: wars_menu(id);
-		case 6: client_cmd(id, "messagemode PODAJ_NOWA_NAZWE_KLANU");
+		case 6: change_name_menu(id);
 		case 7: show_clan_menu(id, 1);
+	}
+
+	return PLUGIN_HANDLED;
+}
+
+public change_name_menu(id)
+{
+	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
+
+	if (!cvarNameChangeFee) {
+		client_cmd(id, "messagemode PODAJ_NOWA_NAZWE_KLANU");
+	} else {
+		new menuData[128], menu;
+
+		formatex(menuData, charsmax(menuData), "\wKoszt zmiany wynosi \y%i\w honoru. Jestes \ypewien\w, ze chcesz \rzmienic nazwe\w klanu?", cvarNameChangeFee);
+
+		menu = menu_create(menuData, "change_name_menu_handle");
+
+		menu_additem(menu, "Tak", "0");
+		menu_additem(menu, "Nie^n", "1");
+
+		menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+
+		menu_display(id, menu);
+	}
+
+	return PLUGIN_HANDLED;
+}
+
+public change_name_menu_handle(id, menu, item)
+{
+	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
+
+	if (item == MENU_EXIT) {
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		show_clan_menu(id, 1);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
+	}
+
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	switch (item) {
+		case 0: client_cmd(id, "messagemode PODAJ_NOWA_NAZWE_KLANU");
+		case 1: show_clan_menu(id, 1);
 	}
 
 	return PLUGIN_HANDLED;
@@ -491,7 +540,7 @@ public leader_menu_handle(id, menu, item)
 
 public disband_menu(id)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || get_user_status(id) != STATUS_LEADER || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	new menu = menu_create("\wJestes \ypewien\w, ze chcesz \rrozwiazac\w klan?", "disband_menu_handle");
 
@@ -507,7 +556,7 @@ public disband_menu(id)
 
 public disband_menu_handle(id, menu, item)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || get_user_status(id) != STATUS_LEADER || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -537,7 +586,7 @@ public disband_menu_handle(id, menu, item)
 
 public skills_menu(id)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	new codClan[clanInfo], menuData[128];
 
@@ -571,7 +620,7 @@ public skills_menu(id)
 
 public skills_menu_handle(id, menu, item)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -745,7 +794,7 @@ public skills_menu_handle(id, menu, item)
 
 public invite_menu(id)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	new userName[MAX_NAME], userId[6], playersAvailable = 0;
 
@@ -771,7 +820,7 @@ public invite_menu(id)
 
 public invite_menu_handle(id, menu, item)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -808,7 +857,7 @@ public invite_menu_handle(id, menu, item)
 
 public invite_confirm_menu(id, player)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || !is_user_connected(player) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(player, "spk %s", codSounds[SOUND_SELECT]);
 
@@ -834,7 +883,7 @@ public invite_confirm_menu(id, player)
 
 public invite_confirm_menu_handle(id, menu, item)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT || item) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -883,7 +932,7 @@ public invite_confirm_menu_handle(id, menu, item)
 
 public change_name_handle(id)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || get_user_status(id) != STATUS_LEADER) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || get_user_status(id) != STATUS_LEADER || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
@@ -916,6 +965,16 @@ public change_name_handle(id)
 
 		return PLUGIN_HANDLED;
 	}
+
+	if (cvarNameChangeFee && get_clan_honor(clan[id]) < cvarNameChangeFee) {
+		cod_print_chat(id, "W banku klanu nie ma wystarczajaco honoru na oplate za zmiane nazwy (^x04Wymagane %i Honoru^x01).", cvarNameChangeFee);
+
+		show_clan_menu(id, 1);
+
+		return PLUGIN_HANDLED;
+	}
+
+	set_clan_info(clan[id], CLAN_HONOR, -cvarNameChangeFee);
 
 	update_clan_name(clan[id], clanName, charsmax(clanName));
 
@@ -950,7 +1009,7 @@ public members_menu_handle(failState, Handle:query, error[], errorNum, tempId[],
 
 	new id = tempId[0];
 
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	new itemData[96], userName[MAX_NAME], status, menu = menu_create("\yZarzadzaj \rCzlonkami:^n\wWybierz \yczlonka\w, aby pokazac mozliwe opcje.", "member_menu_handle");
 
@@ -983,7 +1042,7 @@ public members_menu_handle(failState, Handle:query, error[], errorNum, tempId[],
 
 public member_menu_handle(id, menu, item)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -1046,7 +1105,7 @@ public member_menu_handle(id, menu, item)
 
 public member_options_menu_handle(id, menu, item)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -1078,7 +1137,7 @@ public member_options_menu_handle(id, menu, item)
 
 public update_member(id, status)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	new bool:playerOnline;
 
@@ -1134,7 +1193,7 @@ public update_member(id, status)
 
 public applications_menu(id)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	new queryData[256], tempId[1];
 
@@ -1158,7 +1217,7 @@ public applications_menu_handle(failState, Handle:query, error[], errorNum, temp
 
 	new id = tempId[0];
 
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	new itemName[128], userName[MAX_NAME], level, honor, usersCount = 0, menu = menu_create("\yRozpatrywanie \rPodan:^n\wWybierz \rpodanie\w, aby je \yzatwierdzic\w lub \yodrzucic\w.", "applications_confirm_menu");
 
@@ -1192,7 +1251,7 @@ public applications_menu_handle(failState, Handle:query, error[], errorNum, temp
 
 public applications_confirm_menu(id, menu, item)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -1269,7 +1328,7 @@ public applications_confirm_handle(id, menu, item)
 
 	if (!item) {
 		if (get_clan_honor(clan[id]) < cvarJoinFee) {
-			cod_print_chat(id, "W banku klanu nie ma wystarczajaco pieniedzy na oplate wpisowa (^x04Wymagane %i Honoru^x01).", cvarJoinFee);
+			cod_print_chat(id, "W banku klanu nie ma wystarczajaco honoru na oplate wpisowa (^x04Wymagane %i Honoru^x01).", cvarJoinFee);
 
 			return PLUGIN_HANDLED;
 		}
@@ -1945,7 +2004,7 @@ public remove_war_confirm_handle(id, menu, item)
 
 public deposit_honor_handle(id)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || !clan[id]) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
@@ -2036,7 +2095,7 @@ public set_war_reward_handle(id)
 
 public depositors_list(id)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	new queryData[128], tempId[1];
 
@@ -2060,7 +2119,7 @@ public show_depositors_list(failState, Handle:query, error[], errorNum, tempId[]
 
 	new id = tempId[0];
 
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	static motdData[2048], playerName[MAX_NAME], motdLength, rank, honor;
 
@@ -2091,7 +2150,7 @@ public show_depositors_list(failState, Handle:query, error[], errorNum, tempId[]
 
 public clans_top15(id)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	new queryData[256], tempId[1];
 
@@ -2115,7 +2174,7 @@ public show_clans_top15(failState, Handle:query, error[], errorNum, tempId[], da
 
 	new id = tempId[0];
 
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	static motdData[2048], clanName[MAX_NAME], motdLength, clanId, rank, members, honor, kills, level, wins;
 
@@ -2266,7 +2325,7 @@ public application_menu_handle(failState, Handle:query, error[], errorNum, tempI
 
 public application_handle(id, menu, item)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -2318,7 +2377,7 @@ public application_handle(id, menu, item)
 
 public application_confirm_handle(id, menu, item)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT || item) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
@@ -2357,7 +2416,7 @@ public application_confirm_handle(id, menu, item)
 
 stock set_user_clan(id, playerClan = 0, owner = 0)
 {
-	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return;
+	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return;
 
 	if (playerClan == 0) {
 		set_clan_info(clan[id], CLAN_MEMBERS, -1);
