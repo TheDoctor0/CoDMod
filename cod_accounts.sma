@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Accounts"
-#define VERSION "1.1.1"
+#define VERSION "1.2.2"
 #define AUTHOR "O'Zone"
 
 #define TASK_PASSWORD   1945
@@ -173,7 +173,7 @@ public account_menu(id, sound)
 
 	if (sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	if (playerData[id][STATUS] <= NOT_LOGGED && !task_exists(id + TASK_PASSWORD)) set_task(float(cvarLoginMaxTime), "kick_player", id + TASK_PASSWORD);
+	if (playerData[id][STATUS] <= NOT_LOGGED && !task_exists(id + TASK_PASSWORD) && cvarLoginMaxTime) set_task(float(cvarLoginMaxTime), "kick_player", id + TASK_PASSWORD);
 
 	static menuData[256];
 
@@ -283,9 +283,11 @@ public login_account(id)
 	remove_quotes(password);
 
 	if (!equal(playerData[id][PASSWORD], password)) {
-		if (++playerData[id][FAILS] >= cvarPasswordMaxFails) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
+		if (cvarPasswordMaxFails) {
+			if (++playerData[id][FAILS] >= cvarPasswordMaxFails) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
 
-		cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01. (Bledne haslo^x04 %i/%i^x01)", playerData[id][FAILS], cvarPasswordMaxFails);
+			cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01. (Bledne haslo^x04 %i/%i^x01)", playerData[id][FAILS], cvarPasswordMaxFails);
+		} else cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01.");
 
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
 
@@ -435,9 +437,11 @@ public change_step_one(id)
 	remove_quotes(password);
 
 	if (!equal(playerData[id][PASSWORD], password)) {
-		if (++playerData[id][FAILS] >= cvarPasswordMaxFails) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
+		if (cvarPasswordMaxFails) {
+			if (++playerData[id][FAILS] >= cvarPasswordMaxFails) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
 
-		cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01. (Bledne haslo^x04 %i/%i^x01)", playerData[id][FAILS], cvarPasswordMaxFails);
+			cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01. (Bledne haslo^x04 %i/%i^x01)", playerData[id][FAILS], cvarPasswordMaxFails);
+		} else cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01.");
 
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
 		show_hudmessage(id, "Podane haslo jest nieprawidlowe.");
@@ -546,9 +550,11 @@ public delete_account(id)
 	remove_quotes(password);
 
 	if (!equal(playerData[id][PASSWORD], password)) {
-		if (++playerData[id][FAILS] >= cvarPasswordMaxFails) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
+		if (cvarPasswordMaxFails) {
+			if (++playerData[id][FAILS] >= cvarPasswordMaxFails) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
 
-		cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01. (Bledne haslo^x04 %i/%i^x01)", playerData[id][FAILS], cvarPasswordMaxFails);
+			cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01. (Bledne haslo^x04 %i/%i^x01)", playerData[id][FAILS], cvarPasswordMaxFails);
+		} else cod_print_chat(id, "Podane haslo jest^x04 nieprawidlowe^x01.");
 
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
 		show_hudmessage(id, "Podane haslo jest nieprawidlowe.");
