@@ -114,8 +114,8 @@ new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpDamagePer, cvarExpWinRound
 
 new Array:codItems, Array:codClasses, Array:codPromotions, Array:codFractions, Array:codPlayerClasses[MAX_PLAYERS + 1], Array:codPlayerRender[MAX_PLAYERS + 1], codForwards[forwards];
 
-new Handle:sql, Handle:connection, bool:sqlConnected, bool:skillsBlocked, bool:nightExp, bool:mapChange, bool:freezeTime = true, hudInfo, hudSync,
-	hudSync2, playersNum, dataLoaded, hudLoaded, resetStats, userConnected, renderTimer, glowActive, roundStart, lastInfo;
+new Handle:sql, Handle:connection, bool:sqlConnected, bool:skillsBlocked, bool:nightExp, bool:mapChange, bool:freezeTime = true,
+	hudInfo, hudSync, hudSync2, dataLoaded, hudLoaded, resetStats, renderTimer, glowActive, roundStart, lastInfo;
 
 public plugin_init()
 {
@@ -502,10 +502,6 @@ public client_connect(id)
 
 public client_putinserver(id)
 {
-	playersNum++;
-
-	set_bit(id, userConnected);
-
 	show_bonus_info();
 
 	if (is_user_bot(id) || is_user_hltv(id)) return;
@@ -518,12 +514,9 @@ public client_putinserver(id)
 
 public client_disconnected(id)
 {
-	if (get_bit(id, userConnected)) playersNum--;
-
 	save_data(id, mapChange ? MAP_END : FINAL);
 
 	remove_tasks(id);
-
 	remove_ents(id);
 
 	if (!mapChange) {
@@ -4708,7 +4701,7 @@ stock get_exp_bonus(id, exp)
 
 stock get_players_amount()
 {
-	if (get_maxplayers() - playersNum <= cvarMinBonusPlayers) return (cvarMinBonusPlayers - (get_maxplayers() - playersNum));
+	if (get_maxplayers() - get_playersnum() <= cvarMinBonusPlayers) return (cvarMinBonusPlayers - (get_maxplayers() - get_playersnum()));
 
 	return 0;
 }
