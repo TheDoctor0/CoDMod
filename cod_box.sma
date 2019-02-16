@@ -6,7 +6,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Box"
-#define VERSION "1.1.1"
+#define VERSION "1.2.2"
 #define AUTHOR "O'Zone"
 
 new const boxClass[] = "cod_box", boxModel[] = "models/CoDMod/box.mdl";
@@ -33,7 +33,7 @@ public plugin_precache()
 }
 
 public cod_killed(killer, victim, weaponId, hitPlace)
-	if (random_num(1, cvarBoxChance) == 1) create_box(victim);
+	if (cvarBoxChance && random_num(1, cvarBoxChance) == 1) create_box(victim);
 
 public cod_new_round()
 {
