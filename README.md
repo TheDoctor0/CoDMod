@@ -15,3 +15,6 @@ In both cases with ReHLDS and ReGameDLL also installed.
 You can fix it by doing one of those things:
 1. Add *-heapsize 65535* to server launch options.
 2. Uncomment *#define LITE* in *cod_icons.sma* and compile it locally to use version with smaller sprites.
+
+### Servers
+List of servers that are using this mod is available [HERE](https://www.gametracker.com/search/?search_by=server_variable&search_by2=cod_version&query=&loc=_all&sort=&order=).
