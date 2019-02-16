@@ -128,7 +128,7 @@ public cod_bomb_picked(id)
 	remove_icon(iconEntity[BOMB_DROP], BOMB_DROP);
 }
 
-public cod_bomb_plant(id)
+public cod_bomb_planted(id)
 {
 	bombTimer = get_pcvar_num(cvarC4);
 
@@ -163,15 +163,17 @@ public bomb_timer()
 public cod_box_dropped(ent)
 	spawn_sprite(ent, BOX);
 
+public cod_start_round()
+	roundStarted = true;
+
 public cod_new_round()
 {
 	remove_icon(iconEntity[BOMB_DROP], BOMB_DROP);
 	remove_icon(iconEntity[BOMB_PLANT], BOMB_PLANT);
 	remove_icon(iconEntity[BOMB_EXPLODE], BOMB_EXPLODE);
-}
 
-public cod_start_round()
 	roundStarted = true;
+}
 
 public cod_end_round()
 {
