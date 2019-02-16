@@ -109,8 +109,8 @@ enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 
 new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpDamagePer, cvarExpWinRound, cvarExpPlant, cvarExpDefuse, cvarExpRescue, cvarNightExpEnabled, cvarNightExpFrom, cvarNightExpTo,
-	Float:cvarNightExpMultiplier, cvarLevelLimit, cvarLevelRatio, cvarPointsPerLevel, cvarPointsLimitEnabled, cvarKillStreakTime, cvarMinPlayers, cvarMinBonusPlayers, cvarMaxDurability,
-	cvarMinDamageDurability, cvarMaxDamageDurability, Float:cvarBlockSkillsTime;
+	cvarNightExpBonus, cvarLevelLimit, cvarLevelRatio, cvarPointsPerLevel, cvarPointsLimitEnabled, cvarKillStreakTime, cvarMinPlayers, cvarMinBonusPlayers, cvarBonusPlayersPer,
+	cvarMaxDurability, cvarMinDamageDurability, cvarMaxDamageDurability, cvarBlockSkillsTime;
 
 new Array:codItems, Array:codClasses, Array:codPromotions, Array:codFractions, Array:codPlayerClasses[MAX_PLAYERS + 1], Array:codPlayerRender[MAX_PLAYERS + 1], codForwards[forwards];
 
@@ -131,7 +131,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_kill_exp", "30"), cvarExpKill);
 	bind_pcvar_num(create_cvar("cod_hs_exp", "10"), cvarExpKillHS);
 	bind_pcvar_num(create_cvar("cod_damage_exp", "3"), cvarExpDamage);
-	bind_pcvar_num(create_cvar("cod_damage_exp_per", "25"), cvarExpDamagePer);
+	bind_pcvar_num(create_cvar("cod_damage_exp_per", "50"), cvarExpDamagePer);
 	bind_pcvar_num(create_cvar("cod_win_exp", "25"), cvarExpWinRound);
 	bind_pcvar_num(create_cvar("cod_bomb_exp", "25"), cvarExpPlant);
 	bind_pcvar_num(create_cvar("cod_defuse_exp", "25"), cvarExpDefuse);
@@ -139,7 +139,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_night_exp", "1"), cvarNightExpEnabled);
 	bind_pcvar_num(create_cvar("cod_night_exp_from", "22"), cvarNightExpFrom);
 	bind_pcvar_num(create_cvar("cod_night_exp_to", "8"), cvarNightExpTo);
-	bind_pcvar_float(create_cvar("cod_night_exp_multiplier", "2.0"), cvarNightExpMultiplier);
+	bind_pcvar_num(create_cvar("cod_night_exp_bonus", "100"), cvarNightExpBonus);
 	bind_pcvar_num(create_cvar("cod_max_level", "501"), cvarLevelLimit);
 	bind_pcvar_num(create_cvar("cod_level_ratio", "20"), cvarLevelRatio);
 	bind_pcvar_num(create_cvar("cod_points_per_level", "1"), cvarPointsPerLevel);
@@ -147,10 +147,11 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_killstreak_time", "15"), cvarKillStreakTime);
 	bind_pcvar_num(create_cvar("cod_min_players", "4"), cvarMinPlayers);
 	bind_pcvar_num(create_cvar("cod_min_bonus_players", "10"), cvarMinBonusPlayers);
+	bind_pcvar_num(create_cvar("cod_bonus_players_per", "10"), cvarBonusPlayersPer);
 	bind_pcvar_num(create_cvar("cod_max_durability", "100"), cvarMaxDurability);
 	bind_pcvar_num(create_cvar("cod_min_damage_durability", "10"), cvarMinDamageDurability);
 	bind_pcvar_num(create_cvar("cod_max_damage_durability", "25"), cvarMaxDamageDurability);
-	bind_pcvar_float(create_cvar("cod_block_skills_time", "5"), cvarBlockSkillsTime);
+	bind_pcvar_num(create_cvar("cod_block_skills_time", "5"), cvarBlockSkillsTime);
 
 	register_cvar("cod_version", VERSION, FCVAR_SERVER);
 
@@ -2087,7 +2088,7 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 
 	ExecuteForward(codForwards[DAMAGE_POST], ret, attacker, victim, weapon, damage, damageBits, hitPlace);
 
-	while (damage > cvarExpDamagePer) {
+	while (cvarExpDamagePer && damage > cvarExpDamagePer) {
 		damage -= cvarExpDamagePer;
 
 		codPlayer[attacker][PLAYER_GAINED_EXP] += get_exp_bonus(attacker, cvarExpDamage);
@@ -2107,7 +2108,7 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 	if (codPlayer[killer][PLAYER_CLASS] && get_playersnum() > cvarMinPlayers) {
 		new exp = get_exp_bonus(killer, hitPlace == HIT_HEAD ? (cvarExpKill + cvarExpKillHS) : cvarExpKill);
 
-		if (codPlayer[victim][PLAYER_LEVEL] > codPlayer[killer][PLAYER_LEVEL]) exp += get_exp_bonus(killer, (codPlayer[victim][PLAYER_LEVEL] - codPlayer[killer][PLAYER_LEVEL]) * (cvarExpKill/10));
+		if (codPlayer[victim][PLAYER_LEVEL] > codPlayer[killer][PLAYER_LEVEL]) exp += get_exp_bonus(killer, (codPlayer[victim][PLAYER_LEVEL] - codPlayer[killer][PLAYER_LEVEL]) * (cvarExpKill / 10));
 
 		codPlayer[killer][PLAYER_GAINED_EXP] += exp;
 
@@ -2120,12 +2121,14 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 		set_dhudmessage(255, 206, 85, -1.0, 0.6, 0, 0.0, 2.0, 0.0, 0.0);
 		show_dhudmessage(killer, "+%i XP", exp);
 
-		codPlayer[killer][PLAYER_KS]++;
-		codPlayer[killer][PLAYER_TIME_KS] = cvarKillStreakTime;
+		if (cvarKillStreakTime) {
+			codPlayer[killer][PLAYER_KS]++;
+			codPlayer[killer][PLAYER_TIME_KS] = cvarKillStreakTime;
 
-		if (task_exists(killer + TASK_END_KILL_STREAK)) remove_task(killer + TASK_END_KILL_STREAK);
+			if (task_exists(killer + TASK_END_KILL_STREAK)) remove_task(killer + TASK_END_KILL_STREAK);
 
-		set_task(1.0, "end_kill_streak", killer + TASK_END_KILL_STREAK, _, _, "b");
+			set_task(1.0, "end_kill_streak", killer + TASK_END_KILL_STREAK, _, _, "b");
+		}
 	} else {
 		get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
@@ -2157,13 +2160,15 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 	if (codPlayer[victim][PLAYER_ITEM]) {
 		execute_forward_ignore_three_params(get_item_info(codPlayer[victim][PLAYER_ITEM], ITEM_KILLED), killer, victim, hitPlace);
 
-		codPlayer[victim][PLAYER_ITEM_DURA] -= random_num(cvarMinDamageDurability, cvarMaxDamageDurability);
+		if (cvarMaxDurability) {
+			codPlayer[victim][PLAYER_ITEM_DURA] -= random_num(cvarMinDamageDurability, cvarMaxDamageDurability);
 
-		if (codPlayer[victim][PLAYER_ITEM_DURA] <= 0) {
-			set_item(victim);
+			if (codPlayer[victim][PLAYER_ITEM_DURA] <= 0) {
+				set_item(victim);
 
-			chat_print(victim, "Twoj przedmiot ulegl zniszczeniu.");
-		} else chat_print(victim, "Pozostala wytrzymalosc twojego przedmiotu to^x03 %i^x01/^x03%i^x01.", codPlayer[victim][PLAYER_ITEM_DURA], cvarMaxDurability);
+				chat_print(victim, "Twoj przedmiot ulegl zniszczeniu.");
+			} else chat_print(victim, "Pozostala wytrzymalosc twojego przedmiotu to^x03 %i^x01/^x03%i^x01.", codPlayer[victim][PLAYER_ITEM_DURA], cvarMaxDurability);
+		}
 	}
 
 	new ret;
@@ -2294,7 +2299,7 @@ public start_round()
 
 	remove_task(TASK_BLOCK);
 
-	set_task(cvarBlockSkillsTime, "unblock_skills", TASK_BLOCK);
+	set_task(float(cvarBlockSkillsTime), "unblock_skills", TASK_BLOCK);
 
 	for (new id = 1; id <= MAX_PLAYERS; id++) {
 		if (!is_user_alive(id)) continue;
@@ -2685,9 +2690,9 @@ public show_info(id)
 		return PLUGIN_CONTINUE;
 	}
 
-	static hudData[512], className[MAX_NAME], itemName[MAX_NAME], clanName[MAX_NAME], missionProgress[MAX_NAME], gameTime[MAX_NAME], Float:levelPercent, exp, target;
+	static hudData[512], className[MAX_NAME], itemName[MAX_NAME], clanName[MAX_NAME], missionProgress[MAX_NAME], gameTime[MAX_NAME], itemDurability[16], Float:levelPercent, exp, target;
 
-	clanName = ""; missionProgress = "";
+	clanName = ""; missionProgress = "", itemDurability = "";
 
 	target = id;
 
@@ -2716,8 +2721,12 @@ public show_info(id)
 	exp = codPlayer[target][PLAYER_LEVEL] - 1 >= 0 ? get_level_exp(codPlayer[target][PLAYER_LEVEL] - 1) : 0;
 	levelPercent = codPlayer[target][PLAYER_LEVEL] < cvarLevelLimit ? (float((codPlayer[target][PLAYER_EXP] - exp)) / float((get_level_exp(codPlayer[target][PLAYER_LEVEL]) - exp))) * 100.0 : 0.0;
 
-	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot : %s (%0.0f%s)]%s^n[Zycie : %i]^n[Honor : %i]^n[Czas Gry : %s]",
-	className, clanName, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, float(codPlayer[target][PLAYER_ITEM_DURA] / cvarMaxDurability) * 100.0, "%%", missionProgress, get_user_health(target), cod_get_user_honor(target), gameTime);
+	if (cvarMaxDurability) {
+		formatex(itemDurability, charsmax(itemDurability), " (%0.0f%s)", float(codPlayer[target][PLAYER_ITEM_DURA] / cvarMaxDurability) * 100.0, "%%");
+	}
+
+	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot : %s%s]%s^n[Zycie : %i]^n[Honor : %i]^n[Czas Gry : %s]",
+	className, clanName, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, itemDurability, missionProgress, get_user_health(target), cod_get_user_honor(target), gameTime);
 
 	if (get_exp_bonus(target, NONE)) format(hudData, charsmax(hudData), "%s^n[Exp Bonus : %i%s]", hudData, get_exp_bonus(target, NONE), "%%");
 
@@ -2742,7 +2751,7 @@ public show_help(id)
 
 	set_dhudmessage(0, 255, 0, -1.0, 0.7, 0, 5.0, 5.0, 0.1, 0.5);
 
-	switch (random_num(1, 17)) {
+	switch (random_num(1, cvarMinPlayers ? 17 : 16)) {
 		case 1: show_dhudmessage(id, "Aby uzyc umiejetnosci klasy wcisnij klawisz E. Przedmiotow uzywa sie klawiszem F.");
 		case 2: show_dhudmessage(id, "Chcialbys zalozyc klan lub do niego dolaczyc? Wpisz komende /klan.");
 		case 3: show_dhudmessage(id, "Sposobem na zdobywanie wiekszej ilosci doswiadczenia sa /misje.");
@@ -2783,8 +2792,8 @@ public check_time()
 
 public night_exp_info()
 {
-	if (nightExp) chat_print(0, "Na serwerze^x03 aktywny^x01 jest nocny exp^x03 wiekszy o %i procent^x01!", floatround((cvarNightExpMultiplier - 1.0) * 100));
-	else chat_print(0, "Od godziny^x03 %i:00^x01 do^x03 %i:00^x01 na serwerze exp jest^x03 wiekszy o %i procent^x01!", cvarNightExpFrom, cvarNightExpTo, floatround((cvarNightExpMultiplier - 1.0) * 100));
+	if (nightExp) chat_print(0, "Na serwerze^x03 aktywny^x01 jest nocny exp^x03 wiekszy o %i procent^x01!", cvarNightExpBonus);
+	else chat_print(0, "Od godziny^x03 %i:00^x01 do^x03 %i:00^x01 na serwerze exp jest^x03 wiekszy o %i procent^x01!", cvarNightExpFrom, cvarNightExpTo, cvarNightExpBonus);
 }
 
 public set_speed_limit(id)
@@ -3272,11 +3281,11 @@ stock remove_ents(id = 0, const className[] = "")
 public show_bonus_info()
 {
 	if (get_players_amount() > 0 && (lastInfo + 5.0 < get_gametime() || get_players_amount() == cvarMinBonusPlayers)) {
-		if (get_players_amount() == cvarMinBonusPlayers) chat_print(0, "Serwer jest pelny, a to oznacza^x03 EXP x 2^x01!");
+		if (get_players_amount() == cvarMinBonusPlayers) chat_print(0, "Serwer jest pelny, a to oznacza^x03 EXP wiekszy o %i procent^x01!", cvarBonusPlayersPer * cvarMinBonusPlayers);
 		else {
 			new playersToFull = cvarMinBonusPlayers - get_players_amount();
 
-			chat_print(0, "Do pelnego serwera brakuj%s^x03 %i osob%s^x01. Exp jest^x03 wiekszy o %i procent^x01!", playersToFull > 1 ? (playersToFull < 5 ? "a" : "e") : "e", playersToFull, playersToFull == 1 ? "a" : (playersToFull < 5 ? "y" : ""), get_players_amount() * 10);
+			chat_print(0, "Do pelnego serwera brakuj%s^x03 %i osob%s^x01. Exp jest^x03 wiekszy o %i procent^x01!", playersToFull > 1 ? (playersToFull < 5 ? "a" : "e") : "e", playersToFull, playersToFull == 1 ? "a" : (playersToFull < 5 ? "y" : ""), get_players_amount() * cvarBonusPlayersPer);
 		}
 
 		lastInfo = floatround(get_gametime());
@@ -4691,10 +4700,10 @@ stock get_exp_bonus(id, exp)
 
 	if (cod_get_user_vip(id)) bonus += 0.25;
 
-	if (nightExp) bonus += (cvarNightExpMultiplier - 1.0);
+	if (nightExp) bonus += cvarNightExpBonus / 100.0;
 
 	bonus += floatmin(codPlayer[id][PLAYER_KS] * 0.2, 1.0);
-	bonus += get_players_amount() * 0.1;
+	bonus += get_players_amount() * cvarBonusPlayersPer / 100.0;
 
 	return exp == NONE ? floatround((bonus - 1.0) * 100) : floatround(exp * bonus);
 }

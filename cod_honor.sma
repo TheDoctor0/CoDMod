@@ -19,7 +19,7 @@
 #define TASK_UPDATE 	9501
 
 new cvarMinPlayers, cvarKill, cvarKillHS, cvarKillFirst, cvarWinRound, cvarBombPlanted, cvarBombDefused,
-	cvarRescueHostage, cvarKillHostage, Float:cvarVIPMultiplier;
+	cvarRescueHostage, cvarKillHostage, cvarVIPBonus;
 
 new playerName[MAX_PLAYERS + 1][MAX_SAFE_NAME], playerHonor[MAX_PLAYERS + 1], playerHonorGained[MAX_PLAYERS + 1],
 	Handle:sql, Handle:connection, bool:sqlConnected, bool:firstKill, dataLoaded, msgMoney;
@@ -37,7 +37,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_honor_bomb_defused", "5"), cvarBombDefused);
 	bind_pcvar_num(create_cvar("cod_honor_rescue_hostage", "5"), cvarRescueHostage);
 	bind_pcvar_num(create_cvar("cod_honor_kill_hostage", "5"), cvarKillHostage);
-	bind_pcvar_float(create_cvar("cod_honor_vip_multiplier", "1.5"), cvarVIPMultiplier);
+	bind_pcvar_num(create_cvar("cod_honor_vip_bonus", "50"), cvarVIPBonus);
 
 	register_event("Money", "money_update", "b");
 
@@ -167,7 +167,7 @@ public cod_hostage_killed(id)
 		return;
 	}
 
-	playerHonorGained[id] -= cod_get_user_vip(id) ? floatround(cvarKillHostage / cvarVIPMultiplier) : cvarKillHostage;
+	playerHonorGained[id] -= cod_get_user_vip(id) ? floatround(cvarKillHostage -  cvarKillHostage * (cvarVIPBonus / 100.0)) : cvarKillHostage;
 
 	save_honor(id);
 }
@@ -367,5 +367,5 @@ public _cod_add_user_honor(id, amount, bonus)
 
 stock get_user_bonus(id, bonus)
 {
-	return cod_get_user_vip(id) ? floatround(bonus * cvarVIPMultiplier) : bonus;
+	return cod_get_user_vip(id) ? floatround(bonus + bonus * (cvarVIPBonus / 100.0)) : bonus;
 }
