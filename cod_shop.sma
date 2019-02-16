@@ -11,7 +11,7 @@ enum _:shopInfo { REPAIR, BUY, UPGRADE, SMALL_BANDAGE, BIG_BANDAGE, SMALL_EXP, M
 
 new cvarCostRepair, cvarCostItem, cvarCostUpgrade, cvarCostSmallBandage, cvarCostBigBandage, cvarCostSmallExp, cvarCostMediumExp,
 	cvarCostBigExp, cvarCostRandomExp, cvarCostArmor, cvarDurabilityAmount, cvarSmallExp, cvarMediumExp,cvarBigExp, cvarMinRandomExp,
-	cvarMaxRandomExp, cvarSmallBandageHP, cvarBigBandageHP, cvarArmorAmount, bool:mapEnd;
+	cvarMaxRandomExp, cvarSmallBandageHP, cvarBigBandageHP, cvarArmorAmount, cvarMaxDurability, bool:mapEnd;
 
 public plugin_init()
 {
@@ -39,6 +39,8 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_shop_random_exp_min", "1"), cvarMinRandomExp);
 	bind_pcvar_num(create_cvar("cod_shop_random_exp_max", "200"), cvarMaxRandomExp);
 	bind_pcvar_num(create_cvar("cod_shop_armor_amount", "100"), cvarArmorAmount);
+
+	bind_pcvar_num(get_cvar_pointer("cod_max_durability"), cvarMaxDurability);
 }
 
 public cod_end_map()
@@ -52,9 +54,11 @@ public shop_menu(id)
 
 	new menuData[128], menuPrice[10], menu = menu_create("\ySklep \rCoD Mod", "shop_menu_handle");
 
-	formatex(menuData, charsmax(menuData), "Napraw Przedmiot \r[\y+%i Wytrzymalosci\r] \wKoszt:\r %iH", cvarDurabilityAmount, cvarCostRepair);
-	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostRepair);
-	menu_additem(menu, menuData, menuPrice);
+	if (cvarMaxDurability) {
+		formatex(menuData, charsmax(menuData), "Napraw Przedmiot \r[\y+%i Wytrzymalosci\r] \wKoszt:\r %iH", cvarDurabilityAmount, cvarCostRepair);
+		formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostRepair);
+		menu_additem(menu, menuData, menuPrice);
+	}
 
 	formatex(menuData, charsmax(menuData), "Kup Przedmiot \r[\yLosowy Przedmiot\r] \wKoszt:\r %iH", cvarCostItem);
 	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostItem);
@@ -114,6 +118,8 @@ public shop_menu_handle(id, menu, item)
 	}
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+
+	if (!cvarMaxDurability) item++;
 
 	if (item == REPAIR) {
 		if (!cod_get_user_item(id)) {
