@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Knives"
-#define VERSION "1.1.1"
+#define VERSION "1.3.0"
 #define AUTHOR "O'Zone"
 
 new const knifeModels[][][] =
@@ -14,20 +14,23 @@ new const knifeModels[][][] =
 	{ "Kieszonkowy", "(+10 Inteligencji)", "models/CoDMod/pocket.mdl" },
 	{ "Tasak", "(+10 Wytrzymalosci)", "models/CoDMod/chopper.mdl" },
 	{ "Maczeta", "(+10 Sily)", "models/CoDMod/machete.mdl" },
-	{ "Katana", "(+10 Kondycji)", "models/CoDMod/katana.mdl" }
+	{ "Katana", "(+10 Kondycji)", "models/CoDMod/katana.mdl" },
+	{ "Siekiera", "(+4 Kazdej Statystyki)", "models/CoDMod/axe.mdl" }
 };
 
 new const commandKnives[][] = { "noze", "say /noz", "say_team /noz", "say /noze", "say_team /noze", "say /knife", "say_team /knife",
 "say /knifes", "say_team /knifes", "say /kosa", "say_team /kosa", "say /kosy", "say_team /kosy" };
 
 enum _:knifeInfo { NAME, BONUS, MODEL };
-enum _:knifeTypes { DEFAULT, HEALTH, INTELLIGENCE, STAMINA, STRENGTH, CONDITION };
+enum _:knifeTypes { DEFAULT, HEALTH, INTELLIGENCE, STAMINA, STRENGTH, CONDITION, VIP };
 
-new playerName[MAX_PLAYERS + 1][MAX_NAME], playerKnife[MAX_PLAYERS + 1], knives;
+new playerName[MAX_PLAYERS + 1][MAX_NAME], playerKnife[MAX_PLAYERS + 1], knives, cvarKnifeVIP;
 
 public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
+
+	bind_pcvar_num(create_cvar("cod_knife_vip", "1"), cvarKnifeVIP);
 
 	for (new i; i < sizeof commandKnives; i++) register_clcmd(commandKnives[i], "change_knife");
 
@@ -57,14 +60,16 @@ public change_knife(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new knifeData[64], knifeId[3], menu = menu_create("\yWybierz \rModel Noza\w:", "change_knife_handle");
+	new knifeData[64], knifeId[3], menu = menu_create("\yWybierz \rModel Noza\w:", "change_knife_handle"), callback = menu_makecallback("change_knife_callback");
 
 	for (new i = 0; i < sizeof(knifeModels); i++) {
-		formatex(knifeData, charsmax(knifeData), "%s \y%s", knifeModels[i][NAME], knifeModels[i][BONUS]);
+		if (i == VIP && !cvarKnifeVIP) continue;
+
+		formatex(knifeData, charsmax(knifeData), "%s \y%s%s", knifeModels[i][NAME], knifeModels[i][BONUS], i == VIP ? " \r(VIP)": "");
 
 		num_to_str(i, knifeId, charsmax(knifeId));
 
-		menu_additem(menu, knifeData, knifeId);
+		menu_additem(menu, knifeData, knifeId, _, callback);
 	}
 
 	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
@@ -75,6 +80,9 @@ public change_knife(id)
 
 	return PLUGIN_HANDLED;
 }
+
+public change_knife_callback(id, menu, item)
+	return (item == VIP && !cod_get_user_vip(id)) ? ITEM_DISABLED : ITEM_ENABLED;
 
 public change_knife_handle(id, menu, item)
 {
@@ -111,7 +119,15 @@ public cod_weapon_deploy(id, weapon, ent)
 	if (weapon == CSW_KNIFE) set_knife(id);
 
 public cod_spawn(id)
+{
+	if (!cod_get_user_vip(id) && playerKnife[id] == VIP) {
+		set_bonus(id, playerKnife[id], DEFAULT);
+
+		save_knife(id);
+	}
+
 	set_knife(id, 1);
+}
 
 stock set_knife(id, check = 0)
 {
@@ -136,7 +152,14 @@ public set_bonus(id, oldKnife, newKnife)
 		case STAMINA: cod_add_user_bonus_stamina(id, -10);
 		case STRENGTH: cod_add_user_bonus_strength(id, -10);
 		case CONDITION: cod_add_user_bonus_condition(id, -10);
-	}
+		case VIP: {
+				cod_add_user_bonus_health(id, -4);
+				cod_add_user_bonus_intelligence(id, -4);
+				cod_add_user_bonus_stamina(id, -4);
+				cod_add_user_bonus_strength(id, -4);
+				cod_add_user_bonus_condition(id, -4);
+			}
+		}
 
 	switch (newKnife) {
 		case DEFAULT: {
@@ -150,6 +173,13 @@ public set_bonus(id, oldKnife, newKnife)
 		case STAMINA: cod_add_user_bonus_stamina(id, 10);
 		case STRENGTH: cod_add_user_bonus_strength(id, 10);
 		case CONDITION: cod_add_user_bonus_condition(id, 10);
+		case VIP: {
+			cod_add_user_bonus_health(id, 4);
+			cod_add_user_bonus_intelligence(id, 4);
+			cod_add_user_bonus_stamina(id, 4);
+			cod_add_user_bonus_strength(id, 4);
+			cod_add_user_bonus_condition(id, 4);
+		}
 	}
 
 	playerKnife[id] = newKnife;
