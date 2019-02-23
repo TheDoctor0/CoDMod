@@ -7,11 +7,14 @@
 
 new const commandShopMenu[][] = { "sklep", "say /shop", "say_team /shop", "say /sklep", "say_team /sklep" };
 
-enum _:shopInfo { REPAIR, BUY, UPGRADE, SMALL_BANDAGE, BIG_BANDAGE, SMALL_EXP, MEDIUM_EXP, BIG_EXP, RANDOM_EXP, ARMOR };
+enum _:shopInfo { REPAIR, BUY, UPGRADE, SMALL_BANDAGE, BIG_BANDAGE, SMALL_EXP, MEDIUM_EXP, BIG_EXP, RANDOM_EXP,
+	ROCKET, MINE, DYNAMITE, MEDKIT, THUNDER, TELEPORT, JUMP, BUNNY_HOP, SILENT, ARMOR, DAMAGE, INVISIBLE };
 
-new cvarCostRepair, cvarCostItem, cvarCostUpgrade, cvarCostSmallBandage, cvarCostBigBandage, cvarCostSmallExp, cvarCostMediumExp,
-	cvarCostBigExp, cvarCostRandomExp, cvarCostArmor, cvarDurabilityAmount, cvarSmallExp, cvarMediumExp,cvarBigExp, cvarMinRandomExp,
-	cvarMaxRandomExp, cvarSmallBandageHP, cvarBigBandageHP, cvarArmorAmount, cvarMaxDurability, bool:mapEnd;
+new cvarCostRepair, cvarCostItem, cvarCostUpgrade, cvarCostSmallBandage, cvarCostBigBandage, cvarCostSmallExp,
+	cvarCostMediumExp,cvarCostBigExp, cvarCostRandomExp, cvarCostRocket, cvarCostMine, cvarCostDynamite, cvarCostMedkit,
+	cvarCostThunder,cvarCostTeleport, cvarCostJump, cvarCostBunnyHop, cvarCostSilent, cvarCostArmor, cvarCostDamage,
+	cvarCostInvisible,cvarDurabilityAmount, cvarSmallExp, cvarMediumExp,cvarBigExp, cvarMinRandomExp, cvarMaxRandomExp,
+	cvarSmallBandageHP,cvarBigBandageHP, cvarArmorAmount, cvarDamageAmount, cvarMaxDurability, bool:mapEnd, damageBonus;
 
 public plugin_init()
 {
@@ -28,7 +31,18 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_shop_medium_exp_cost", "14"), cvarCostMediumExp);
 	bind_pcvar_num(create_cvar("cod_shop_big_exp_cost", "25"), cvarCostBigExp);
 	bind_pcvar_num(create_cvar("cod_shop_random_exp_cost", "15"), cvarCostRandomExp);
+	bind_pcvar_num(create_cvar("cod_shop_rocket_cost", "15"), cvarCostRocket);
+	bind_pcvar_num(create_cvar("cod_shop_mine_cost", "15"), cvarCostMine);
+	bind_pcvar_num(create_cvar("cod_shop_dynamite_cost", "15"), cvarCostDynamite);
+	bind_pcvar_num(create_cvar("cod_shop_medkit_cost", "15"), cvarCostMedkit);
+	bind_pcvar_num(create_cvar("cod_shop_thunder_cost", "15"), cvarCostThunder);
+	bind_pcvar_num(create_cvar("cod_shop_teleport_cost", "30"), cvarCostTeleport);
+	bind_pcvar_num(create_cvar("cod_shop_jump_cost", "20"), cvarCostJump);
+	bind_pcvar_num(create_cvar("cod_shop_bunny_hop_cost", "25"), cvarCostBunnyHop);
+	bind_pcvar_num(create_cvar("cod_shop_silent_cost", "15"), cvarCostSilent);
 	bind_pcvar_num(create_cvar("cod_shop_armor_cost", "20"), cvarCostArmor);
+	bind_pcvar_num(create_cvar("cod_shop_damage_cost", "35"), cvarCostDamage);
+	bind_pcvar_num(create_cvar("cod_shop_invisible_cost", "50"), cvarCostInvisible);
 
 	bind_pcvar_num(create_cvar("cod_shop_durability_amount", "50"), cvarDurabilityAmount);
 	bind_pcvar_num(create_cvar("cod_shop_small_bandage_hp", "25"), cvarSmallBandageHP);
@@ -39,6 +53,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_shop_random_exp_min", "1"), cvarMinRandomExp);
 	bind_pcvar_num(create_cvar("cod_shop_random_exp_max", "200"), cvarMaxRandomExp);
 	bind_pcvar_num(create_cvar("cod_shop_armor_amount", "100"), cvarArmorAmount);
+	bind_pcvar_num(create_cvar("cod_shop_damage_amount", "10"), cvarDamageAmount);
 
 	bind_pcvar_num(get_cvar_pointer("cod_max_durability"), cvarMaxDurability);
 }
@@ -108,9 +123,75 @@ public shop_menu(id)
 		menu_additem(menu, menuData, menuPrice);
 	}
 
+	if (cvarCostRocket) {
+		formatex(menuData, charsmax(menuData), "Dodatkowa Rakieta \r[\y+1 Rakieta\r] \wKoszt:\r %iH", cvarCostRocket);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostRocket, ROCKET);
+		menu_additem(menu, menuData, menuPrice);
+	}
+
+	if (cvarCostMine) {
+		formatex(menuData, charsmax(menuData), "Dodatkowa Mina \r[\y+1 Mina\r] \wKoszt:\r %iH", cvarCostMine);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostMine, MINE);
+		menu_additem(menu, menuData, menuPrice);
+	}
+
+	if (cvarCostDynamite) {
+		formatex(menuData, charsmax(menuData), "Dodatkowy Dynamit \r[\y+1 Dynamit\r] \wKoszt:\r %iH", cvarCostDynamite);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostDynamite, DYNAMITE);
+		menu_additem(menu, menuData, menuPrice);
+	}
+
+	if (cvarCostMedkit) {
+		formatex(menuData, charsmax(menuData), "Dodatkowa Apteczka \r[\y+1 Apteczka\r] \wKoszt:\r %iH", cvarCostMedkit);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostMedkit, MEDKIT);
+		menu_additem(menu, menuData, menuPrice);
+	}
+
+	if (cvarCostThunder) {
+		formatex(menuData, charsmax(menuData), "Dodatkowy Piorun \r[\y+1 Piorun\r] \wKoszt:\r %iH", cvarCostThunder);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostThunder, THUNDER);
+		menu_additem(menu, menuData, menuPrice);
+	}
+
+	if (cvarCostTeleport) {
+		formatex(menuData, charsmax(menuData), "Dodatkowy Teleport \r[\y+1 Teleport\r] \wKoszt:\r %iH", cvarCostTeleport);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostTeleport, TELEPORT);
+		menu_additem(menu, menuData, menuPrice);
+	}
+
+	if (cvarCostJump) {
+		formatex(menuData, charsmax(menuData), "Dodatkowy Skok \r[\y+1 Skok w Powietrzu\r] \wKoszt:\r %iH", cvarCostJump);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostJump, JUMP);
+		menu_additem(menu, menuData, menuPrice);
+	}
+
+	if (cvarCostBunnyHop) {
+		formatex(menuData, charsmax(menuData), "Bunny Hop \r[\yAuto BunnyHop\r] \wKoszt:\r %iH", cvarCostBunnyHop);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostBunnyHop, BUNNY_HOP);
+		menu_additem(menu, menuData, menuPrice);
+	}
+
+	if (cvarCostSilent) {
+		formatex(menuData, charsmax(menuData), "Ciche Chodzenie \r[\yBrak Dzwieku Biegu\r] \wKoszt:\r %iH", cvarCostSilent);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostSilent, SILENT);
+		menu_additem(menu, menuData, menuPrice);
+	}
+
 	if (cvarCostArmor) {
 		formatex(menuData, charsmax(menuData), "Dodatkowy Pancerz \r[\y+%i Kamizelki\r] \wKoszt:\r %iH", cvarArmorAmount, cvarCostArmor);
 		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostArmor, ARMOR);
+		menu_additem(menu, menuData, menuPrice);
+	}
+
+	if (cvarCostDamage) {
+		formatex(menuData, charsmax(menuData), "Wieksze Obrazenia \r[\y+%i Obrazen\r] \wKoszt:\r %iH", cvarDamageAmount, cvarCostDamage);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostDamage, DAMAGE);
+		menu_additem(menu, menuData, menuPrice);
+	}
+
+	if (cvarCostInvisible) {
+		formatex(menuData, charsmax(menuData), "Peleryna Niewidka \r[\yPelna Niewidzialnosc\r] \wKoszt:\r %iH", cvarCostInvisible);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostInvisible, INVISIBLE);
 		menu_additem(menu, menuData, menuPrice);
 	}
 
@@ -249,6 +330,66 @@ public shop_menu_handle(id, menu, item)
 			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", randomExp);
 
 			cod_set_user_exp(id, randomExp);
+		} case ROCKET: {
+			cod_print_chat(id, "Kupiles^x03 Dodatkowa Rakiete^x01!");
+
+			cod_add_user_mines(id, 1, ADDITIONAL);
+		} case MINE: {
+			cod_print_chat(id, "Kupiles^x03 Dodatkowa Mine^x01!");
+
+			cod_add_user_rockets(id, 1, ADDITIONAL);
+		} case DYNAMITE: {
+			cod_print_chat(id, "Kupiles^x03 Dodatkowy Dynamit^x01!");
+
+			cod_add_user_dynamites(id, 1, ADDITIONAL);
+		} case MEDKIT: {
+			cod_print_chat(id, "Kupiles^x03 Dodatkowa Apteczke^x01!");
+
+			cod_add_user_medkits(id, 1, ADDITIONAL);
+		} case THUNDER: {
+			cod_print_chat(id, "Kupiles^x03 Dodatkowy Piorun^x01!");
+
+			cod_add_user_thunders(id, 1, ADDITIONAL);
+		} case TELEPORT: {
+			if (cod_get_user_teleports(id) == FULL) {
+				cod_print_chat(id, "Masz juz nielimitowany^x03 Teleport^x01!");
+
+				return PLUGIN_HANDLED;
+			}
+
+			cod_print_chat(id, "Kupiles^x03 Dodatkowy Teleport^x01!");
+
+			cod_add_user_teleports(id, 1, ADDITIONAL);
+		} case JUMP: {
+			if (cod_get_user_multijumps(id) >= 3) {
+				cod_print_chat(id, "Mozesz miec maksymalnie^x03 3 Dodatkowe Skoki^x01!");
+
+				return PLUGIN_HANDLED;
+			}
+
+			cod_print_chat(id, "Kupiles^x03 Dodatkowy Skok^x01!");
+
+			cod_add_user_multijumps(id, 1, ROUND);
+		} case BUNNY_HOP: {
+			if (cod_get_user_bunnyhop(id)) {
+				cod_print_chat(id, "Masz juz ^x03 Bunny Hop^x01!");
+
+				return PLUGIN_HANDLED;
+			}
+
+			cod_print_chat(id, "Kupiles^x03 BunnyHop^x01!");
+
+			cod_set_user_bunnyhop(id, 1, ROUND);
+		} case SILENT: {
+			if (cod_get_user_footsteps(id)) {
+				cod_print_chat(id, "Masz juz ^x03 Ciche Chodzenie^x01!");
+
+				return PLUGIN_HANDLED;
+			}
+
+			cod_print_chat(id, "Kupiles^x03 Ciche Chodzenie^x01!");
+
+			cod_set_user_footsteps(id, 1, ROUND);
 		} case ARMOR: {
 			if (cod_get_user_armor(id) >= 300) {
 				cod_print_chat(id, "Mozesz miec maksymalnie^x03 300 Pancerza^x01!");
@@ -259,6 +400,26 @@ public shop_menu_handle(id, menu, item)
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Pancerz^x01!");
 
 			cod_add_user_armor(id, cvarArmorAmount);
+		} case DAMAGE: {
+			if (get_bit(id, damageBonus)) {
+				cod_print_chat(id, "W tej rundzie juz kupiles^x03 Wieksze Obrazenia^x01!");
+
+				return PLUGIN_HANDLED;
+			}
+
+			cod_print_chat(id, "Kupiles^x03 Wieksze Obrazenia^x01!");
+
+			set_bit(id, damageBonus);
+		} case INVISIBLE: {
+			if (!cod_get_user_render(id)) {
+				cod_print_chat(id, "Masz juz^x03 Pelna Niewidzialnosc^x01!");
+
+				return PLUGIN_HANDLED;
+			}
+
+			cod_print_chat(id, "Kupiles^x03 Peleryne Niewidke^x01!");
+
+			cod_set_user_render(id, 0, ROUND);
 		}
 	}
 
@@ -266,6 +427,12 @@ public shop_menu_handle(id, menu, item)
 
 	return PLUGIN_HANDLED;
 }
+
+public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
+	if (get_bit(attacker, damageBonus)) cod_inflict_damage(attacker, victim, float(cvarDamageAmount), 0.0, damageBits);
+
+public cod_new_round()
+	for (new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, damageBonus);
 
 stock explode(const string[], const character, output[][], const maxParts, const maxLength)
 {
