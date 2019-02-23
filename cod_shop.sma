@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Shop"
-#define VERSION "1.1.1"
+#define VERSION "1.3.0"
 #define AUTHOR "O'Zone"
 
 new const commandShopMenu[][] = { "sklep", "say /shop", "say_team /shop", "say /sklep", "say_team /sklep" };
@@ -52,49 +52,67 @@ public shop_menu(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new menuData[128], menuPrice[10], menu = menu_create("\ySklep \rCoD Mod", "shop_menu_handle");
+	new menuData[128], menuPrice[10], menu = menu_create("\yMenu \rSklepu\w:", "shop_menu_handle");
 
-	if (cvarMaxDurability) {
+	if (cvarMaxDurability && cvarCostRepair) {
 		formatex(menuData, charsmax(menuData), "Napraw Przedmiot \r[\y+%i Wytrzymalosci\r] \wKoszt:\r %iH", cvarDurabilityAmount, cvarCostRepair);
-		formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostRepair);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostRepair, REPAIR);
 		menu_additem(menu, menuData, menuPrice);
 	}
 
-	formatex(menuData, charsmax(menuData), "Kup Przedmiot \r[\yLosowy Przedmiot\r] \wKoszt:\r %iH", cvarCostItem);
-	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostItem);
-	menu_additem(menu, menuData, menuPrice);
+	if (cvarCostItem) {
+		formatex(menuData, charsmax(menuData), "Kup Przedmiot \r[\yLosowy Przedmiot\r] \wKoszt:\r %iH", cvarCostItem);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostItem, BUY);
+		menu_additem(menu, menuData, menuPrice);
+	}
 
-	formatex(menuData, charsmax(menuData), "Ulepsz Przedmiot \r[\yWzmocnienie Przedmiotu\r] \wKoszt:\r %iH", cvarCostUpgrade);
-	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostUpgrade);
-	menu_additem(menu, menuData, menuPrice);
+	if (cvarCostUpgrade) {
+		formatex(menuData, charsmax(menuData), "Ulepsz Przedmiot \r[\yWzmocnienie Przedmiotu\r] \wKoszt:\r %iH", cvarCostUpgrade);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostUpgrade, UPGRADE);
+		menu_additem(menu, menuData, menuPrice);
+	}
 
-	formatex(menuData, charsmax(menuData), "Maly Bandaz \r[\y+%i HP\r] \wKoszt:\r %iH", cvarSmallBandageHP, cvarCostSmallBandage);
-	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostSmallBandage);
-	menu_additem(menu, menuData, menuPrice);
+	if (cvarCostSmallBandage) {
+		formatex(menuData, charsmax(menuData), "Maly Bandaz \r[\y+%i HP\r] \wKoszt:\r %iH", cvarSmallBandageHP, cvarCostSmallBandage);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostSmallBandage, SMALL_BANDAGE);
+		menu_additem(menu, menuData, menuPrice);
+	}
 
-	formatex(menuData, charsmax(menuData), "Duzy Bandaz \r[\y+%i HP\r] \wKoszt:\r %iH", cvarBigBandageHP, cvarCostBigBandage);
-	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostBigBandage);
-	menu_additem(menu, menuData, menuPrice);
+	if (cvarCostBigBandage) {
+		formatex(menuData, charsmax(menuData), "Duzy Bandaz \r[\y+%i HP\r] \wKoszt:\r %iH", cvarBigBandageHP, cvarCostBigBandage);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostBigBandage, BIG_BANDAGE);
+		menu_additem(menu, menuData, menuPrice);
+	}
 
-	formatex(menuData, charsmax(menuData), "Male Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", cvarSmallExp, cvarCostSmallExp);
-	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostSmallExp);
-	menu_additem(menu, menuData, menuPrice);
+	if (cvarCostSmallExp) {
+		formatex(menuData, charsmax(menuData), "Male Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", cvarSmallExp, cvarCostSmallExp);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostSmallExp, SMALL_EXP);
+		menu_additem(menu, menuData, menuPrice);
+	}
 
-	formatex(menuData, charsmax(menuData), "Srednie Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", cvarMediumExp, cvarCostMediumExp);
-	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostMediumExp);
-	menu_additem(menu, menuData, menuPrice);
+	if (cvarCostMediumExp) {
+		formatex(menuData, charsmax(menuData), "Srednie Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", cvarMediumExp, cvarCostMediumExp);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostMediumExp, MEDIUM_EXP);
+		menu_additem(menu, menuData, menuPrice);
+	}
 
-	formatex(menuData, charsmax(menuData), "Duze Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", cvarBigExp, cvarCostBigExp);
-	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostBigExp);
-	menu_additem(menu, menuData, menuPrice);
+	if (cvarCostBigExp) {
+		formatex(menuData, charsmax(menuData), "Duze Doswiadczenie \r[\y%i Expa\r] \wKoszt:\r %iH", cvarBigExp, cvarCostBigExp);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostBigExp, BIG_EXP);
+		menu_additem(menu, menuData, menuPrice);
+	}
 
-	formatex(menuData, charsmax(menuData), "Losowe Doswiadczenie \r[\yLosowo od %i do %i Expa\r] \wKoszt:\r %iH", cvarMinRandomExp, cvarMaxRandomExp, cvarCostRandomExp);
-	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostRandomExp);
-	menu_additem(menu, menuData, menuPrice);
+	if (cvarCostRandomExp) {
+		formatex(menuData, charsmax(menuData), "Losowe Doswiadczenie \r[\yLosowo od %i do %i Expa\r] \wKoszt:\r %iH", cvarMinRandomExp, cvarMaxRandomExp, cvarCostRandomExp);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostRandomExp, RANDOM_EXP);
+		menu_additem(menu, menuData, menuPrice);
+	}
 
-	formatex(menuData, charsmax(menuData), "Dodatkowy Pancerz \r[\y+%i Kamizelki\r] \wKoszt:\r %iH", cvarArmorAmount, cvarCostArmor);
-	formatex(menuPrice, charsmax(menuPrice), "%i", cvarCostArmor);
-	menu_additem(menu, menuData, menuPrice);
+	if (cvarCostArmor) {
+		formatex(menuData, charsmax(menuData), "Dodatkowy Pancerz \r[\y+%i Kamizelki\r] \wKoszt:\r %iH", cvarArmorAmount, cvarCostArmor);
+		formatex(menuPrice, charsmax(menuPrice), "%i#%i", cvarCostArmor, ARMOR);
+		menu_additem(menu, menuData, menuPrice);
+	}
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
@@ -119,53 +137,16 @@ public shop_menu_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	if (!cvarMaxDurability) item++;
+	new itemData[16], dataParts[2][8], itemAccess, itemCallback;
 
-	if (item == REPAIR) {
-		if (!cod_get_user_item(id)) {
-			cod_print_chat(id, "Nie masz zadnego przedmiotu^x01!");
+	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
 
-			return PLUGIN_HANDLED;
-		}
+	menu_destroy(menu);
 
-		if (cod_get_item_durability(id) >= cod_max_item_durability()) {
-			cod_print_chat(id, "Twoj przedmiot jest juz w pelni^x03 naprawiony^x01!");
+	explode(itemData, '#', dataParts, sizeof(dataParts), charsmax(dataParts[]));
 
-			return PLUGIN_HANDLED;
-		}
-	}
-
-	if ((item == SMALL_BANDAGE || item == BIG_BANDAGE) && cod_get_user_health(id, 1) >= cod_get_user_max_health(id)) {
-		cod_print_chat(id, "Jestes juz w pelni^x03 uzdrowiony^x01!");
-
-		return PLUGIN_HANDLED;
-	}
-
-	if (item == ARMOR && cod_get_user_armor(id) >= 300) {
-		cod_print_chat(id, "Mozesz miec maksymalnie^x03 300 Pancerza^x01!");
-
-		return PLUGIN_HANDLED;
-	}
-
-	if (item == UPGRADE) {
-		if (!cod_get_user_item(id)) {
-			cod_print_chat(id, "Nie masz zadnego przedmiotu!");
-
-			return PLUGIN_HANDLED;
-		}
-
-		if (!cod_upgrade_user_item(id, 1)) {
-			cod_print_chat(id, "Ulepszenie twojego przedmiotu nie jest mozliwe!");
-
-			return PLUGIN_HANDLED;
-		}
-	}
-
-	new itemPrice[10], itemAccess, itemCallback;
-
-	menu_item_getinfo(menu, item, itemAccess, itemPrice, charsmax(itemPrice), _, _, itemCallback);
-
-	new price = str_to_num(itemPrice);
+	new price = str_to_num(dataParts[0]);
+	item = str_to_num(dataParts[1]);
 
 	if (cod_get_user_honor(id) < price) {
 		cod_print_chat(id, "Nie masz wystarczajaco duzo^x03 Honoru^x01!");
@@ -175,6 +156,18 @@ public shop_menu_handle(id, menu, item)
 
 	switch (item) {
 		case REPAIR: {
+			if (!cod_get_user_item(id)) {
+				cod_print_chat(id, "Nie masz zadnego przedmiotu^x01!");
+
+				return PLUGIN_HANDLED;
+			}
+
+			if (cod_get_item_durability(id) >= cod_max_item_durability()) {
+				cod_print_chat(id, "Twoj przedmiot jest juz w pelni^x03 naprawiony^x01!");
+
+				return PLUGIN_HANDLED;
+			}
+
 			cod_print_chat(id, "Kupiles^x03 +%i^x01 wytrzymalosci przedmiotu!", cvarDurabilityAmount);
 
 			if (cod_get_item_durability(id) + cvarDurabilityAmount >= cod_max_item_durability()) {
@@ -191,6 +184,18 @@ public shop_menu_handle(id, menu, item)
 
 			cod_set_user_item(id, RANDOM);
 		} case UPGRADE: {
+			if (!cod_get_user_item(id)) {
+				cod_print_chat(id, "Nie masz zadnego przedmiotu!");
+
+				return PLUGIN_HANDLED;
+			}
+
+			if (!cod_upgrade_user_item(id, 1)) {
+				cod_print_chat(id, "Ulepszenie twojego przedmiotu nie jest mozliwe!");
+
+				return PLUGIN_HANDLED;
+			}
+
 			cod_print_chat(id, "Kupiles^x03 Ulepszenie Przedmiotu^x01!");
 
 			if (!cod_upgrade_user_item(id)) {
@@ -199,10 +204,22 @@ public shop_menu_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 		} case SMALL_BANDAGE: {
+			if (cod_get_user_health(id, 1) >= cod_get_user_max_health(id)) {
+				cod_print_chat(id, "Jestes juz w pelni^x03 uzdrowiony^x01!");
+
+				return PLUGIN_HANDLED;
+			}
+
 			cod_set_user_health(id, cod_get_user_health(id, 1) + cvarSmallBandageHP);
 
 			cod_print_chat(id, "Kupiles^x03 Maly Bandaz^x01!");
 		} case BIG_BANDAGE: {
+			if (cod_get_user_health(id, 1) >= cod_get_user_max_health(id)) {
+				cod_print_chat(id, "Jestes juz w pelni^x03 uzdrowiony^x01!");
+
+				return PLUGIN_HANDLED;
+			}
+
 			cod_set_user_health(id, cod_get_user_health(id, 1) + cvarBigBandageHP);
 
 			cod_print_chat(id, "Kupiles^x03 Duzy Bandaz^x01!");
@@ -233,7 +250,13 @@ public shop_menu_handle(id, menu, item)
 
 			cod_set_user_exp(id, randomExp);
 		} case ARMOR: {
-			cod_print_chat(id, "Kupiles^x03 Dodatkowy Armor^x01!");
+			if (cod_get_user_armor(id) >= 300) {
+				cod_print_chat(id, "Mozesz miec maksymalnie^x03 300 Pancerza^x01!");
+
+				return PLUGIN_HANDLED;
+			}
+
+			cod_print_chat(id, "Kupiles^x03 Dodatkowy Pancerz^x01!");
 
 			cod_add_user_armor(id, cvarArmorAmount);
 		}
@@ -241,7 +264,14 @@ public shop_menu_handle(id, menu, item)
 
 	cod_add_user_honor(id, -price);
 
-	menu_destroy(menu);
-
 	return PLUGIN_HANDLED;
+}
+
+stock explode(const string[], const character, output[][], const maxParts, const maxLength)
+{
+	new currentPart = 0, stringLength = strlen(string), currentLength = 0;
+
+	do {
+		currentLength += (1 + copyc(output[currentPart++], maxLength, string[currentLength], character));
+	} while(currentLength < stringLength && currentPart < maxParts);
 }

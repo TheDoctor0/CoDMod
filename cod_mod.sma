@@ -10,7 +10,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.2.2"
+#define VERSION "1.3.0"
 #define AUTHOR "O'Zone"
 
 #pragma dynamic              65536
