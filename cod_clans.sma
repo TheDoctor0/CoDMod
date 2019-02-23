@@ -4,19 +4,19 @@
 #include <cod>
 
 #define PLUGIN "CoD Clans"
-#define VERSION "1.2.2"
+#define VERSION "1.3.0"
 #define AUTHOR "O'Zone"
 
 #define TASK_INFO 9843
 
 new const commandClan[][] = { "klan", "say /clan", "say_team /clan", "say /clans", "say_team /clans", "say /klany", "say_team /klany", "say /klan", "say_team /klan" };
 
-enum _:clanInfo { CLAN_ID, CLAN_LEVEL, CLAN_HONOR, CLAN_HEALTH, CLAN_GRAVITY, CLAN_DAMAGE, CLAN_DROP, CLAN_KILLS, CLAN_WINS, CLAN_MEMBERS, Trie:CLAN_STATUS, CLAN_NAME[MAX_NAME] };
+enum _:clanInfo { CLAN_ID, CLAN_LEVEL, CLAN_HONOR, CLAN_HEALTH, CLAN_GRAVITY, CLAN_DAMAGE, CLAN_EXP, CLAN_KILLS, CLAN_WINS, CLAN_MEMBERS, Trie:CLAN_STATUS, CLAN_NAME[MAX_NAME] };
 enum _:warInfo { WAR_ID, WAR_CLAN, WAR_CLAN2, WAR_PROGRESS, WAR_PROGRESS2, WAR_DURATION, WAR_REWARD };
 enum _:statusInfo { STATUS_NONE, STATUS_MEMBER, STATUS_DEPUTY, STATUS_LEADER };
 
 new cvarCreateLevel, cvarCreateFee, cvarJoinFee, cvarNameChangeFee, cvarMembersStart, cvarLevelMax, cvarSkillMax, cvarChatPrefix, cvarLevelCost, cvarNextLevelCost,
-	cvarSkillCost, cvarNextSkillCost, cvarMembersPerLevel, cvarHealthPerLevel, cvarGravityPerLevel, cvarDamagePerLevel, cvarWeaponDropPerLevel;
+	cvarSkillCost, cvarNextSkillCost, cvarMembersPerLevel, cvarHealthPerLevel, cvarGravityPerLevel, cvarDamagePerLevel, cvarExpPerLevel;
 
 new playerName[MAX_PLAYERS + 1][MAX_NAME], chosenName[MAX_PLAYERS + 1][MAX_NAME], clan[MAX_PLAYERS + 1], chosenId[MAX_PLAYERS + 1], warFrags[MAX_PLAYERS + 1],
 	warReward[MAX_PLAYERS + 1], Handle:sql, Handle:connection, bool:sqlConnected, Array:codClans, Array:codWars, bool:mapEnd, info, loaded;
@@ -52,7 +52,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_clans_health_per_level", "1"), cvarHealthPerLevel);
 	bind_pcvar_num(create_cvar("cod_clans_gravity_per_level", "2"), cvarGravityPerLevel);
 	bind_pcvar_num(create_cvar("cod_clans_damage_per_level", "1"), cvarDamagePerLevel);
-	bind_pcvar_num(create_cvar("cod_clans_weapondrop_per_level", "1"), cvarWeaponDropPerLevel);
+	bind_pcvar_num(create_cvar("cod_clans_exp_per_level", "2"), cvarExpPerLevel);
 
 	register_message(get_user_msgid("SayText"), "say_text");
 
@@ -62,6 +62,7 @@ public plugin_init()
 public plugin_natives()
 {
 	register_native("cod_get_user_clan", "_cod_get_user_clan", 1);
+	register_native("cod_get_user_clan_bonus", "_cod_get_user_clan_bonus", 1);
 	register_native("cod_get_clan_name", "_cod_get_clan_name", 1);
 }
 
@@ -89,8 +90,8 @@ public client_putinserver(id)
 	if (is_user_bot(id) || is_user_hltv(id)) return;
 
 	clan[id] = 0;
-	warFrags[id] = 25;
-	warReward[id] = 100;
+	warFrags[id] = 50;
+	warReward[id] = 1000;
 
 	get_user_name(id, playerName[id], charsmax(playerName));
 
@@ -129,8 +130,6 @@ public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPl
 	if (!clan[attacker]) return PLUGIN_CONTINUE;
 
 	cod_inflict_damage(attacker, victim, damage * cvarDamagePerLevel * get_clan_info(clan[attacker], CLAN_DAMAGE) / 100.0, 0.0, damageBits);
-
-	if (cod_percent_chance(get_clan_info(clan[attacker], CLAN_DROP) * cvarWeaponDropPerLevel)) engclient_cmd(victim, "drop");
 
 	return PLUGIN_CONTINUE;
 }
@@ -181,6 +180,8 @@ public show_clan_menu(id, sound)
 
 	menu_additem(menu, "\wTop15 \yKlanow", "6", _, callback);
 
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 
 	menu_display(id, menu);
@@ -609,9 +610,11 @@ public skills_menu(id)
 	formatex(menuData, charsmax(menuData), "Obrazenia \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i Honoru\w]", codClan[CLAN_DAMAGE], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_DAMAGE]);
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "Obezwladnienie \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i Honoru\w]", codClan[CLAN_DROP], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_DROP]);
+	formatex(menuData, charsmax(menuData), "Doswiadczenie \w[\rLevel: \y%i/%i\w] [\rKoszt: \y%i Honoru\w]", codClan[CLAN_EXP], cvarSkillMax, cvarSkillCost + cvarNextSkillCost * codClan[CLAN_EXP]);
 	menu_additem(menu, menuData);
 
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 
 	menu_display(id, menu);
@@ -745,7 +748,7 @@ public skills_menu_handle(id, menu, item)
 
 			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Obrazenia^x01 na^x03 %i^x01 poziom!", codClan[CLAN_DAMAGE]);
 		} case 4: {
-			if (codClan[CLAN_DROP] == cvarSkillMax) {
+			if (codClan[CLAN_EXP] == cvarSkillMax) {
 				cod_print_chat(id, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
 
 				skills_menu(id);
@@ -753,7 +756,7 @@ public skills_menu_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 
-			new remainingHonor = codClan[CLAN_HONOR] - (cvarSkillCost + cvarNextSkillCost * codClan[CLAN_DROP]);
+			new remainingHonor = codClan[CLAN_HONOR] - (cvarSkillCost + cvarNextSkillCost * codClan[CLAN_EXP]);
 
 			if (remainingHonor < 0) {
 				cod_print_chat(id, "Twoj klan nie ma wystarczajacej ilosci Honoru.");
@@ -763,12 +766,12 @@ public skills_menu_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 
-			upgradedSkill = CLAN_DROP;
+			upgradedSkill = CLAN_EXP;
 
-			codClan[CLAN_DROP]++;
+			codClan[CLAN_EXP]++;
 			codClan[CLAN_HONOR] = remainingHonor;
 
-			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Obezwladnienie^x01 na^x03 %i^x01 poziom!", codClan[CLAN_DROP]);
+			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Doswiadczenie^x01 na^x03 %i^x01 poziom!", codClan[CLAN_EXP]);
 		}
 	}
 
@@ -1032,9 +1035,9 @@ public members_menu_handle(failState, Handle:query, error[], errorNum, tempId[],
 		SQL_NextRow(query);
 	}
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 
 	menu_display(id, menu);
 
@@ -1237,9 +1240,9 @@ public applications_menu_handle(failState, Handle:query, error[], errorNum, temp
 		usersCount++;
 	}
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 
 	if (!usersCount) {
 		menu_destroy(menu);
@@ -1517,9 +1520,9 @@ public show_war_list_menu(failState, Handle:query, error[], errorNum, tempId[], 
 	}
 
 	menu_setprop(menu, MPROP_PERPAGE, 6);
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 
 	if (!warsCount) {
 		menu_destroy(menu);
@@ -1643,9 +1646,9 @@ public declare_war_select(failState, Handle:query, error[], errorNum, tempId[], 
 	}
 
 	menu_setprop(menu, MPROP_PERPAGE, 6);
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 
 	if (!clansCount) {
 		menu_destroy(menu);
@@ -1780,9 +1783,9 @@ public accept_war_menu_handle(failState, Handle:query, error[], errorNum, tempId
 	}
 
 	menu_setprop(menu, MPROP_PERPAGE, 6);
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 
 	if (!warsCount) {
 		menu_destroy(menu);
@@ -1932,9 +1935,9 @@ public remove_war_menu_handle(failState, Handle:query, error[], errorNum, tempId
 	}
 
 	menu_setprop(menu, MPROP_PERPAGE, 6);
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 
 	if (!warsCount) {
 		menu_destroy(menu);
@@ -2323,9 +2326,9 @@ public application_menu_handle(failState, Handle:query, error[], errorNum, tempI
 		clansCount++;
 	}
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 
 	if (!clansCount) {
 		menu_destroy(menu);
@@ -2497,7 +2500,7 @@ public sql_init()
 
 	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans` (`id` INT NOT NULL AUTO_INCREMENT, `name` varchar(%i) NOT NULL, ", MAX_SAFE_NAME);
 	add(queryData, charsmax(queryData), "`honor` INT NOT NULL, `kills` INT NOT NULL, `level` INT NOT NULL, `wins` INT NOT NULL, `health` INT NOT NULL, ");
-	add(queryData, charsmax(queryData), "`gravity` INT NOT NULL, `damage` INT NOT NULL, `weapondrop` INT NOT NULL, PRIMARY KEY (`id`));");
+	add(queryData, charsmax(queryData), "`gravity` INT NOT NULL, `damage` INT NOT NULL, `exp` INT NOT NULL, PRIMARY KEY (`id`));");
 
 	new Handle:query = SQL_PrepareQuery(connection, queryData);
 
@@ -2543,8 +2546,8 @@ public save_clan(clan)
 
 	cod_sql_string(codClan[CLAN_NAME], safeClanName, charsmax(safeClanName));
 
-	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET level = '%i', honor = '%i', kills = '%i', wins = '%i', health = '%i', gravity = '%i', weapondrop = '%i', damage = '%i' WHERE name = ^"%s^"",
-		codClan[CLAN_LEVEL], codClan[CLAN_HONOR], codClan[CLAN_KILLS], codClan[CLAN_WINS], codClan[CLAN_HEALTH], codClan[CLAN_GRAVITY], codClan[CLAN_DROP], codClan[CLAN_DAMAGE], safeClanName);
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET level = '%i', honor = '%i', kills = '%i', wins = '%i', health = '%i', gravity = '%i', exp = '%i', damage = '%i' WHERE name = ^"%s^"",
+		codClan[CLAN_LEVEL], codClan[CLAN_HONOR], codClan[CLAN_KILLS], codClan[CLAN_WINS], codClan[CLAN_HEALTH], codClan[CLAN_GRAVITY], codClan[CLAN_EXP], codClan[CLAN_DAMAGE], safeClanName);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
@@ -2588,7 +2591,7 @@ public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], da
 			codClan[CLAN_HONOR] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
 			codClan[CLAN_HEALTH] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "health"));
 			codClan[CLAN_GRAVITY] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "gravity"));
-			codClan[CLAN_DROP] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "weapondrop"));
+			codClan[CLAN_EXP] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "exp"));
 			codClan[CLAN_DAMAGE] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "damage"));
 			codClan[CLAN_KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "kills"));
 			codClan[CLAN_WINS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "wins"));
@@ -2673,6 +2676,9 @@ public load_wars_data_handle(failState, Handle:query, error[], errorNum)
 
 public _cod_get_user_clan(id)
 	return clan[id];
+
+public _cod_get_user_clan_bonus(id)
+	return get_clan_info(clan[id], CLAN_EXP) * cvarExpPerLevel;
 
 public _cod_get_clan_name(clanId, dataReturn[], dataLength)
 {

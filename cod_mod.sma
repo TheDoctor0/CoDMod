@@ -4718,6 +4718,7 @@ stock get_exp_bonus(id, exp)
 
 	bonus += floatmin(codPlayer[id][PLAYER_KS] * 0.2, 1.0);
 	bonus += get_players_amount() * cvarBonusPlayersPer / 100.0;
+	bonus += cod_get_user_clan_bonus(id) / 100.0;
 
 	return exp == NONE ? floatround((bonus - 1.0) * 100) : floatround(exp * bonus);
 }

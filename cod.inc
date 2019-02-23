@@ -111,6 +111,11 @@ Return clan id.
 native cod_get_user_clan(id);
 
 /*------------------------------
+Return clan exp bonus in percent.
+------------------------------*/
+native cod_get_user_clan_bonus(id);
+
+/*------------------------------
 Return clan's name by clan id.
 ------------------------------*/
 native cod_get_clan_name(clan, dataReturn[], dataLength);
