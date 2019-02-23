@@ -2173,6 +2173,8 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 		}
 	}
 
+	reset_attributes(victim, DEATH);
+
 	new ret;
 
 	ExecuteForward(codForwards[KILLED], ret, killer, victim, weaponId, hitPlace);
@@ -3037,7 +3039,7 @@ public reset_attributes(id, type)
 
 	new unlimitedWeapons, eliminatorWeapons, reductorWeapons, jumps;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_FOOTSTEPS][i]) codPlayer[id][PLAYER_FOOTSTEPS][ALL] = true;
 		if (codPlayer[id][PLAYER_BUNNYHOP][i]) codPlayer[id][PLAYER_BUNNYHOP][ALL] = true;
 		if (codPlayer[id][PLAYER_RESISTANCE][i]) codPlayer[id][PLAYER_RESISTANCE][ALL] = true;
@@ -3141,7 +3143,7 @@ public set_gravity(id)
 {
 	new Float:gravity = 1.0;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_GRAVITY][i] >= 0.0 && codPlayer[id][PLAYER_GRAVITY][i] < gravity) gravity = codPlayer[id][PLAYER_GRAVITY][i];
 		else if (codPlayer[id][PLAYER_GRAVITY][i] < 0.0) gravity += codPlayer[id][PLAYER_GRAVITY][i];
 	}
@@ -3157,7 +3159,7 @@ public set_speed(id)
 
 	speed += (get_condition(id) * 0.85);
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_SPEED][i] == COD_FREEZE) {
 			speed = COD_FREEZE;
 
@@ -3941,7 +3943,7 @@ public _cod_set_user_multijumps(id, value, type)
 {
 	codPlayer[id][PLAYER_JUMPS][type] = max(0, value);
 
-	for (new i = CLASS; i <= ROUND; i++) codPlayer[id][PLAYER_JUMPS][ALL] += codPlayer[id][PLAYER_JUMPS][i];
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_JUMPS][ALL] += codPlayer[id][PLAYER_JUMPS][i];
 
 	codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS][ALL];
 }
@@ -4009,7 +4011,7 @@ public _cod_add_user_multijumps(id, value, type)
 {
 	codPlayer[id][PLAYER_JUMPS][type] = max(0, codPlayer[id][PLAYER_JUMPS][type] + value);
 
-	for (new i = CLASS; i <= ROUND; i++) codPlayer[id][PLAYER_JUMPS][ALL] += codPlayer[id][PLAYER_JUMPS][i];
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_JUMPS][ALL] += codPlayer[id][PLAYER_JUMPS][i];
 
 	codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS][ALL];
 }
@@ -4091,7 +4093,7 @@ public _cod_set_user_resistance(id, value, type)
 
 	new bool:enabled;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_RESISTANCE][i]) enabled = true;
 	}
 
@@ -4104,7 +4106,7 @@ public _cod_set_user_godmode(id, value, type)
 
 	new bool:enabled;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_GODMODE][i]) enabled = true;
 	}
 
@@ -4119,7 +4121,7 @@ public _cod_set_user_noclip(id, value, type)
 
 	new bool:enabled;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_NOCLIP][i]) enabled = true;
 	}
 
@@ -4136,7 +4138,7 @@ public _cod_set_user_bunnyhop(id, value, type)
 
 	new bool:enabled;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_BUNNYHOP][i]) enabled = true;
 	}
 
@@ -4149,7 +4151,7 @@ public _cod_set_user_footsteps(id, value, type)
 
 	new bool:enabled;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_FOOTSTEPS][i]) enabled = true;
 	}
 
@@ -4164,7 +4166,7 @@ public _cod_set_user_model(id, value, type)
 
 	new bool:enabled;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_MODEL][i]) enabled = true;
 	}
 
@@ -4185,7 +4187,7 @@ public _cod_set_user_unlimited_ammo(id, value, type, weapon)
 
 	new bool:enabled, weapons;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_UNLIMITED_AMMO][i]) enabled = true;
 
 		if (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i] == FULL) weapons = FULL;
@@ -4208,7 +4210,7 @@ public _cod_set_user_recoil_eliminator(id, value, type, weapon)
 
 	new bool:enabled, weapons;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_ELIMINATOR][i]) enabled = true;
 
 		if (codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][i] == FULL) weapons = FULL;
@@ -4231,7 +4233,7 @@ public _cod_set_user_recoil_reducer(id, value, type, weapon)
 
 	new bool:enabled, weapons;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_REDUCER][i]) enabled = true;
 
 		if (codPlayer[id][PLAYER_REDUCER_WEAPONS][i] == FULL) weapons = FULL;
@@ -4288,7 +4290,7 @@ public _cod_set_user_render(id, value, type, status, weapon, Float:timer)
 
 		switch (type) {
 			case CLASS, ITEM, ADDITIONAL: ArraySetArray(codPlayerRender[id], type, codRender);
-			case ROUND: ArrayPushArray(codPlayerRender[id], codRender);
+			case ROUND, DEATH: ArrayPushArray(codPlayerRender[id], codRender);
 		}
 
 		render_change(id);
@@ -4809,7 +4811,7 @@ stock calculate_left(id, type)
 	codPlayer[id][type][ALL] = 0;
 
 	if (type == PLAYER_TELEPORTS) {
-		for (new i = CLASS; i <= ROUND; i++) {
+		for (new i = CLASS; i <= DEATH; i++) {
 			if (codPlayer[id][PLAYER_TELEPORTS][i] == FULL) {
 				codPlayer[id][PLAYER_TELEPORTS][ALL] = FULL;
 
@@ -4819,7 +4821,7 @@ stock calculate_left(id, type)
 
 		codPlayer[id][PLAYER_TELEPORTS][ALL] = codPlayer[id][PLAYER_TELEPORTS][ALL] == FULL ? FULL : max(0, codPlayer[id][PLAYER_TELEPORTS][ALL] - codPlayer[id][PLAYER_TELEPORTS][USED]);
 	} else {
-		for (new i = CLASS; i <= ROUND; i++) codPlayer[id][type][ALL] += codPlayer[id][type][i];
+		for (new i = CLASS; i <= DEATH; i++) codPlayer[id][type][ALL] += codPlayer[id][type][i];
 
 		codPlayer[id][type][ALL] = max(0, codPlayer[id][type][ALL] - codPlayer[id][type][USED]);
 	}
@@ -4829,7 +4831,7 @@ stock calculate_rockets_left(id)
 {
 	codPlayer[id][PLAYER_ROCKETS][ALL] = 0;
 
-	for (new i = CLASS; i <= ROUND; i++) codPlayer[id][PLAYER_ROCKETS][ALL] += codPlayer[id][PLAYER_ROCKETS][i];
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_ROCKETS][ALL] += codPlayer[id][PLAYER_ROCKETS][i];
 
 	codPlayer[id][PLAYER_ROCKETS][ALL] = max(0, codPlayer[id][PLAYER_ROCKETS][ALL] - codPlayer[id][PLAYER_ROCKETS][USED]);
 }
@@ -4838,7 +4840,7 @@ stock calculate_mines_left(id)
 {
 	codPlayer[id][PLAYER_MINES][ALL] = 0;
 
-	for (new i = CLASS; i <= ROUND; i++) codPlayer[id][PLAYER_MINES][ALL] += codPlayer[id][PLAYER_MINES][i];
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_MINES][ALL] += codPlayer[id][PLAYER_MINES][i];
 
 	codPlayer[id][PLAYER_MINES][ALL] = max(0, codPlayer[id][PLAYER_MINES][ALL] - codPlayer[id][PLAYER_MINES][USED]);
 }
@@ -4847,7 +4849,7 @@ stock calculate_dynamites_left(id)
 {
 	codPlayer[id][PLAYER_DYNAMITES][ALL] = 0;
 
-	for (new i = CLASS; i <= ROUND; i++) codPlayer[id][PLAYER_DYNAMITES][ALL] += codPlayer[id][PLAYER_DYNAMITES][i];
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_DYNAMITES][ALL] += codPlayer[id][PLAYER_DYNAMITES][i];
 
 	codPlayer[id][PLAYER_DYNAMITES][ALL] = max(0, codPlayer[id][PLAYER_DYNAMITES][ALL] - codPlayer[id][PLAYER_DYNAMITES][USED]);
 }
@@ -4856,7 +4858,7 @@ stock calculate_thunders_left(id)
 {
 	codPlayer[id][PLAYER_THUNDERS][ALL] = 0;
 
-	for (new i = CLASS; i <= ROUND; i++) codPlayer[id][PLAYER_THUNDERS][ALL] += codPlayer[id][PLAYER_THUNDERS][i];
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_THUNDERS][ALL] += codPlayer[id][PLAYER_THUNDERS][i];
 
 	codPlayer[id][PLAYER_THUNDERS][ALL] = max(0, codPlayer[id][PLAYER_THUNDERS][ALL] - codPlayer[id][PLAYER_THUNDERS][USED]);
 }
@@ -4865,7 +4867,7 @@ stock calculate_medkits_left(id)
 {
 	codPlayer[id][PLAYER_MEDKITS][ALL] = 0;
 
-	for (new i = CLASS; i <= ROUND; i++) codPlayer[id][PLAYER_MEDKITS][ALL] += codPlayer[id][PLAYER_MEDKITS][i];
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_MEDKITS][ALL] += codPlayer[id][PLAYER_MEDKITS][i];
 
 	codPlayer[id][PLAYER_MEDKITS][ALL] = max(0, codPlayer[id][PLAYER_MEDKITS][ALL] - codPlayer[id][PLAYER_MEDKITS][USED]);
 }
@@ -4874,7 +4876,7 @@ stock calculate_teleports_left(id)
 {
 	codPlayer[id][PLAYER_TELEPORTS][ALL] = 0;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_TELEPORTS][i] == FULL) {
 			codPlayer[id][PLAYER_TELEPORTS][ALL] = FULL;
 
@@ -5021,7 +5023,7 @@ stock get_user_class_info(id, class, info, dataReturn[] = "", dataLength = 0)
 	return codPlayer[id][PLAYER_PROMOTION] ? get_promotion_info(codPlayer[id][PLAYER_PROMOTION_ID], info, dataReturn, dataLength) : get_class_info(class, info, dataReturn, dataLength);
 
 stock clear_render(id)
-	for (new i = CLASS; i <= ROUND; i++) remove_render_type(id, i);
+	for (new i = CLASS; i <= DEATH; i++) remove_render_type(id, i);
 
 stock remove_render_type(id, type)
 {
@@ -5030,9 +5032,8 @@ stock remove_render_type(id, type)
 	for (new i = 0; i < ArraySize(codPlayerRender[id]); i++) {
 		ArrayGetArray(codPlayerRender[id], i, codRender);
 
-		if (codRender[RENDER_TYPE] == type)
-		{
-		 	if (type == ROUND) ArrayDeleteItem(codPlayerRender[id], i);
+		if (codRender[RENDER_TYPE] == type) {
+		 	if (type == ROUND || type == DEATH) ArrayDeleteItem(codPlayerRender[id], i);
 			else {
 				codRender[RENDER_VALUE] = 256;
 				codRender[RENDER_STATUS] = 0;
