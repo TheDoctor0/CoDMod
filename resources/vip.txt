@@ -14,14 +14,14 @@
 			* 1 HE co rundę<br>
 			* 2 Flashe co rundę<br>
 			* 1 Smoke co rundę<br>
-			* O 50% więcej zdobywanego Honoru
-			* O 25% więcej zdobywanego Expa
-			* O 5% zwiększone zadawane obrażenia
+			* O 50% więcej zdobywanego Honoru<br>
+			* O 25% więcej zdobywanego Expa<br>
+			* O 5% zwiększone zadawane obrażenia<br>
+			* Specjalny noz dodajacy po 4 punkty do kazdej ze statystyk<br>
 			* Dodatkowe życie za zabójstwo ( 15HP - z HeadShotem | 10HP - Normalne )<br>
 			* Dodatkowy exp za zabójstwo ( 15HP - z HeadShotem | 10HP - Normalne )<br>
 			* Prefix [VIP] w czacie<br>
 			* Status VIP w tabeli punktów<br>
 			* VIP widoczny na liście /vips<br>
-			<font size="2" color="#FF0000"><b>VIPa możesz zakupić pod komenda /sklepsms</b>
 		</font><center>
 </body>

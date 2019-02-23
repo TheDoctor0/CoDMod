@@ -1,18 +1,22 @@
 #include <amxmodx>
 #include <fakemeta>
+#include <hamsandwich>
+#include <engine>
 #include <sqlx>
 #include <cod>
 
 #define PLUGIN "CoD Skins"
-#define VERSION "1.1.1"
+#define VERSION "1.3.0"
 #define AUTHOR "O'Zone"
+
+#define TASK_FORCE 8431
 
 new const commandSkins[][] = { "skiny", "say /skins", "say_team /skins", "say /skin", "say_team /skin", "say /skiny", "say_team /skiny", "say /modele", "say_team /modele", "say /model", "say_team /model" };
 
-enum _:playerInfo { NAME[MAX_NAME], ACTIVE[CSW_P90 + 1], WEAPON, SKIN };
+enum _:playerInfo { NAME[MAX_NAME], ACTIVE[CSW_P90 + 1], WEAPON, SKIN, TEMP, Float:COUNTDOWN };
 enum _:skinsInfo { SKIN_NAME[MAX_NAME], SKIN_WEAPON[32], SKIN_MODEL[128], SKIN_PRICE };
 
-new playerData[MAX_PLAYERS + 1][playerInfo], Array:playerSkins[MAX_PLAYERS + 1], Array:skins, Array:weapons, Handle:sql, bool:sqlConnected, loaded;
+new playerData[MAX_PLAYERS + 1][playerInfo], Array:playerSkins[MAX_PLAYERS + 1], Array:skins, Array:weapons, Handle:sql, bool:sqlConnected, loaded, force;
 
 public plugin_init()
 {
@@ -26,7 +30,7 @@ public plugin_init()
 public plugin_precache()
 {
 	skins = ArrayCreate(skinsInfo);
-	weapons = ArrayCreate(MAX_NAME, 16);
+	weapons = ArrayCreate(MAX_NAME);
 
 	new file[128];
 
@@ -87,7 +91,7 @@ public plugin_cfg()
 
 public plugin_end()
 {
-	SQL_FreeHandle(sql);
+	if (sql != Empty_Handle) SQL_FreeHandle(sql);
 
 	ArrayDestroy(skins);
 
@@ -95,11 +99,15 @@ public plugin_end()
 }
 
 public client_disconnected(id)
+{
 	remove_task(id);
+	remove_task(id + TASK_FORCE);
+}
 
 public client_putinserver(id)
 {
 	rem_bit(id, loaded);
+	rem_bit(id, force);
 
 	for (new i = 0; i <= CSW_P90; i++) playerData[id][ACTIVE][i] = NONE;
 
@@ -212,7 +220,11 @@ public set_weapon_skin(id, weapon[])
 {
 	new menuData[MAX_NAME], skin[skinsInfo], tempId[5], count, menu = menu_create("\yWybierz \rSkin\w:", "set_weapon_skin_handle");
 
-	menu_additem(menu, "Domyslny", weapon);
+	num_to_str(NONE, tempId, charsmax(tempId));
+
+	menu_additem(menu, "Domyslny", tempId);
+
+	playerData[id][TEMP] = get_weapon_id(weapon);
 
 	for (new i = 0; i < ArraySize(playerSkins[id]); i++) {
 		ArrayGetArray(skins, ArrayGetCell(playerSkins[id], i), skin);
@@ -253,30 +265,41 @@ public set_weapon_skin_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new itemData[12], itemAccess, itemCallback;
+	new itemData[5], itemAccess, itemCallback, skinId;
 
 	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
 
 	menu_destroy(menu);
 
-	new skin[skinsInfo], skinId = str_to_num(itemData);
+	skinId = str_to_num(itemData);
 
-	ArrayGetArray(skins, skinId, skin);
+	if (skinId > NONE) {
+		new skin[skinsInfo], skinId = str_to_num(itemData);
 
-	if (!skinId && strlen(itemData[0]) > 3) remove_active_skin(id, itemData);
-	else remove_active_skin(id, skin[SKIN_WEAPON]);
+		ArrayGetArray(skins, skinId, skin);
 
-	if (item) {
+		remove_active_skin(id, skin[SKIN_WEAPON]);
+
 		set_skin(id, skin[SKIN_WEAPON], skinId);
 
 		set_active_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
 
-		cod_print_chat(id, "Twoj nowy skin^x03 %s^x01 to^x03 %s^x01.", skin[SKIN_WEAPON], skin[SKIN_NAME]);
+		cod_print_chat(id, "Twoj nowy skin broni^x03 %s^x01 to^x03 %s^x01.", skin[SKIN_WEAPON], skin[SKIN_NAME]);
 	} else {
-		set_skin(id, itemData, NONE);
+		new weaponName[32];
 
-		cod_print_chat(id, "Przywrociles domyslny skin broni^x03 %s^x01.", itemData);
+		get_weapon_name(playerData[id][TEMP], weaponName, charsmax(weaponName));
+
+		remove_active_skin(id, weaponName);
+
+		set_skin(id, weaponName, NONE);
+
+		reset_skin(id);
+
+		cod_print_chat(id, "Przywrociles domyslny skin broni^x03 %s^x01.", weaponName);
 	}
+
+	change_skin(id, playerData[id][WEAPON]);
 
 	return PLUGIN_HANDLED;
 }
@@ -289,6 +312,8 @@ public buy_weapon_skin(id, weapon[])
 		ArrayGetArray(skins, i, skin);
 
 		if (equal(weapon, skin[SKIN_WEAPON])) {
+			if (has_skin(id, i)) continue;
+
 			num_to_str(i, tempId, charsmax(tempId));
 
 			formatex(menuData, charsmax(menuData), "\y%s \w- \r%i Honoru", skin[SKIN_NAME], skin[SKIN_PRICE])
@@ -304,7 +329,7 @@ public buy_weapon_skin(id, weapon[])
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 
 	if (!count) {
-		cod_print_chat(id, "Do kupienia nie ma^x03 zadnych^x01 skinow tej broni.");
+		cod_print_chat(id, "Nie ma^x03 zadnych^x01 skinow tej broni mozliwych dla ciebie do kupienia.");
 
 		menu_destroy(menu);
 	} else menu_display(id, menu);
@@ -332,39 +357,109 @@ public buy_weapon_skin_handle(id, menu, item)
 
 	menu_destroy(menu);
 
-	for (new i = 0; i < ArraySize(playerSkins[id]); i++) {
-		if (ArrayGetCell(playerSkins[id], i) == skinId) {
-			cod_print_chat(id, "Juz posiadasz tego skina!");
-
-			return PLUGIN_HANDLED;
-		}
-	}
-
-	new skin[skinsInfo];
-
-	ArrayGetArray(skins, skinId, skin);
-
-	if (cod_get_user_honor(id) < skin[SKIN_PRICE]) {
-		cod_print_chat(id, "Nie masz wystarczajacej ilosci^x03 honoru^x01.");
+	if (has_skin(id, skinId)) {
+		cod_print_chat(id, "Juz posiadasz tego skina!");
 
 		return PLUGIN_HANDLED;
 	}
 
-	add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
+	playerData[id][TEMP] = skinId;
 
-	if (playerData[id][ACTIVE][get_weaponid(skin[SKIN_WEAPON])] == NONE) {
-		remove_active_skin(id, skin[SKIN_WEAPON]);
+	buy_weapon_skin_confirm(id);
 
-		set_active_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
+	return PLUGIN_HANDLED;
+}
 
-		set_skin(id, skin[SKIN_WEAPON], skinId);
+public buy_weapon_skin_confirm(id)
+{
+	new skin[skinsInfo], menuData[256];
+
+	ArrayGetArray(skins, playerData[id][TEMP], skin);
+
+	formatex(menuData, charsmax(menuData), "\yPotwierdzenie \rzakupu^n\wCzy na pewno chcesz \ykupic\w tego skina?^nBron: \y%s\w^nNazwa: \y%s\w^nCena: \y%i Honoru", skin[SKIN_WEAPON], skin[SKIN_NAME], skin[SKIN_PRICE]);
+
+	new menu = menu_create(menuData, "buy_weapon_skin_confirm_handle");
+
+	menu_additem(menu, "\yWyprobuj");
+	menu_additem(menu, "\rKup^n");
+	menu_additem(menu, "Wroc");
+
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+
+	menu_display(id, menu);
+
+	return PLUGIN_HANDLED;
+}
+
+public buy_weapon_skin_confirm_handle(id, menu, item)
+{
+	if (!is_user_connected(id)) return PLUGIN_HANDLED;
+
+	if (item == MENU_EXIT) {
+		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+
+		menu_destroy(menu);
+
+		return PLUGIN_HANDLED;
 	}
 
-	cod_add_user_honor(id, -skin[SKIN_PRICE]);
+	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	ArrayPushCell(playerSkins[id], skinId);
+	if (has_skin(id, playerData[id][TEMP])) {
+		cod_print_chat(id, "Juz posiadasz tego skina!");
 
-	cod_print_chat(id, "Pomyslnie zakupiles skin^x03 %s^x01 do broni^x03 %s^x01.", skin[SKIN_NAME], skin[SKIN_WEAPON]);
+		return PLUGIN_HANDLED;
+	}
+
+	new skin[skinsInfo];
+
+	ArrayGetArray(skins, playerData[id][TEMP], skin);
+
+	switch (item) {
+		case 0: {
+			set_bit(id, force);
+
+			set_pev(id, pev_viewmodel2, skin[SKIN_MODEL]);
+
+			playerData[id][COUNTDOWN] = get_gametime();
+
+			set_task(0.1, "show_countdown", id + TASK_FORCE, .flags = "b");
+
+			buy_weapon_skin_confirm(id);
+
+			return PLUGIN_HANDLED;
+		} case 1: {
+			if (cod_get_user_honor(id) < skin[SKIN_PRICE]) {
+				cod_print_chat(id, "Nie masz wystarczajacej ilosci^x03 honoru^x01.");
+
+				return PLUGIN_HANDLED;
+			}
+
+			add_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
+
+			if (playerData[id][ACTIVE][get_weapon_id(skin[SKIN_WEAPON])] == NONE) {
+				remove_active_skin(id, skin[SKIN_WEAPON]);
+
+				set_active_skin(id, skin[SKIN_WEAPON], skin[SKIN_NAME]);
+
+				set_skin(id, skin[SKIN_WEAPON], playerData[id][TEMP]);
+			}
+
+			cod_add_user_honor(id, -skin[SKIN_PRICE]);
+
+			ArrayPushCell(playerSkins[id], playerData[id][TEMP]);
+
+			cod_print_chat(id, "Pomyslnie zakupiles skin^x03 %s^x01 do broni^x03 %s^x01.", skin[SKIN_NAME], skin[SKIN_WEAPON]);
+		} case 2: {
+			choose_weapon_menu(id, 1);
+		}
+	}
+
+	client_print(id, print_center, "");
+
+	remove_task(id + TASK_FORCE);
+
+	reset_skin(id);
 
 	return PLUGIN_HANDLED;
 }
@@ -391,6 +486,38 @@ public set_fov(id)
 	}
 }
 
+public show_countdown(id)
+{
+	id -= TASK_FORCE;
+
+	new Float:currentTime = (playerData[id][COUNTDOWN] + 5.0) - get_gametime();
+
+	if (currentTime <= 0.0) {
+		client_print(id, print_center, "");
+
+		remove_task(id + TASK_FORCE);
+
+		reset_skin(id);
+
+		return;
+	}
+
+	client_print(id, print_center, "Skin zostanie zresetowany za %0.1fs", currentTime);
+}
+
+public reset_skin(id)
+{
+	rem_bit(id, force);
+
+	if (!is_user_alive(id)) return;
+
+	static weaponName[32];
+
+	get_weaponname(playerData[id][WEAPON], weaponName, charsmax(weaponName));
+
+	ExecuteHamB(Ham_Item_Deploy, find_ent_by_owner(-1, weaponName, id));
+}
+
 public change_skin(id, weapon)
 {
 	if (!is_user_alive(id)) return;
@@ -403,6 +530,14 @@ public change_skin(id, weapon)
 		set_pev(id, pev_viewmodel2, skin[SKIN_MODEL]);
 
 		playerData[id][SKIN] = playerData[id][ACTIVE][weapon];
+	}
+
+	if (get_bit(id, force) && playerData[id][TEMP] > NONE) {
+		static skin[skinsInfo];
+
+		ArrayGetArray(skins, playerData[id][TEMP], skin);
+
+		set_pev(id, pev_viewmodel2, skin[SKIN_MODEL]);
 	}
 }
 
@@ -422,6 +557,8 @@ public sql_init()
 	if (errorNum) {
 		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 
+		sql = Empty_Handle;
+
 		set_task(5.0, "sql_init");
 
 		return;
@@ -429,7 +566,7 @@ public sql_init()
 
 	sqlConnected = true;
 
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_skins` (name VARCHAR(%i), weapon VARCHAR(32), skin VARCHAR(64), PRIMARY KEY(name, weapon, skin))", MAX_SAFE_NAME);
+	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_skins` (name VARCHAR(%i), weapon VARCHAR(32), skin VARCHAR(%i), active INT NOT NULL, PRIMARY KEY(name, weapon, skin));", MAX_SAFE_NAME, MAX_SAFE_NAME);
 
 	new Handle:query = SQL_PrepareQuery(connectHandle, queryData);
 
@@ -451,7 +588,7 @@ public load_skins(id)
 
 	playerId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_skins` WHERE name = ^"%s^"", playerData[id][NAME]);
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_skins` WHERE name = ^"%s^";", playerData[id][NAME]);
 
 	SQL_ThreadQuery(sql, "load_skins_handle", queryData, playerId, sizeof(playerId));
 }
@@ -471,15 +608,13 @@ public load_skins_handle(failState, Handle:query, error[], errorNum, playerId[],
 		SQL_ReadResult(query, SQL_FieldNameToNum(query, "skin"), skin[SKIN_NAME], charsmax(skin[SKIN_NAME]));
 		SQL_ReadResult(query, SQL_FieldNameToNum(query, "weapon"), skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]));
 
-		if (contain(skin[SKIN_WEAPON], "ACTIVE") != NONE) {
-			replace(skin[SKIN_WEAPON], charsmax(skin[SKIN_WEAPON]), " ACTIVE", "");
-
+		if (SQL_ReadResult(query, SQL_FieldNameToNum(query, "active"))) {
 			set_skin(id, skin[SKIN_WEAPON], get_skin_id(skin[SKIN_NAME], skin[SKIN_WEAPON]));
-		} else {
-			new skinId = get_skin_id(skin[SKIN_NAME], skin[SKIN_WEAPON]);
-
-			if (skinId > NONE) ArrayPushCell(playerSkins[id], skinId);
 		}
+
+		new skinId = get_skin_id(skin[SKIN_NAME], skin[SKIN_WEAPON]);
+
+		if (skinId > NONE) ArrayPushCell(playerSkins[id], skinId);
 
 		SQL_NextRow(query);
 	}
@@ -498,11 +633,20 @@ stock get_weapon_id(weapon[])
 	return get_weaponid(weaponName);
 }
 
+stock get_weapon_name(weaponId, weaponName[] = "", weaponNameLength = 0)
+{
+	get_weaponname(weaponId, weaponName, weaponNameLength);
+
+	replace(weaponName, weaponNameLength, "weapon_", "");
+
+	strtoupper(weaponName);
+}
+
 stock remove_active_skin(id, weapon[])
 {
 	static queryData[256];
 
-	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_skins` WHERE name = ^"%s^" AND weapon = '%s ACTIVE'", playerData[id][NAME], weapon);
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_skins` SET active = '0' WHERE name = ^"%s^" AND weapon = '%s';", playerData[id][NAME], weapon);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
@@ -511,7 +655,7 @@ stock set_active_skin(id, weapon[], name[])
 {
 	static queryData[256];
 
-	formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES (^"%s^", '%s ACTIVE', '%s')", playerData[id][NAME], weapon, name);
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_skins` SET active = '1' WHERE name = ^"%s^" AND weapon = '%s' AND skin = '%s';", playerData[id][NAME], weapon, name);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
@@ -520,9 +664,22 @@ stock add_skin(id, weapon[], name[])
 {
 	static queryData[256];
 
-	formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES (^"%s^", '%s', '%s')", playerData[id][NAME], weapon, name);
+	formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES (^"%s^", '%s', '%s');", playerData[id][NAME], weapon, name);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
+}
+
+stock has_skin(id, skinId)
+{
+	if (skinId >= ArraySize(skins)) return false;
+
+	for (new i = 0; i < ArraySize(playerSkins[id]); i++) {
+		if (ArrayGetCell(playerSkins[id], i) == skinId) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 stock set_skin(id, weapon[], skin)

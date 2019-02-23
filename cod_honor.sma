@@ -5,7 +5,7 @@
 
 #define PLUGIN	"CoD Honor System"
 #define AUTHOR	"O'Zone"
-#define VERSION	"1.2.1"
+#define VERSION	"1.2.2"
 
 #define set_user_money(%1,%2)	set_pdata_int(%1, OFFSET_CSMONEY, %2, OFFSET_LINUX)
 
@@ -19,7 +19,7 @@
 #define TASK_UPDATE 	9501
 
 new cvarMinPlayers, cvarKill, cvarKillHS, cvarKillFirst, cvarWinRound, cvarBombPlanted, cvarBombDefused,
-	cvarRescueHostage, cvarKillHostage, Float:cvarVIPMultiplier;
+	cvarRescueHostage, cvarKillHostage, cvarVIPBonus;
 
 new playerName[MAX_PLAYERS + 1][MAX_SAFE_NAME], playerHonor[MAX_PLAYERS + 1], playerHonorGained[MAX_PLAYERS + 1],
 	Handle:sql, Handle:connection, bool:sqlConnected, bool:firstKill, dataLoaded, msgMoney;
@@ -37,7 +37,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_honor_bomb_defused", "5"), cvarBombDefused);
 	bind_pcvar_num(create_cvar("cod_honor_rescue_hostage", "5"), cvarRescueHostage);
 	bind_pcvar_num(create_cvar("cod_honor_kill_hostage", "5"), cvarKillHostage);
-	bind_pcvar_float(create_cvar("cod_honor_vip_multiplier", "1.5"), cvarVIPMultiplier);
+	bind_pcvar_num(create_cvar("cod_honor_vip_bonus", "50"), cvarVIPBonus);
 
 	register_event("Money", "money_update", "b");
 
@@ -58,8 +58,8 @@ public plugin_natives()
 
 public plugin_end()
 {
-	SQL_FreeHandle(sql);
-	SQL_FreeHandle(connection);
+	if (sql != Empty_Handle) SQL_FreeHandle(sql);
+	if (connection != Empty_Handle) SQL_FreeHandle(connection);
 }
 
 public client_putinserver(id)
@@ -94,22 +94,22 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 {
 	if (get_playersnum() < cvarMinPlayers) return;
 
-	if (!firstKill) {
+	if (!firstKill && cvarKillFirst) {
 		firstKill = true;
 
 		playerHonorGained[killer] += get_user_bonus(killer, cvarKillFirst);
 	}
 
-	playerHonorGained[killer] += get_user_bonus(killer, cvarKill);
+	if (cvarKill) playerHonorGained[killer] += get_user_bonus(killer, cvarKill);
 
-	if (hitPlace == HIT_HEAD) playerHonorGained[killer] += get_user_bonus(killer, cvarKillHS);
+	if (hitPlace == HIT_HEAD && cvarKillHS) playerHonorGained[killer] += get_user_bonus(killer, cvarKillHS);
 
 	save_honor(killer);
 }
 
 public cod_win_round(team)
 {
-	if (get_playersnum() < cvarMinPlayers) return;
+	if (get_playersnum() < cvarMinPlayers || !cvarWinRound) return;
 
 	for (new id = 1; id < MAX_PLAYERS; id++) {
 		if (!cod_get_user_class(id) || get_user_team(id) != team) continue;
@@ -122,7 +122,7 @@ public cod_win_round(team)
 
 public cod_bomb_planted(id)
 {
-	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
+	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id) || !cvarBombPlanted) {
 		delayed_hud_update(id, 0);
 
 		return;
@@ -135,7 +135,7 @@ public cod_bomb_planted(id)
 
 public cod_bomb_defused(id)
 {
-	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
+	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id) || !cvarBombDefused) {
 		delayed_hud_update(id, 0);
 
 		return;
@@ -148,7 +148,7 @@ public cod_bomb_defused(id)
 
 public cod_hostage_rescued(id)
 {
-	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
+	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id) || !cvarRescueHostage) {
 		delayed_hud_update(id, 0);
 
 		return;
@@ -161,13 +161,13 @@ public cod_hostage_rescued(id)
 
 public cod_hostage_killed(id)
 {
-	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id)) {
+	if (get_playersnum() < cvarMinPlayers || !cod_get_user_class(id) || !cvarKillHostage) {
 		delayed_hud_update(id, 0);
 
 		return;
 	}
 
-	playerHonorGained[id] -= cod_get_user_vip(id) ? floatround(cvarKillHostage / cvarVIPMultiplier) : cvarKillHostage;
+	playerHonorGained[id] -= cod_get_user_vip(id) ? floatround(cvarKillHostage -  cvarKillHostage * (cvarVIPBonus / 100.0)) : cvarKillHostage;
 
 	save_honor(id);
 }
@@ -198,6 +198,8 @@ public sql_init()
 
 	if (errorNum) {
 		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
+
+		sql = Empty_Handle;
 
 		set_task(5.0, "sql_init");
 
@@ -367,5 +369,5 @@ public _cod_add_user_honor(id, amount, bonus)
 
 stock get_user_bonus(id, bonus)
 {
-	return cod_get_user_vip(id) ? floatround(bonus * cvarVIPMultiplier) : bonus;
+	return cod_get_user_vip(id) ? floatround(bonus + bonus * (cvarVIPBonus / 100.0)) : bonus;
 }

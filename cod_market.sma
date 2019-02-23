@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Market"
-#define VERSION "1.1.1"
+#define VERSION "1.2.2"
 #define AUTHOR "O'Zone"
 
 new const commandMarket[][] = { "rynek", "say /market", "say_team /market", "say /rynek", "say_team /rynek" };

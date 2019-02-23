@@ -9,7 +9,7 @@
 #include <nvault>
 
 #define PLUGIN "CoD Stats"
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 #define AUTHOR "O'Zone"
 
 #define TASK_TIME 9054
@@ -33,8 +33,8 @@ enum _:winers { THIRD, SECOND, FIRST };
 new playerName[MAX_PLAYERS + 1][MAX_SAFE_NAME], playerStats[MAX_PLAYERS + 1][statsInfo], playerDamage[MAX_PLAYERS + 1][MAX_PLAYERS + 1],
 	Handle:sql, Handle:connection, bool:sqlConnected, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo;
 
-new cvarGoldMedalExp, cvarSilverMedalExp, cvarBronzeMedalExp, cvarAssistEnabled, cvarAssistDamage, cvarAssistHonor, cvarAssistExp,
-	cvarRevengeEnabled, cvarRevengeHonor, cvarRevengeExp;
+new cvarMinPlayers, cvarMedalsEnabled, cvarGoldMedalExp, cvarSilverMedalExp, cvarBronzeMedalExp, cvarAssistEnabled,
+	cvarAssistDamage, cvarAssistHonor, cvarAssistExp, cvarRevengeEnabled, cvarRevengeHonor, cvarRevengeExp;
 
 new soundsVault, soundMayTheForce, soundOneAndOnly, soundPrepare, soundHumiliation, soundLastLeft;
 
@@ -44,9 +44,11 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
 
-	bind_pcvar_num(create_cvar("cod_medal_gold_exp", "500"), cvarGoldMedalExp);
-	bind_pcvar_num(create_cvar("cod_medal_silver_exp", "300"), cvarSilverMedalExp);
-	bind_pcvar_num(create_cvar("cod_medal_bronze_exp", "100"), cvarBronzeMedalExp);
+	bind_pcvar_num(create_cvar("cod_stats_min_players", "4"), cvarMinPlayers);
+	bind_pcvar_num(create_cvar("cod_medals_enabled", "1"), cvarMedalsEnabled);
+	bind_pcvar_num(create_cvar("cod_medals_gold_exp", "500"), cvarGoldMedalExp);
+	bind_pcvar_num(create_cvar("cod_medals_silver_exp", "300"), cvarSilverMedalExp);
+	bind_pcvar_num(create_cvar("cod_medals_bronze_exp", "100"), cvarBronzeMedalExp);
 	bind_pcvar_num(create_cvar("cod_assist_enabled", "1"), cvarAssistEnabled);
 	bind_pcvar_num(create_cvar("cod_assist_damage", "65"), cvarAssistDamage);
 	bind_pcvar_num(create_cvar("cod_assist_honor", "1"), cvarAssistHonor);
@@ -75,8 +77,8 @@ public plugin_cfg()
 
 public plugin_end()
 {
-	SQL_FreeHandle(sql);
-	SQL_FreeHandle(connection);
+	if (sql != Empty_Handle) SQL_FreeHandle(sql);
+	if (connection != Empty_Handle) SQL_FreeHandle(connection);
 }
 
 public plugin_natives()
@@ -709,15 +711,19 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 		cs_set_user_deaths(killer, cs_get_user_deaths(killer));
 
-		cod_add_user_honor(killer, cvarRevengeHonor, true);
-
-		new nameVictim[MAX_NAME], exp = cod_get_user_bonus_exp(killer, cvarRevengeExp);
-
-		cod_set_user_exp(killer, exp);
+		new nameVictim[MAX_NAME];
 
 		get_user_name(victim, nameVictim, charsmax(nameVictim));
 
-		cod_print_chat(killer, "Zemsciles sie na^x03 %s^x01. Dostajesz fraga i^x03 %i^x01 expa!", nameVictim, exp);
+		if (cvarMinPlayers >= get_playersnum()) cod_add_user_honor(killer, cvarRevengeHonor, true);
+
+		if (cvarMinPlayers >= get_playersnum() && cvarRevengeExp) {
+			new exp = cod_get_user_bonus_exp(killer, cvarRevengeExp);
+
+			cod_set_user_exp(killer, exp);
+
+			cod_print_chat(killer, "Zemsciles sie na^x03 %s^x01. Dostajesz fraga i^x03 %i^x01 expa!", nameVictim, exp);
+		} else cod_print_chat(killer, "Zemsciles sie na^x03 %s^x01. Dostajesz fraga!", nameVictim);
 	}
 
 	if (cvarAssistEnabled) {
@@ -739,16 +745,20 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 			cs_set_user_deaths(assist, cs_get_user_deaths(assist));
 
-			cod_add_user_honor(assist, cvarAssistHonor, true);
-
-			new nameVictim[MAX_NAME], nameKiller[MAX_NAME], exp = cod_get_user_bonus_exp(assist, cvarAssistExp);
-
-			cod_set_user_exp(assist, exp);
+			new nameVictim[MAX_NAME], nameKiller[MAX_NAME];
 
 			get_user_name(victim, nameVictim, charsmax(nameVictim));
 			get_user_name(killer, nameKiller, charsmax(nameKiller));
 
-			cod_print_chat(assist, "Pomogles^x03 %s^x01 w zabiciu^x03 %s^x01. Dostajesz fraga i^x03 %i^x01 expa!", nameKiller, nameVictim, exp);
+			if (cvarMinPlayers >= get_playersnum()) cod_add_user_honor(assist, cvarAssistHonor, true);
+
+			if (cvarMinPlayers >= get_playersnum() && cvarAssistExp) {
+				new exp = exp = cod_get_user_bonus_exp(assist, cvarAssistExp);
+
+				cod_set_user_exp(assist, exp);
+
+				cod_print_chat(assist, "Pomogles^x03 %s^x01 w zabiciu^x03 %s^x01. Dostajesz fraga i^x03 %i^x01 expa!", nameKiller, nameVictim, exp);
+			} else cod_print_chat(assist, "Pomogles^x03 %s^x01 w zabiciu^x03 %s^x01. Dostajesz fraga!", nameKiller, nameVictim);
 		}
 	}
 
@@ -833,71 +843,70 @@ public cod_hostages_rescued(id)
 
 public cod_end_map()
 {
-	new playerName[MAX_NAME], winnersId[3], winnersFrags[3], tempFrags, swapFrags, swapId, exp;
+	if (cvarMedalsEnabled) {
+		new playerName[MAX_NAME], winnersId[3], winnersFrags[3], tempFrags, swapFrags, swapId, exp;
 
-	for (new id = 1; id <= MAX_PLAYERS; id++) {
-		if (!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
+		for (new id = 1; id <= MAX_PLAYERS; id++) {
+			if (!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
 
-		tempFrags = get_user_frags(id);
+			tempFrags = get_user_frags(id);
 
-		if (tempFrags > winnersFrags[THIRD]) {
-			winnersFrags[THIRD] = tempFrags;
-			winnersId[THIRD] = id;
+			if (tempFrags > winnersFrags[THIRD]) {
+				winnersFrags[THIRD] = tempFrags;
+				winnersId[THIRD] = id;
 
-			if (tempFrags > winnersFrags[SECOND]) {
-				swapFrags = winnersFrags[SECOND];
-				swapId = winnersId[SECOND];
-				winnersFrags[SECOND] = tempFrags;
-				winnersId[SECOND] = id;
-				winnersFrags[THIRD] = swapFrags;
-				winnersId[THIRD] = swapId;
+				if (tempFrags > winnersFrags[SECOND]) {
+					swapFrags = winnersFrags[SECOND];
+					swapId = winnersId[SECOND];
+					winnersFrags[SECOND] = tempFrags;
+					winnersId[SECOND] = id;
+					winnersFrags[THIRD] = swapFrags;
+					winnersId[THIRD] = swapId;
 
-				if (tempFrags > winnersFrags[FIRST]) {
-					swapFrags = winnersFrags[FIRST];
-					swapId = winnersId[FIRST];
-					winnersFrags[FIRST] = tempFrags;
-					winnersId[FIRST] = id;
-					winnersFrags[SECOND] = swapFrags;
-					winnersId[SECOND] = swapId;
+					if (tempFrags > winnersFrags[FIRST]) {
+						swapFrags = winnersFrags[FIRST];
+						swapId = winnersId[FIRST];
+						winnersFrags[FIRST] = tempFrags;
+						winnersId[FIRST] = id;
+						winnersFrags[SECOND] = swapFrags;
+						winnersId[SECOND] = swapId;
+					}
 				}
 			}
 		}
-	}
 
-	if (!winnersId[FIRST]) return PLUGIN_CONTINUE;
+		if (!winnersId[FIRST]) return PLUGIN_CONTINUE;
 
-	new const medals[][] = { "Brazowy", "Srebrny", "Zloty" };
+		new const medals[][] = { "Brazowy", "Srebrny", "Zloty" };
 
-	cod_print_chat(0, "Gratulacje dla^x03 Najlepszych Graczy^x01!");
+		cod_print_chat(0, "Gratulacje dla^x03 Najlepszych Graczy^x01!");
 
-	for (new i = 2; i >= 0; i--) {
-		if (!is_user_connected(winnersId[i])) continue;
+		for (new i = 2; i >= 0; i--) {
+			if (!is_user_connected(winnersId[i])) continue;
 
-		switch (i) {
-			case THIRD: {
-				exp = cvarBronzeMedalExp;
-
-				playerStats[winnersId[i]][BRONZE]++;
+			switch (i) {
+				case THIRD: {
+					playerStats[winnersId[i]][BRONZE]++;
+					exp = cvarBronzeMedalExp;
+				} case SECOND: {
+					playerStats[winnersId[i]][SILVER]++;
+					exp = cvarSilverMedalExp;
+				} case FIRST: {
+					playerStats[winnersId[i]][GOLD]++;
+					exp = cvarGoldMedalExp;
+				}
 			}
-			case SECOND: {
-				exp = cvarSilverMedalExp;
 
-				playerStats[winnersId[i]][SILVER]++;
-			}
-			case FIRST: {
-				exp = cvarGoldMedalExp;
+			save_stats(winnersId[i], 1);
 
-				playerStats[winnersId[i]][GOLD]++;
-			}
+			get_user_name(winnersId[i], playerName, charsmax(playerName));
+
+			if (cvarMinPlayers >= get_playersnum() && exp) {
+				cod_set_user_exp(winnersId[i], exp);
+
+				cod_print_chat(0, "^x03 %s^x01 -^x03 %i^x01 Zabojstw - %s Medal (+^x03%i^x01 Doswiadczenia).", playerName, winnersFrags[i], medals[i], exp);
+			} else cod_print_chat(0, "^x03 %s^x01 -^x03 %i^x01 Zabojstw - %s Medal.", playerName, winnersFrags[i], medals[i]);
 		}
-
-		cod_set_user_exp(winnersId[i], exp);
-
-		save_stats(winnersId[i], 1);
-
-		get_user_name(winnersId[i], playerName, charsmax(playerName));
-
-		cod_print_chat(0, "^x03 %s^x01 -^x03 %i^x01 Zabojstw - %s Medal (+^x03%i^x01 Doswiadczenia).", playerName, winnersFrags[i], medals[i], exp);
 	}
 
 	for (new id = 1; id <= MAX_PLAYERS; id++) {
@@ -965,6 +974,8 @@ public sql_init()
 
 	if (errorNum) {
 		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
+
+		sql = Empty_Handle;
 
 		set_task(5.0, "sql_init");
 

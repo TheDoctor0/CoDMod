@@ -10,7 +10,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.2.1"
+#define VERSION "1.3.0"
 #define AUTHOR "O'Zone"
 
 #pragma dynamic              65536
@@ -47,6 +47,9 @@ new const weapons[][] = { "", "weapon_p228", "", "weapon_scout", "weapon_hegrena
 		"weapon_famas", "weapon_usp", "weapon_glock18", "weapon_awp", "weapon_mp5navy", "weapon_m249", "weapon_m3", "weapon_m4a1",
 		"weapon_tmp", "weapon_g3sg1", "weapon_flashbang", "weapon_deagle", "weapon_sg552", "weapon_ak47", "weapon_knife", "weapon_p90" };
 
+new const excludedWeapons = (1<<CSW_HEGRENADE) | (1<<CSW_SMOKEGRENADE) | (1<<CSW_FLASHBANG) | (1<<CSW_KNIFE) | (1<<CSW_C4);
+new const allowedWeapons = (1<<CSW_KNIFE) | (1<<CSW_C4);
+
 new const maxClipAmmo[] = { -1, 13, -1, 10, 1, 7, 1, 30, 30, 1, 30, 20, 25, 30, 35, 25, 12, 20, 10, 30, 100, 8, 30, 30, 20, 2, 7, 30, 30, -1, 50 };
 new const maxBpAmmo[] = { -1, 52, -1, 90, 1, 32, 1, 100, 90, 1, 120, 100, 100, 90, 90, 90, 100, 120, 30, 120, 200, 32, 90, 120, 90, 1, 35, 90, 90, -1, 100 }
 
@@ -73,8 +76,6 @@ new const codSprites[sprites][] = {
 
 new codSprite[sizeof codSprites];
 
-new allowedWeapons = 1<<CSW_KNIFE | 1<<CSW_C4;
-
 enum _:save { NORMAL, FINAL, MAP_END };
 
 enum _:repeatingData { ATTACKER, VICTIM, DAMAGE, COUNTER, FLAGS };
@@ -100,7 +101,7 @@ enum _:renderInfo { RENDER_TYPE, RENDER_VALUE, RENDER_STATUS, RENDER_WEAPON };
 enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL, PLAYER_INT,
 	PLAYER_STAM, PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTRA_HEAL, PLAYER_EXTRA_INT, PLAYER_EXTRA_STAM, PLAYER_EXTRA_STR, PLAYER_EXTRA_COND, PLAYER_EXTRA_WEAPONS,
 	PLAYER_WEAPON, PLAYER_WEAPONS, PLAYER_STATUS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_SPAWNED, PLAYER_KS, PLAYER_TIME_KS, Float:PLAYER_LAST_ROCKET, Float:PLAYER_LAST_MINE,
-	Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY,
+	Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, SKILL_USE,
 	PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1],
 	PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_RESISTANCE[ALL + 1], PLAYER_GODMODE[ALL + 1], PLAYER_NOCLIP[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1],
 	PLAYER_ELIMINATOR[ALL + 1], PLAYER_ELIMINATOR_WEAPONS[ALL + 1], PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_SAFE_NAME] };
@@ -108,13 +109,13 @@ enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 
 new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpDamagePer, cvarExpWinRound, cvarExpPlant, cvarExpDefuse, cvarExpRescue, cvarNightExpEnabled, cvarNightExpFrom, cvarNightExpTo,
-	Float:cvarNightExpMultiplier, cvarLevelLimit, cvarLevelRatio, cvarPointsPerLevel, cvarPointsLimitEnabled, cvarKillStreakTime, cvarMinPlayers, cvarMinBonusPlayers, cvarMaxDurability,
-	cvarMinDamageDurability, cvarMaxDamageDurability, Float:cvarBlockSkillsTime;
+	cvarNightExpBonus, cvarLevelLimit, cvarLevelRatio, cvarPointsPerLevel, cvarPointsLimitEnabled, cvarKillStreakTime, cvarMinPlayers, cvarMinBonusPlayers, cvarBonusPlayersPer,
+	cvarMaxDurability, cvarMinDamageDurability, cvarMaxDamageDurability, cvarBlockSkillsTime;
 
 new Array:codItems, Array:codClasses, Array:codPromotions, Array:codFractions, Array:codPlayerClasses[MAX_PLAYERS + 1], Array:codPlayerRender[MAX_PLAYERS + 1], codForwards[forwards];
 
-new Handle:sql, Handle:connection, bool:sqlConnected, bool:skillsBlocked, bool:nightExp, bool:mapChange, bool:freezeTime = true, hudInfo,
-	hudSync, hudSync2, playersNum, dataLoaded, hudLoaded, resetStats, userConnected, renderTimer, glowActive, roundStart, lastInfo;
+new Handle:sql, Handle:connection, bool:sqlConnected, bool:skillsBlocked, bool:nightExp, bool:mapChange, bool:freezeTime = true,
+	hudInfo, hudSync, hudSync2, dataLoaded, hudLoaded, resetStats, renderTimer, glowActive, roundStart, lastInfo;
 
 public plugin_init()
 {
@@ -130,7 +131,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_kill_exp", "30"), cvarExpKill);
 	bind_pcvar_num(create_cvar("cod_hs_exp", "10"), cvarExpKillHS);
 	bind_pcvar_num(create_cvar("cod_damage_exp", "3"), cvarExpDamage);
-	bind_pcvar_num(create_cvar("cod_damage_exp_per", "25"), cvarExpDamagePer);
+	bind_pcvar_num(create_cvar("cod_damage_exp_per", "50"), cvarExpDamagePer);
 	bind_pcvar_num(create_cvar("cod_win_exp", "25"), cvarExpWinRound);
 	bind_pcvar_num(create_cvar("cod_bomb_exp", "25"), cvarExpPlant);
 	bind_pcvar_num(create_cvar("cod_defuse_exp", "25"), cvarExpDefuse);
@@ -138,7 +139,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_night_exp", "1"), cvarNightExpEnabled);
 	bind_pcvar_num(create_cvar("cod_night_exp_from", "22"), cvarNightExpFrom);
 	bind_pcvar_num(create_cvar("cod_night_exp_to", "8"), cvarNightExpTo);
-	bind_pcvar_float(create_cvar("cod_night_exp_multiplier", "2.0"), cvarNightExpMultiplier);
+	bind_pcvar_num(create_cvar("cod_night_exp_bonus", "100"), cvarNightExpBonus);
 	bind_pcvar_num(create_cvar("cod_max_level", "501"), cvarLevelLimit);
 	bind_pcvar_num(create_cvar("cod_level_ratio", "20"), cvarLevelRatio);
 	bind_pcvar_num(create_cvar("cod_points_per_level", "1"), cvarPointsPerLevel);
@@ -146,10 +147,11 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_killstreak_time", "15"), cvarKillStreakTime);
 	bind_pcvar_num(create_cvar("cod_min_players", "4"), cvarMinPlayers);
 	bind_pcvar_num(create_cvar("cod_min_bonus_players", "10"), cvarMinBonusPlayers);
+	bind_pcvar_num(create_cvar("cod_bonus_players_per", "10"), cvarBonusPlayersPer);
 	bind_pcvar_num(create_cvar("cod_max_durability", "100"), cvarMaxDurability);
 	bind_pcvar_num(create_cvar("cod_min_damage_durability", "10"), cvarMinDamageDurability);
 	bind_pcvar_num(create_cvar("cod_max_damage_durability", "25"), cvarMaxDamageDurability);
-	bind_pcvar_float(create_cvar("cod_block_skills_time", "5"), cvarBlockSkillsTime);
+	bind_pcvar_num(create_cvar("cod_block_skills_time", "5"), cvarBlockSkillsTime);
 
 	register_cvar("cod_version", VERSION, FCVAR_SERVER);
 
@@ -165,12 +167,12 @@ public plugin_init()
 	for (new i; i < sizeof commandTop; i++) register_clcmd(commandTop[i], "level_top");
 	for (new i; i < sizeof commandBlock; i++) register_clcmd(commandBlock[i], "block_command");
 
-	register_clcmd("+rocket", "use_rocket");
-	register_clcmd("+mine", "use_mine");
-	register_clcmd("+dynamite", "use_dynamite");
-	register_clcmd("+medkit", "use_medkit");
-	register_clcmd("+thunder", "use_thunder");
-	register_clcmd("+teleport", "use_teleport");
+	register_clcmd("+rocket", "bind_use_rocket");
+	register_clcmd("+mine", "bind_use_mine");
+	register_clcmd("+dynamite", "bind_use_dynamite");
+	register_clcmd("+medkit", "bind_use_medkit");
+	register_clcmd("+thunder", "bind_use_thunder");
+	register_clcmd("+teleport", "bind_use_teleport");
 	register_clcmd("+class", "use_class");
 	register_clcmd("+item", "use_item");
 
@@ -190,7 +192,11 @@ public plugin_init()
 	RegisterHam(Ham_Spawn, "func_buyzone", "block_buyzone");
 
 	for (new i = 1; i < sizeof weapons; i++) {
-		if (weapons[i][0]) RegisterHam(Ham_Item_Deploy, weapons[i], "weapon_deploy_post", 1);
+		if (weapons[i][0]) {
+			RegisterHam(Ham_Item_Deploy, weapons[i], "weapon_deploy_post", 1);
+
+			if (!(excludedWeapons & (1<<get_weaponid(weapons[i])))) RegisterHam(Ham_Weapon_PrimaryAttack, weapons[i], "weapon_primary_attack_post", 1);
+		}
 	}
 
 	register_logevent("start_round", 2, "1=Round_Start");
@@ -212,7 +218,6 @@ public plugin_init()
 	register_forward(FM_CmdStart, "cmd_start");
 	register_forward(FM_EmitSound, "sound_emit");
 	register_forward(FM_PlayerPreThink, "player_prethink");
-	register_forward(FM_UpdateClientData, "update_client_data", 1);
 
 	register_message(get_user_msgid("SayText"), "say_text");
 	register_message(get_user_msgid("AmmoX"), "message_ammo");
@@ -449,8 +454,8 @@ public plugin_cfg()
 
 public plugin_end()
 {
-	SQL_FreeHandle(sql);
-	SQL_FreeHandle(connection);
+	if (sql != Empty_Handle) SQL_FreeHandle(sql);
+	if (connection != Empty_Handle) SQL_FreeHandle(connection);
 
 	for (new i = 0; i < sizeof codForwards; i++) DestroyForward(i);
 	for (new i = 0; i < ArraySize(codItems); i++) for (new j = ITEM_GIVE; j <= ITEM_UPGRADE; j++) DestroyForward(get_item_info(i, j));
@@ -481,6 +486,8 @@ public client_connect(id)
 
 	if (is_user_bot(id) || is_user_hltv(id)) return;
 
+	codPlayer[id][SKILL_USE] = NONE;
+
 	ArrayClear(codPlayerClasses[id]);
 
 	new codPlayerClass[playerClassInfo];
@@ -496,10 +503,6 @@ public client_connect(id)
 
 public client_putinserver(id)
 {
-	playersNum++;
-
-	set_bit(id, userConnected);
-
 	show_bonus_info();
 
 	if (is_user_bot(id) || is_user_hltv(id)) return;
@@ -512,12 +515,9 @@ public client_putinserver(id)
 
 public client_disconnected(id)
 {
-	if (get_bit(id, userConnected)) playersNum--;
-
 	save_data(id, mapChange ? MAP_END : FINAL);
 
 	remove_tasks(id);
-
 	remove_ents(id);
 
 	if (!mapChange) {
@@ -1389,23 +1389,34 @@ public show_level_top(failState, Handle:query, error[], errorNum, tempData[], da
 public block_command()
 	return PLUGIN_HANDLED;
 
+public bind_use_rocket(id)
+{
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id) || codPlayer[id][SKILL_USE] > NONE) return PLUGIN_HANDLED;
+
+	use_rocket(id);
+
+	return PLUGIN_HANDLED;
+}
+
 public use_rocket(id)
 {
 	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_HANDLED;
 
 	if (!codPlayer[id][PLAYER_ROCKETS][ALL]) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.2, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Wykorzystales juz wszystkie rakiety!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 
 	if (codPlayer[id][PLAYER_LAST_ROCKET] + 3.0 > get_gametime()) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.2, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Rakiet mozesz uzywac co 3 sekundy!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
+
+	codPlayer[id][SKILL_USE] = 0;
 
 	codPlayer[id][PLAYER_LAST_ROCKET] = get_gametime();
 	codPlayer[id][PLAYER_ROCKETS][ALL]--;
@@ -1449,37 +1460,48 @@ public touch_rocket(ent)
 	remove_entity(ent);
 }
 
+public bind_use_mine(id)
+{
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id) || codPlayer[id][SKILL_USE] > NONE) return PLUGIN_HANDLED;
+
+	use_mine(id);
+
+	return PLUGIN_HANDLED;
+}
+
 public use_mine(id)
 {
-	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_CONTINUE;
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_HANDLED;
 
 	if (!codPlayer[id][PLAYER_MINES][ALL]) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.23, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Wykorzystales juz wszystkie miny!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 
 	if (codPlayer[id][PLAYER_LAST_MINE] + 3.0 > get_gametime()) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.23, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Miny mozesz stawiac co 3 sekundy!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 
 	if (!(pev(id, pev_flags) & FL_ONGROUND)) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.23, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Musisz stac na podlozu, aby podlozyc mine!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 
 	if (!is_enough_space(id, 80.0)) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.23, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Nie mozesz postawic miny w przejsciu!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
+
+	codPlayer[id][SKILL_USE] = 0;
 
 	codPlayer[id][PLAYER_LAST_MINE] = get_gametime();
 	codPlayer[id][PLAYER_MINES][ALL]--;
@@ -1504,7 +1526,7 @@ public use_mine(id)
 
 	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public touch_mine(ent, victim)
@@ -1520,40 +1542,52 @@ public touch_mine(ent, victim)
 	remove_entity(ent);
 }
 
+public bind_use_dynamite(id)
+{
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id) || codPlayer[id][SKILL_USE] > NONE) return PLUGIN_HANDLED;
+
+	use_dynamite(id);
+
+	return PLUGIN_HANDLED;
+}
+
 public use_dynamite(id)
 {
-	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_CONTINUE;
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_HANDLED;
 
 	if (is_valid_ent(codPlayer[id][PLAYER_DYNAMITE])) {
 		make_explosion(codPlayer[id][PLAYER_DYNAMITE], 250, 1, 250.0, 70.0, 0.5, _, DYNAMITE_EXPLODE);
 
 		remove_entity(codPlayer[id][PLAYER_DYNAMITE]);
 
+		codPlayer[id][SKILL_USE] = 0;
 		codPlayer[id][PLAYER_DYNAMITE] = 0;
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 
 	if (!codPlayer[id][PLAYER_DYNAMITES][ALL]) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.26, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Wykorzystales juz wszystkie dynamity!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 
 	if (codPlayer[id][PLAYER_LAST_DYNAMITE] + 3.0 > get_gametime()) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.26, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Dynamity mozesz klasc co 3 sekundy!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 
 	if (!(pev(id, pev_flags) & FL_ONGROUND)) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.26, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Musisz stac na podlozu, aby postawic dynamit!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
+
+	codPlayer[id][SKILL_USE] = 0;
 
 	codPlayer[id][PLAYER_LAST_DYNAMITE] = get_gametime();
 	codPlayer[id][PLAYER_DYNAMITES][ALL]--;
@@ -1578,26 +1612,37 @@ public use_dynamite(id)
 
 	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
+}
+
+public bind_use_medkit(id)
+{
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id) || codPlayer[id][SKILL_USE] > NONE) return PLUGIN_HANDLED;
+
+	use_medkit(id);
+
+	return PLUGIN_HANDLED;
 }
 
 public use_medkit(id)
 {
-	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_CONTINUE;
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_HANDLED;
 
 	if (!codPlayer[id][PLAYER_MEDKITS][ALL]) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.29, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Wykorzystales juz wszystkie apteczki!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 
 	if (codPlayer[id][PLAYER_LAST_MEDKIT] + 3.0 > get_gametime()) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.29, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Apteczki mozesz klasc co 3 sekundy!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
+
+	codPlayer[id][SKILL_USE] = 0;
 
 	codPlayer[id][PLAYER_LAST_MEDKIT] = get_gametime();
 	codPlayer[id][PLAYER_MEDKITS][ALL]--;
@@ -1621,7 +1666,7 @@ public use_medkit(id)
 
 	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
 }
 
 public think_medkit(ent)
@@ -1659,29 +1704,40 @@ public think_medkit(ent)
 	return PLUGIN_CONTINUE;
 }
 
+public bind_use_thunder(id)
+{
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id) || codPlayer[id][SKILL_USE] > NONE) return PLUGIN_HANDLED;
+
+	use_thunder(id);
+
+	return PLUGIN_HANDLED;
+}
+
 public use_thunder(id)
 {
-	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_CONTINUE;
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_HANDLED;
 
 	if (!codPlayer[id][PLAYER_THUNDERS][ALL]) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.32, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Wykorzystales juz wszystkie pioruny!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 
 	new victim, body, ret;
 
 	get_user_aiming(id, victim, body);
 
-	if (!is_user_alive(victim) || get_user_team(victim) == get_user_team(id)) return PLUGIN_CONTINUE;
+	if (!is_user_alive(victim) || get_user_team(victim) == get_user_team(id)) return PLUGIN_HANDLED;
 
 	if (codPlayer[id][PLAYER_LAST_THUNDER] + 3.0 > get_gametime()) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.32, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Piorunow mozesz uzywac co 3 sekundy!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
+
+	codPlayer[id][SKILL_USE] = 0;
 
 	codPlayer[id][PLAYER_LAST_THUNDER] = get_gametime();
 	codPlayer[id][PLAYER_THUNDERS][ALL]--;
@@ -1715,38 +1771,47 @@ public use_thunder(id)
 
 	ExecuteForward(codForwards[THUNDER_REACH], ret, id, victim, 65.0 + get_intelligence(id) * 0.5);
 
-	if (float(ret) == COD_BLOCK) return PLUGIN_CONTINUE;
+	if (float(ret) != COD_BLOCK) {
+		cod_inflict_damage(id, victim, 65.0, 0.5, DMG_CODSKILL | DMG_THUNDER);
 
-	cod_inflict_damage(id, victim, 65.0, 0.5, DMG_CODSKILL | DMG_THUNDER);
+		codPlayer[id][PLAYER_LAST_THUNDER] += ret;
+	}
 
-	codPlayer[id][PLAYER_LAST_THUNDER] += ret;
+	return PLUGIN_HANDLED;
+}
 
-	return PLUGIN_CONTINUE;
+public bind_use_teleport(id)
+{
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id) || codPlayer[id][SKILL_USE] > NONE) return PLUGIN_HANDLED;
+
+	use_teleport(id);
+
+	return PLUGIN_HANDLED;
 }
 
 public use_teleport(id)
 {
-	if (!is_user_alive(id) || freezeTime) return PLUGIN_CONTINUE;
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_HANDLED;
 
 	if (codPlayer[id][PLAYER_TELEPORTS][ALL] == 0) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Wykorzystales juz wszystkie teleporty!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 
 	if (roundStart + 15.0 > get_gametime()) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Teleportowac mozesz sie po 15 sekundach od rozpoczecia rundy!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 
 	if (codPlayer[id][PLAYER_LAST_TELEPORT] + 15.0 > get_gametime()) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Teleportowac mozesz sie co 15 sekund!");
 
-		return PLUGIN_CONTINUE;
+		return PLUGIN_HANDLED;
 	}
 
 	new Float:start[3], Float:view[3], Float:end[3];
@@ -1768,6 +1833,7 @@ public use_teleport(id)
 
 	if (engfunc(EngFunc_PointContents, dest) == CONTENTS_SKY) return PLUGIN_HANDLED;
 
+	codPlayer[id][SKILL_USE] = 0;
 	codPlayer[id][PLAYER_LAST_TELEPORT] = get_gametime();
 
 	if (codPlayer[id][PLAYER_TELEPORTS][ALL] != FULL) {
@@ -2022,7 +2088,7 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 
 	ExecuteForward(codForwards[DAMAGE_POST], ret, attacker, victim, weapon, damage, damageBits, hitPlace);
 
-	while (damage > cvarExpDamagePer) {
+	while (cvarExpDamagePer && damage > cvarExpDamagePer) {
 		damage -= cvarExpDamagePer;
 
 		codPlayer[attacker][PLAYER_GAINED_EXP] += get_exp_bonus(attacker, cvarExpDamage);
@@ -2035,32 +2101,36 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 
 public client_death(killer, victim, weaponId, hitPlace, teamKill)
 {
-	if (!is_user_connected(killer) || !is_user_connected(victim) || !is_user_alive(killer) || get_user_team(victim) == get_user_team(killer)) return PLUGIN_CONTINUE;
+	if (!is_user_connected(killer) || !is_user_connected(victim) || get_user_team(victim) == get_user_team(killer)) return PLUGIN_CONTINUE;
 
 	new playerName[MAX_NAME], className[MAX_NAME], itemName[MAX_NAME];
 
 	if (codPlayer[killer][PLAYER_CLASS] && get_playersnum() > cvarMinPlayers) {
-		new exp = get_exp_bonus(killer, hitPlace == HIT_HEAD ? (cvarExpKill + cvarExpKillHS) : cvarExpKill);
+		if (cvarExpKill || cvarExpKillHS) {
+			new exp = get_exp_bonus(killer, hitPlace == HIT_HEAD ? (cvarExpKill + cvarExpKillHS) : cvarExpKill);
 
-		if (codPlayer[victim][PLAYER_LEVEL] > codPlayer[killer][PLAYER_LEVEL]) exp += get_exp_bonus(killer, (codPlayer[victim][PLAYER_LEVEL] - codPlayer[killer][PLAYER_LEVEL]) * (cvarExpKill/10));
+			if (codPlayer[victim][PLAYER_LEVEL] > codPlayer[killer][PLAYER_LEVEL]) exp += get_exp_bonus(killer, (codPlayer[victim][PLAYER_LEVEL] - codPlayer[killer][PLAYER_LEVEL]) * (cvarExpKill / 10));
 
-		codPlayer[killer][PLAYER_GAINED_EXP] += exp;
+			codPlayer[killer][PLAYER_GAINED_EXP] += exp;
 
-		get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
+			get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
-		get_user_name(victim, playerName, charsmax(playerName));
+			get_user_name(victim, playerName, charsmax(playerName));
 
-		chat_print(killer, "Zabiles%s^x03 %s^x04 (%s - %i)^x01, dostajesz^x03 %i^x01 doswiadczenia.", hitPlace == HIT_HEAD ? " z HS" : "", playerName, className, codPlayer[victim][PLAYER_LEVEL], exp);
+			chat_print(killer, "Zabiles%s^x03 %s^x04 (%s - %i)^x01, dostajesz^x03 %i^x01 doswiadczenia.", hitPlace == HIT_HEAD ? " z HS" : "", playerName, className, codPlayer[victim][PLAYER_LEVEL], exp);
 
-		set_dhudmessage(255, 206, 85, -1.0, 0.6, 0, 0.0, 2.0, 0.0, 0.0);
-		show_dhudmessage(killer, "+%i XP", exp);
+			set_dhudmessage(255, 206, 85, -1.0, 0.6, 0, 0.0, 2.0, 0.0, 0.0);
+			show_dhudmessage(killer, "+%i XP", exp);
+		}
 
-		codPlayer[killer][PLAYER_KS]++;
-		codPlayer[killer][PLAYER_TIME_KS] = cvarKillStreakTime;
+		if (cvarKillStreakTime) {
+			codPlayer[killer][PLAYER_KS]++;
+			codPlayer[killer][PLAYER_TIME_KS] = cvarKillStreakTime;
 
-		if (task_exists(killer + TASK_END_KILL_STREAK)) remove_task(killer + TASK_END_KILL_STREAK);
+			if (task_exists(killer + TASK_END_KILL_STREAK)) remove_task(killer + TASK_END_KILL_STREAK);
 
-		set_task(1.0, "end_kill_streak", killer + TASK_END_KILL_STREAK, _, _, "b");
+			set_task(1.0, "end_kill_streak", killer + TASK_END_KILL_STREAK, _, _, "b");
+		}
 	} else {
 		get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
@@ -2092,14 +2162,18 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 	if (codPlayer[victim][PLAYER_ITEM]) {
 		execute_forward_ignore_three_params(get_item_info(codPlayer[victim][PLAYER_ITEM], ITEM_KILLED), killer, victim, hitPlace);
 
-		codPlayer[victim][PLAYER_ITEM_DURA] -= random_num(cvarMinDamageDurability, cvarMaxDamageDurability);
+		if (cvarMaxDurability) {
+			codPlayer[victim][PLAYER_ITEM_DURA] -= random_num(cvarMinDamageDurability, cvarMaxDamageDurability);
 
-		if (codPlayer[victim][PLAYER_ITEM_DURA] <= 0) {
-			set_item(victim);
+			if (codPlayer[victim][PLAYER_ITEM_DURA] <= 0) {
+				set_item(victim);
 
-			chat_print(victim, "Twoj przedmiot ulegl zniszczeniu.");
-		} else chat_print(victim, "Pozostala wytrzymalosc twojego przedmiotu to^x03 %i^x01/^x03%i^x01.", codPlayer[victim][PLAYER_ITEM_DURA], cvarMaxDurability);
+				chat_print(victim, "Twoj przedmiot ulegl zniszczeniu.");
+			} else chat_print(victim, "Pozostala wytrzymalosc twojego przedmiotu to^x03 %i^x01/^x03%i^x01.", codPlayer[victim][PLAYER_ITEM_DURA], cvarMaxDurability);
+		}
 	}
+
+	reset_attributes(victim, DEATH);
 
 	new ret;
 
@@ -2151,6 +2225,8 @@ public block_buyzone()
 
 public weapon_deploy_post(ent)
 {
+	if (pev_valid(ent) != 2) return HAM_IGNORED;
+
 	new id = get_pdata_cbase(ent, 41, 4);
 
 	if (!is_user_alive(id)) return HAM_IGNORED;
@@ -2160,6 +2236,29 @@ public weapon_deploy_post(ent)
 	ExecuteForward(codForwards[WEAPON_DEPLOY], ret, id, weapon, ent);
 
 	render_change(id);
+
+	return HAM_IGNORED;
+}
+
+public weapon_primary_attack_post(ent)
+{
+	if (pev_valid(ent) != 2) return HAM_IGNORED;
+
+	new id = get_pdata_cbase(ent, 41, 4);
+
+	if (!is_user_alive(id)) return HAM_IGNORED;
+
+	if (codPlayer[id][PLAYER_ELIMINATOR][ALL] && (codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL])) {
+		set_pev(id, pev_punchangle, {0.0, 0.0, 0.0});
+	} else if (codPlayer[id][PLAYER_REDUCER][ALL] && (codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL])) {
+		new Float:punchAngle[3];
+
+		pev(id, pev_punchangle, punchAngle);
+
+		for (new i = 0; i < 3; i++) punchAngle[i] *= 0.5;
+
+		set_pev(id, pev_punchangle, punchAngle);
+	}
 
 	return HAM_IGNORED;
 }
@@ -2204,7 +2303,7 @@ public start_round()
 
 	remove_task(TASK_BLOCK);
 
-	set_task(cvarBlockSkillsTime, "unblock_skills", TASK_BLOCK);
+	set_task(float(cvarBlockSkillsTime), "unblock_skills", TASK_BLOCK);
 
 	for (new id = 1; id <= MAX_PLAYERS; id++) {
 		if (!is_user_alive(id)) continue;
@@ -2247,7 +2346,13 @@ public cur_weapon(id)
 
 	execute_forward_ignore_two_params(codForwards[CUR_WEAPON], id, get_user_weapon(id));
 
-	if (codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] && (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] <= 0 || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL])) set_user_clip(id);
+	new weapon = read_data(2);
+
+	if (!weapon || excludedWeapons & (1<<weapon)) return;
+
+	if (codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] && (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL])) {
+		set_pdata_int(get_pdata_cbase(id, 373), 51, maxClipAmmo[weapon], 4);
+	}
 }
 
 public t_win_round()
@@ -2260,7 +2365,7 @@ public round_winner(team)
 {
 	execute_forward_ignore_one_param(codForwards[WIN_ROUND], team);
 
-	if (get_playersnum() < cvarMinPlayers) return;
+	if (get_playersnum() < cvarMinPlayers || !cvarExpWinRound) return;
 
 	for (new id = 1; id <= MAX_PLAYERS; id++) {
 		if (!codPlayer[id][PLAYER_CLASS] || get_user_team(id) != team) continue;
@@ -2282,7 +2387,7 @@ public bomb_planted(id)
 {
 	execute_forward_ignore_one_param(codForwards[BOMB_PLANTED], id);
 
-	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS]) return;
+	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS] || !cvarExpPlant) return;
 
 	new exp = get_exp_bonus(id, cvarExpPlant);
 
@@ -2300,7 +2405,7 @@ public bomb_defused(id)
 {
 	execute_forward_ignore_one_param(codForwards[BOMB_DEFUSED], id);
 
-	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS]) return;
+	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS] || !cvarExpDefuse) return;
 
 	new exp = get_exp_bonus(id, cvarExpDefuse);
 
@@ -2340,6 +2445,16 @@ public hostage_rescued()
 	new id = get_loguser_index();
 
 	execute_forward_ignore_one_param(codForwards[HOSTAGE_RESCUED], id);
+
+	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS] || !cvarExpRescue) return;
+
+	new exp = get_exp_bonus(id, cvarExpRescue);
+
+	codPlayer[id][PLAYER_GAINED_EXP] += exp;
+
+	chat_print(id, "Dostales^x03 %i^x01 doswiadczenia za uratowanie zakladnika.", exp);
+
+	check_level(id);
 }
 
 public hostages_rescued()
@@ -2347,16 +2462,6 @@ public hostages_rescued()
 	new id = get_loguser_index();
 
 	execute_forward_ignore_one_param(codForwards[HOSTAGES_RESCUED], id);
-
-	if (get_playersnum() < cvarMinPlayers || !codPlayer[id][PLAYER_CLASS]) return;
-
-	new exp = get_exp_bonus(id, cvarExpRescue);
-
-	codPlayer[id][PLAYER_GAINED_EXP] += exp;
-
-	chat_print(id, "Dostales^x03 %i^x01 doswiadczenia za uratowanie zakladnikow.", exp);
-
-	check_level(id);
 }
 
 stock render_change(id, playerStatus = NONE)
@@ -2416,6 +2521,12 @@ public cmd_start(id, ucHandle)
 {
 	if (!is_user_alive(id) || freezeTime) return FMRES_IGNORED;
 
+	if (codPlayer[id][SKILL_USE] > NONE) {
+		if (codPlayer[id][SKILL_USE]++ > 128) {
+			codPlayer[id][SKILL_USE] = NONE;
+		}
+	}
+
 	static Float:velocity[3], Float:speed, button, oldButton, playerState, ret;
 
 	button = get_uc(ucHandle, UC_Buttons);
@@ -2427,17 +2538,6 @@ public cmd_start(id, ucHandle)
 	speed = vector_length(velocity);
 
 	if (get_user_maxspeed(id) > speed * 1.8) set_pev(id, pev_flTimeStepSound, 300);
-
-	if (codPlayer[id][PLAYER_REDUCER][ALL] && (codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] <= 0 || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL]) && button & IN_ATTACK)
-	{
-		new Float:punchAngle[3];
-
-		pev(id, pev_punchangle, punchAngle);
-
-		for (new i = 0; i < 3; i++) punchAngle[i] *= 0.9;
-
-		set_pev(id, pev_punchangle, punchAngle);
-	}
 
 	if (speed == 0.0) playerState |= RENDER_STAND;
 	else playerState |= RENDER_MOVE;
@@ -2498,8 +2598,6 @@ public player_prethink(id)
 
 	execute_forward_ignore_one_param(codForwards[PRETHINK], id);
 
-	if (codPlayer[id][PLAYER_ELIMINATOR][ALL] && (codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] <= 0 || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL])) set_pev(id, pev_punchangle, {0.0, 0.0, 0.0});
-
 	if (!codPlayer[id][PLAYER_BUNNYHOP][ALL]) return FMRES_IGNORED;
 
 	entity_set_float(id, EV_FL_fuser2, 0.0);
@@ -2522,9 +2620,6 @@ public player_prethink(id)
 
 	return FMRES_IGNORED;
 }
-
-public update_client_data(id, sendWeapons, cdHandle)
-	if (codPlayer[id][PLAYER_ELIMINATOR][ALL] && (codPlayer[id][PLAYER_ELIMINATOR][ALL] && codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] & codPlayer[id][PLAYER_WEAPON])) set_cd(cdHandle, CD_PunchAngle, {0.0, 0.0, 0.0});
 
 public say_text(msgId, msgDest, msgEnt)
 {
@@ -2566,7 +2661,7 @@ public message_ammo(msgId, msgDest, id)
 {
 	new weapon = get_user_weapon(id);
 
-	if (weapon && weapon != CSW_KNIFE && weapon != CSW_C4 && weapon != CSW_HEGRENADE && weapon != CSW_FLASHBANG && weapon != CSW_SMOKEGRENADE) cs_set_user_bpammo(id, weapon, maxBpAmmo[weapon]);
+	if (weapon && !(excludedWeapons & (1<<weapon))) cs_set_user_bpammo(id, weapon, maxBpAmmo[weapon]);
 }
 
 public message_intermission()
@@ -2599,9 +2694,9 @@ public show_info(id)
 		return PLUGIN_CONTINUE;
 	}
 
-	static hudData[512], className[MAX_NAME], itemName[MAX_NAME], clanName[MAX_NAME], missionProgress[MAX_NAME], gameTime[MAX_NAME], Float:levelPercent, exp, target;
+	static hudData[512], className[MAX_NAME], itemName[MAX_NAME], clanName[MAX_NAME], missionProgress[MAX_NAME], gameTime[MAX_NAME], itemDurability[16], Float:levelPercent, exp, target;
 
-	clanName = ""; missionProgress = "";
+	clanName = ""; missionProgress = "", itemDurability = "";
 
 	target = id;
 
@@ -2612,6 +2707,16 @@ public show_info(id)
 	} else set_hudmessage(codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], float(codPlayer[id][PLAYER_HUD_POSX]) / 100.0, float(codPlayer[id][PLAYER_HUD_POSY]) / 100.0, 0, 0.0, 0.3, 0.0, 0.0, 4);
 
 	if (!target) return PLUGIN_CONTINUE;
+
+	if (sql == Empty_Handle) {
+		set_hudmessage(255, 15, 15, -1.0, 0.3, 0, 0.0, 0.3, 0.0, 0.0, 4);
+
+		formatex(hudData, charsmax(hudData), "Wystapil blad przy probie nawiazania polaczenia z baza danych!");
+
+		ShowSyncHudMsg(id, hudInfo, hudData);
+
+		return PLUGIN_CONTINUE;
+	}
 
 	get_user_class_info(target, codPlayer[target][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 	get_item_info(codPlayer[target][PLAYER_ITEM], ITEM_NAME, itemName, charsmax(itemName));
@@ -2630,8 +2735,12 @@ public show_info(id)
 	exp = codPlayer[target][PLAYER_LEVEL] - 1 >= 0 ? get_level_exp(codPlayer[target][PLAYER_LEVEL] - 1) : 0;
 	levelPercent = codPlayer[target][PLAYER_LEVEL] < cvarLevelLimit ? (float((codPlayer[target][PLAYER_EXP] - exp)) / float((get_level_exp(codPlayer[target][PLAYER_LEVEL]) - exp))) * 100.0 : 0.0;
 
-	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot : %s (%i/%i)]%s^n[Zycie : %i]^n[Honor : %i]^n[Czas Gry : %s]",
-	className, clanName, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, codPlayer[target][PLAYER_ITEM_DURA], cvarMaxDurability, missionProgress, get_user_health(target), cod_get_user_honor(target), gameTime);
+	if (cvarMaxDurability) {
+		formatex(itemDurability, charsmax(itemDurability), " (%0.0f%s)", float(codPlayer[target][PLAYER_ITEM_DURA] / cvarMaxDurability) * 100.0, "%%");
+	}
+
+	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot : %s%s]%s^n[Zycie : %i]^n[Honor : %i]^n[Czas Gry : %s]",
+	className, clanName, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, itemDurability, missionProgress, get_user_health(target), cod_get_user_honor(target), gameTime);
 
 	if (get_exp_bonus(target, NONE)) format(hudData, charsmax(hudData), "%s^n[Exp Bonus : %i%s]", hudData, get_exp_bonus(target, NONE), "%%");
 
@@ -2646,7 +2755,7 @@ public show_advertisement(id)
 {
 	id -= TASK_SHOW_AD;
 
-	chat_print(id, "Witaj na serwerze^x03  Call of Duty Mod^x01 stworzonym przez^x03 O'Zone^x01.");
+	chat_print(id, "Witaj na serwerze^x03 Call of Duty Mod^x01 stworzonym przez^x03 O'Zone^x01.");
 	chat_print(id, "W celu uzyskania informacji o komendach wpisz^x03 /menu^x01 (klawisz^x03 ^"v^"^x01).");
 }
 
@@ -2656,7 +2765,7 @@ public show_help(id)
 
 	set_dhudmessage(0, 255, 0, -1.0, 0.7, 0, 5.0, 5.0, 0.1, 0.5);
 
-	switch (random_num(1, 17)) {
+	switch (random_num(1, cvarMinPlayers ? 17 : 16)) {
 		case 1: show_dhudmessage(id, "Aby uzyc umiejetnosci klasy wcisnij klawisz E. Przedmiotow uzywa sie klawiszem F.");
 		case 2: show_dhudmessage(id, "Chcialbys zalozyc klan lub do niego dolaczyc? Wpisz komende /klan.");
 		case 3: show_dhudmessage(id, "Sposobem na zdobywanie wiekszej ilosci doswiadczenia sa /misje.");
@@ -2697,8 +2806,8 @@ public check_time()
 
 public night_exp_info()
 {
-	if (nightExp) chat_print(0, "Na serwerze^x03 aktywny^x01 jest nocny exp^x03 wiekszy o %i procent^x01!", floatround((cvarNightExpMultiplier - 1.0) * 100));
-	else chat_print(0, "Od godziny^x03 %i:00^x01 do^x03 %i:00^x01 na serwerze exp jest^x03 wiekszy o %i procent^x01!", cvarNightExpFrom, cvarNightExpTo, floatround((cvarNightExpMultiplier - 1.0) * 100));
+	if (nightExp) chat_print(0, "Na serwerze^x03 aktywny^x01 jest nocny exp^x03 wiekszy o %i procent^x01!", cvarNightExpBonus);
+	else chat_print(0, "Od godziny^x03 %i:00^x01 do^x03 %i:00^x01 na serwerze exp jest^x03 wiekszy o %i procent^x01!", cvarNightExpFrom, cvarNightExpTo, cvarNightExpBonus);
 }
 
 public set_speed_limit(id)
@@ -2930,7 +3039,7 @@ public reset_attributes(id, type)
 
 	new unlimitedWeapons, eliminatorWeapons, reductorWeapons, jumps;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_FOOTSTEPS][i]) codPlayer[id][PLAYER_FOOTSTEPS][ALL] = true;
 		if (codPlayer[id][PLAYER_BUNNYHOP][i]) codPlayer[id][PLAYER_BUNNYHOP][ALL] = true;
 		if (codPlayer[id][PLAYER_RESISTANCE][i]) codPlayer[id][PLAYER_RESISTANCE][ALL] = true;
@@ -3011,9 +3120,9 @@ public set_attributes(id)
 	get_user_weapons(id, playerWeapons, weaponsNum);
 
 	for (new i = 0; i < weaponsNum; i++) {
-		if (playerWeapons[i] == CSW_KNIFE || playerWeapons[i] == CSW_C4 || playerWeapons[i] == CSW_HEGRENADE || playerWeapons[i] == CSW_FLASHBANG || playerWeapons[i] == CSW_SMOKEGRENADE) continue;
+		if (excludedWeapons & (1<<playerWeapons[i])) continue;
 
-		if (maxBpAmmo[playerWeapons[i]] > 0) cs_set_user_bpammo(id, playerWeapons[i], maxBpAmmo[playerWeapons[i]]);
+		cs_set_user_bpammo(id, playerWeapons[i], maxBpAmmo[playerWeapons[i]]);
 	}
 }
 
@@ -3034,7 +3143,7 @@ public set_gravity(id)
 {
 	new Float:gravity = 1.0;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_GRAVITY][i] >= 0.0 && codPlayer[id][PLAYER_GRAVITY][i] < gravity) gravity = codPlayer[id][PLAYER_GRAVITY][i];
 		else if (codPlayer[id][PLAYER_GRAVITY][i] < 0.0) gravity += codPlayer[id][PLAYER_GRAVITY][i];
 	}
@@ -3050,7 +3159,7 @@ public set_speed(id)
 
 	speed += (get_condition(id) * 0.85);
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_SPEED][i] == COD_FREEZE) {
 			speed = COD_FREEZE;
 
@@ -3186,11 +3295,11 @@ stock remove_ents(id = 0, const className[] = "")
 public show_bonus_info()
 {
 	if (get_players_amount() > 0 && (lastInfo + 5.0 < get_gametime() || get_players_amount() == cvarMinBonusPlayers)) {
-		if (get_players_amount() == cvarMinBonusPlayers) chat_print(0, "Serwer jest pelny, a to oznacza^x03 EXP x 2^x01!");
+		if (get_players_amount() == cvarMinBonusPlayers) chat_print(0, "Serwer jest pelny, a to oznacza^x03 EXP wiekszy o %i procent^x01!", cvarBonusPlayersPer * cvarMinBonusPlayers);
 		else {
 			new playersToFull = cvarMinBonusPlayers - get_players_amount();
 
-			chat_print(0, "Do pelnego serwera brakuj%s^x03 %i osob%s^x01. Exp jest^x03 wiekszy o %i procent^x01!", playersToFull > 1 ? (playersToFull < 5 ? "a" : "e") : "e", playersToFull, playersToFull == 1 ? "a" : (playersToFull < 5 ? "y" : ""), get_players_amount() * 10);
+			chat_print(0, "Do pelnego serwera brakuj%s^x03 %i osob%s^x01. Exp jest^x03 wiekszy o %i procent^x01!", playersToFull > 1 ? (playersToFull < 5 ? "a" : "e") : "e", playersToFull, playersToFull == 1 ? "a" : (playersToFull < 5 ? "y" : ""), get_players_amount() * cvarBonusPlayersPer);
 		}
 
 		lastInfo = floatround(get_gametime());
@@ -3271,6 +3380,8 @@ public sql_init()
 
 	if (errorNum) {
 		log_to_file(LOG_FILE, "[%s] SQL Error: %s (%d)", PLUGIN, error, errorNum);
+
+		sql = Empty_Handle;
 
 		set_task(5.0, "sql_init");
 
@@ -3832,7 +3943,7 @@ public _cod_set_user_multijumps(id, value, type)
 {
 	codPlayer[id][PLAYER_JUMPS][type] = max(0, value);
 
-	for (new i = CLASS; i <= ROUND; i++) codPlayer[id][PLAYER_JUMPS][ALL] += codPlayer[id][PLAYER_JUMPS][i];
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_JUMPS][ALL] += codPlayer[id][PLAYER_JUMPS][i];
 
 	codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS][ALL];
 }
@@ -3900,7 +4011,7 @@ public _cod_add_user_multijumps(id, value, type)
 {
 	codPlayer[id][PLAYER_JUMPS][type] = max(0, codPlayer[id][PLAYER_JUMPS][type] + value);
 
-	for (new i = CLASS; i <= ROUND; i++) codPlayer[id][PLAYER_JUMPS][ALL] += codPlayer[id][PLAYER_JUMPS][i];
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_JUMPS][ALL] += codPlayer[id][PLAYER_JUMPS][i];
 
 	codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS][ALL];
 }
@@ -3960,19 +4071,19 @@ public _cod_get_user_noclip(id, type)
 
 public _cod_get_user_unlimited_ammo(id, type, weapon)
 {
-	if (weapon) return (codPlayer[id][PLAYER_UNLIMITED_AMMO][type] && (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] <= 0 || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type]));
+	if (weapon) return (codPlayer[id][PLAYER_UNLIMITED_AMMO][type] && (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type]));
 	else return codPlayer[id][PLAYER_UNLIMITED_AMMO][type];
 }
 
 public _cod_get_user_recoil_eliminator(id, type, weapon)
 {
-	if (weapon) return (codPlayer[id][PLAYER_ELIMINATOR][type] && (codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] <= 0 || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type]));
+	if (weapon) return (codPlayer[id][PLAYER_ELIMINATOR][type] && (codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type]));
 	return codPlayer[id][PLAYER_ELIMINATOR][type];
 }
 
 public _cod_get_user_recoil_reducer(id, type, weapon)
 {
-	if (weapon) return (codPlayer[id][PLAYER_REDUCER][type] && (codPlayer[id][PLAYER_REDUCER_WEAPONS][type] <= 0|| 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_REDUCER_WEAPONS][type]));
+	if (weapon) return (codPlayer[id][PLAYER_REDUCER][type] && (codPlayer[id][PLAYER_REDUCER_WEAPONS][type] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_REDUCER_WEAPONS][type]));
 	return codPlayer[id][PLAYER_REDUCER][type];
 }
 
@@ -3982,7 +4093,7 @@ public _cod_set_user_resistance(id, value, type)
 
 	new bool:enabled;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_RESISTANCE][i]) enabled = true;
 	}
 
@@ -3995,7 +4106,7 @@ public _cod_set_user_godmode(id, value, type)
 
 	new bool:enabled;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_GODMODE][i]) enabled = true;
 	}
 
@@ -4010,7 +4121,7 @@ public _cod_set_user_noclip(id, value, type)
 
 	new bool:enabled;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_NOCLIP][i]) enabled = true;
 	}
 
@@ -4027,7 +4138,7 @@ public _cod_set_user_bunnyhop(id, value, type)
 
 	new bool:enabled;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_BUNNYHOP][i]) enabled = true;
 	}
 
@@ -4040,7 +4151,7 @@ public _cod_set_user_footsteps(id, value, type)
 
 	new bool:enabled;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_FOOTSTEPS][i]) enabled = true;
 	}
 
@@ -4055,7 +4166,7 @@ public _cod_set_user_model(id, value, type)
 
 	new bool:enabled;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_MODEL][i]) enabled = true;
 	}
 
@@ -4067,11 +4178,16 @@ public _cod_set_user_model(id, value, type)
 public _cod_set_user_unlimited_ammo(id, value, type, weapon)
 {
 	codPlayer[id][PLAYER_UNLIMITED_AMMO][type] = value;
-	codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] = weapon;
+
+	if (weapon > 0 && codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] != FULL) {
+		codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] |= weapon;
+	} else {
+		codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] = FULL;
+	}
 
 	new bool:enabled, weapons;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_UNLIMITED_AMMO][i]) enabled = true;
 
 		if (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i] == FULL) weapons = FULL;
@@ -4085,11 +4201,16 @@ public _cod_set_user_unlimited_ammo(id, value, type, weapon)
 public _cod_set_user_recoil_eliminator(id, value, type, weapon)
 {
 	codPlayer[id][PLAYER_ELIMINATOR][type] = value;
-	codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] = weapon;
+
+	if (weapon > 0 && codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] != FULL) {
+		codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] |= weapon;
+	} else {
+		codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] = FULL;
+	}
 
 	new bool:enabled, weapons;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_ELIMINATOR][i]) enabled = true;
 
 		if (codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][i] == FULL) weapons = FULL;
@@ -4103,11 +4224,16 @@ public _cod_set_user_recoil_eliminator(id, value, type, weapon)
 public _cod_set_user_recoil_reducer(id, value, type, weapon)
 {
 	codPlayer[id][PLAYER_REDUCER][type] = value;
-	codPlayer[id][PLAYER_REDUCER_WEAPONS][type] = weapon;
+
+	if (weapon > 0 && codPlayer[id][PLAYER_REDUCER_WEAPONS][type] != FULL) {
+		codPlayer[id][PLAYER_REDUCER_WEAPONS][type] |= weapon;
+	} else {
+		codPlayer[id][PLAYER_REDUCER_WEAPONS][type] = FULL;
+	}
 
 	new bool:enabled, weapons;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_REDUCER][i]) enabled = true;
 
 		if (codPlayer[id][PLAYER_REDUCER_WEAPONS][i] == FULL) weapons = FULL;
@@ -4130,7 +4256,7 @@ public _cod_give_weapon(id, weapon, amount)
 
 	if (amount > cs_get_user_bpammo(id, weapon)) cs_set_user_bpammo(id, weapon, amount);
 
-	if (weapon != CSW_KNIFE && weapon != CSW_C4 && weapon != CSW_HEGRENADE && weapon != CSW_FLASHBANG && weapon != CSW_SMOKEGRENADE) cs_set_user_bpammo(id, weapon, maxBpAmmo[weapon]);
+	if (!(excludedWeapons & (1<<weapon))) cs_set_user_bpammo(id, weapon, maxBpAmmo[weapon]);
 }
 
 public _cod_take_weapon(id, weapon)
@@ -4164,7 +4290,7 @@ public _cod_set_user_render(id, value, type, status, weapon, Float:timer)
 
 		switch (type) {
 			case CLASS, ITEM, ADDITIONAL: ArraySetArray(codPlayerRender[id], type, codRender);
-			case ROUND: ArrayPushArray(codPlayerRender[id], codRender);
+			case ROUND, DEATH: ArrayPushArray(codPlayerRender[id], codRender);
 		}
 
 		render_change(id);
@@ -4590,17 +4716,18 @@ stock get_exp_bonus(id, exp)
 
 	if (cod_get_user_vip(id)) bonus += 0.25;
 
-	if (nightExp) bonus += (cvarNightExpMultiplier - 1.0);
+	if (nightExp) bonus += cvarNightExpBonus / 100.0;
 
 	bonus += floatmin(codPlayer[id][PLAYER_KS] * 0.2, 1.0);
-	bonus += get_players_amount() * 0.1;
+	bonus += get_players_amount() * cvarBonusPlayersPer / 100.0;
+	bonus += cod_get_user_clan_bonus(id) / 100.0;
 
 	return exp == NONE ? floatround((bonus - 1.0) * 100) : floatround(exp * bonus);
 }
 
 stock get_players_amount()
 {
-	if (get_maxplayers() - playersNum <= cvarMinBonusPlayers) return (cvarMinBonusPlayers - (get_maxplayers() - playersNum));
+	if (get_maxplayers() - get_playersnum() <= cvarMinBonusPlayers) return (cvarMinBonusPlayers - (get_maxplayers() - get_playersnum()));
 
 	return 0;
 }
@@ -4684,7 +4811,7 @@ stock calculate_left(id, type)
 	codPlayer[id][type][ALL] = 0;
 
 	if (type == PLAYER_TELEPORTS) {
-		for (new i = CLASS; i <= ROUND; i++) {
+		for (new i = CLASS; i <= DEATH; i++) {
 			if (codPlayer[id][PLAYER_TELEPORTS][i] == FULL) {
 				codPlayer[id][PLAYER_TELEPORTS][ALL] = FULL;
 
@@ -4694,7 +4821,7 @@ stock calculate_left(id, type)
 
 		codPlayer[id][PLAYER_TELEPORTS][ALL] = codPlayer[id][PLAYER_TELEPORTS][ALL] == FULL ? FULL : max(0, codPlayer[id][PLAYER_TELEPORTS][ALL] - codPlayer[id][PLAYER_TELEPORTS][USED]);
 	} else {
-		for (new i = CLASS; i <= ROUND; i++) codPlayer[id][type][ALL] += codPlayer[id][type][i];
+		for (new i = CLASS; i <= DEATH; i++) codPlayer[id][type][ALL] += codPlayer[id][type][i];
 
 		codPlayer[id][type][ALL] = max(0, codPlayer[id][type][ALL] - codPlayer[id][type][USED]);
 	}
@@ -4704,7 +4831,7 @@ stock calculate_rockets_left(id)
 {
 	codPlayer[id][PLAYER_ROCKETS][ALL] = 0;
 
-	for (new i = CLASS; i <= ROUND; i++) codPlayer[id][PLAYER_ROCKETS][ALL] += codPlayer[id][PLAYER_ROCKETS][i];
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_ROCKETS][ALL] += codPlayer[id][PLAYER_ROCKETS][i];
 
 	codPlayer[id][PLAYER_ROCKETS][ALL] = max(0, codPlayer[id][PLAYER_ROCKETS][ALL] - codPlayer[id][PLAYER_ROCKETS][USED]);
 }
@@ -4713,7 +4840,7 @@ stock calculate_mines_left(id)
 {
 	codPlayer[id][PLAYER_MINES][ALL] = 0;
 
-	for (new i = CLASS; i <= ROUND; i++) codPlayer[id][PLAYER_MINES][ALL] += codPlayer[id][PLAYER_MINES][i];
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_MINES][ALL] += codPlayer[id][PLAYER_MINES][i];
 
 	codPlayer[id][PLAYER_MINES][ALL] = max(0, codPlayer[id][PLAYER_MINES][ALL] - codPlayer[id][PLAYER_MINES][USED]);
 }
@@ -4722,7 +4849,7 @@ stock calculate_dynamites_left(id)
 {
 	codPlayer[id][PLAYER_DYNAMITES][ALL] = 0;
 
-	for (new i = CLASS; i <= ROUND; i++) codPlayer[id][PLAYER_DYNAMITES][ALL] += codPlayer[id][PLAYER_DYNAMITES][i];
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_DYNAMITES][ALL] += codPlayer[id][PLAYER_DYNAMITES][i];
 
 	codPlayer[id][PLAYER_DYNAMITES][ALL] = max(0, codPlayer[id][PLAYER_DYNAMITES][ALL] - codPlayer[id][PLAYER_DYNAMITES][USED]);
 }
@@ -4731,7 +4858,7 @@ stock calculate_thunders_left(id)
 {
 	codPlayer[id][PLAYER_THUNDERS][ALL] = 0;
 
-	for (new i = CLASS; i <= ROUND; i++) codPlayer[id][PLAYER_THUNDERS][ALL] += codPlayer[id][PLAYER_THUNDERS][i];
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_THUNDERS][ALL] += codPlayer[id][PLAYER_THUNDERS][i];
 
 	codPlayer[id][PLAYER_THUNDERS][ALL] = max(0, codPlayer[id][PLAYER_THUNDERS][ALL] - codPlayer[id][PLAYER_THUNDERS][USED]);
 }
@@ -4740,7 +4867,7 @@ stock calculate_medkits_left(id)
 {
 	codPlayer[id][PLAYER_MEDKITS][ALL] = 0;
 
-	for (new i = CLASS; i <= ROUND; i++) codPlayer[id][PLAYER_MEDKITS][ALL] += codPlayer[id][PLAYER_MEDKITS][i];
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_MEDKITS][ALL] += codPlayer[id][PLAYER_MEDKITS][i];
 
 	codPlayer[id][PLAYER_MEDKITS][ALL] = max(0, codPlayer[id][PLAYER_MEDKITS][ALL] - codPlayer[id][PLAYER_MEDKITS][USED]);
 }
@@ -4749,7 +4876,7 @@ stock calculate_teleports_left(id)
 {
 	codPlayer[id][PLAYER_TELEPORTS][ALL] = 0;
 
-	for (new i = CLASS; i <= ROUND; i++) {
+	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_TELEPORTS][i] == FULL) {
 			codPlayer[id][PLAYER_TELEPORTS][ALL] = FULL;
 
@@ -4896,7 +5023,7 @@ stock get_user_class_info(id, class, info, dataReturn[] = "", dataLength = 0)
 	return codPlayer[id][PLAYER_PROMOTION] ? get_promotion_info(codPlayer[id][PLAYER_PROMOTION_ID], info, dataReturn, dataLength) : get_class_info(class, info, dataReturn, dataLength);
 
 stock clear_render(id)
-	for (new i = CLASS; i <= ROUND; i++) remove_render_type(id, i);
+	for (new i = CLASS; i <= DEATH; i++) remove_render_type(id, i);
 
 stock remove_render_type(id, type)
 {
@@ -4905,9 +5032,8 @@ stock remove_render_type(id, type)
 	for (new i = 0; i < ArraySize(codPlayerRender[id]); i++) {
 		ArrayGetArray(codPlayerRender[id], i, codRender);
 
-		if (codRender[RENDER_TYPE] == type)
-		{
-		 	if (type == ROUND) ArrayDeleteItem(codPlayerRender[id], i);
+		if (codRender[RENDER_TYPE] == type) {
+		 	if (type == ROUND || type == DEATH) ArrayDeleteItem(codPlayerRender[id], i);
 			else {
 				codRender[RENDER_VALUE] = 256;
 				codRender[RENDER_STATUS] = 0;
@@ -5113,12 +5239,12 @@ stock set_user_clip(id)
 {
 	if (!is_user_alive(id)) return;
 
-	new weaponName[32], weaponid = -1, weapon = codPlayer[id][PLAYER_WEAPON];
+	new weaponName[32], weaponId = -1, weapon = codPlayer[id][PLAYER_WEAPON];
 
 	get_weaponname(weapon, weaponName, charsmax(weaponName));
 
-	while ((weaponid = engfunc(EngFunc_FindEntityByString, weaponid, "classname", weaponName)) != 0) {
-		if (pev(weaponid, pev_owner) == id) set_pdata_int(weaponid, 51, maxClipAmmo[weapon], 4);
+	while ((weaponId = engfunc(EngFunc_FindEntityByString, weaponId, "classname", weaponName)) != 0) {
+		if (pev(weaponId, pev_owner) == id && !(excludedWeapons & (1<<weaponId))) set_pdata_int(weaponId, 51, maxClipAmmo[weapon], 4);
 	}
 }
 
@@ -5148,8 +5274,7 @@ stock cs_get_weaponbox_type(weaponTypeBox)
 
 stock strip_weapons(id, type, bool:switchIfActive = true)
 {
-	if (is_user_alive(id))
-	{
+	if (is_user_alive(id)) {
 		new ent, weapon;
 
 		while ((weapon = get_weapon_from_slot(id, type, ent)) > 0) ham_strip_user_weapon(id, weapon, type, switchIfActive);

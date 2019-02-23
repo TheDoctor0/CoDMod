@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME        "Ogranicznik Rozrzutu"
-#define DESCRIPTION "Masz zmniejszony rozrzut we wszystkich broniach"
+#define DESCRIPTION "Masz o polowe zmniejszony rozrzut we wszystkich broniach"
 
 public plugin_init()
 {
