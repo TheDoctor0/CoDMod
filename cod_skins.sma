@@ -253,7 +253,7 @@ public set_weapon_skin_handle(id, menu, item)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new itemData[5], itemAccess, itemCallback;
+	new itemData[12], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
 
