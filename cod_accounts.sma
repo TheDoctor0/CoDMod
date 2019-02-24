@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Accounts"
-#define VERSION "1.2.2"
+#define VERSION "1.3.1"
 #define AUTHOR "O'Zone"
 
 #define TASK_PASSWORD   1945
@@ -22,7 +22,7 @@ new const commandAccount[][] = { "konto", "say /haslo", "say_team /haslo", "say 
 	"say /konto", "say_team /konto", "say /account", "say_team /account" };
 
 new playerData[MAX_PLAYERS + 1][playerInfo], Handle:sql, bool:sqlConnected, dataLoaded, autoLogin,
-cvarAccountsEnabled, cvarLoginMaxTime, cvarPasswordMaxFails, cvarPasswordMinLength, cvarSetinfo[32];
+	cvarAccountsEnabled, cvarLoginMaxTime, cvarPasswordMaxFails, cvarPasswordMinLength, cvarSetinfo[32];
 
 public plugin_init()
 {
@@ -60,6 +60,23 @@ public plugin_cfg()
 
 public plugin_end()
 	if (sql != Empty_Handle) SQL_FreeHandle(sql);
+
+public cod_reset_all_data()
+{
+	for (new i = 1; i <= MAX_PLAYERS; i++) {
+		rem_bit(i, dataLoaded);
+
+		playerData[i][STATUS] = NOT_REGISTERED;
+	}
+
+	sqlConnected = false;
+
+	new tempData[32];
+
+	formatex(tempData, charsmax(tempData), "DROP TABLE `cod_accounts`;");
+
+	SQL_ThreadQuery(sql, "ignore_handle", tempData);
+}
 
 public client_connect(id)
 {

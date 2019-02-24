@@ -98,6 +98,31 @@ public plugin_end()
 	for (new i = 1; i <= MAX_PLAYERS; i++) ArrayDestroy(playerSkins[i]);
 }
 
+public cod_reset_data()
+	clear_database();
+
+public cod_reset_all_data()
+	clear_database();
+
+public clear_database()
+{
+	for (new i = 1; i <= MAX_PLAYERS; i++) {
+		for (new j = 0; j <= CSW_P90; j++) playerData[i][ACTIVE][j] = NONE;
+
+		ArrayClear(playerSkins[i]);
+
+		rem_bit(i, loaded);
+	}
+
+	sqlConnected = false;
+
+	new tempData[32];
+
+	formatex(tempData, charsmax(tempData), "DROP TABLE `cod_skins`;");
+
+	SQL_ThreadQuery(sql, "ignore_handle", tempData);
+}
+
 public client_disconnected(id)
 {
 	remove_task(id);

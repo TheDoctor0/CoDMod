@@ -1169,6 +1169,21 @@ Multiforward executed on map end (message intermission) event.
 forward cod_end_map();
 
 /*------------------------------
+Multiforward executed on data reset.
+------------------------------*/
+forward cod_reset_data();
+
+/*------------------------------
+Multiforward executed on stats data reset.
+------------------------------*/
+forward cod_reset_stats_data();
+
+/*------------------------------
+Multiforward executed on full data reset.
+------------------------------*/
+forward cod_reset_all_data();
+
+/*------------------------------
 Multiforward executed on medkit player heal.
 Id is medkit owner.
 Player is healed player.

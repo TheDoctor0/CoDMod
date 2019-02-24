@@ -62,6 +62,30 @@ public plugin_end()
 	if (connection != Empty_Handle) SQL_FreeHandle(connection);
 }
 
+public cod_reset_data()
+	clear_database();
+
+public cod_reset_all_data()
+	clear_database();
+
+public clear_database()
+{
+	for (new i = 1; i <= MAX_PLAYERS; i++) {
+		playerHonor[i] = 0;
+		playerHonorGained[i] = 0;
+
+		rem_bit(i, dataLoaded);
+	}
+
+	sqlConnected = false;
+
+	new tempData[32];
+
+	formatex(tempData, charsmax(tempData), "DROP TABLE `cod_honor`;");
+
+	SQL_ThreadQuery(sql, "ignore_handle", tempData);
+}
+
 public client_putinserver(id)
 {
 	playerHonor[id] = 0;

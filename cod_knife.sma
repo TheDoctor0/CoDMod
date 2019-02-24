@@ -24,7 +24,7 @@ new const commandKnives[][] = { "noze", "say /noz", "say_team /noz", "say /noze"
 enum _:knifeInfo { NAME, BONUS, MODEL };
 enum _:knifeTypes { DEFAULT, HEALTH, INTELLIGENCE, STAMINA, STRENGTH, CONDITION, VIP };
 
-new playerName[MAX_PLAYERS + 1][MAX_NAME], playerKnife[MAX_PLAYERS + 1], knives, cvarKnifeVIP;
+new playerName[MAX_PLAYERS + 1][MAX_NAME], playerKnife[MAX_PLAYERS + 1], bool:mapEnd, dataLoaded, knives, cvarKnifeVIP;
 
 public plugin_init()
 {
@@ -47,11 +47,25 @@ public plugin_end()
 
 public client_putinserver(id)
 {
+	rem_bit(id, dataLoaded);
+
 	if (is_user_bot(id) || is_user_hltv(id)) return;
 
 	playerKnife[id] = DEFAULT;
 
 	load_knife(id);
+}
+
+public cod_end_map()
+	mapEnd = true;
+
+public cod_reset_all_data()
+{
+	for (new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, dataLoaded);
+
+	mapEnd = true;
+
+	nvault_prune(knives, 0, get_systime() + 1);
 }
 
 public change_knife(id)
@@ -189,6 +203,8 @@ public set_bonus(id, oldKnife, newKnife)
 
 public save_knife(id)
 {
+	if (!get_bit(id, dataLoaded) || mapEnd) return PLUGIN_CONTINUE;
+
 	new vaultKey[MAX_NAME], vaultData[3];
 
 	formatex(vaultKey, charsmax(vaultKey), "%s-cod_knife", playerName[id]);
@@ -201,6 +217,8 @@ public save_knife(id)
 
 public load_knife(id)
 {
+	if (mapEnd) return PLUGIN_CONTINUE;
+
 	new vaultKey[MAX_NAME], vaultData[3];
 
 	get_user_name(id, playerName[id], charsmax(playerName[]));
@@ -212,6 +230,8 @@ public load_knife(id)
 
 		set_bonus(id, NONE, playerKnife[id]);
 	} else set_bonus(id, NONE, DEFAULT);
+
+	set_bit(id, dataLoaded);
 
 	return PLUGIN_CONTINUE;
 }

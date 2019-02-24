@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Missions"
-#define VERSION "1.2.1"
+#define VERSION "1.3.1"
 #define AUTHOR "O'Zone"
 
 new const commandMission[][] = { "misje", "say /quest", "say_team /quest", "say /misja", "say_team /misja", "say /misje", "say_team /misje", "say /questy", "say_team /questy" };
@@ -26,7 +26,8 @@ enum _:playerInfo { PLAYER_ID, PLAYER_TYPE, PLAYER_ADDITIONAL, PLAYER_PROGRESS, 
 enum _:chapterInfo { CHAPTER_NAME[MAX_NAME], CHAPTER_START, CHAPTER_END };
 enum _:missionInfo { MISSION_CHAPTER, MISSION_AMOUNT, MISSION_TYPE, MISSION_REWARD };
 
-new playerClass[MAX_PLAYERS + 1][MAX_NAME], playerName[MAX_PLAYERS + 1][MAX_NAME], playerData[MAX_PLAYERS + 1][playerInfo], Array:codChapters, Array:codMissions, cvarMinPlayers, missions, loaded;
+new playerClass[MAX_PLAYERS + 1][MAX_NAME], playerName[MAX_PLAYERS + 1][MAX_NAME], playerData[MAX_PLAYERS + 1][playerInfo],
+	Array:codChapters, Array:codMissions, bool:mapEnd, cvarMinPlayers, missions, dataLoaded;
 
 public plugin_init()
 {
@@ -117,13 +118,31 @@ public plugin_end()
 	nvault_close(missions);
 
 public client_disconnected(id)
-	rem_bit(id, loaded);
+	rem_bit(id, dataLoaded);
 
 public client_putinserver(id)
 {
 	get_user_name(id, playerName[id], charsmax(playerName[]));
 
 	reset_mission(id, 1, 1);
+}
+
+public cod_end_map()
+	mapEnd = true;
+
+public cod_reset_data()
+	clear_nvault();
+
+public cod_reset_all_data()
+	clear_nvault();
+
+public clear_nvault()
+{
+	for (new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, dataLoaded);
+
+	mapEnd = true;
+
+	nvault_prune(missions, 0, get_systime() + 1);
 }
 
 public mission_menu(id)
@@ -466,7 +485,7 @@ public cod_class_changed(id, class)
 
 public save_mission(id)
 {
-	if (is_user_bot(id) || is_user_hltv(id) || !get_bit(id, loaded)) return PLUGIN_HANDLED;
+	if (is_user_bot(id) || is_user_hltv(id) || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 
 	new vaultKey[MAX_NAME * 2], vaultData[64];
 
@@ -480,13 +499,13 @@ public save_mission(id)
 
 public load_mission(id)
 {
-	if (is_user_bot(id) || is_user_hltv(id)) return PLUGIN_HANDLED;
+	if (is_user_bot(id) || is_user_hltv(id) || mapEnd) return PLUGIN_HANDLED;
 
 	new vaultKey[MAX_NAME * 2], vaultData[64], missionData[5][16], missionParam[5];
 
 	formatex(vaultKey, charsmax(vaultKey), "%s-%s", playerName[id], playerClass[id]);
 
-	set_bit(id, loaded);
+	set_bit(id, dataLoaded);
 
 	if (nvault_get(missions, vaultKey, vaultData, charsmax(vaultData))) {
 		parse(vaultData, missionData[0], charsmax(missionData[]), missionData[1], charsmax(missionData[]), missionData[2], charsmax(missionData[]), missionData[3], charsmax(missionData[]), missionData[4], charsmax(missionData[]));

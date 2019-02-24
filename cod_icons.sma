@@ -6,7 +6,7 @@
 #include <cod>
 
 #define PLUGIN  "CoD Icons"
-#define VERSION "1.2.1"
+#define VERSION "1.3.1"
 #define AUTHOR  "O'Zone"
 
 // Uncomment to enable lite version of icons.
@@ -44,8 +44,8 @@ new const iconSprite[icons][] = {
 };
 #endif
 
-new playerName[MAX_PLAYERS + 1][MAX_NAME], bombEntity[icons], iconEntity[icons], playerTeam[MAX_PLAYERS + 1],
-	bool:roundStarted, iconBombSites, iconDropped, iconPlanted, iconBox, bombTimer, cvarC4, iconsVault;
+new playerName[MAX_PLAYERS + 1][MAX_NAME], bombEntity[icons], iconEntity[icons], playerTeam[MAX_PLAYERS + 1],bool:mapEnd,
+	bool:roundStarted, dataLoaded, iconBombSites, iconDropped, iconPlanted, iconBox, bombTimer, cvarC4, iconsVault;
 
 public plugin_init()
 {
@@ -94,8 +94,12 @@ public plugin_natives()
 public plugin_precache()
 	for (new i; i < sizeof(iconSprite); i++) precache_model(iconSprite[i]);
 
+public plugin_end()
+	nvault_close(iconsVault);
+
 public client_putinserver(id)
 {
+	rem_bit(id, dataLoaded);
 	rem_bit(id, iconBombSites);
 	rem_bit(id, iconDropped);
 	rem_bit(id, iconPlanted);
@@ -104,6 +108,18 @@ public client_putinserver(id)
 	if (is_user_bot(id) || is_user_hltv(id)) return;
 
 	load_icons(id);
+}
+
+public cod_end_map()
+	mapEnd = true;
+
+public cod_reset_all_data()
+{
+	for (new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, dataLoaded);
+
+	mapEnd = true;
+
+	nvault_prune(iconsVault, 0, get_systime() + 1);
 }
 
 public cod_team_assign(id, team)
@@ -359,6 +375,8 @@ public change_icons_handle(id, menu, item)
 
 public save_icons(id)
 {
+	if (!get_bit(id, dataLoaded) || mapEnd) return PLUGIN_CONTINUE;
+
 	new vaultKey[MAX_NAME], vaultData[16];
 
 	formatex(vaultKey, charsmax(vaultKey), "%s-cod_icons", playerName[id]);
@@ -371,6 +389,8 @@ public save_icons(id)
 
 public load_icons(id)
 {
+	if (mapEnd) return PLUGIN_CONTINUE;
+
 	new vaultKey[MAX_NAME], vaultData[16], iconsData[4][4];
 
 	get_user_name(id, playerName[id], charsmax(playerName[]));
@@ -392,6 +412,8 @@ public load_icons(id)
 
 		save_icons(id);
 	}
+
+	set_bit(id, dataLoaded);
 
 	return PLUGIN_CONTINUE;
 }

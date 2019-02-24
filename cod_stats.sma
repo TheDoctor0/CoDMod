@@ -9,7 +9,7 @@
 #include <nvault>
 
 #define PLUGIN "CoD Stats"
-#define VERSION "1.2.2"
+#define VERSION "1.3.1"
 #define AUTHOR "O'Zone"
 
 #define TASK_TIME 9054
@@ -31,7 +31,7 @@ enum _:statsInfo { ADMIN, REVENGE, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE,
 enum _:winers { THIRD, SECOND, FIRST };
 
 new playerName[MAX_PLAYERS + 1][MAX_SAFE_NAME], playerStats[MAX_PLAYERS + 1][statsInfo], playerDamage[MAX_PLAYERS + 1][MAX_PLAYERS + 1],
-	Handle:sql, Handle:connection, bool:sqlConnected, bool:blockCount, bool:showedOneAndOnly, round, dataLoaded, visitInfo;
+	Handle:sql, Handle:connection, bool:sqlConnected, bool:blockCount, bool:showedOneAndOnly, bool:mapEnd, round, dataLoaded, visitInfo;
 
 new cvarMinPlayers, cvarMedalsEnabled, cvarGoldMedalExp, cvarSilverMedalExp, cvarBronzeMedalExp, cvarAssistEnabled,
 	cvarAssistDamage, cvarAssistHonor, cvarAssistExp, cvarRevengeEnabled, cvarRevengeHonor, cvarRevengeExp;
@@ -79,6 +79,8 @@ public plugin_end()
 {
 	if (sql != Empty_Handle) SQL_FreeHandle(sql);
 	if (connection != Empty_Handle) SQL_FreeHandle(connection);
+
+	nvault_close(soundsVault);
 }
 
 public plugin_natives()
@@ -125,6 +127,34 @@ public client_disconnected(id)
 	remove_task(id);
 
 	save_stats(id, 1);
+}
+
+public cod_reset_data()
+	clear_database();
+
+public cod_reset_stats_data()
+	clear_database();
+
+public cod_reset_all_data()
+{
+	clear_database();
+
+	mapEnd = true;
+
+	nvault_prune(soundsVault, 0, get_systime() + 1);
+}
+
+public clear_database()
+{
+	for (new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, dataLoaded);
+
+	sqlConnected = false;
+
+	new tempData[32];
+
+	formatex(tempData, charsmax(tempData), "DROP TABLE `cod_stats`;");
+
+	SQL_ThreadQuery(sql, "ignore_handle", tempData);
 }
 
 public stats_menu(id)
@@ -843,6 +873,8 @@ public cod_hostages_rescued(id)
 
 public cod_end_map()
 {
+	mapEnd = true;
+
 	if (cvarMedalsEnabled) {
 		new playerName[MAX_NAME], winnersId[3], winnersFrags[3], tempFrags, swapFrags, swapId, exp;
 
@@ -897,7 +929,7 @@ public cod_end_map()
 				}
 			}
 
-			save_stats(winnersId[i], 1);
+			save_stats(winnersId[i], mapEnd);
 
 			get_user_name(winnersId[i], playerName, charsmax(playerName));
 
@@ -912,7 +944,7 @@ public cod_end_map()
 	for (new id = 1; id <= MAX_PLAYERS; id++) {
 		if (!is_user_connected(id) || is_user_hltv(id) || is_user_bot(id)) continue;
 
-		save_stats(id, 1);
+		save_stats(id, mapEnd);
 	}
 
 	return PLUGIN_CONTINUE;
@@ -1093,6 +1125,8 @@ stock save_stats(id, end = 0)
 
 public save_sounds(id)
 {
+	if (mapEnd) return PLUGIN_CONTINUE;
+
 	new vaultKey[MAX_NAME], vaultData[16];
 
 	formatex(vaultKey, charsmax(vaultKey), "%s-sounds", playerName[id]);
@@ -1105,6 +1139,8 @@ public save_sounds(id)
 
 public load_sounds(id)
 {
+	if (mapEnd) return PLUGIN_CONTINUE;
+
 	new vaultKey[MAX_NAME], vaultData[16], soundsData[5][5];
 
 	formatex(vaultKey, charsmax(vaultKey), "%s-sounds", playerName[id]);
@@ -1112,11 +1148,11 @@ public load_sounds(id)
 	if (nvault_get(soundsVault, vaultKey, vaultData, charsmax(vaultData))) {
 		parse(vaultData, soundsData[0], charsmax(soundsData), soundsData[1], charsmax(soundsData), soundsData[2], charsmax(soundsData), soundsData[3], charsmax(soundsData), soundsData[4], charsmax(soundsData));
 
-		if(str_to_num(soundsData[0])) set_bit(id, soundMayTheForce);
-		if(str_to_num(soundsData[1])) set_bit(id, soundOneAndOnly);
-		if(str_to_num(soundsData[2])) set_bit(id, soundHumiliation);
-		if(str_to_num(soundsData[3])) set_bit(id, soundPrepare);
-		if(str_to_num(soundsData[4])) set_bit(id, soundLastLeft);
+		if (str_to_num(soundsData[0])) set_bit(id, soundMayTheForce);
+		if (str_to_num(soundsData[1])) set_bit(id, soundOneAndOnly);
+		if (str_to_num(soundsData[2])) set_bit(id, soundHumiliation);
+		if (str_to_num(soundsData[3])) set_bit(id, soundPrepare);
+		if (str_to_num(soundsData[4])) set_bit(id, soundLastLeft);
 	}
 
 	return PLUGIN_CONTINUE;

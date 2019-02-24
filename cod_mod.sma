@@ -10,7 +10,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 #define AUTHOR "O'Zone"
 
 #pragma dynamic              65536
@@ -29,6 +29,8 @@
 #define TASK_RESPAWN         14294
 
 #define LOG_FILE             "cod_mod.log"
+
+#define RESET_FLAG			 ADMIN_ADMIN
 
 new const commandClass[][] = { "klasa", "say /klasa", "say_team /klasa", "say /class", "say_team /class", "say /k", "say_team /k", "say /c", "say_team /c" };
 new const commandClasses[][] = { "klasy", "say /klasy", "say_team /klasy", "say /classes", "say_team /classes", "say /ky", "say_team /ky", "say /cs", "say_team /cs" };
@@ -82,10 +84,11 @@ enum _:repeatingData { ATTACKER, VICTIM, DAMAGE, COUNTER, FLAGS };
 
 enum _:weaponSlots { PRIMARY = 1, SECONDARY, KNIFE, GRENADES, C4 };
 
-enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, SPEED_CHANGED, DAMAGE_PRE, DAMAGE_POST, DAMAGE_INFLICT,
-	WEAPON_DEPLOY, CUR_WEAPON, KILLED, SPAWNED, CMD_START, PRETHINK, BOMB_DROPPED, BOMB_PICKED, BOMB_PLANTING, BOMB_PLANTED, BOMB_DEFUSING,
-	BOMB_DEFUSED, BOMB_EXPLODED, HOSTAGE_KILLED, HOSTAGE_RESCUED, HOSTAGES_RESCUED, TEAM_ASSIGN, NEW_ROUND, START_ROUND, RESTART_ROUND,
-	END_ROUND, WIN_ROUND, END_MAP, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH, TELEPORT_USED };
+enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, SPEED_CHANGED, DAMAGE_PRE, DAMAGE_POST,
+	DAMAGE_INFLICT, WEAPON_DEPLOY, CUR_WEAPON, KILLED, SPAWNED, CMD_START, PRETHINK, BOMB_DROPPED, BOMB_PICKED, BOMB_PLANTING,
+	BOMB_PLANTED, BOMB_DEFUSING, BOMB_DEFUSED, BOMB_EXPLODED, HOSTAGE_KILLED, HOSTAGE_RESCUED, HOSTAGES_RESCUED, TEAM_ASSIGN,
+	NEW_ROUND, START_ROUND, RESTART_ROUND, END_ROUND, WIN_ROUND, END_MAP, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE,
+	THUNDER_REACH, TELEPORT_USED, RESET_DATA, RESET_STATS_DATA, RESET_ALL_DATA };
 
 enum _:itemInfo { ITEM_NAME[MAX_NAME], ITEM_DESC[MAX_DESC], ITEM_PLUGIN, ITEM_RANDOM_MIN, ITEM_RANDOM_MAX, ITEM_GIVE, ITEM_DROP,
 	ITEM_SPAWNED, ITEM_KILL, ITEM_KILLED, ITEM_SKILL_USED, ITEM_UPGRADE, ITEM_VALUE, ITEM_DAMAGE_ATTACKER, ITEM_DAMAGE_VICTIM };
@@ -114,7 +117,7 @@ new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpDamagePer, cvarExpWinRound
 
 new Array:codItems, Array:codClasses, Array:codPromotions, Array:codFractions, Array:codPlayerClasses[MAX_PLAYERS + 1], Array:codPlayerRender[MAX_PLAYERS + 1], codForwards[forwards];
 
-new Handle:sql, Handle:connection, bool:sqlConnected, bool:skillsBlocked, bool:nightExp, bool:mapChange, bool:freezeTime = true,
+new Handle:sql, Handle:connection, bool:sqlConnected, bool:skillsBlocked, bool:nightExp, bool:mapEnd, bool:freezeTime = true,
 	hudInfo, hudSync, hudSync2, dataLoaded, hudLoaded, resetStats, renderTimer, glowActive, roundStart, lastInfo;
 
 public plugin_init()
@@ -166,6 +169,10 @@ public plugin_init()
 	for (new i; i < sizeof commandBinds; i++) register_clcmd(commandBinds[i], "show_binds");
 	for (new i; i < sizeof commandTop; i++) register_clcmd(commandTop[i], "level_top");
 	for (new i; i < sizeof commandBlock; i++) register_clcmd(commandBlock[i], "block_command");
+
+	register_clcmd("cod_reset_data", "reset_data");
+	register_clcmd("cod_reset_stats_data", "reset_stats_data");
+	register_clcmd("cod_reset_all_data", "reset_all_data");
 
 	register_clcmd("+rocket", "bind_use_rocket");
 	register_clcmd("+mine", "bind_use_mine");
@@ -264,6 +271,9 @@ public plugin_init()
 	codForwards[DYNAMITE_EXPLODE] = CreateMultiForward("cod_dynamite_explode", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
 	codForwards[THUNDER_REACH] = CreateMultiForward("cod_thunder_reach", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
 	codForwards[TELEPORT_USED] = CreateMultiForward("cod_teleport_used", ET_CONTINUE, FP_CELL);
+	codForwards[RESET_DATA] = CreateMultiForward("cod_reset_data", ET_IGNORE);
+	codForwards[RESET_STATS_DATA] = CreateMultiForward("cod_reset_stats_data", ET_IGNORE);
+	codForwards[RESET_ALL_DATA] = CreateMultiForward("cod_reset_all_data", ET_IGNORE);
 }
 
 public plugin_natives()
@@ -515,12 +525,12 @@ public client_putinserver(id)
 
 public client_disconnected(id)
 {
-	save_data(id, mapChange ? MAP_END : FINAL);
+	save_data(id, mapEnd ? MAP_END : FINAL);
 
 	remove_tasks(id);
 	remove_ents(id);
 
-	if (!mapChange) {
+	if (!mapEnd) {
 		if (codPlayer[id][PLAYER_CLASS]) execute_forward_ignore_one_param(get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_DISABLED), id);
 		if (codPlayer[id][PLAYER_ITEM]) execute_forward_ignore_one_param(get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_DROP), id);
 	}
@@ -558,6 +568,99 @@ public create_arrays()
 			ArrayPushArray(codPlayerRender[i], codRender);
 		}
 	}
+}
+
+public reset_data(id)
+{
+	if (!(get_user_flags(id) & RESET_FLAG)) return PLUGIN_HANDLED;
+
+	new adminName[MAX_NAME];
+
+	get_user_name(id, adminName, charsmax(adminName));
+
+	log_to_file(LOG_FILE, "[%s] Admin %s wymusil przeprowadzenie resetu danych.", PLUGIN, adminName);
+
+	client_print(id, print_console, "[CoD] Trwa przeprowadzanie resetu danych...");
+	client_print(id, print_console, "[CoD] Za 10 sekund nastapi restart mapy.");
+
+	chat_print(0, "Trwa przeprowadzanie resetu danych...");
+	chat_print(0, "Za 10 sekund nastapi restart mapy.");
+
+	clear_database(id);
+
+	execute_forward_ignore(codForwards[RESET_DATA]);
+
+	return PLUGIN_HANDLED;
+}
+
+public reset_stats_data(id)
+{
+	if (!(get_user_flags(id) & RESET_FLAG)) return PLUGIN_HANDLED;
+
+	new adminName[MAX_NAME];
+
+	get_user_name(id, adminName, charsmax(adminName));
+
+	log_to_file(LOG_FILE, "[%s] Admin %s wymusil przeprowadzenie resetu danych statystyk.", PLUGIN, adminName);
+
+	client_print(id, print_console, "[CoD] Trwa przeprowadzanie resetu danych statystyk...");
+	client_print(id, print_console, "[CoD] Za 10 sekund nastapi restart mapy.");
+
+	chat_print(0, "Trwa przeprowadzanie resetu danych statystyk...");
+	chat_print(0, "Za 10 sekund nastapi restart mapy.");
+
+	execute_forward_ignore(codForwards[RESET_STATS_DATA]);
+
+	set_task(10.0, "restart_map");
+
+	return PLUGIN_HANDLED;
+}
+
+public reset_all_data(id)
+{
+	if (!(get_user_flags(id) & RESET_FLAG)) return PLUGIN_HANDLED;
+
+	new adminName[MAX_NAME];
+
+	get_user_name(id, adminName, charsmax(adminName));
+
+	log_to_file(LOG_FILE, "[%s] Admin %s wymusil przeprowadzenie pelnego resetu danych.", PLUGIN, adminName);
+
+	client_print(id, print_console, "[CoD] Trwa przeprowadzanie pelnego resetu danych...");
+	client_print(id, print_console, "[CoD] Za 10 sekund nastapi restart mapy.");
+
+	chat_print(0, "Trwa przeprowadzanie pelnego resetu danych...");
+	chat_print(0, "Za 10 sekund nastapi restart mapy.");
+
+	clear_database(id);
+
+	execute_forward_ignore(codForwards[RESET_ALL_DATA]);
+
+	return PLUGIN_HANDLED;
+}
+
+public clear_database(id)
+{
+	for (new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, dataLoaded);
+
+	sqlConnected = false;
+
+	new tempData[32];
+
+	formatex(tempData, charsmax(tempData), "DROP TABLE `cod_mod`;");
+
+	SQL_ThreadQuery(sql, "ignore_handle", tempData);
+
+	set_task(10.0, "restart_map");
+}
+
+public restart_map()
+{
+	new currentMap[64];
+
+	get_mapname(currentMap, charsmax(currentMap));
+
+	server_cmd("changelevel ^"%s^"", currentMap);
 }
 
 public select_fraction(id)
@@ -2666,7 +2769,7 @@ public message_ammo(msgId, msgDest, id)
 
 public message_intermission()
 {
-	mapChange = true;
+	mapEnd = true;
 
 	execute_forward_ignore(codForwards[END_MAP]);
 

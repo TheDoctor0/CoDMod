@@ -85,6 +85,25 @@ public plugin_end()
 	ArrayDestroy(codClans);
 }
 
+public cod_reset_data()
+	clear_database();
+
+public cod_reset_all_data()
+	clear_database();
+
+public clear_database()
+{
+	for (new i = 1; i <= MAX_PLAYERS; i++) clan[i] = 0;
+
+	sqlConnected = false;
+
+	new tempData[256];
+
+	formatex(tempData, charsmax(tempData), "DROP TABLE `cod_clans`; DROP TABLE `cod_clans_applications`; DROP TABLE `cod_clans_members`; DROP TABLE `cod_clans_wars`;");
+
+	SQL_ThreadQuery(sql, "ignore_handle", tempData);
+}
+
 public client_putinserver(id)
 {
 	if (is_user_bot(id) || is_user_hltv(id)) return;
