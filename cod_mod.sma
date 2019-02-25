@@ -809,7 +809,7 @@ public select_class_confirm(id, menu, item)
 	new flag = get_class_info(class, CLASS_FLAG);
 
 	if (flag != NONE && !(get_user_flags(id) & flag)) {
-		chat_print(id, "Nie posiadasz uprawnien do korzystania z tej klasy. Wykup je w^x03 /sklepsms^x01!");
+		chat_print(id, "Nie posiadasz uprawnien do korzystania z tej klasy!");
 
 		return PLUGIN_CONTINUE;
 	}
@@ -2883,9 +2883,8 @@ public show_help(id)
 		case 12: show_dhudmessage(id, "Oddaj przedmiot komenda /daj lub uzyj /wymien do wymiany z innym graczem.");
 		case 13: show_dhudmessage(id, "Aby zarzadzac swoim kontem - w tym zmienic haslo, wpisz komende /konto.");
 		case 14: show_dhudmessage(id, "Glowne menu serwera znajdziesz pod komenda /menu lub klawiszem V.");
-		case 15: show_dhudmessage(id, "Jesli chcesz kupic VIPa, klasy premium, exp lub honor zajrzyj do /sklepsms.");
-		case 16: show_dhudmessage(id, "Jest wiele dodatkowych statystyk, ktore znajdziesz pod komenda /statymenu.");
-		case 17: {
+		case 15: show_dhudmessage(id, "Jest wiele dodatkowych statystyk, ktore znajdziesz pod komenda /statymenu.");
+		case 16: {
 			static info[128];
 
 			formatex(info, charsmax(info), "Doswiadczenie i misje sa naliczane, jesli na serwerze gra co najmniej %i graczy.", cvarMinPlayers);
