@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN  "CoD Admin Menu"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 #define AUTHOR  "O'Zone"
 
 #define ACCESS_FLAG ADMIN_CVAR
@@ -13,7 +13,8 @@ new const menuOptions[][] = {
 	"Dodaj \rPoziom",
 	"Dodaj \rDoswiadczenie",
 	"Zamien \rDoswiadczenie",
-	"Przenies \rDoswiadczenie"
+	"Przenies \rDoswiadczenie",
+	"Dodaj \rHonor"
 };
 
 enum _:options {
@@ -22,7 +23,8 @@ enum _:options {
 	ADD_LEVEL,
 	ADD_EXP,
 	EXCHANGE_EXP,
-	TRANSFER_EXP
+	TRANSFER_EXP,
+	ADD_HONOR
 };
 
 new const commandMenu[][] = { "codadmin", "say /codadmin", "say_team /codadmin" };
@@ -147,6 +149,11 @@ public player_menu_handle(id, menu, item)
 
 			client_print(id, print_center, "Wpisz ile doswiadczenia chcesz dodac graczowi.");
 			cod_print_chat(id, "Wpisz ile doswiadczenia chcesz dodac graczowi.");
+		} case ADD_HONOR: {
+			client_cmd(id, "messagemode WPISZ_ILOSC");
+
+			client_print(id, print_center, "Wpisz ile honoru chcesz dodac graczowi.");
+			cod_print_chat(id, "Wpisz ile honoru chcesz dodac graczowi.");
 		}
 	}
 
@@ -340,6 +347,10 @@ public amount_handle(id)
 			cod_set_user_exp(selectedPlayer[id], amount);
 
 			cod_print_chat(id, "Dodales^x04 %i^x01 doswiadczenia graczowi^x03 %s^x01.", amount, playerName);
+		} case ADD_HONOR: {
+			cod_add_user_honor(selectedPlayer[id], amount);
+
+			cod_print_chat(id, "Dodales^x04 %i^x01 honoru graczowi^x03 %s^x01.", amount, playerName);
 		}
 	}
 
