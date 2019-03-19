@@ -280,20 +280,19 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 	if (equal(className, iconSprite[BOMB_DROP]) && (!get_bit(host, iconDropped) || playerTeam[host] != 1)) return FMRES_IGNORED;
 	if (equal(className, iconSprite[BOX]) && !get_bit(host, iconBox)) return FMRES_IGNORED;
 
-	static Float:hostOrigin[3], Float:targetOrigin[3], Float:middleOirgin[3], Float:wallOffset[3], Float:spriteOffset[3], Float:hitPoint[3], Float:distanceToWall, Float:distance;
+	static Float:hostOrigin[3], Float:targetOrigin[3], Float:middleOirgin[3], Float:wallOffset[3], Float:spriteOffset[3], Float:hitPoint[3], Float:distanceToWall, distance;
 
 	pev(ent, pev_origin, targetOrigin);
 
 	if (!is_in_viewcone(host, targetOrigin)) return FMRES_IGNORED;
 
-	set_es(es, ES_Effects, get_es(es, ES_Effects) & ~EF_NODRAW);
-
 	pev(host, pev_origin, hostOrigin);
 
-	distance = get_distance_f(hostOrigin, targetOrigin) / UNITS_PER_METER;
+	distance = floatround(get_distance_f(hostOrigin, targetOrigin) / UNITS_PER_METER, floatround_floor);
 
 	#if !defined LITE
-	if (distance > 1.0 && distance <= 100.0) set_es(es, ES_Frame, 100.0 - floatround(distance));
+	if (!distance) return FMRES_IGNORED;
+	else if (distance <= 100) set_es(es, ES_Frame, 100.0 - distance);
 	else set_es(es, ES_Frame, 100.0);
 	#endif
 
@@ -306,6 +305,8 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 	normalize(middleOirgin, wallOffset, distanceToWall);
 
 	xs_vec_add(wallOffset, hostOrigin, spriteOffset);
+
+	set_es(es, ES_Effects, get_es(es, ES_Effects) & ~EF_NODRAW);
 
 	if (equal(className, iconSprite[BOMB_DROP]) || equal(className, iconSprite[BOMB_PLANT]) || equal(className, iconSprite[BOMB_EXPLODE])) spriteOffset[2] += 25.0;
 	if (equal(className, iconSprite[BOX])) spriteOffset[2] += 35.0;
