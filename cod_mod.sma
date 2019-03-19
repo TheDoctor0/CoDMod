@@ -4633,7 +4633,7 @@ public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
 
 		ExecuteForward(codForwards[DAMAGE_INFLICT], ret, attacker, victim, Float:damage, Float:factor, flags);
 
-		if (float(ret) == COD_BLOCK) return;
+		if (float(ret) == COD_BLOCK || damage <= 0.0) return;
 
 		ExecuteHam(Ham_TakeDamage, victim, attacker, attacker, damage + get_intelligence(attacker) * factor, DMG_CODSKILL | flags);
 	}
