@@ -2837,7 +2837,7 @@ public show_info(id)
 	levelPercent = codPlayer[target][PLAYER_LEVEL] < cvarLevelLimit ? (float((codPlayer[target][PLAYER_EXP] - exp)) / float((get_level_exp(codPlayer[target][PLAYER_LEVEL]) - exp))) * 100.0 : 0.0;
 
 	if (cvarMaxDurability) {
-		formatex(itemDurability, charsmax(itemDurability), " (%0.0f%s)", float(codPlayer[target][PLAYER_ITEM_DURA] / cvarMaxDurability) * 100.0, "%%");
+		formatex(itemDurability, charsmax(itemDurability), " (%0.0f%s)", codPlayer[target][PLAYER_ITEM_DURA] * 100.0 / cvarMaxDurability, "%%");
 	}
 
 	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot : %s%s]%s^n[Zycie : %i]^n[Honor : %i]^n[Czas Gry : %s]",
