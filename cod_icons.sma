@@ -188,6 +188,12 @@ public cod_new_round()
 	remove_icon(iconEntity[BOMB_PLANT], BOMB_PLANT);
 	remove_icon(iconEntity[BOMB_EXPLODE], BOMB_EXPLODE);
 
+	new ent = NONE;
+
+	while ((ent = find_ent_by_class(ent, iconSprite[BOX]))) {
+		if (pev_valid(ent)) remove_entity(ent);
+	}
+
 	roundStarted = true;
 }
 
