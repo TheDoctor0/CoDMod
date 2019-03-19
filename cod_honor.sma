@@ -5,11 +5,13 @@
 
 #define PLUGIN	"CoD Honor System"
 #define AUTHOR	"O'Zone"
-#define VERSION	"1.2.2"
+#define VERSION	"1.3.1"
 
 #define set_user_money(%1,%2)	set_pdata_int(%1, OFFSET_CSMONEY, %2, OFFSET_LINUX)
 
 #define MAX_MONEY		99999
+
+#define HONOR_LIMIT		2147483647
 
 #define OFFSET_CSMONEY	115
 #define OFFSET_LINUX	5
@@ -272,6 +274,10 @@ public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], d
 
 	if (SQL_MoreResults(query)) {
 		playerHonor[id] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
+
+		if (playerHonor[id] > HONOR_LIMIT) {
+			playerHonor[id] = HONOR_LIMIT;
+		}
 	} else {
 		new queryData[128];
 
@@ -293,8 +299,11 @@ stock save_honor(id, end = 0)
 
 	delayed_hud_update(id, playerHonorGained[id]);
 
-	playerHonor[id] += playerHonorGained[id];
-	playerHonorGained[id] = 0;
+	if (playerHonorGained[id] && (playerHonor[id] + playerHonorGained[id] < 0 || playerHonor[id] + playerHonorGained[id] > HONOR_LIMIT)) {
+		playerHonor[id] = HONOR_LIMIT;
+	} else {
+		playerHonor[id] += playerHonorGained[id];
+	}
 
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_honor` SET honor = '%i' WHERE name = ^"%s^"", playerHonor[id], playerName[id]);
 
@@ -379,14 +388,14 @@ public _cod_get_user_honor(id)
 
 public _cod_set_user_honor(id, amount, bonus)
 {
-	playerHonor[id] = max(0, bonus ? get_user_bonus(id, amount) : amount);
+	playerHonor[id] = min(max(0, bonus ? get_user_bonus(id, amount) : amount), HONOR_LIMIT);
 
 	save_honor(id);
 }
 
 public _cod_add_user_honor(id, amount, bonus)
 {
-	playerHonorGained[id] += max(-playerHonor[id], bonus ? get_user_bonus(id, amount) : amount);
+	playerHonorGained[id] = max(-playerHonor[id], bonus ? get_user_bonus(id, amount) : amount);
 
 	save_honor(id);
 }
