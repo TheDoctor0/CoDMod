@@ -103,7 +103,7 @@ public dice_menu(id, number)
 			amount *= 5;
 
 			win = true;
-		} else if (playerData[id][DICE][GAME_TYPE] == DICE_LOWHIGH && (playerData[id][DICE][GAME_CHOICE] == DICE_LOW && number <= 3) || (playerData[id][DICE][GAME_CHOICE] == DICE_HIGH && number > 3)) {
+		} else if (playerData[id][DICE][GAME_TYPE] == DICE_LOWHIGH && ((playerData[id][DICE][GAME_CHOICE] == DICE_LOW && number <= 3) || (playerData[id][DICE][GAME_CHOICE] == DICE_HIGH && number > 3))) {
 			amount = floatround(amount * 1.8);
 
 			win = true;
