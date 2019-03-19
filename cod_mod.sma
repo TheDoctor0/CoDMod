@@ -101,9 +101,9 @@ enum _:playerClassInfo { PCLASS_LEVEL, PCLASS_EXP, PCLASS_HEAL, PCLASS_INT, PCLA
 
 enum _:renderInfo { RENDER_TYPE, RENDER_VALUE, RENDER_STATUS, RENDER_WEAPON };
 
-enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL, PLAYER_INT,
-	PLAYER_STAM, PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTRA_HEAL, PLAYER_EXTRA_INT, PLAYER_EXTRA_STAM, PLAYER_EXTRA_STR, PLAYER_EXTRA_COND, PLAYER_EXTRA_WEAPONS,
-	PLAYER_WEAPON, PLAYER_WEAPONS, PLAYER_STATUS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_SPAWNED, PLAYER_KS, PLAYER_TIME_KS, Float:PLAYER_LAST_ROCKET, Float:PLAYER_LAST_MINE,
+enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL, PLAYER_INT, PLAYER_STAM,
+	PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTRA_HEAL, PLAYER_EXTRA_INT, PLAYER_EXTRA_STAM, PLAYER_EXTRA_STR, PLAYER_EXTRA_COND, PLAYER_EXTRA_WEAPONS, PLAYER_WEAPON,
+	PLAYER_WEAPONS, PLAYER_STATUS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_SPAWNED, PLAYER_RENDER, PLAYER_KS, PLAYER_TIME_KS, Float:PLAYER_LAST_ROCKET, Float:PLAYER_LAST_MINE,
 	Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, SKILL_USE,
 	PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1],
 	PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_RESISTANCE[ALL + 1], PLAYER_GODMODE[ALL + 1], PLAYER_NOCLIP[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1],
@@ -2330,7 +2330,7 @@ public weapon_deploy_post(ent)
 {
 	if (pev_valid(ent) != 2) return HAM_IGNORED;
 
-	new id = get_pdata_cbase(ent, 41, 4);
+	static id; id = get_pdata_cbase(ent, 41, 4);
 
 	if (!is_user_alive(id)) return HAM_IGNORED;
 
@@ -2569,20 +2569,18 @@ public hostages_rescued()
 
 stock render_change(id, playerStatus = NONE)
 {
-	if (!is_user_alive(id) || codPlayer[id][PLAYER_STATUS] == playerStatus || get_bit(id, renderTimer) || get_bit(id, glowActive)) return;
+	if (!is_user_alive(id) || (codPlayer[id][PLAYER_STATUS] == playerStatus && playerStatus != NONE) || get_bit(id, renderTimer) || get_bit(id, glowActive)) return;
 
 	if (playerStatus != NONE) codPlayer[id][PLAYER_STATUS] = playerStatus;
 
-	static renderAmount, oldRenderAmount[MAX_PLAYERS + 1];
+	static renderAmount; renderAmount = render_count(id);
 
-	renderAmount = render_count(id);
+	if (renderAmount != codPlayer[id][PLAYER_RENDER]) {
+		codPlayer[id][PLAYER_RENDER] = renderAmount;
 
-	if (renderAmount != oldRenderAmount[id]) {
-		set_user_rendering(id, kRenderFxNone, 0, 0, 0, kRenderTransAlpha, renderAmount);
+		set_user_rendering(id, kRenderFxNone, 0, 0, 0, kRenderTransAlpha, codPlayer[id][PLAYER_RENDER]);
 
-		execute_forward_ignore_two_params(codForwards[RENDER_CHANGED], id, renderAmount);
-
-		oldRenderAmount[id] = renderAmount;
+		execute_forward_ignore_two_params(codForwards[RENDER_CHANGED], id, codPlayer[id][PLAYER_RENDER]);
 	}
 }
 
@@ -3089,9 +3087,9 @@ public reset_attributes(id, type)
 	codPlayer[id][PLAYER_REDUCER][type] = 0;
 	codPlayer[id][PLAYER_REDUCER_WEAPONS][type] = 0;
 	codPlayer[id][PLAYER_TELEPORTS][type] = 0;
-
 	codPlayer[id][PLAYER_GRAVITY][type] = _:1.0;
 	codPlayer[id][PLAYER_SPEED][type] = _:0.0;
+	codPlayer[id][PLAYER_RENDER] = 255;
 
 	remove_render_type(id, type);
 
@@ -4397,6 +4395,8 @@ public _cod_set_user_render(id, value, type, status, weapon, Float:timer)
 
 		render_change(id);
 	} else {
+		codPlayer[id][PLAYER_RENDER] = NONE;
+
 		set_user_rendering(id, kRenderFxNone, 0, 0, 0, kRenderTransAlpha, max(0, value));
 
 		set_bit(id, renderTimer);
@@ -4413,7 +4413,11 @@ public _cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:tim
 
 	set_user_rendering(id, effect, red, green, blue, model, amount);
 
-	if (timer != 0.0) set_task(timer, "reset_glow", id + TASK_GLOW);
+	if (timer != 0.0) {
+		codPlayer[id][PLAYER_RENDER] = NONE;
+
+		set_task(timer, "reset_glow", id + TASK_GLOW);
+	}
 }
 
 public reset_render(id)
