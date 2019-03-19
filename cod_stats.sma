@@ -539,7 +539,7 @@ public show_top_medals(failState, Handle:query, error[], errorNum, tempId[], dat
 		gold = SQL_ReadResult(query, 1);
 		silver = SQL_ReadResult(query, 2);
 		bronze = SQL_ReadResult(query, 3);
-		medals = SQL_ReadResult(query, 3);
+		medals = SQL_ReadResult(query, 4);
 
 		replace_all(userName, charsmax(userName), "<", "");
 		replace_all(userName, charsmax(userName), ">", "");
