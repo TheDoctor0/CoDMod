@@ -2579,11 +2579,11 @@ public load_data(id)
 		return;
 	}
 
-	new queryData[192], tempId[1];
+	new queryData[256], tempId[1];
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT a.flag, b.*, COUNT(a.clan) AS members FROM `cod_clans_members` a JOIN `cod_clans` b ON a.clan = b.id WHERE a.name = ^"%s^"", playerName[id]);
+	formatex(queryData, charsmax(queryData), "SELECT a.flag, b.*, (SELECT COUNT(clan) FROM `cod_clans_members` WHERE clan = a.clan) AS members FROM `cod_clans_members` a JOIN `cod_clans` b ON a.clan = b.id WHERE a.name = ^"%s^"", playerName[id]);
 	SQL_ThreadQuery(sql, "load_data_handle", queryData, tempId, sizeof(tempId));
 }
 
