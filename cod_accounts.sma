@@ -22,7 +22,7 @@ new const commandAccount[][] = { "konto", "say /haslo", "say_team /haslo", "say 
 	"say /konto", "say_team /konto", "say /account", "say_team /account" };
 
 new playerData[MAX_PLAYERS + 1][playerInfo], Handle:sql, bool:sqlConnected, dataLoaded, autoLogin,
-	cvarAccountsEnabled, cvarLoginMaxTime, cvarPasswordMaxFails, cvarPasswordMinLength, cvarSetinfo[32];
+	cvarAccountsEnabled, cvarLoginMaxTime, cvarPasswordMaxFails, cvarPasswordMinLength, cvarAutoLoginConfig, cvarSetinfo[32];
 
 public plugin_init()
 {
@@ -34,7 +34,8 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_accounts_login_max_time", "60"), cvarLoginMaxTime);
 	bind_pcvar_num(create_cvar("cod_accounts_password_max_fails", "3"), cvarPasswordMaxFails);
 	bind_pcvar_num(create_cvar("cod_accounts_password_min_length", "5"), cvarPasswordMinLength);
-	bind_pcvar_string(create_cvar("cod_accounts_setinfo", "codpass"), cvarSetinfo, charsmax(cvarSetinfo));
+	bind_pcvar_num(create_cvar("cod_accounts_autologin_config", "1"), cvarAutoLoginConfig);
+	bind_pcvar_string(create_cvar("cod_accounts_autologin_setinfo", "codpass"), cvarSetinfo, charsmax(cvarSetinfo));
 
 	register_clcmd("WPROWADZ_SWOJE_HASLO", "login_account");
 	register_clcmd("WPROWADZ_WYBRANE_HASLO", "register_step_one");
@@ -196,7 +197,10 @@ public account_menu(id, sound)
 
 	formatex(menuData, charsmax(menuData), "\rSYSTEM REJESTRACJI^n^n\rNick: \w[\y%s\w]^n\rStatus: \w[\y%s\w]", playerData[id][NAME], accountStatus[playerData[id][STATUS]]);
 
-	if ((playerData[id][STATUS] == NOT_LOGGED || playerData[id][STATUS] == LOGGED) && !get_bit(id, autoLogin)) format(menuData, charsmax(menuData),"%s^n\wWpisz w konsoli \ysetinfo ^"_%s^" ^"twojehaslo^"^n\wSprawi to, ze twoje haslo bedzie ladowane \rautomatycznie\w.", menuData, cvarSetinfo);
+	if ((playerData[id][STATUS] == NOT_LOGGED || playerData[id][STATUS] == LOGGED) && !get_bit(id, autoLogin)) {
+		if (cvarAutoLoginConfig) format(menuData, charsmax(menuData),"%s^n\wWpisz w konsoli \ysetinfo ^"_%s^" ^"twojehaslo^"^n\wSprawi to, ze twoje haslo bedzie ladowane \rautomatycznie\w.", menuData, cvarSetinfo);
+		else format(menuData, charsmax(menuData),"%s^n\wDopisz \ysetinfo ^"_%s^" ^"twojehaslo^" do swojego configu^n\wSprawi to, ze twoje haslo bedzie ladowane \rautomatycznie\w.", menuData, cvarSetinfo);
+	}
 
 	new menu = menu_create(menuData, "account_menu_handle"), callback = menu_makecallback("account_menu_callback");
 
@@ -424,10 +428,15 @@ public register_confirmation_handle(id, menu, item)
 			show_hudmessage(id, "Zostales pomyslnie zarejestrowany i zalogowany.");
 
 			cod_print_chat(id, "Twoj nick zostal pomyslnie^x04 zarejestrowany^x01.");
-			cod_print_chat(id, "Wpisz w konsoli komende^x04 setinfo ^"_%s^" ^"%s^"^x01, aby twoje haslo bylo ladowane automatycznie.", cvarSetinfo, playerData[id][PASSWORD]);
 
-			cod_cmd_execute(id, "setinfo _%s %s", cvarSetinfo, playerData[id][PASSWORD]);
-			cod_cmd_execute(id, "writecfg %s", cvarSetinfo);
+			if (cvarAutoLoginConfig) {
+				cod_print_chat(id, "Wpisz w konsoli komende^x04 setinfo ^"_%s^" ^"%s^"^x01, aby twoje haslo bylo ladowane automatycznie.", cvarSetinfo, playerData[id][PASSWORD]);
+
+				cod_cmd_execute(id, "setinfo _%s %s", cvarSetinfo, playerData[id][PASSWORD]);
+				cod_cmd_execute(id, "writecfg %s", cvarSetinfo);
+			} else {
+				cod_print_chat(id, "Dopisz komende^x04 setinfo ^"_%s^" ^"%s^"^x01 do swojego configu, aby twoje haslo bylo ladowane automatycznie.", cvarSetinfo, playerData[id][PASSWORD]);
+			}
 
 			client_cmd(id, "chooseteam");
 			engclient_cmd(id, "chooseteam");
@@ -549,10 +558,15 @@ public change_step_three(id)
 	show_hudmessage(id, "Twoje haslo zostalo pomyslnie zmienione.");
 
 	cod_print_chat(id, "Twoje haslo zostalo pomyslnie^x04 zmienione^x01.");
-	cod_print_chat(id, "Wpisz w konsoli komende^x04 setinfo ^"_%s^" ^"%s^"^x01, aby twoje haslo bylo ladowane automatycznie.", cvarSetinfo, playerData[id][PASSWORD]);
 
-	cod_cmd_execute(id, "setinfo _%s %s", cvarSetinfo, playerData[id][PASSWORD]);
-	cod_cmd_execute(id, "writecfg %s", cvarSetinfo);
+	if (cvarAutoLoginConfig) {
+		cod_print_chat(id, "Wpisz w konsoli komende^x04 setinfo ^"_%s^" ^"%s^"^x01, aby twoje haslo bylo ladowane automatycznie.", cvarSetinfo, playerData[id][PASSWORD]);
+
+		cod_cmd_execute(id, "setinfo _%s %s", cvarSetinfo, playerData[id][PASSWORD]);
+		cod_cmd_execute(id, "writecfg %s", cvarSetinfo);
+	} else {
+		cod_print_chat(id, "Dopisz komende^x04 setinfo ^"_%s^" ^"%s^"^x01 do swojego configu, aby twoje haslo bylo ladowane automatycznie.", cvarSetinfo, playerData[id][PASSWORD]);
+	}
 
 	return PLUGIN_HANDLED;
 }
@@ -688,7 +702,7 @@ public load_account_handle(failState, Handle:query, error[], errorNum, tempId[],
 
 			formatex(info, charsmax(info), "_%s", cvarSetinfo);
 
-			cod_cmd_execute(id, "exec %s.cfg", cvarSetinfo);
+			if (cvarAutoLoginConfig) cod_cmd_execute(id, "exec %s.cfg", cvarSetinfo);
 
 			get_user_info(id, info, password, charsmax(password));
 
@@ -704,7 +718,7 @@ public load_account_handle(failState, Handle:query, error[], errorNum, tempId[],
 				account_menu(id, true);
 			}
 
-			cod_cmd_execute(id, "exec config.cfg");
+			if (cvarAutoLoginConfig) cod_cmd_execute(id, "exec config.cfg");
 		}
 	}
 
