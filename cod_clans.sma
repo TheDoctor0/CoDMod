@@ -2716,7 +2716,7 @@ stock save_member(id, status = 0, change = 0, const name[] = "")
 	if (status) {
 		if (change) formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '%i', flag = '%i' WHERE name = ^"%s^"", clan[id], status, safeName);
 		else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET flag = '%i' WHERE name = ^"%s^"", status, safeName);
-	} else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '0', flag = '%i', honor = '0' WHERE name = ^"%s^"", safeName, STATUS_NONE);
+	} else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '0', flag = '0', honor = '0' WHERE name = ^"%s^"", safeName);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
