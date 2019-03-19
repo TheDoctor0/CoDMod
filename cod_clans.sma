@@ -50,9 +50,9 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_clans_next_skill_cost", "500"), cvarNextSkillCost);
 	bind_pcvar_num(create_cvar("cod_clans_members_per_level", "1"), cvarMembersPerLevel);
 	bind_pcvar_num(create_cvar("cod_clans_health_per_level", "1"), cvarHealthPerLevel);
-	bind_pcvar_num(create_cvar("cod_clans_gravity_per_level", "2"), cvarGravityPerLevel);
+	bind_pcvar_num(create_cvar("cod_clans_gravity_per_level", "5"), cvarGravityPerLevel);
 	bind_pcvar_num(create_cvar("cod_clans_damage_per_level", "1"), cvarDamagePerLevel);
-	bind_pcvar_num(create_cvar("cod_clans_exp_per_level", "2"), cvarExpPerLevel);
+	bind_pcvar_num(create_cvar("cod_clans_exp_per_level", "3"), cvarExpPerLevel);
 
 	register_message(get_user_msgid("SayText"), "say_text");
 
@@ -139,7 +139,7 @@ public cod_spawned(id, respawn)
 
 	if (!get_bit(id, info) && is_user_alive(id)) set_task(5.0, "show_clan_info", id + TASK_INFO);
 
-	cod_add_user_gravity(id, -800.0 * (cvarGravityPerLevel * get_clan_info(clan[id], CLAN_GRAVITY) / 100.0), ROUND);
+	cod_add_user_gravity(id, -(cvarGravityPerLevel * get_clan_info(clan[id], CLAN_GRAVITY) / 100.0), ROUND);
 
 	return PLUGIN_CONTINUE;
 }

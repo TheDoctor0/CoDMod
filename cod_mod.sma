@@ -3992,7 +3992,7 @@ public Float:_cod_get_user_gravity(id, type)
 	return Float:codPlayer[id][PLAYER_GRAVITY][type];
 
 public Float:_cod_get_user_speed(id, type)
-	return type == FULL? get_user_maxspeed(id) : Float:codPlayer[id][PLAYER_GRAVITY][type];
+	return type == FULL? get_user_maxspeed(id) : Float:codPlayer[id][PLAYER_SPEED][type];
 
 public _cod_get_user_armor(id, value)
 	return cs_get_user_armor(id);
