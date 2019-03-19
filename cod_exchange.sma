@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Exchange"
-#define VERSION "1.1.1"
+#define VERSION "1.1.2"
 #define AUTHOR "O'Zone"
 
 new const commandExchange[][] = { "wymien", "say /exchange", "say_team /exchange", "say /zamien", "say_team /zamien", "say /wymien", "say_team /wymien" };
@@ -145,13 +145,13 @@ public exchange_item_handle(id, menu, item)
 	}
 
 	if (get_bit(player, cooldown)) {
-		cod_print_chat(id, "Wybrany gracz musi poczekac^x03 1 runde^x01, aby wymienic sie przedmiotem.");
+		cod_print_chat(id, "Wybrany gracz musi poczekac^x03 jedna runde^x01, aby wymienic sie przedmiotem.");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (get_bit(id, cooldown)) {
-		cod_print_chat(id, "Musisz poczekac^x03 1 runde^x01, aby wymienic sie tym przedmiotem.");
+		cod_print_chat(id, "Musisz poczekac^x03 jedna runde^x01, aby wymienic sie tym przedmiotem.");
 
 		return PLUGIN_HANDLED;
 	}
@@ -177,7 +177,7 @@ public exchange_item_handle(id, menu, item)
 
 	new menu = menu_create(menuData, "exchange_item_question");
 
-	num_to_str(player, playerId, charsmax(playerId));
+	num_to_str(id, playerId, charsmax(playerId));
 
 	menu_additem(menu, "Tak", playerId);
 	menu_additem(menu, "Nie", playerId);
@@ -218,7 +218,7 @@ public exchange_item_question(id, menu, item)
 	}
 
 	if (get_bit(player, cooldown)) {
-		cod_print_chat(id, "Gracz proponujacy wymiane musi poczekac^x03 1 runde^x01, aby wymienic sie przedmiotem.");
+		cod_print_chat(id, "Gracz proponujacy wymiane musi poczekac^x03 jedna runde^x01, aby wymienic sie przedmiotem.");
 
 		return PLUGIN_HANDLED;
 	}
@@ -238,8 +238,8 @@ public exchange_item_question(id, menu, item)
 	switch (item) {
 		case 0: {
 			new name[MAX_NAME], playerName[MAX_NAME], itemName[MAX_NAME], playerItemName[MAX_NAME],
-				playerItemValue, playerItemId = cod_get_user_item(player, playerItemValue), itemValue, itemId = cod_get_user_item(id, itemValue),
-				playerItemDurability = cod_get_item_durability(player), itemDurability = cod_get_item_durability(id);
+				itemValue, itemId = cod_get_user_item(id, itemValue), itemDurability = cod_get_item_durability(id),
+				playerItemValue, playerItemId = cod_get_user_item(player, playerItemValue), playerItemDurability = cod_get_item_durability(player);
 
 			get_user_name(player, playerName, charsmax(playerName));
 			get_user_name(id, name, charsmax(name));
@@ -247,8 +247,8 @@ public exchange_item_question(id, menu, item)
 			cod_get_item_name(cod_get_user_item(player), playerItemName, charsmax(playerItemName));
 			cod_get_item_name(cod_get_user_item(id), itemName, charsmax(itemName));
 
-			cod_set_user_item(player, itemId);
-			cod_set_user_item(id, playerItemId);
+			cod_set_user_item(player, itemId, itemValue);
+			cod_set_user_item(id, playerItemId, playerItemValue);
 
 			cod_set_item_durability(player, itemDurability);
 			cod_set_item_durability(id, playerItemDurability);
@@ -256,8 +256,8 @@ public exchange_item_question(id, menu, item)
 			set_bit(player, cooldown);
 			set_bit(id, cooldown);
 
-			cod_print_chat(player, "Wymieniles sie przedmiotem z^x03 %s^x01. Otrzymales^x03 %s^x01.", name, playerItemName);
-			cod_print_chat(id, "Wymieniles sie przedmiotem z^x03 %s^x01. Otrzymales^x03 %s^x01.", playerName, itemName);
+			cod_print_chat(player, "Wymieniles sie przedmiotem z^x03 %s^x01. Otrzymales^x03 %s^x01.", name, itemName);
+			cod_print_chat(id, "Wymieniles sie przedmiotem z^x03 %s^x01. Otrzymales^x03 %s^x01.", playerName, playerItemName);
 		} case 1: cod_print_chat(player, "Wybrany gracz nie zgodzil sie na wymiane przedmiotami.");
 	}
 
@@ -326,7 +326,7 @@ public give_item_handle(id, menu, item)
 	}
 
 	if (get_bit(id, cooldown)) {
-		cod_print_chat(id, "Musisz poczekac^x03 1 runde^x01, aby oddac ten przedmiot.");
+		cod_print_chat(id, "Musisz poczekac^x03 jedna runde^x01, aby oddac ten przedmiot.");
 
 		return PLUGIN_HANDLED;
 	}

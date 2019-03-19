@@ -281,7 +281,7 @@ native cod_upgrade_user_item(id, check = 0);
 /*------------------------------
 Return item id using item name.
 ------------------------------*/
-native cod_get_item_id(szItem[]);
+native cod_get_item_id(itemName[]);
 
 /*------------------------------
 Return item name.
