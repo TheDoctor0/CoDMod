@@ -3165,7 +3165,7 @@ public reset_attributes(id, type)
 		if (codPlayer[id][PLAYER_ELIMINATOR][i]) codPlayer[id][PLAYER_ELIMINATOR][ALL] = true;
 		if (codPlayer[id][PLAYER_REDUCER][i]) codPlayer[id][PLAYER_REDUCER][ALL] = true;
 
-		if (codPlayer[id][PLAYER_JUMPS][i]) jumps += codPlayer[id][PLAYER_JUMPS][i];
+		if (codPlayer[id][PLAYER_JUMPS][i]) codPlayer[id][PLAYER_JUMPS][ALL] += codPlayer[id][PLAYER_JUMPS][i];
 
 		if (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i] == FULL) unlimitedWeapons = FULL;
 		else if (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i]) unlimitedWeapons == FULL ? (unlimitedWeapons = FULL) : (unlimitedWeapons |= codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i]);
@@ -3181,7 +3181,7 @@ public reset_attributes(id, type)
 	codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] = eliminatorWeapons;
 	codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] = reductorWeapons;
 
-	codPlayer[id][PLAYER_JUMPS][ALL] = codPlayer[id][PLAYER_LEFT_JUMPS] = jumps;
+	codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS][ALL];
 
 	set_user_footsteps(id, codPlayer[id][PLAYER_FOOTSTEPS][ALL]);
 	set_user_noclip(id, codPlayer[id][PLAYER_NOCLIP][ALL]);
@@ -4056,6 +4056,7 @@ public _cod_set_user_teleports(id, value, type)
 public _cod_set_user_multijumps(id, value, type)
 {
 	codPlayer[id][PLAYER_JUMPS][type] = max(0, value);
+	codPlayer[id][PLAYER_JUMPS][ALL] = 0;
 
 	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_JUMPS][ALL] += codPlayer[id][PLAYER_JUMPS][i];
 
@@ -4124,6 +4125,7 @@ public _cod_add_user_teleports(id, value, type)
 public _cod_add_user_multijumps(id, value, type)
 {
 	codPlayer[id][PLAYER_JUMPS][type] = max(0, codPlayer[id][PLAYER_JUMPS][type] + value);
+	codPlayer[id][PLAYER_JUMPS][ALL] = 0;
 
 	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_JUMPS][ALL] += codPlayer[id][PLAYER_JUMPS][i];
 
