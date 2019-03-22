@@ -70,13 +70,11 @@ public cod_player_prethink(id)
 
 	if (get_bit(id, flashlightActive) && flashlightBattery[id]) {
 		static flashlightR, flashlightG, flashlightB;
-		
+
 		if ((flashlightR += 1 + random_num(0, 2)) > 250) flashlightR -= 245;
-		
 		if ((flashlightG += 1 + random_num(-1, 1)) > 250) flashlightG -= 245;
-		
 		if ((flashlightB += -1 + random_num(-1, 1)) < 5) flashlightB += 240;
-		
+
 		static origin[3];
 
 		get_user_origin(id, origin, 3);
@@ -93,7 +91,7 @@ public cod_player_prethink(id)
 		write_byte(1);
 		write_byte(90);
 		message_end();
-		
+
 		static target, bodyPart, render;
 
 		get_user_aiming(id, target, bodyPart);

@@ -113,20 +113,18 @@ public client_putinserver(id)
 	set_task(0.1, "load_stats", id);
 }
 
-public amxbans_admin_connect(id)
-    client_authorized_post(id);
-
-public client_authorized(id)
-    client_authorized_post(id);
-
-public client_authorized_post(id)
-    playerStats[id][ADMIN] = (get_user_flags(id) & ADMIN_FLAG) ? 1 : 0;
-
 public client_disconnected(id)
 {
 	remove_task(id);
 
 	save_stats(id, 1);
+}
+
+public cod_flags_changed(id, flags)
+{
+	playerStats[id][ADMIN] = (flags & ADMIN_FLAG) ? 1 : 0;
+
+	save_stats(id);
 }
 
 public cod_reset_data()

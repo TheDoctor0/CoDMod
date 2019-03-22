@@ -536,6 +536,21 @@ public client_disconnected(id)
 	}
 }
 
+public cod_flags_changed(id, flags)
+{
+	if (!codPlayer[id][PLAYER_CLASS]) return;
+
+	new flag = get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_FLAG);
+
+	if (flag != NONE && !(flags & flag)) {
+		chat_print(id, "Nie posiadasz uprawnien do korzystania z tej klasy i zostanie ona zmieniona w nastepnej rundzie!");
+
+		codPlayer[id][PLAYER_NEW_CLASS] = 0;
+
+		return;
+	}
+}
+
 public create_arrays()
 {
 	new codItem[itemInfo], codClass[classInfo], codRender[renderInfo];
@@ -800,7 +815,7 @@ public select_class_confirm(id, menu, item)
 
 	menu_destroy(menu);
 
-	if (class == codPlayer[id][PLAYER_CLASS] && !codPlayer[id][PLAYER_NEW_CLASS]) {
+	if (class == codPlayer[id][PLAYER_CLASS] && codPlayer[id][PLAYER_NEW_CLASS] == NONE) {
 		chat_print(id, "To twoja aktualnie wybrana klasa.");
 
 		return PLUGIN_CONTINUE;
@@ -808,7 +823,7 @@ public select_class_confirm(id, menu, item)
 
 	new flag = get_class_info(class, CLASS_FLAG);
 
-	if (flag != NONE && !(get_user_flags(id) & flag)) {
+	if (flag != NONE && !(cod_get_user_flags(id) & flag)) {
 		chat_print(id, "Nie posiadasz uprawnien do korzystania z tej klasy!");
 
 		return PLUGIN_CONTINUE;
@@ -2017,7 +2032,7 @@ public player_spawn(id)
 {
 	if (!cod_check_account(id)) return PLUGIN_HANDLED;
 
-	if (codPlayer[id][PLAYER_NEW_CLASS]) set_new_class(id);
+	if (codPlayer[id][PLAYER_NEW_CLASS] != NONE) set_new_class(id);
 
 	if (!codPlayer[id][PLAYER_CLASS]) {
 		select_fraction(id);
@@ -2954,7 +2969,7 @@ public set_new_class(id)
 	}
 
 	codPlayer[id][PLAYER_CLASS] = codPlayer[id][PLAYER_NEW_CLASS];
-	codPlayer[id][PLAYER_NEW_CLASS] = 0;
+	codPlayer[id][PLAYER_NEW_CLASS] = NONE;
 
 	execute_forward_ignore_two_params(codForwards[CLASS_CHANGED], id, codPlayer[id][PLAYER_CLASS]);
 
@@ -3321,6 +3336,8 @@ public reset_player(id)
 		codPlayer[id][PLAYER_REDUCER_WEAPONS][i] = 0;
 		codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i] = 0;
 	}
+
+	codPlayer[id][PLAYER_NEW_CLASS] = NONE;
 
 	codPlayer[id][PLAYER_HUD_RED] = 0;
 	codPlayer[id][PLAYER_HUD_GREEN] = 255;

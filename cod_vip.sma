@@ -2,8 +2,10 @@
 #include <cod>
 
 #define PLUGIN "CoD VIP"
-#define VERSION "1.2.1"
+#define VERSION "1.2.2"
 #define AUTHOR "O'Zone"
+
+#define VIP_FLAG ADMIN_LEVEL_H
 
 new Array:listVIPs, vip;
 
@@ -26,23 +28,14 @@ public plugin_init()
 }
 
 public plugin_natives()
-{
 	register_native("cod_get_user_vip", "_cod_get_user_vip", 1);
-	register_native("cod_set_user_vip", "_cod_set_user_vip", 1);
-}
 
 public plugin_end()
 	ArrayDestroy(listVIPs);
 
-public amxbans_admin_connect(id)
-	client_authorized_post(id);
-
-public client_authorized(id)
-	client_authorized_post(id);
-
-public client_authorized_post(id)
+public cod_flags_changed(id, flags)
 {
-	if (get_user_flags(id) & ADMIN_LEVEL_H) {
+	if (flags & VIP_FLAG) {
 		set_bit(id, vip);
 
 		new name[MAX_NAME], tempName[MAX_NAME], size = ArraySize(listVIPs);
@@ -56,12 +49,15 @@ public client_authorized_post(id)
 		}
 
 		ArrayPushString(listVIPs, name);
-	}
+	} else remove_vip(id);
 
 	return PLUGIN_CONTINUE;
 }
 
 public client_disconnected(id)
+	remove_vip(id);
+
+public remove_vip(id)
 {
 	if (get_bit(id, vip)) {
 		rem_bit(id, vip);
@@ -218,6 +214,3 @@ public say_text(msgId, msgDest, msgEnt)
 
 public _cod_get_user_vip(id)
 	return get_bit(id, vip);
-
-public _cod_set_user_vip(id)
-	client_authorized(id, "");

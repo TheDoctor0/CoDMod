@@ -960,6 +960,16 @@ If id > 0 will remove only ents owned by that player.
 native cod_remove_ents(id = 0, className[]);
 
 /*------------------------------
+Get player access flags.
+------------------------------*/
+native cod_get_user_flags(id);
+
+/*------------------------------
+Set player access flags.
+------------------------------*/
+native cod_set_user_flags(id, flags);
+
+/*------------------------------
 Register new item and return its id.
 ValueMin is normal item value or random min value.
 ValueMax is random max value.
@@ -1331,3 +1341,8 @@ forward cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damag
 Class function for victim damage change.
 ------------------------------*/
 forward cod_class_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace);
+
+/*------------------------------
+Class forward executed on player flags change.
+------------------------------*/
+forward cod_flags_changed(id, flags);
