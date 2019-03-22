@@ -3149,11 +3149,8 @@ public reset_attributes(id, type)
 		if (codPlayer[id][PLAYER_UNLIMITED_AMMO][i]) codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] = true;
 		if (codPlayer[id][PLAYER_ELIMINATOR][i]) codPlayer[id][PLAYER_ELIMINATOR][ALL] = true;
 		if (codPlayer[id][PLAYER_REDUCER][i]) codPlayer[id][PLAYER_REDUCER][ALL] = true;
-		if (codPlayer[id][PLAYER_JUMPS][i]) {
-			codPlayer[id][PLAYER_JUMPS][ALL] = true;
 
-			jumps += codPlayer[id][PLAYER_JUMPS][i];
-		}
+		if (codPlayer[id][PLAYER_JUMPS][i]) jumps += codPlayer[id][PLAYER_JUMPS][i];
 
 		if (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i] == FULL) unlimitedWeapons = FULL;
 		else if (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i]) unlimitedWeapons == FULL ? (unlimitedWeapons = FULL) : (unlimitedWeapons |= codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][i]);
@@ -3169,7 +3166,7 @@ public reset_attributes(id, type)
 	codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][ALL] = eliminatorWeapons;
 	codPlayer[id][PLAYER_REDUCER_WEAPONS][ALL] = reductorWeapons;
 
-	codPlayer[id][PLAYER_LEFT_JUMPS] = jumps;
+	codPlayer[id][PLAYER_JUMPS][ALL] = codPlayer[id][PLAYER_LEFT_JUMPS] = jumps;
 
 	set_user_footsteps(id, codPlayer[id][PLAYER_FOOTSTEPS][ALL]);
 	set_user_noclip(id, codPlayer[id][PLAYER_NOCLIP][ALL]);
