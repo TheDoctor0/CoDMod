@@ -267,19 +267,20 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 	if (equal(className, iconSprite[BOMB_DROP]) && (!get_bit(host, iconDropped) || playerTeam[host] != 1)) return FMRES_IGNORED;
 	if (equal(className, iconSprite[BOX]) && !get_bit(host, iconBox)) return FMRES_IGNORED;
 
-	static Float:hostOrigin[3], Float:targetOrigin[3], Float:middleOirgin[3], Float:wallOffset[3], Float:spriteOffset[3], Float:hitPoint[3], Float:distanceToWall, distance;
+	static Float:hostOrigin[3], Float:targetOrigin[3], Float:middleOirgin[3], Float:wallOffset[3], Float:spriteOffset[3], Float:hitPoint[3], Float:distanceToWall, Float:distance;
 
 	pev(ent, pev_origin, targetOrigin);
 
 	if (!is_in_viewcone(host, targetOrigin)) return FMRES_IGNORED;
 
+	set_es(es, ES_Effects, get_es(es, ES_Effects) & ~EF_NODRAW);
+
 	pev(host, pev_origin, hostOrigin);
 
-	distance = floatround(get_distance_f(hostOrigin, targetOrigin) / UNITS_PER_METER, floatround_floor);
+	distance = get_distance_f(hostOrigin, targetOrigin) / UNITS_PER_METER;
 
 	#if !defined LITE
-	if (!distance) return FMRES_IGNORED;
-	else if (distance <= 100) set_es(es, ES_Frame, 100.0 - distance);
+	if (distance <= 100.0) set_es(es, ES_Frame, 100.0 - distance);
 	else set_es(es, ES_Frame, 100.0);
 	#endif
 
@@ -293,13 +294,13 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 
 	xs_vec_add(wallOffset, hostOrigin, spriteOffset);
 
-	set_es(es, ES_Effects, get_es(es, ES_Effects) & ~EF_NODRAW);
-
 	if (equal(className, iconSprite[BOMB_DROP]) || equal(className, iconSprite[BOMB_PLANT]) || equal(className, iconSprite[BOMB_EXPLODE])) spriteOffset[2] += 25.0;
 	if (equal(className, iconSprite[BOX])) spriteOffset[2] += 35.0;
 
 	set_es(es, ES_Origin, spriteOffset);
-	set_es(es, ES_Scale, distance < 10.0 ? 1.0 : floatmin(floatmax(0.3, 0.0025 * distanceToWall), 1.25));
+
+	if (floatround(distanceToWall / UNITS_PER_METER, floatround_floor) < 2.0) set_es(es, ES_Scale, 0.35);
+	else set_es(es, ES_Scale, distance < 10.0 ? 1.0 : floatmin(floatmax(0.3, 0.0025 * distanceToWall), 1.25));
 
 	return FMRES_IGNORED;
 }
