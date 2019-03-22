@@ -4395,8 +4395,6 @@ public _cod_set_user_render(id, value, type, status, weapon, Float:timer)
 
 		render_change(id);
 	} else {
-		codPlayer[id][PLAYER_RENDER] = NONE;
-
 		set_user_rendering(id, kRenderFxNone, 0, 0, 0, kRenderTransAlpha, max(0, value));
 
 		set_bit(id, renderTimer);
@@ -4413,11 +4411,7 @@ public _cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:tim
 
 	set_user_rendering(id, effect, red, green, blue, model, amount);
 
-	if (timer != 0.0) {
-		codPlayer[id][PLAYER_RENDER] = NONE;
-
-		set_task(timer, "reset_glow", id + TASK_GLOW);
-	}
+	if (timer != 0.0) set_task(timer, "reset_glow", id + TASK_GLOW);
 }
 
 public reset_render(id)
@@ -4428,6 +4422,8 @@ public reset_render(id)
 
 	if (is_user_connected(id)) {
 		set_user_rendering(id);
+
+		codPlayer[id][PLAYER_RENDER] = NONE;
 
 		render_change(id);
 	}
@@ -4441,6 +4437,8 @@ public reset_glow(id)
 
 	if (is_user_connected(id)) {
 		set_user_rendering(id);
+
+		codPlayer[id][PLAYER_RENDER] = NONE;
 
 		render_change(id);
 	}
