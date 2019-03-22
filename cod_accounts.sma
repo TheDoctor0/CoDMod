@@ -88,7 +88,7 @@ public client_connect(id)
 	rem_bit(id, dataLoaded);
 	rem_bit(id, autoLogin);
 
-	if (is_user_bot(id) || is_user_hltv(id)) return;
+	if (is_user_bot(id) || is_user_hltv(id) || !cvarAccountsEnabled) return;
 
 	get_user_name(id, playerData[id][NAME], charsmax(playerData[][NAME]));
 
@@ -106,6 +106,8 @@ public client_disconnected(id)
 
 public message_show_menu(msgId, dest, id)
 {
+	if (!cvarAccountsEnabled) return PLUGIN_CONTINUE;
+
 	new const Team_Select[] = "#Team_Select";
 	static menuData[sizeof(Team_Select)];
 
@@ -124,7 +126,7 @@ public message_show_menu(msgId, dest, id)
 
 public message_vgui_menu(msgId, dest, id)
 {
-	if (get_msg_arg_int(1) == 2 && get_bit(id, dataLoaded) && playerData[id][STATUS] < LOGGED && sql != Empty_Handle) {
+	if (get_msg_arg_int(1) == 2 && cvarAccountsEnabled && get_bit(id, dataLoaded) && playerData[id][STATUS] < LOGGED && sql != Empty_Handle) {
 		set_task(0.1, "account_menu", id);
 
 		return PLUGIN_HANDLED;
@@ -135,7 +137,7 @@ public message_vgui_menu(msgId, dest, id)
 
 public cod_player_prethink(id)
 {
-	if (is_user_connected(id) && get_bit(id, dataLoaded) && !is_user_bot(id) && !is_user_hltv(id) && !is_user_alive(id) && playerData[id][STATUS] < LOGGED && sql != Empty_Handle) {
+	if (cvarAccountsEnabled && is_user_connected(id) && get_bit(id, dataLoaded) && !is_user_bot(id) && !is_user_hltv(id) && !is_user_alive(id) && playerData[id][STATUS] < LOGGED && sql != Empty_Handle) {
 		static msgScreenFade;
 
 		if (!msgScreenFade) msgScreenFade = get_user_msgid("ScreenFade");
@@ -154,7 +156,7 @@ public cod_player_prethink(id)
 
 public check_account(id)
 {
-	if (playerData[id][STATUS] < LOGGED) {
+	if (cvarAccountsEnabled && playerData[id][STATUS] < LOGGED) {
 		account_menu(id, true);
 
 		return PLUGIN_HANDLED;
@@ -172,7 +174,7 @@ public kick_player(id)
 
 public account_menu(id, sound)
 {
-	if (!is_user_connected(id) || !is_user_valid(id)) return PLUGIN_HANDLED;
+	if (!cvarAccountsEnabled || !is_user_connected(id) || !is_user_valid(id)) return PLUGIN_HANDLED;
 
 	if (!get_bit(id, dataLoaded)) {
 		remove_task(id);
@@ -233,7 +235,7 @@ public account_menu_callback(id, menu, item)
 
 public account_menu_handle(id, menu, item)
 {
-	if (!is_user_connected(id)) return PLUGIN_HANDLED;
+	if (!cvarAccountsEnabled || !is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT || item == 5) {
 		menu_destroy(menu);
@@ -295,7 +297,7 @@ public account_menu_handle(id, menu, item)
 
 public login_account(id)
 {
-	if (playerData[id][STATUS] != NOT_LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
+	if (!cvarAccountsEnabled || playerData[id][STATUS] != NOT_LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 
 	new password[MAX_PASSWORD];
 
@@ -337,7 +339,7 @@ public login_account(id)
 
 public register_step_one(id)
 {
-	if ((playerData[id][STATUS] != NOT_REGISTERED && playerData[id][STATUS] != GUEST) || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
+	if (!cvarAccountsEnabled || (playerData[id][STATUS] != NOT_REGISTERED && playerData[id][STATUS] != GUEST) || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 
 	new password[MAX_PASSWORD];
 
@@ -369,7 +371,7 @@ public register_step_one(id)
 
 public register_step_two(id)
 {
-	if ((playerData[id][STATUS] != NOT_REGISTERED && playerData[id][STATUS] != GUEST) || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
+	if (!cvarAccountsEnabled || (playerData[id][STATUS] != NOT_REGISTERED && playerData[id][STATUS] != GUEST) || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 
 	new password[MAX_PASSWORD];
 
@@ -406,7 +408,7 @@ public register_step_two(id)
 
 public register_confirmation_handle(id, menu, item)
 {
-	if (!is_user_connected(id)) return PLUGIN_HANDLED;
+	if (!cvarAccountsEnabled || !is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
 		menu_destroy(menu);
@@ -455,7 +457,7 @@ public register_confirmation_handle(id, menu, item)
 
 public change_step_one(id)
 {
-	if (playerData[id][STATUS] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
+	if (!cvarAccountsEnabled || playerData[id][STATUS] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 
 	new password[MAX_PASSWORD];
 
@@ -489,7 +491,7 @@ public change_step_one(id)
 
 public change_step_two(id)
 {
-	if (playerData[id][STATUS] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
+	if (!cvarAccountsEnabled || playerData[id][STATUS] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 
 	new password[MAX_PASSWORD];
 
@@ -532,7 +534,7 @@ public change_step_two(id)
 
 public change_step_three(id)
 {
-	if (playerData[id][STATUS] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
+	if (!cvarAccountsEnabled || playerData[id][STATUS] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 
 	new password[MAX_PASSWORD];
 
@@ -573,7 +575,7 @@ public change_step_three(id)
 
 public delete_account(id)
 {
-	if (playerData[id][STATUS] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
+	if (!cvarAccountsEnabled || playerData[id][STATUS] != LOGGED || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 
 	new password[MAX_PASSWORD];
 

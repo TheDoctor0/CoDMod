@@ -3152,7 +3152,7 @@ public reset_attributes(id, type)
 	codPlayer[id][PLAYER_REDUCER][ALL] = 0;
 	codPlayer[id][PLAYER_JUMPS][ALL] = 0;
 
-	new unlimitedWeapons, eliminatorWeapons, reductorWeapons, jumps;
+	new unlimitedWeapons, eliminatorWeapons, reductorWeapons;
 
 	for (new i = CLASS; i <= DEATH; i++) {
 		if (codPlayer[id][PLAYER_FOOTSTEPS][i]) codPlayer[id][PLAYER_FOOTSTEPS][ALL] = true;
