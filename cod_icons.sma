@@ -44,8 +44,8 @@ new const iconSprite[icons][] = {
 };
 #endif
 
-new playerName[MAX_PLAYERS + 1][MAX_NAME], bombEntity[icons], iconEntity[icons], playerTeam[MAX_PLAYERS + 1],bool:mapEnd,
-	bool:roundStarted, dataLoaded, iconBombSites, iconDropped, iconPlanted, iconBox, bombTimer, cvarC4, iconsVault;
+new playerName[MAX_PLAYERS + 1][MAX_NAME], bombEntity[icons], iconEntity[icons], playerTeam[MAX_PLAYERS + 1],
+	bool:mapEnd, dataLoaded, iconBombSites, iconDropped, iconPlanted, iconBox, bombTimer, cvarC4, iconsVault;
 
 public plugin_init()
 {
@@ -179,41 +179,24 @@ public bomb_timer()
 public cod_box_dropped(ent)
 	spawn_sprite(ent, BOX);
 
-public cod_start_round()
-	roundStarted = true;
-
 public cod_new_round()
 {
 	remove_icon(iconEntity[BOMB_DROP], BOMB_DROP);
 	remove_icon(iconEntity[BOMB_PLANT], BOMB_PLANT);
 	remove_icon(iconEntity[BOMB_EXPLODE], BOMB_EXPLODE);
 
-	new ent = NONE;
-
-	while ((ent = find_ent_by_class(ent, iconSprite[BOX]))) {
-		if (pev_valid(ent)) remove_entity(ent);
-	}
-
-	roundStarted = true;
+	remove_entity_name(iconSprite[BOX]);
 }
 
 public cod_end_round()
 {
 	bombTimer = NONE;
 
-	roundStarted = false;
-
 	bombEntity[BOMB_PLANT] = 0;
 
 	remove_icon(iconEntity[BOMB_DROP], BOMB_DROP);
 	remove_icon(iconEntity[BOMB_PLANT], BOMB_PLANT);
 	remove_icon(iconEntity[BOMB_EXPLODE], BOMB_EXPLODE);
-
-	new ent = NONE;
-
-	while ((ent = find_ent_by_class(ent, iconSprite[BOX]))) {
-		if (pev_valid(ent)) remove_entity(ent);
-	}
 
 	remove_task(TASK_PLANT);
 	remove_task(TASK_PLANTED);
@@ -260,8 +243,6 @@ public check_visible(ent, pSet)
 
 	if (!check_classname(className)) return FMRES_IGNORED;
 
-	if (!roundStarted) return FMRES_IGNORED;
-
 	forward_return(FMV_CELL, 1);
 
 	return FMRES_SUPERCEDE;
@@ -279,7 +260,7 @@ public fm_fullpack(es, e, ent, host, hostflags, player, pSet)
 
 	set_es(es, ES_Effects, get_es(es, ES_Effects) | EF_NODRAW);
 
-	if (!roundStarted || !is_user_alive(host)) return FMRES_IGNORED;
+	if (!is_user_alive(host)) return FMRES_IGNORED;
 
 	if ((equal(className, iconSprite[BOMBSITE_A]) || equal(className, iconSprite[BOMBSITE_B])) && (!get_bit(host, iconBombSites) || is_valid_ent(bombEntity[BOMB_PLANT]))) return FMRES_IGNORED;
 	if ((equal(className, iconSprite[BOMB_PLANT]) || equal(className, iconSprite[BOMB_EXPLODE])) && !get_bit(host, iconPlanted)) return FMRES_IGNORED;

@@ -6,7 +6,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Box"
-#define VERSION "1.2.2"
+#define VERSION "1.2.3"
 #define AUTHOR "O'Zone"
 
 new const boxClass[] = "cod_box", boxModel[] = "models/CoDMod/box.mdl";
@@ -36,17 +36,11 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 	if (cvarBoxChance && random_num(1, cvarBoxChance) == 1) create_box(victim);
 
 public cod_new_round()
-{
-	new ent = NONE;
-
-	while ((ent = find_ent_by_class(ent, boxClass))) {
-		if (pev_valid(ent)) remove_entity(ent);
-	}
-}
+	remove_entity_name(boxClass);
 
 public create_box(id)
 {
-	new ent, Float:origin[3];
+	new ret, ent, Float:origin[3];
 
 	entity_get_vector(id, EV_VEC_origin, origin);
 
@@ -69,7 +63,7 @@ public create_box(id)
 	entity_set_int(ent, EV_INT_solid, SOLID_TRIGGER);
 	set_pev(ent, pev_movetype, MOVETYPE_FLY);
 
-	execute_forward_ignore_one_param(boxDroppedForward, ent);
+	ExecuteForward(boxDroppedForward, ret, ent);
 
 	return PLUGIN_CONTINUE;
 }
@@ -202,11 +196,4 @@ stock Float:distance_to_floor(Float:start[3], ignoremonsters = 1)
 	new Float:ret = start[2] - end[2];
 
 	return ret > 0 ? ret : 0.0;
-}
-
-stock execute_forward_ignore_one_param(forwardHandle, param)
-{
-	static ret;
-
-	return ExecuteForward(forwardHandle, ret, param);
 }
