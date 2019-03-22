@@ -21,8 +21,12 @@ public cod_item_enabled(id, value)
 	rem_bit(id, itemUsed);
 
 public cod_item_spawned(id, respawn)
+{
+	cod_set_user_render(id, 256, ITEM);
+
 	if (!respawn) rem_bit(id, itemUsed);
-	
+}
+
 public cod_item_skill_used(id)
 {
 	if (get_bit(id, itemUsed)) {
@@ -32,7 +36,7 @@ public cod_item_skill_used(id)
 	}
 
 	cod_set_user_render(id, 0, ITEM, RENDER_ALWAYS);
-		
+
 	set_bit(id, itemUsed);
 
 	return COD_CONTINUE;
