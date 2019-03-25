@@ -88,7 +88,7 @@ enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, 
 	DAMAGE_INFLICT, WEAPON_DEPLOY, CUR_WEAPON, KILLED, SPAWNED, CMD_START, PRETHINK, BOMB_DROPPED, BOMB_PICKED, BOMB_PLANTING,
 	BOMB_PLANTED, BOMB_DEFUSING, BOMB_DEFUSED, BOMB_EXPLODED, HOSTAGE_KILLED, HOSTAGE_RESCUED, HOSTAGES_RESCUED, TEAM_ASSIGN,
 	NEW_ROUND, START_ROUND, RESTART_ROUND, END_ROUND, WIN_ROUND, END_MAP, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE,
-	THUNDER_REACH, TELEPORT_USED, RESET_DATA, RESET_STATS_DATA, RESET_ALL_DATA };
+	THUNDER_REACH, TELEPORT_USED, RESET_DATA, RESET_STATS_DATA, RESET_ALL_DATA, FLAGS_CHANGED };
 
 enum _:itemInfo { ITEM_NAME[MAX_NAME], ITEM_DESC[MAX_DESC], ITEM_PLUGIN, ITEM_RANDOM_MIN, ITEM_RANDOM_MAX, ITEM_GIVE, ITEM_DROP,
 	ITEM_SPAWNED, ITEM_KILL, ITEM_KILLED, ITEM_SKILL_USED, ITEM_UPGRADE, ITEM_VALUE, ITEM_DAMAGE_ATTACKER, ITEM_DAMAGE_VICTIM };
@@ -101,9 +101,9 @@ enum _:playerClassInfo { PCLASS_LEVEL, PCLASS_EXP, PCLASS_HEAL, PCLASS_INT, PCLA
 
 enum _:renderInfo { RENDER_TYPE, RENDER_VALUE, RENDER_STATUS, RENDER_WEAPON };
 
-enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL, PLAYER_INT, PLAYER_STAM,
-	PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTRA_HEAL, PLAYER_EXTRA_INT, PLAYER_EXTRA_STAM, PLAYER_EXTRA_STR, PLAYER_EXTRA_COND, PLAYER_EXTRA_WEAPONS, PLAYER_WEAPON,
-	PLAYER_WEAPONS, PLAYER_STATUS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_SPAWNED, PLAYER_RENDER, PLAYER_KS, PLAYER_TIME_KS, Float:PLAYER_LAST_ROCKET, Float:PLAYER_LAST_MINE,
+enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL, PLAYER_INT, PLAYER_STAM, PLAYER_STR,
+	PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTRA_HEAL, PLAYER_EXTRA_INT, PLAYER_EXTRA_STAM, PLAYER_EXTRA_STR, PLAYER_EXTRA_COND, PLAYER_EXTRA_WEAPONS, PLAYER_WEAPON, PLAYER_WEAPONS,
+	PLAYER_STATUS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_SPAWNED, PLAYER_RENDER, PLAYER_FLAGS, PLAYER_KS, PLAYER_TIME_KS, Float:PLAYER_LAST_ROCKET, Float:PLAYER_LAST_MINE,
 	Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, SKILL_USE,
 	PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1],
 	PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_RESISTANCE[ALL + 1], PLAYER_GODMODE[ALL + 1], PLAYER_NOCLIP[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1],
@@ -119,6 +119,9 @@ new Array:codItems, Array:codClasses, Array:codPromotions, Array:codFractions, A
 
 new Handle:sql, Handle:connection, bool:sqlConnected, bool:skillsBlocked, bool:nightExp, bool:mapEnd, bool:freezeTime = true,
 	hudInfo, hudSync, hudSync2, dataLoaded, hudLoaded, resetStats, renderTimer, glowActive, roundStart, lastInfo;
+
+forward amxbans_admin_connect(id);
+forward client_admin(id, flags);
 
 public plugin_init()
 {
@@ -249,6 +252,7 @@ public plugin_init()
 	codForwards[SPAWNED] = CreateMultiForward("cod_spawned", ET_IGNORE, FP_CELL, FP_CELL);
 	codForwards[CMD_START] = CreateMultiForward("cod_cmd_start", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[PRETHINK] = CreateMultiForward("cod_player_prethink", ET_IGNORE, FP_CELL);
+	codForwards[FLAGS_CHANGED] = CreateMultiForward("cod_flags_changed", ET_CONTINUE, FP_CELL, FP_CELL);
 	codForwards[BOMB_PLANTING] = CreateMultiForward("cod_bomb_planting", ET_IGNORE, FP_CELL);
 	codForwards[BOMB_PLANTED] = CreateMultiForward("cod_bomb_planted", ET_IGNORE, FP_CELL);
 	codForwards[BOMB_DEFUSING] = CreateMultiForward("cod_bomb_defusing", ET_IGNORE, FP_CELL);
@@ -412,6 +416,9 @@ public plugin_natives()
 	register_native("cod_set_user_render", "_cod_set_user_render", 1);
 	register_native("cod_set_user_glow", "_cod_set_user_glow", 1);
 
+	register_native("cod_get_user_flags", "_cod_get_user_flags", 1);
+	register_native("cod_set_user_flags", "_cod_set_user_flags", 1);
+
 	register_native("cod_print_chat", "_cod_print_chat", 1);
 	register_native("cod_log_error", "_cod_log_error", 1);
 	register_native("cod_show_hud", "_cod_show_hud", 1);
@@ -523,6 +530,15 @@ public client_putinserver(id)
 	set_task(0.1, "show_info", id + TASK_SHOW_INFO, .flags = "b");
 }
 
+public amxbans_admin_connect(id)
+	update_user_flags(id, get_user_flags(id));
+
+public client_authorized(id)
+	update_user_flags(id, get_user_flags(id));
+
+public client_admin(id, flags)
+	update_user_flags(id, flags);
+
 public client_disconnected(id)
 {
 	save_data(id, mapEnd ? MAP_END : FINAL);
@@ -533,21 +549,6 @@ public client_disconnected(id)
 	if (!mapEnd) {
 		if (codPlayer[id][PLAYER_CLASS]) execute_forward_ignore_one_param(get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_DISABLED), id);
 		if (codPlayer[id][PLAYER_ITEM]) execute_forward_ignore_one_param(get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_DROP), id);
-	}
-}
-
-public cod_flags_changed(id, flags)
-{
-	if (!codPlayer[id][PLAYER_CLASS]) return;
-
-	new flag = get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_FLAG);
-
-	if (flag != NONE && !(flags & flag)) {
-		chat_print(id, "Nie posiadasz uprawnien do korzystania z tej klasy i zostanie ona zmieniona w nastepnej rundzie!");
-
-		codPlayer[id][PLAYER_NEW_CLASS] = 0;
-
-		return;
 	}
 }
 
@@ -587,7 +588,7 @@ public create_arrays()
 
 public reset_data(id)
 {
-	if (!(get_user_flags(id) & RESET_FLAG)) return PLUGIN_HANDLED;
+	if (!(codPlayer[id][PLAYER_FLAGS] & RESET_FLAG)) return PLUGIN_HANDLED;
 
 	new adminName[MAX_NAME];
 
@@ -610,7 +611,7 @@ public reset_data(id)
 
 public reset_stats_data(id)
 {
-	if (!(get_user_flags(id) & RESET_FLAG)) return PLUGIN_HANDLED;
+	if (!(codPlayer[id][PLAYER_FLAGS] & RESET_FLAG)) return PLUGIN_HANDLED;
 
 	new adminName[MAX_NAME];
 
@@ -633,7 +634,7 @@ public reset_stats_data(id)
 
 public reset_all_data(id)
 {
-	if (!(get_user_flags(id) & RESET_FLAG)) return PLUGIN_HANDLED;
+	if (!(codPlayer[id][PLAYER_FLAGS] & RESET_FLAG)) return PLUGIN_HANDLED;
 
 	new adminName[MAX_NAME];
 
@@ -823,7 +824,7 @@ public select_class_confirm(id, menu, item)
 
 	new flag = get_class_info(class, CLASS_FLAG);
 
-	if (flag != NONE && !(cod_get_user_flags(id) & flag)) {
+	if (flag != NONE && !(codPlayer[id][PLAYER_FLAGS] & flag)) {
 		chat_print(id, "Nie posiadasz uprawnien do korzystania z tej klasy!");
 
 		return PLUGIN_CONTINUE;
@@ -4484,6 +4485,33 @@ public _cod_display_icon(id, const icon[], enable, red, green, blue)
 	}
 
 	message_end();
+}
+
+public _cod_get_user_flags(id)
+	return codPlayer[id][PLAYER_FLAGS];
+
+public _cod_set_user_flags(id, flags)
+	update_user_flags(id, get_user_flags(id) | flags);
+
+public update_user_flags(id, flags)
+{
+	codPlayer[id][PLAYER_FLAGS] = flags;
+
+	set_user_flags(id, codPlayer[id][PLAYER_FLAGS]);
+
+	execute_forward_ignore_two_params(codForwards[FLAGS_CHANGED], id, flags);
+
+	if (!codPlayer[id][PLAYER_CLASS]) return;
+
+	new flag = get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_FLAG);
+
+	if (flag != NONE && !(flags & flag)) {
+		chat_print(id, "Nie posiadasz uprawnien do korzystania z tej klasy i zostanie ona zmieniona w nastepnej rundzie!");
+
+		codPlayer[id][PLAYER_NEW_CLASS] = 0;
+
+		return;
+	}
 }
 
 public _cod_print_chat(id, const text[], any:...)
