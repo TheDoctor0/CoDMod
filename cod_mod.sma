@@ -5215,7 +5215,7 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 	}
 
 	if (damage_distance > 0.0) {
-		new entList[33], foundPlayers = find_sphere_class(ent, "player", damage_distance, entList, MAX_PLAYERS), player, ret, flag;
+		new entList[MAX_PLAYERS + 1], foundPlayers = find_sphere_class(ent, "player", damage_distance, entList, MAX_PLAYERS), player, ret, flag;
 
 		for (new i = 0; i < foundPlayers; i++) {
 			player = entList[i];
