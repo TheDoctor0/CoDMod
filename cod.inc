@@ -1075,14 +1075,10 @@ Multiforward executed on cmd start event.
 Id is player id.
 Button is button pressed right now.
 Oldbutton is last pressed button.
+Flags are FL_ flags.
 Player state have types RENDER_ALWAYS, RENDER_STAND, RENDER_MOVE, RENDER_DUCK, RENDER_SHIFT.
 ------------------------------*/
-forward cod_cmd_start(id, button, oldButton, playerState);
-
-/*------------------------------
-Multiforward executed on player prethink.
-------------------------------*/
-forward cod_player_prethink(id);
+forward cod_cmd_start(id, button, oldButton, flags, playerState);
 
 /*------------------------------
 Multiforward executed on bomb planting event.

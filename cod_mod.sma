@@ -85,10 +85,10 @@ enum _:repeatingData { ATTACKER, VICTIM, DAMAGE, COUNTER, FLAGS };
 enum _:weaponSlots { PRIMARY = 1, SECONDARY, KNIFE, GRENADES, C4 };
 
 enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, SPEED_CHANGED, DAMAGE_PRE, DAMAGE_POST,
-	DAMAGE_INFLICT, WEAPON_DEPLOY, CUR_WEAPON, KILLED, SPAWNED, CMD_START, PRETHINK, BOMB_DROPPED, BOMB_PICKED, BOMB_PLANTING,
-	BOMB_PLANTED, BOMB_DEFUSING, BOMB_DEFUSED, BOMB_EXPLODED, HOSTAGE_KILLED, HOSTAGE_RESCUED, HOSTAGES_RESCUED, TEAM_ASSIGN,
-	NEW_ROUND, START_ROUND, RESTART_ROUND, END_ROUND, WIN_ROUND, END_MAP, MEDKIT_HEAL, ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE,
-	THUNDER_REACH, TELEPORT_USED, RESET_DATA, RESET_STATS_DATA, RESET_ALL_DATA, FLAGS_CHANGED };
+	DAMAGE_INFLICT, WEAPON_DEPLOY, CUR_WEAPON, KILLED, SPAWNED, CMD_START, BOMB_DROPPED, BOMB_PICKED, BOMB_PLANTING,
+	BOMB_PLANTED, BOMB_DEFUSING, BOMB_DEFUSED, BOMB_EXPLODED, HOSTAGE_KILLED, HOSTAGE_RESCUED, HOSTAGES_RESCUED,
+	TEAM_ASSIGN, NEW_ROUND, START_ROUND, RESTART_ROUND, END_ROUND, WIN_ROUND, END_MAP, MEDKIT_HEAL, ROCKET_EXPLODE,
+	MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH, TELEPORT_USED, RESET_DATA, RESET_STATS_DATA, RESET_ALL_DATA, FLAGS_CHANGED };
 
 enum _:itemInfo { ITEM_NAME[MAX_NAME], ITEM_DESC[MAX_DESC], ITEM_PLUGIN, ITEM_RANDOM_MIN, ITEM_RANDOM_MAX, ITEM_GIVE, ITEM_DROP,
 	ITEM_SPAWNED, ITEM_KILL, ITEM_KILLED, ITEM_SKILL_USED, ITEM_UPGRADE, ITEM_VALUE, ITEM_DAMAGE_ATTACKER, ITEM_DAMAGE_VICTIM };
@@ -227,7 +227,6 @@ public plugin_init()
 
 	register_forward(FM_CmdStart, "cmd_start");
 	register_forward(FM_EmitSound, "sound_emit");
-	register_forward(FM_PlayerPreThink, "player_prethink");
 
 	register_message(get_user_msgid("SayText"), "say_text");
 	register_message(get_user_msgid("AmmoX"), "message_ammo");
@@ -250,8 +249,7 @@ public plugin_init()
 	codForwards[TEAM_ASSIGN] = CreateMultiForward("cod_team_assign", ET_IGNORE, FP_CELL, FP_CELL);
 	codForwards[KILLED] = CreateMultiForward("cod_killed", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[SPAWNED] = CreateMultiForward("cod_spawned", ET_IGNORE, FP_CELL, FP_CELL);
-	codForwards[CMD_START] = CreateMultiForward("cod_cmd_start", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_CELL);
-	codForwards[PRETHINK] = CreateMultiForward("cod_player_prethink", ET_IGNORE, FP_CELL);
+	codForwards[CMD_START] = CreateMultiForward("cod_cmd_start", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL, FP_CELL, FP_CELL);
 	codForwards[FLAGS_CHANGED] = CreateMultiForward("cod_flags_changed", ET_CONTINUE, FP_CELL, FP_CELL);
 	codForwards[BOMB_PLANTING] = CreateMultiForward("cod_bomb_planting", ET_IGNORE, FP_CELL);
 	codForwards[BOMB_PLANTED] = CreateMultiForward("cod_bomb_planted", ET_IGNORE, FP_CELL);
@@ -1626,7 +1624,7 @@ public use_mine(id)
 	codPlayer[id][PLAYER_MINES][ALL]--;
 	codPlayer[id][PLAYER_MINES][USED]++;
 
-	new Float:origin[3], ent = create_entity("info_target")
+	new Float:origin[3], ent = create_entity("info_target");
 
 	entity_get_vector(id, EV_VEC_origin, origin);
 
@@ -2636,7 +2634,7 @@ stock render_count(id, type = NONE)
 
 public cmd_start(id, ucHandle)
 {
-	if (!is_user_alive(id) || freezeTime) return FMRES_IGNORED;
+	if (!is_user_alive(id) || freezeTime || !codPlayer[id][PLAYER_CLASS]) return FMRES_IGNORED;
 
 	if (codPlayer[id][SKILL_USE] > NONE) {
 		if (codPlayer[id][SKILL_USE]++ > 128) {
@@ -2644,10 +2642,11 @@ public cmd_start(id, ucHandle)
 		}
 	}
 
-	static Float:velocity[3], Float:speed, button, oldButton, playerState, ret;
+	static Float:velocity[3], Float:speed, button, oldButton, playerState, ret, flags;
 
 	button = get_uc(ucHandle, UC_Buttons);
 	oldButton = pev(id, pev_oldbuttons);
+	flags = pev(id, pev_flags);
 	playerState = RENDER_ALWAYS;
 
 	pev(id, pev_velocity, velocity);
@@ -2663,23 +2662,37 @@ public cmd_start(id, ucHandle)
 
 	if (pev(id, pev_gaitsequence) == 3) playerState |= RENDER_SHIFT;
 
-	ExecuteForward(codForwards[CMD_START], ret, id, button, oldButton, playerState);
+	ExecuteForward(codForwards[CMD_START], ret, id, button, oldButton, flags, playerState);
 
 	render_change(id, playerState);
 
-	if (!codPlayer[id][PLAYER_JUMPS][ALL]) return FMRES_IGNORED;
+	if (codPlayer[id][PLAYER_JUMPS][ALL]) {
+		if ((button & IN_JUMP) && !(flags & FL_ONGROUND) && !(oldButton & IN_JUMP) && codPlayer[id][PLAYER_LEFT_JUMPS]) {
+			codPlayer[id][PLAYER_LEFT_JUMPS]--;
 
-	new flags = pev(id, pev_flags);
+			pev(id, pev_velocity, velocity);
 
-	if ((button & IN_JUMP) && !(flags & FL_ONGROUND) && !(oldButton & IN_JUMP) && codPlayer[id][PLAYER_LEFT_JUMPS]) {
-		codPlayer[id][PLAYER_LEFT_JUMPS]--;
+			velocity[2] = random_float(265.0, 285.0);
 
-		pev(id, pev_velocity, velocity);
+			set_pev(id, pev_velocity, velocity);
+		} else if (flags & FL_ONGROUND) codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS][ALL];
+	}
 
-		velocity[2] = random_float(265.0, 285.0);
+	if (codPlayer[id][PLAYER_BUNNYHOP][ALL]) {
+		entity_set_float(id, EV_FL_fuser2, 0.0);
 
-		set_pev(id, pev_velocity, velocity);
-	} else if (flags & FL_ONGROUND) codPlayer[id][PLAYER_LEFT_JUMPS] = codPlayer[id][PLAYER_JUMPS][ALL];
+		if (!(button & IN_JUMP) || flags & FL_WATERJUMP || entity_get_int(id, EV_INT_waterlevel) >= 2 || !(flags & FL_ONGROUND)) return FMRES_IGNORED;
+
+		new Float:velocity[3];
+
+		entity_get_vector(id, EV_VEC_velocity, velocity);
+
+		velocity[2] += 250.0;
+
+		entity_set_vector(id, EV_VEC_velocity, velocity);
+
+		entity_set_int(id, EV_INT_gaitsequence, 6);
+	}
 
 	return FMRES_IGNORED;
 }
@@ -2704,35 +2717,6 @@ public sound_emit(id, channel, sound[], Float:volume, Float:attn, flags, pitch)
 		cs_set_user_nvg(id, 0);
 
 		return FMRES_SUPERCEDE;
-	}
-
-	return FMRES_IGNORED;
-}
-
-public player_prethink(id)
-{
-	if (!is_user_alive(id)) return FMRES_IGNORED;
-
-	execute_forward_ignore_one_param(codForwards[PRETHINK], id);
-
-	if (!codPlayer[id][PLAYER_BUNNYHOP][ALL]) return FMRES_IGNORED;
-
-	entity_set_float(id, EV_FL_fuser2, 0.0);
-
-	if (entity_get_int(id, EV_INT_button) & 2) {
-		new flags = entity_get_int(id , EV_INT_flags);
-
-		if (flags & FL_WATERJUMP || entity_get_int(id, EV_INT_waterlevel) >= 2 || !(flags & FL_ONGROUND)) return FMRES_IGNORED;
-
-		new Float:velocity[3];
-
-		entity_get_vector(id, EV_VEC_velocity, velocity);
-
-		velocity[2] += 250.0;
-
-		entity_set_vector(id, EV_VEC_velocity, velocity);
-
-		entity_set_int(id, EV_INT_gaitsequence, 6);
 	}
 
 	return FMRES_IGNORED;
