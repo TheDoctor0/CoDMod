@@ -20,11 +20,13 @@
 #define TASK_LOAD 		4721
 #define TASK_UPDATE 	9501
 
-new cvarMinPlayers, cvarKill, cvarKillHS, cvarKillFirst, cvarWinRound, cvarBombPlanted, cvarBombDefused,
-	cvarRescueHostage, cvarKillHostage, cvarVIPBonus;
+enum _:playerInfo { NAME[MAX_SAFE_NAME], HONOR, HONOR_GAINED };
 
-new playerName[MAX_PLAYERS + 1][MAX_SAFE_NAME], playerHonor[MAX_PLAYERS + 1], playerHonorGained[MAX_PLAYERS + 1],
-	Handle:sql, Handle:connection, bool:sqlConnected, bool:firstKill, dataLoaded, msgMoney;
+new cvarMinPlayers, cvarKill, cvarKillHS, cvarKillFirst, cvarWinRound, cvarBombPlanted,
+	cvarBombDefused,cvarRescueHostage, cvarKillHostage, cvarVIPBonus;
+
+new playerData[MAX_PLAYERS + 1][playerInfo], Handle:sql, Handle:connection,
+	bool:sqlConnected, bool:firstKill, dataLoaded, msgMoney;
 
 public plugin_init()
 {
@@ -73,8 +75,8 @@ public cod_reset_all_data()
 public clear_database()
 {
 	for (new i = 1; i <= MAX_PLAYERS; i++) {
-		playerHonor[i] = 0;
-		playerHonorGained[i] = 0;
+		playerData[i][HONOR] = 0;
+		playerData[i][HONOR_GAINED] = 0;
 
 		rem_bit(i, dataLoaded);
 	}
@@ -90,16 +92,16 @@ public clear_database()
 
 public client_putinserver(id)
 {
-	playerHonor[id] = 0;
-	playerHonorGained[id] = 0;
+	playerData[id][HONOR] = 0;
+	playerData[id][HONOR_GAINED] = 0;
 
 	rem_bit(id, dataLoaded);
 
 	if (is_user_bot(id) || is_user_hltv(id)) return;
 
-	get_user_name(id, playerName[id], charsmax(playerName[]));
+	get_user_name(id, playerData[id][NAME], charsmax(playerData[][NAME]));
 
-	cod_sql_string(playerName[id], playerName[id], charsmax(playerName[]));
+	cod_sql_string(playerData[id][NAME], playerData[id][NAME], charsmax(playerData[][NAME]));
 
 	set_task(0.1, "load_honor", id + TASK_LOAD);
 }
@@ -123,12 +125,12 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 	if (!firstKill && cvarKillFirst) {
 		firstKill = true;
 
-		playerHonorGained[killer] += get_user_bonus(killer, cvarKillFirst);
+		playerData[killer][HONOR_GAINED] = get_user_bonus(killer, cvarKillFirst);
 	}
 
-	if (cvarKill) playerHonorGained[killer] += get_user_bonus(killer, cvarKill);
+	if (cvarKill) playerData[killer][HONOR_GAINED] += get_user_bonus(killer, cvarKill);
 
-	if (hitPlace == HIT_HEAD && cvarKillHS) playerHonorGained[killer] += get_user_bonus(killer, cvarKillHS);
+	if (hitPlace == HIT_HEAD && cvarKillHS) playerData[killer][HONOR_GAINED] += get_user_bonus(killer, cvarKillHS);
 
 	save_honor(killer);
 }
@@ -140,7 +142,7 @@ public cod_win_round(team)
 	for (new id = 1; id < MAX_PLAYERS; id++) {
 		if (!cod_get_user_class(id) || get_user_team(id) != team) continue;
 
-		playerHonorGained[id] += get_user_bonus(id, cvarWinRound);
+		playerData[id][HONOR_GAINED] = get_user_bonus(id, cvarWinRound);
 
 		save_honor(id);
 	}
@@ -154,7 +156,7 @@ public cod_bomb_planted(id)
 		return;
 	}
 
-	playerHonorGained[id] += get_user_bonus(id, cvarBombPlanted);
+	playerData[id][HONOR_GAINED] = get_user_bonus(id, cvarBombPlanted);
 
 	save_honor(id);
 }
@@ -167,7 +169,7 @@ public cod_bomb_defused(id)
 		return;
 	}
 
-	playerHonorGained[id] += get_user_bonus(id, cvarBombDefused);
+	playerData[id][HONOR_GAINED] = get_user_bonus(id, cvarBombDefused);
 
 	save_honor(id);
 }
@@ -180,7 +182,7 @@ public cod_hostage_rescued(id)
 		return;
 	}
 
-	playerHonorGained[id] += get_user_bonus(id, cvarRescueHostage);
+	playerData[id][HONOR_GAINED] = get_user_bonus(id, cvarRescueHostage);
 
 	save_honor(id);
 }
@@ -193,7 +195,7 @@ public cod_hostage_killed(id)
 		return;
 	}
 
-	playerHonorGained[id] -= cod_get_user_vip(id) ? floatround(cvarKillHostage -  cvarKillHostage * (cvarVIPBonus / 100.0)) : cvarKillHostage;
+	playerData[id][HONOR_GAINED] = max(-playerData[id][HONOR], cod_get_user_vip(id) ? floatround(cvarKillHostage -  cvarKillHostage * (cvarVIPBonus / 100.0)) : cvarKillHostage);
 
 	save_honor(id);
 }
@@ -257,7 +259,7 @@ public load_honor(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_honor` WHERE name = ^"%s^"", playerName[id]);
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_honor` WHERE name = ^"%s^";", playerData[id][NAME]);
 	SQL_ThreadQuery(sql, "load_honor_handle", queryData, tempId, sizeof(tempId));
 }
 
@@ -273,20 +275,20 @@ public load_honor_handle(failState, Handle:query, error[], errorNum, tempId[], d
 	new id = tempId[0];
 
 	if (SQL_MoreResults(query)) {
-		playerHonor[id] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
+		playerData[id][HONOR] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "honor"));
 
-		if (playerHonor[id] > HONOR_LIMIT) {
-			playerHonor[id] = HONOR_LIMIT;
+		if (playerData[id][HONOR] > HONOR_LIMIT) {
+			playerData[id][HONOR] = HONOR_LIMIT;
 		}
 	} else {
 		new queryData[128];
 
-		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_honor` (`name`) VALUES (^"%s^")", playerName[id]);
+		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_honor` (`name`) VALUES (^"%s^");", playerData[id][NAME]);
 
 		SQL_ThreadQuery(sql, "ignore_handle", queryData);
 	}
 
-	update_hud(id, playerHonor[id]);
+	update_hud(id, playerData[id][HONOR]);
 
 	set_bit(id, dataLoaded);
 }
@@ -297,15 +299,17 @@ stock save_honor(id, end = 0)
 
 	new queryData[128];
 
-	delayed_hud_update(id, playerHonorGained[id]);
+	delayed_hud_update(id, playerData[id][HONOR_GAINED]);
 
-	if (playerHonorGained[id] && (playerHonor[id] + playerHonorGained[id] < 0 || playerHonor[id] + playerHonorGained[id] > HONOR_LIMIT)) {
-		playerHonor[id] = HONOR_LIMIT;
+	if (playerData[id][HONOR_GAINED] && (playerData[id][HONOR] + playerData[id][HONOR_GAINED] < 0 || playerData[id][HONOR] + playerData[id][HONOR_GAINED] > HONOR_LIMIT)) {
+		playerData[id][HONOR] = HONOR_LIMIT;
 	} else {
-		playerHonor[id] += playerHonorGained[id];
+		playerData[id][HONOR] += playerData[id][HONOR_GAINED];
 	}
 
-	formatex(queryData, charsmax(queryData), "UPDATE `cod_honor` SET honor = '%i' WHERE name = ^"%s^"", playerHonor[id], playerName[id]);
+	playerData[id][HONOR_GAINED] = 0;
+
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_honor` SET honor = '%i' WHERE name = ^"%s^";", playerData[id][HONOR], playerData[id][NAME]);
 
 	switch (end) {
 		case 0: SQL_ThreadQuery(sql, "ignore_handle", queryData);
@@ -334,7 +338,7 @@ public message_money(msgId, msgDest, msgEnt)
 {
 	if (!is_user_connected(msgEnt)) return;
 
-	set_msg_arg_int(1, get_msg_argtype(1), playerHonor[msgEnt]);
+	set_msg_arg_int(1, get_msg_argtype(1), min(playerHonor[msgEnt], MAX_MONEY));
 
 	update_hud(msgEnt);
 }
@@ -358,7 +362,7 @@ stock update_hud(id, gained = 0)
 {
 	if (!is_user_connected(id) || pev_valid(id) != PDATA_SAFE) return;
 
-	new tempHonor = min(playerHonor[id], MAX_MONEY);
+	new tempHonor = min(playerData[id][HONOR], MAX_MONEY);
 
 	set_user_money(id, tempHonor);
 
@@ -384,18 +388,18 @@ public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSiz
 }
 
 public _cod_get_user_honor(id)
-	return playerHonor[id];
+	return playerData[id][HONOR];
 
 public _cod_set_user_honor(id, amount, bonus)
 {
-	playerHonor[id] = min(max(0, bonus ? get_user_bonus(id, amount) : amount), HONOR_LIMIT);
+	playerData[id][HONOR] = min(max(0, bonus ? get_user_bonus(id, amount) : amount), HONOR_LIMIT);
 
 	save_honor(id);
 }
 
 public _cod_add_user_honor(id, amount, bonus)
 {
-	playerHonorGained[id] = max(-playerHonor[id], bonus ? get_user_bonus(id, amount) : amount);
+	playerData[id][HONOR_GAINED] = max(-playerData[id][HONOR], bonus ? get_user_bonus(id, amount) : amount);
 
 	save_honor(id);
 }
