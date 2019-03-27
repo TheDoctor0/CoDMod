@@ -135,25 +135,6 @@ public message_vgui_menu(msgId, dest, id)
 	return PLUGIN_CONTINUE;
 }
 
-public cod_player_prethink(id)
-{
-	if (cvarAccountsEnabled && is_user_connected(id) && get_bit(id, dataLoaded) && !is_user_bot(id) && !is_user_hltv(id) && !is_user_alive(id) && playerData[id][STATUS] < LOGGED && sql != Empty_Handle) {
-		static msgScreenFade;
-
-		if (!msgScreenFade) msgScreenFade = get_user_msgid("ScreenFade");
-
-		message_begin(MSG_ONE, msgScreenFade, {0, 0, 0}, id);
-		write_short(1<<12);
-		write_short(1<<12);
-		write_short(0x0000);
-		write_byte(0);
-		write_byte(0);
-		write_byte(0);
-		write_byte(255);
-		message_end();
-	}
-}
-
 public check_account(id)
 {
 	if (cvarAccountsEnabled && playerData[id][STATUS] < LOGGED) {

@@ -26,10 +26,10 @@ enum { V_CROSSBOW, P_CROSSBOW, BELT };
 
 new crossbowBelts[MAX_PLAYERS + 1], lastCrossbowBelt[MAX_PLAYERS + 1], crossbowActive, classActive;
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION, FLAG);
 
 	register_touch("belt", "*" , "touch_belt");
@@ -76,30 +76,26 @@ public cod_new_round()
 public cod_weapon_deploy(id, weapon, ent)
 	rem_bit(id, crossbowActive);
 
-public cod_cmd_start(id, button, oldButton, playerState)
+public cod_cmd_start(id, button, oldButton, flags, playerState)
 {
 	if (!get_bit(id, classActive)) return;
 
-	if (cod_get_user_weapon(id) == CSW_KNIFE && button & IN_RELOAD && !(oldButton & IN_RELOAD)) {
+	if (!get_bit(id, crossbowActive) && button & IN_RELOAD && !(oldButton & IN_RELOAD) && cod_get_user_weapon(id) == CSW_KNIFE) {
 		set_bit(id, crossbowActive);
 
 		entity_set_string(id, EV_SZ_viewmodel, classModels[V_CROSSBOW]);
 		entity_set_string(id, EV_SZ_weaponmodel, classModels[P_CROSSBOW]);
 	}
 
-	if (button & IN_ATTACK && !(oldButton & IN_ATTACK)) {
-		static modelName[32];
-
-		entity_get_string(id, EV_SZ_viewmodel, modelName, charsmax(modelName));
-
-		if (equal(modelName, classModels[V_CROSSBOW])) shoot_belt(id);
+	if (get_bit(id, crossbowActive) && button & IN_ATTACK && !(oldButton & IN_ATTACK)) {
+		shoot_belt(id);
 	}
 }
 
 public shoot_belt(id)
 {
 	if (!is_user_alive(id)) return;
-	
+
 	if (!crossbowBelts[id]) {
 		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Juz wykorzystales wszystkie belty!");
 
@@ -111,30 +107,28 @@ public shoot_belt(id)
 
 		return;
 	}
-	
+
 	if (lastCrossbowBelt[id] + 3.0 > get_gametime()) {
 		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Belt mozesz wystrzelic raz na 3 sekundy!");
 
 		return;
 	}
 
-	rem_bit(id, crossbowActive);
-	
 	lastCrossbowBelt[id] = floatround(get_gametime());
 	crossbowBelts[id]--;
 
-	new Float:origin[3], Float:angle[3], Float:velocity[3];	
+	new Float:origin[3], Float:angle[3], Float:velocity[3];
 
 	entity_get_vector(id, EV_VEC_v_angle, angle);
 	entity_get_vector(id, EV_VEC_origin, origin);
-	
+
 	new ent = create_entity("info_target");
-	
+
 	entity_set_string(ent, EV_SZ_classname, "belt");
 	entity_set_model(ent, classModels[BELT]);
-	
+
 	angle[0] *= -1.0;
-	
+
 	entity_set_origin(ent, origin);
 	entity_set_vector(ent, EV_VEC_angles, angle);
 	entity_set_int(ent, EV_INT_effects, 2);
@@ -143,7 +137,7 @@ public shoot_belt(id)
 	entity_set_edict(ent, EV_ENT_owner, id);
 
 	set_rendering(ent, kRenderFxGlowShell, 255, 0, 0, kRenderNormal, 56);
-	
+
 	VelocityByAim(id, 1500, velocity);
 
 	entity_set_vector(ent, EV_VEC_velocity, velocity);
@@ -154,15 +148,15 @@ public shoot_belt(id)
 public touch_belt(ent)
 {
 	if (!is_valid_ent(ent)) return;
-	
+
 	new owner = entity_get_edict(ent, EV_ENT_owner), entList[33], playersFound = find_sphere_class(ent, "player", 15.0, entList, 32), player;
-	
+
 	for (new i = 0; i < playersFound; i++)
-	{		
+	{
 		player = entList[i];
-		
+
 		if (!is_user_alive(player) || get_user_team(owner) == get_user_team(player)) continue;
-		
+
 		cod_kill_player(owner, player, DMG_CODSKILL);
 	}
 

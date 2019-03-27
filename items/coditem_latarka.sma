@@ -64,7 +64,7 @@ public cod_item_skill_used(id)
 	set_pev(id, pev_effects, pev(id, pev_effects) & ~EF_DIMLIGHT);
 }
 
-public cod_player_prethink(id)
+public cod_cmd_start(id, button, oldButton, flags, playerState)
 {
 	if (!get_bit(id, flashlightActive)) return;
 
@@ -92,14 +92,12 @@ public cod_player_prethink(id)
 		write_byte(90);
 		message_end();
 
-		static target, bodyPart, render;
+		static target, bodyPart;
 
 		get_user_aiming(id, target, bodyPart);
 
-		if (is_user_alive(target) && get_user_team(id) != get_user_team(target)) {
-			render = pev(target, pev_renderamt);
-
-			if (render < 255) cod_set_user_glow(target, kRenderFxGlowShell, flashlightR, flashlightG, flashlightB, kRenderNormal, 20, 5.0);
+		if (is_user_alive(target) && get_user_team(id) != get_user_team(target) && pev(target, pev_renderamt) < 255) {
+			cod_set_user_glow(target, kRenderFxGlowShell, flashlightR, flashlightG, flashlightB, kRenderNormal, 20, 5.0);
 		}
 	}
 }

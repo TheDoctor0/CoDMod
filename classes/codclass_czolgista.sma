@@ -78,23 +78,19 @@ public cod_new_round()
 public cod_weapon_deploy(id, weapon, ent)
 	rem_bit(id, bazookaActive);
 
-public cod_cmd_start(id, button, oldButton, playerState)
+public cod_cmd_start(id, button, oldButton, flags, playerState)
 {
 	if (!get_bit(id, classActive)) return;
 
-	if (cod_get_user_weapon(id) == CSW_KNIFE && button & IN_RELOAD && !(oldButton & IN_RELOAD)) {
+	if (!get_bit(id, bazookaActive) && button & IN_RELOAD && !(oldButton & IN_RELOAD) && cod_get_user_weapon(id) == CSW_KNIFE) {
 		set_bit(id, bazookaActive);
 
 		entity_set_string(id, EV_SZ_viewmodel, classModels[V_BAZOOKA]);
 		entity_set_string(id, EV_SZ_weaponmodel, classModels[P_BAZOOKA]);
 	}
 
-	if (button & IN_ATTACK && !(oldButton & IN_ATTACK)) {
-		static modelName[32];
-
-		entity_get_string(id, EV_SZ_viewmodel, modelName, charsmax(modelName));
-
-		if (equal(modelName, classModels[V_BAZOOKA])) shoot_missile(id);
+	if (get_bit(id, bazookaActive) && button & IN_ATTACK && !(oldButton & IN_ATTACK)) {
+		shoot_missile(id);
 	}
 }
 
@@ -113,8 +109,6 @@ public shoot_missile(id)
 
 		return;
 	}
-
-	rem_bit(id, bazookaActive);
 
 	lastBazookaMissile[id] = floatround(get_gametime());
 	bazookaMissiles[id]--;
