@@ -3089,7 +3089,7 @@ public reset_attributes(id, type)
 	codPlayer[id][PLAYER_TELEPORTS][type] = 0;
 	codPlayer[id][PLAYER_GRAVITY][type] = _:1.0;
 	codPlayer[id][PLAYER_SPEED][type] = _:0.0;
-	codPlayer[id][PLAYER_RENDER] = 255;
+	codPlayer[id][PLAYER_RENDER] = NONE;
 
 	remove_render_type(id, type);
 
