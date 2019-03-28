@@ -170,6 +170,8 @@ public account_menu(id, sound)
 		engclient_cmd(id, "chooseteam");
 
 		return PLUGIN_HANDLED;
+	} else if (playerData[id][STATUS] < LOGGED) {
+		cod_display_fade(id, 0, 0, 0x0001|0x0004, 0, 0, 0, 255);
 	}
 
 	if (sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
@@ -307,6 +309,8 @@ public login_account(id)
 
 	remove_task(id + TASK_PASSWORD);
 
+	cod_display_fade(id, 0, 0, 0x0000, 0, 0, 0, 255);
+
 	cod_print_chat(id, "Zostales pomyslnie^x04 zalogowany^x01. Zyczymy milej gry.");
 
 	set_hudmessage(0, 255, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
@@ -406,6 +410,8 @@ public register_confirmation_handle(id, menu, item)
 			copy(playerData[id][PASSWORD], charsmax(playerData[][PASSWORD]), playerData[id][TEMP_PASSWORD]);
 
 			account_query(id, INSERT);
+
+			cod_display_fade(id, 0, 0, 0x0000, 0, 0, 0, 255);
 
 			set_hudmessage(0, 255, 0, -1.0, 0.9, 0, 0.0, 3.5, 0.0, 0.0);
 			show_hudmessage(id, "Zostales pomyslnie zarejestrowany i zalogowany.");
@@ -691,6 +697,8 @@ public load_account_handle(failState, Handle:query, error[], errorNum, tempId[],
 
 			if (equal(playerData[id][PASSWORD], password)) {
 				playerData[id][STATUS] = LOGGED;
+
+				cod_display_fade(id, 0, 0, 0x0000, 0, 0, 0, 255);
 
 				set_bit(id, autoLogin);
 			} else {

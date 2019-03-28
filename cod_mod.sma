@@ -5335,13 +5335,13 @@ stock sql_string(const source[], dest[], length)
 
 stock display_fade(id, duration, holdtime, fadetype, red, green, blue, alpha)
 {
-	if (!is_user_alive(id)) return;
+	if (!is_user_connected(id)) return;
 
 	static msgScreenFade;
 
 	if (!msgScreenFade) msgScreenFade = get_user_msgid("ScreenFade");
 
-	message_begin(MSG_ONE, msgScreenFade, {0, 0, 0}, id);
+	message_begin(id ? MSG_ONE : MSG_ALL, msgScreenFade, {0, 0, 0}, id);
 	write_short(duration);
 	write_short(holdtime);
 	write_short(fadetype);
