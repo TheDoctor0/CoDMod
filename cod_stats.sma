@@ -735,13 +735,15 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 	}
 
 	if (cvarRevengeEnabled && playerStats[killer][REVENGE] == victim) {
+		new nameVictim[MAX_NAME];
+
+		get_user_name(victim, nameVictim, charsmax(nameVictim));
+
 		set_user_frags(killer, get_user_frags(killer) + 1);
 
 		cs_set_user_deaths(killer, cs_get_user_deaths(killer));
 
-		new nameVictim[MAX_NAME];
-
-		get_user_name(victim, nameVictim, charsmax(nameVictim));
+		playerStats[killer][REVENGE] = 0;
 
 		if (cvarMinPlayers >= get_playersnum()) cod_add_user_honor(killer, cvarRevengeHonor, true);
 
