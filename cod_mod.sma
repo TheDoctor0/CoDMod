@@ -4660,7 +4660,7 @@ public repeat_damage(data[])
 
 public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
 {
-	if (!codPlayer[victim][PLAYER_RESISTANCE][ALL] || (codPlayer[victim][PLAYER_RESISTANCE][ALL] && !(flags & DMG_CODSKILL))) {
+	if (!codPlayer[victim][PLAYER_GODMODE][ALL] || !codPlayer[victim][PLAYER_RESISTANCE][ALL] || (codPlayer[victim][PLAYER_RESISTANCE][ALL] && !(flags & DMG_CODSKILL))) {
 		new ret;
 
 		ExecuteForward(codForwards[DAMAGE_INFLICT], ret, attacker, victim, Float:damage, Float:factor, flags);
@@ -4673,7 +4673,7 @@ public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
 
 public Float:_cod_kill_player(killer, victim, flags)
 {
-	if (is_user_alive(victim)) {
+	if (is_user_alive(victim) && !codPlayer[victim][PLAYER_GODMODE][ALL]) {
 		cs_set_user_armor(victim, 0, CS_ARMOR_NONE);
 
 		_cod_inflict_damage(killer, victim, float(get_user_health(victim) + 1), 0.0, flags | DMG_KILL);

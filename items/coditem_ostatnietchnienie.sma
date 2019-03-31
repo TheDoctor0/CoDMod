@@ -48,7 +48,7 @@ public cod_damage_pre(attacker, victim, weapon, Float:damage, damageBits, hitPla
 
 	if (task_exists(victim + TASK_DEATH)) return _:COD_BLOCK;
 
-	if (cod_get_user_health(victim) < damage) {
+	if (cod_get_user_health(victim) <= damage) {
 		new data[3];
 
 		data[0] = attacker;
@@ -69,7 +69,7 @@ public deactivate_item(data[])
 {
 	if (is_user_connected(data[0]) && is_user_alive(data[1])) {
 		cod_set_user_godmode(data[1], false, ITEM);
-		
+
 		cod_kill_player(data[0], data[1], data[2]);
 	}
 }
