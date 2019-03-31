@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Zimne Kule"
-#define VERSION "1.0.39"
+#define VERSION "1.1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Zimne Kule"

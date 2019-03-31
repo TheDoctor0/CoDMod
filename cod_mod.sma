@@ -2332,7 +2332,7 @@ public speed_change(id)
 {
 	if (!is_user_alive(id) || freezeTime) return HAM_IGNORED;
 
-	new Float:speed = floatmax(COD_FREEZE, codPlayer[id][PLAYER_SPEED][ALL] == COD_FREEZE ? COD_FREEZE : get_user_maxspeed(id) + Float:codPlayer[id][PLAYER_SPEED][ALL]);
+	new Float:speed = Float:codPlayer[id][PLAYER_SPEED][ALL] == COD_FREEZE ? COD_FREEZE : (get_user_maxspeed(id) + Float:codPlayer[id][PLAYER_SPEED][ALL]);
 
 	set_user_maxspeed(id, speed);
 
@@ -3263,16 +3263,18 @@ public set_speed(id)
 	speed += (get_condition(id) * 0.85);
 
 	for (new i = CLASS; i <= DEATH; i++) {
-		if (codPlayer[id][PLAYER_SPEED][i] == COD_FREEZE) {
+		if (Float:codPlayer[id][PLAYER_SPEED][i] == COD_FREEZE) {
 			speed = COD_FREEZE;
 
 			break;
+		} else if (codPlayer[id][PLAYER_SPEED][i] >= 0.0 && codPlayer[id][PLAYER_SPEED][i] > speed) {
+			speed = (speed > 0.0 ? codPlayer[id][PLAYER_SPEED][i] : codPlayer[id][PLAYER_SPEED][i] + speed);
+		} else if (codPlayer[id][PLAYER_SPEED][i] < 0.0) {
+			speed += codPlayer[id][PLAYER_SPEED][i];
 		}
-		else if (codPlayer[id][PLAYER_SPEED][i] >= 0.0 && codPlayer[id][PLAYER_SPEED][i] > speed) speed = (speed > 0.0 ? codPlayer[id][PLAYER_SPEED][i] : codPlayer[id][PLAYER_SPEED][i] + speed);
-		else if (codPlayer[id][PLAYER_SPEED][i] < 0.0) speed += codPlayer[id][PLAYER_SPEED][i];
 	}
 
-	codPlayer[id][PLAYER_SPEED][ALL] = _:speed;
+	codPlayer[id][PLAYER_SPEED][ALL] = _:floatmax(COD_FREEZE, speed);
 
 	if (!is_user_alive(id) || freezeTime) return;
 
