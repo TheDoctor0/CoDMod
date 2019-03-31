@@ -1889,7 +1889,7 @@ public use_thunder(id)
 	ExecuteForward(codForwards[THUNDER_REACH], ret, id, victim, 65.0 + get_intelligence(id) * 0.5);
 
 	if (float(ret) != COD_BLOCK) {
-		cod_inflict_damage(id, victim, 65.0, 0.5, DMG_CODSKILL | DMG_THUNDER);
+		_cod_inflict_damage(id, victim, 65.0, 0.5, DMG_CODSKILL | DMG_THUNDER);
 
 		codPlayer[id][PLAYER_LAST_THUNDER] += ret;
 	}
@@ -2061,7 +2061,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 {
 	if (!is_user_connected(attacker) || !is_user_connected(victim) || get_user_team(attacker) == get_user_team(victim)) return HAM_IGNORED;
 
-	static function, weapon, hitPlace;
+	static function, weapon, hitPlace, Float:baseDamage;
 
 	weapon = codPlayer[attacker][PLAYER_WEAPON];
 
@@ -2093,7 +2093,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 	}
 
 	if (codPlayer[attacker][PLAYER_CLASS]) {
-		damage += get_strength(attacker) / 10.0;
+		baseDamage = damage += get_strength(attacker) / 10.0;
 
 		function = get_class_info(codPlayer[attacker][PLAYER_CLASS], CLASS_DAMAGE_ATTACKER);
 
@@ -2111,6 +2111,8 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 				SetHamParamFloat(4, 0.0);
 
 				return HAM_SUPERCEDE;
+			} else if (codPlayer[victim][PLAYER_RESISTANCE][ALL]) {
+				damage = baseDamage;
 			}
 		}
 	}
@@ -2156,6 +2158,8 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 	}
 
 	if (codPlayer[attacker][PLAYER_ITEM]) {
+		baseDamage = damage;
+
 		function = get_item_info(codPlayer[attacker][PLAYER_ITEM], ITEM_DAMAGE_ATTACKER);
 
 		if (function != NONE) {
@@ -2172,6 +2176,8 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 				SetHamParamFloat(4, 0.0);
 
 				return HAM_SUPERCEDE;
+			} else if (codPlayer[victim][PLAYER_RESISTANCE][ALL]) {
+				damage = baseDamage;
 			}
 		}
 	}
@@ -4649,7 +4655,7 @@ public repeat_damage(data[])
 		}
 	}
 
-	cod_inflict_damage(data[ATTACKER], data[VICTIM], float(data[DAMAGE]), 0.0, data[FLAGS] | DMG_CODSKILL | DMG_REPEAT);
+	_cod_inflict_damage(data[ATTACKER], data[VICTIM], float(data[DAMAGE]), 0.0, data[FLAGS] | DMG_CODSKILL | DMG_REPEAT);
 }
 
 public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
@@ -4670,7 +4676,7 @@ public Float:_cod_kill_player(killer, victim, flags)
 	if (is_user_alive(victim)) {
 		cs_set_user_armor(victim, 0, CS_ARMOR_NONE);
 
-		cod_inflict_damage(killer, victim, float(get_user_health(victim) + 1), 0.0, flags | DMG_KILL);
+		_cod_inflict_damage(killer, victim, float(get_user_health(victim) + 1), 0.0, flags | DMG_KILL);
 	}
 
 	return COD_BLOCK;
@@ -5255,7 +5261,7 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 					case DYNAMITE_EXPLODE: flag = DMG_DYNAMITE;
 				}
 
-				cod_inflict_damage(id, player, damage, factor, DMG_CODSKILL | flag);
+				_cod_inflict_damage(id, player, damage, factor, DMG_CODSKILL | flag);
 			}
 		}
 	}

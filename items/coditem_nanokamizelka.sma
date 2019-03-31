@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME        "Nano Kamizelka"
-#define DESCRIPTION "Jestes odporny na umiejetnosci klas i itemow zadajace obrazenia"
+#define DESCRIPTION "Jestes odporny na rakiety, miny, dynamity, pioruny i inne bonusy zadajace obrazenia."
 
 public plugin_init()
 {
