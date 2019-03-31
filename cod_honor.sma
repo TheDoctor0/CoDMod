@@ -338,7 +338,7 @@ public message_money(msgId, msgDest, msgEnt)
 {
 	if (!is_user_connected(msgEnt)) return;
 
-	set_msg_arg_int(1, get_msg_argtype(1), min(playerHonor[msgEnt], MAX_MONEY));
+	set_msg_arg_int(1, get_msg_argtype(1), min(playerData[msgEnt][HONOR], MAX_MONEY));
 
 	update_hud(msgEnt);
 }
