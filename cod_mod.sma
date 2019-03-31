@@ -3274,7 +3274,7 @@ public set_speed(id)
 		}
 	}
 
-	codPlayer[id][PLAYER_SPEED][ALL] = _:floatmax(COD_FREEZE, speed);
+	codPlayer[id][PLAYER_SPEED][ALL] = _:speed;
 
 	if (!is_user_alive(id) || freezeTime) return;
 
