@@ -7,8 +7,8 @@
 
 #define NAME        "Odwrotnosc"
 #define DESCRIPTION "Po aktywacji przez %s sekund otrzymane obrazenia cie lecza."
-#define RANDOM_MIN  4
-#define RANDOM_MAX  6
+#define RANDOM_MIN  3
+#define RANDOM_MAX  4
 
 #define TASK_ITEM 83241
 

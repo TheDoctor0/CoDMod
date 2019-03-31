@@ -2092,6 +2092,27 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 		}
 	}
 
+	if (codPlayer[victim][PLAYER_ITEM]) {
+		function = get_item_info(codPlayer[victim][PLAYER_ITEM], ITEM_DAMAGE_VICTIM);
+
+		if (function != NONE) {
+			callfunc_begin_i(function, get_item_info(codPlayer[victim][PLAYER_ITEM], ITEM_PLUGIN));
+			callfunc_push_int(attacker);
+			callfunc_push_int(victim);
+			callfunc_push_int(weapon);
+			callfunc_push_floatrf(damage);
+			callfunc_push_int(damageBits);
+			callfunc_push_int(hitPlace);
+			callfunc_end();
+
+			if (damage == COD_BLOCK) {
+				SetHamParamFloat(4, 0.0);
+
+				return HAM_SUPERCEDE;
+			}
+		}
+	}
+
 	if (codPlayer[attacker][PLAYER_CLASS]) {
 		baseDamage = damage += get_strength(attacker) / 10.0;
 
@@ -2113,46 +2134,6 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 				return HAM_SUPERCEDE;
 			} else if (codPlayer[victim][PLAYER_RESISTANCE][ALL]) {
 				damage = baseDamage;
-			}
-		}
-	}
-
-	if (codPlayer[victim][PLAYER_ITEM]) {
-		function = get_item_info(codPlayer[victim][PLAYER_ITEM], ITEM_DAMAGE_VICTIM);
-
-		if (function != NONE) {
-			callfunc_begin_i(function, get_item_info(codPlayer[victim][PLAYER_ITEM], ITEM_PLUGIN));
-			callfunc_push_int(attacker);
-			callfunc_push_int(victim);
-			callfunc_push_int(weapon);
-			callfunc_push_floatrf(damage);
-			callfunc_push_int(damageBits);
-			callfunc_push_int(hitPlace);
-			callfunc_end();
-
-			if (damage == COD_BLOCK) {
-				SetHamParamFloat(4, 0.0);
-
-				return HAM_SUPERCEDE;
-			}
-		}
-
-		function = get_func_id("cod_item_damage_victim", get_item_info(codPlayer[victim][PLAYER_ITEM], ITEM_PLUGIN));
-
-		if (function != NONE) {
-			callfunc_begin_i(function, get_item_info(codPlayer[victim][PLAYER_ITEM], ITEM_PLUGIN));
-			callfunc_push_int(attacker);
-			callfunc_push_int(victim);
-			callfunc_push_int(weapon);
-			callfunc_push_floatrf(damage);
-			callfunc_push_int(damageBits);
-			callfunc_push_int(hitPlace);
-			callfunc_end();
-
-			if (damage == COD_BLOCK) {
-				SetHamParamFloat(4, 0.0);
-
-				return HAM_SUPERCEDE;
 			}
 		}
 	}
