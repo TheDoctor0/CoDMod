@@ -3103,7 +3103,7 @@ public reset_attributes(id, type)
 
 	set_gravity(id);
 
-	speed_change(id);
+	set_speed(id);
 
 	if (type != ITEM) {
 		codPlayer[id][PLAYER_ROCKETS][USED] = 0;
