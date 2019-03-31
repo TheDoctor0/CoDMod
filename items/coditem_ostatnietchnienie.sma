@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Ostatnie Tchnienie"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Ostatnie Tchnienie"
@@ -43,6 +43,12 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id]);
 
 public cod_damage_pre(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
+	return check_damage(attacker, victim, damage, damageBits);
+
+public cod_damage_inflict(attacker, victim, Float:damage, Float:factor, flags)
+	return check_damage(attacker, victim, damage, flags);
+
+public check_damage(attacker, victim, Float:damage, damageBits)
 {
 	if (!get_bit(victim, itemActive)) return COD_CONTINUE;
 
