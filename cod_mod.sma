@@ -2330,7 +2330,7 @@ public touch_weapon(weapon, id)
 
 public speed_change(id)
 {
-	if (!is_user_alive(id) || freezeTime || !codPlayer[id][PLAYER_CLASS]) return HAM_IGNORED;
+	if (!is_user_alive(id) || freezeTime) return HAM_IGNORED;
 
 	new Float:speed = floatmax(COD_FREEZE, codPlayer[id][PLAYER_SPEED][ALL] == COD_FREEZE ? COD_FREEZE : get_user_maxspeed(id) + Float:codPlayer[id][PLAYER_SPEED][ALL]);
 
@@ -3274,7 +3274,7 @@ public set_speed(id)
 
 	codPlayer[id][PLAYER_SPEED][ALL] = _:speed;
 
-	if (!is_user_alive(id) || freezeTime || !codPlayer[id][PLAYER_CLASS]) return;
+	if (!is_user_alive(id) || freezeTime) return;
 
 	ExecuteHamB(Ham_CS_Player_ResetMaxSpeed, id);
 }

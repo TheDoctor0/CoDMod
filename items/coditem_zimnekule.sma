@@ -53,8 +53,7 @@ public remove_freeze_effect(id)
 {
 	id -= TASK_FREEZE;
 
-	if (is_user_connected(id))
-	{
+	if (is_user_connected(id)) {
 		cod_display_icon(id, "dmg_cold");
 
 		cod_set_user_speed(id, 0.0, ITEM);
