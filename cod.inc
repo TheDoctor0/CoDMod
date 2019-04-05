@@ -1244,7 +1244,7 @@ Multiforward executed on teleport use.
 Id is player that used teleport.
 Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
 ------------------------------*/
-forward cod_thunder_reach(id);
+forward cod_teleport_used(id);
 
 /*------------------------------
 Item forward executed on item give.
