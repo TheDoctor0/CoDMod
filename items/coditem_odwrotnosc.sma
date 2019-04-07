@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Odwrotnosc"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Odwrotnosc"
@@ -65,11 +65,17 @@ public cod_item_skill_used(id)
 public deactivate_item(id)
 	rem_bit(id - TASK_ITEM, itemActive);
 
-public cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-{
-	if (get_bit(victim, itemActive)) {
-		cod_add_user_health(victim, floatround(damage));
+public cod_damage_pre(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
+	return handle_damage(attacker, victim, damage, damageBits);
 
-		damage = COD_BLOCK;
-	}
+public cod_damage_inflict(attacker, victim, Float:damage, Float:factor, flags)
+	return handle_damage(attacker, victim, damage, flags);
+
+public handle_damage(attacker, victim, Float:damage, damageBits)
+{
+	if (!get_bit(victim, itemActive)) return COD_CONTINUE;
+
+	cod_add_user_health(victim, floatround(damage));
+
+	return _:COD_BLOCK;
 }
