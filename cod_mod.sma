@@ -900,10 +900,18 @@ public display_classes_description(id, class, sound)
 
 	if (sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new className[MAX_NAME], classId[5], menu = menu_create("\yWybierz \rKlase\w:", "display_classes_description_handle");
+	new className[MAX_NAME * 2], classId[5], menu = menu_create("\yWybierz \rKlase\w:", "display_classes_description_handle");
 
 	for (new i = 1; i < ArraySize(codClasses); i++) {
 		get_class_info(i, CLASS_NAME, className, charsmax(className));
+
+		if (ArraySize(codFractions)) {
+			static classFraction[MAX_NAME];
+
+			get_class_info(i, CLASS_FRACTION, classFraction, charsmax(classFraction));
+
+			format(className, charsmax(className), "%s \y(%s)", className, classFraction);
+		}
 
 		num_to_str(i, classId, charsmax(classId));
 
