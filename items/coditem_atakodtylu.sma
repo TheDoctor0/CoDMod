@@ -1,9 +1,10 @@
 #include <amxmodx>
 #include <fakemeta>
+#include <fakemeta_util>
 #include <cod>
 
 #define PLUGIN "CoD Item Atak od tylu"
-#define VERSION "1.0.14"
+#define VERSION "1.1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Atak od tylu"
@@ -37,12 +38,12 @@ public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageB
 
 		pev(attacker, pev_origin, oldOrigin);
 		pev(victim, pev_origin, origin);
-		pev(victim, pev_v_angle, vector); 
+		pev(victim, pev_v_angle, vector);
 
 		vector[2] = -vector[2];
-		 
+
 		angle_vector(vector, ANGLEVECTOR_FORWARD, vector);
-	 
+
 		vector[0] *= 50.0;
 		vector[1] *= 50.0;
 		vector[2] *= 50.0;
@@ -53,11 +54,20 @@ public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageB
 
 		set_pev(attacker, pev_origin, origin);
 
-		if (is_player_stuck(attacker)) set_pev(attacker, pev_origin, oldOrigin);
+		if (is_player_stuck(attacker)) {
+			set_pev(attacker, pev_origin, oldOrigin);
+		} else if (!fm_is_ent_visible(attacker, victim)) {
+			pev(attacker, pev_angles, vector);
+
+			vector[1] += 180.0;
+
+			set_pev(attacker, pev_angles, vector);
+			set_pev(attacker, pev_fixangle, 1);
+		}
 	}
 }
 
-stock bool:is_player_stuck(id) 
+stock bool:is_player_stuck(id)
 {
 	static Float:origin[3];
 
