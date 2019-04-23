@@ -139,7 +139,7 @@ public cod_spawned(id, respawn)
 
 	if (!get_bit(id, info) && is_user_alive(id)) set_task(5.0, "show_clan_info", id + TASK_INFO);
 
-	cod_add_user_gravity(id, -(cvarGravityPerLevel * get_clan_info(clan[id], CLAN_GRAVITY) / 100.0), ROUND);
+	if (!respawn) cod_add_user_gravity(id, -(cvarGravityPerLevel * get_clan_info(clan[id], CLAN_GRAVITY) / 100.0), ROUND);
 
 	return PLUGIN_CONTINUE;
 }
