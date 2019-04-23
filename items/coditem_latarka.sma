@@ -66,7 +66,7 @@ public cod_item_skill_used(id)
 
 public cod_cmd_start(id, button, oldButton, flags, playerState)
 {
-	if (!get_bit(id, flashlightActive)) return;
+	if (!get_bit(id, itemActive)) return;
 
 	if (get_bit(id, flashlightActive) && flashlightBattery[id]) {
 		static flashlightR, flashlightG, flashlightB;

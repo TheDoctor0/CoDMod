@@ -18,29 +18,25 @@
 
 #define TASK_RADAR 84722
 
-new classLastUsed[MAX_PLAYERS + 1], classActive;
+new classLastUsed[MAX_PLAYERS + 1];
 
 public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 
 	register_forward(FM_Think, "camera_think");
 }
 
 public cod_class_enabled(id, promotion)
-{
 	classLastUsed[id] = 0;
-
-	rem_bit(id, classActive);
-}
 
 public cod_class_skill_used(id)
 {
 	if (classLastUsed[id] + 30.0 > get_gametime()) {
 		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Jasnowidzenia mozesz uzyc raz na 30 sekund!");
-		
+
 		return PLUGIN_CONTINUE;
 	}
 
@@ -48,7 +44,7 @@ public cod_class_skill_used(id)
 
 	for (new i = 1; i <= MAX_PLAYERS; i++) {
 		if (!is_user_alive(i) || get_user_team(i) == get_user_team(id) || i == id) continue;
-		
+
 		num_to_str(i, playerId, charsmax(playerId));
 
 		get_user_name(i, playerName, charsmax(playerName));
@@ -68,7 +64,7 @@ public cod_class_skill_used(id)
 public cod_class_skill_used_handle(id, menu, item)
 {
 	if (!is_user_alive(id)) return PLUGIN_HANDLED;
-	
+
 	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
@@ -82,7 +78,7 @@ public cod_class_skill_used_handle(id, menu, item)
 	new playerName[32], playerId[3], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, playerId, charsmax(playerId), playerName, charsmax(playerName), itemCallback);
-	
+
 	menu_destroy(menu);
 
 	new player = str_to_num(playerId);
@@ -97,7 +93,7 @@ public cod_class_skill_used_handle(id, menu, item)
 	cod_display_fade(id, 1, 1, 0x0000, 254, 254, 254, 25);
 	cod_set_user_render(id, 10, .timer = 3.0);
 	cod_make_bartimer(id, 3);
-	
+
 	new ent = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "info_target"));
 
 	engfunc(EngFunc_SetModel, ent, "models/w_c4.mdl");
@@ -110,14 +106,14 @@ public cod_class_skill_used_handle(id, menu, item)
 	set_pev(ent, pev_rendermode, kRenderTransTexture);
 	set_pev(ent, pev_renderamt, 0.0);
 	set_pev(ent, pev_nextthink, get_gametime());
-	
+
 	new data[3];
 	data[0] = id;
 	data[1] = player;
 	data[2] = ent;
 
 	emit_sound(player, CHAN_VOICE, codSounds[SOUND_CHARGE], 0.6, ATTN_NORM, 0, PITCH_NORM);
-	
+
 	set_task(3.0, "deactivate_class", .parameter = data, .len = sizeof(data));
 
 	classLastUsed[id] = floatround(get_gametime());
@@ -130,11 +126,11 @@ public deactivate_class(data[])
 	new id = data[0], player = data[1], ent = data[2];
 
 	engfunc(EngFunc_RemoveEntity, ent);
-	
+
 	if (!is_user_connected(id)) return;
 
 	engfunc(EngFunc_SetView, id, id);
-	
+
 	if (!is_user_alive(player)) return;
 
 	if (!is_user_alive(id)) {
@@ -161,19 +157,19 @@ public radar_scan(id)
 	if (!msgHostageAdd) msgHostageAdd = get_user_msgid("HostagePos");
 	if (!msgHostageDel) msgHostageDel = get_user_msgid("HostageK");
 
-	for (new i = 1; i <= MAX_PLAYERS; i++) {       
+	for (new i = 1; i <= MAX_PLAYERS; i++) {
 		if (!is_user_alive(i) || get_user_team(i) == get_user_team(id)) continue;
 
 		get_user_origin(i, playerOrigin);
-		
+
 		message_begin(MSG_ONE_UNRELIABLE, msgHostageAdd, {0, 0, 0}, id);
 		write_byte(id);
-		write_byte(i);                               
+		write_byte(i);
 		write_coord(playerOrigin[0]);
 		write_coord(playerOrigin[1]);
 		write_coord(playerOrigin[2]);
 		message_end();
-		
+
 		message_begin(MSG_ONE_UNRELIABLE, msgHostageDel, {0, 0, 0}, id);
 		write_byte(i);
 		message_end();
@@ -187,13 +183,13 @@ public camera_think(ent)
 	static className[32], owner;
 
 	pev(ent, pev_classname, className, charsmax(className));
-	
+
 	if (!equal(className, "player_camera")) return FMRES_IGNORED;
-	
+
 	owner = pev(ent, pev_owner);
-	
+
 	if (!is_user_alive(owner)) return FMRES_IGNORED;
-	
+
 	static Float:origin[3], Float:angle[3], Float:back[3];
 
 	pev(owner, pev_origin, origin);
@@ -205,11 +201,11 @@ public camera_think(ent)
 	origin[0] += (-back[0] * 150.0);
 	origin[1] += (-back[1] * 150.0);
 	origin[2] += (-back[2] * 150.0);
-	
+
 	engfunc(EngFunc_SetOrigin, ent, origin);
 
 	set_pev(ent, pev_angles, angle);
 	set_pev(ent, pev_nextthink, get_gametime());
-	
+
 	return FMRES_HANDLED;
 }
