@@ -30,4 +30,4 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], .valueMin = VALUE_MIN);
 
 public cod_item_killed(killer, victim, hitPlace)
-	cod_respawn_player(victim);
+	if(random_num(1, itemValue[id]) == 1) cod_respawn_player(victim);
