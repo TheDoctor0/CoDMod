@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Atak od tylu"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Atak od tylu"
@@ -32,39 +32,39 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id],.valueMin = VALUE_MIN);
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
+	if (damageBits & DMG_BULLET && random_num(1, itemValue[attacker]) == 1) teleport_behind(attacker, victim);
+
+public teleport_behind(id, target)
 {
-	if (damageBits & DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
-		new Float:origin[3], Float:oldOrigin[3], Float:vector[3];
+	if (!is_user_alive(id) || !is_user_alive(target)) return;
 
-		pev(attacker, pev_origin, oldOrigin);
-		pev(victim, pev_origin, origin);
-		pev(victim, pev_v_angle, vector);
+	new Float:vector[3], Float:origin[3], Float:oldOrigin[3], Float:newOrigin[3], Float:length;
 
-		vector[2] = -vector[2];
+	velocity_by_aim(target, 1, vector);
 
-		angle_vector(vector, ANGLEVECTOR_FORWARD, vector);
+	length = floatsqroot(vector[0] * vector[0] + vector[1] * vector[1]);
 
-		vector[0] *= 50.0;
-		vector[1] *= 50.0;
-		vector[2] *= 50.0;
+	pev(target, pev_origin, origin);
+	pev(id, pev_origin, oldOrigin);
 
-		origin[0] += vector[0];
-		origin[1] += vector[1] - 125.0;
-		origin[2] += vector[2] + 20.0;
+	newOrigin[0] = origin[0] - vector[0] * 50.0 / length;
+	newOrigin[1] = origin[1] - vector[1] * 50.0 / length;
+	newOrigin[2] = origin[2] + 5.0;
 
-		set_pev(attacker, pev_origin, origin);
+	set_pev(id, pev_origin, newOrigin);
 
-		if (is_player_stuck(attacker)) {
-			set_pev(attacker, pev_origin, oldOrigin);
-		} else if (!fm_is_ent_visible(attacker, victim)) {
-			pev(attacker, pev_angles, vector);
+	if (is_player_stuck(id)) {
+		set_pev(id, pev_origin, oldOrigin);
 
-			vector[1] += 180.0;
-
-			set_pev(attacker, pev_angles, vector);
-			set_pev(attacker, pev_fixangle, 1);
-		}
+		return;
 	}
+
+	xs_vec_set(newOrigin, -newOrigin[0], -newOrigin[1], -newOrigin[2]);
+	xs_vec_add(newOrigin, origin, newOrigin);
+	vector_to_angle(newOrigin, newOrigin);
+
+	set_pev(id, pev_angles, newOrigin);
+	set_pev(id, pev_fixangle, 1);
 }
 
 stock bool:is_player_stuck(id)
