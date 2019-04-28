@@ -1070,7 +1070,7 @@ public load_stats_handle(failState, Handle:query, error[], errorNum, tempId[], d
 	} else {
 		new queryData[128];
 
-		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_stats` (`name`) VALUES (^"%s^")", playerName[id]);
+		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_stats` (`name`, `firstvisit`) VALUES (^"%s^", '%i');", playerName[id], get_systime());
 
 		SQL_ThreadQuery(sql, "ignore_handle", queryData);
 	}
