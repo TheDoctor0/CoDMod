@@ -87,8 +87,12 @@ public cod_cmd_start(id, button, oldButton, flags, playerState)
 		entity_set_string(id, EV_SZ_weaponmodel, classModels[P_CROSSBOW]);
 	}
 
-	if (get_bit(id, crossbowActive) && button & IN_ATTACK && !(oldButton & IN_ATTACK)) {
-		shoot_belt(id);
+	if (button & IN_ATTACK && !(oldButton & IN_ATTACK)) {
+		static modelName[32];
+
+		entity_get_string(id, EV_SZ_viewmodel, modelName, charsmax(modelName));
+
+		if (equal(modelName, classModels[V_CROSSBOW])) shoot_belt(id);
 	}
 }
 
@@ -113,6 +117,8 @@ public shoot_belt(id)
 
 		return;
 	}
+
+	rem_bit(id, crossbowActive);
 
 	lastCrossbowBelt[id] = floatround(get_gametime());
 	crossbowBelts[id]--;
