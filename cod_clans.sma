@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Clans"
-#define VERSION "1.3.0"
+#define VERSION "1.3.1"
 #define AUTHOR "O'Zone"
 
 #define TASK_INFO 9843
@@ -14,9 +14,10 @@ new const commandClan[][] = { "klan", "say /clan", "say_team /clan", "say /clans
 enum _:clanInfo { CLAN_ID, CLAN_LEVEL, CLAN_HONOR, CLAN_HEALTH, CLAN_GRAVITY, CLAN_DAMAGE, CLAN_EXP, CLAN_KILLS, CLAN_WINS, CLAN_MEMBERS, Trie:CLAN_STATUS, CLAN_NAME[MAX_NAME] };
 enum _:warInfo { WAR_ID, WAR_CLAN, WAR_CLAN2, WAR_PROGRESS, WAR_PROGRESS2, WAR_DURATION, WAR_REWARD };
 enum _:statusInfo { STATUS_NONE, STATUS_MEMBER, STATUS_DEPUTY, STATUS_LEADER };
+enum _:glow { GLOW_NEVER, GLOW_EXCEPT, GLOW_ALWAYS };
 
 new cvarCreateLevel, cvarCreateFee, cvarJoinFee, cvarNameChangeFee, cvarMembersStart, cvarLevelMax, cvarSkillMax, cvarChatPrefix, cvarLevelCost, cvarNextLevelCost,
-	cvarSkillCost, cvarNextSkillCost, cvarMembersPerLevel, cvarHealthPerLevel, cvarGravityPerLevel, cvarDamagePerLevel, cvarExpPerLevel;
+	cvarSkillCost, cvarNextSkillCost, cvarMembersPerLevel, cvarHealthPerLevel, cvarGravityPerLevel, cvarDamagePerLevel, cvarExpPerLevel, cvarEnemyGlow;
 
 new playerName[MAX_PLAYERS + 1][MAX_NAME], chosenName[MAX_PLAYERS + 1][MAX_NAME], clan[MAX_PLAYERS + 1], chosenId[MAX_PLAYERS + 1], warFrags[MAX_PLAYERS + 1],
 	warReward[MAX_PLAYERS + 1], Handle:sql, Handle:connection, bool:sqlConnected, Array:codClans, Array:codWars, bool:mapEnd, info, loaded;
@@ -53,6 +54,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_clans_gravity_per_level", "5"), cvarGravityPerLevel);
 	bind_pcvar_num(create_cvar("cod_clans_damage_per_level", "1"), cvarDamagePerLevel);
 	bind_pcvar_num(create_cvar("cod_clans_exp_per_level", "3"), cvarExpPerLevel);
+	bind_pcvar_num(create_cvar("cod_clans_enemy_glow", "1"), cvarEnemyGlow);
 
 	register_message(get_user_msgid("SayText"), "say_text");
 
@@ -1434,7 +1436,7 @@ public wars_menu(id)
 
 	menu_additem(menu, "Lista \yWojen", _, _, callback);
 	menu_additem(menu, "Wypowiedz \yWojne", _, _, callback);
-	menu_additem(menu, "Zaakceptuj \yWojne", _, _, callback);
+	menu_additem(menu, "Zaakceptuj / Odrzuc \yWojne", _, _, callback);
 	menu_additem(menu, "Anuluj \yWojne", _, _, callback);
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
@@ -1837,12 +1839,12 @@ public accept_war_confirm(id, menu, item)
 
 	explode(itemData, '#', dataParts, sizeof(dataParts), charsmax(dataParts[]));
 
-	formatex(tempData, charsmax(tempData), "\wCzy chcesz zaakceptowac \rwojne\w z klanem \y%s\w?^n\wLiczba \rFragow\w: \y%s^n\wWysokosc \rNagrody\w: \y%s Honoru", dataParts[0], dataParts[3], dataParts[4]);
+	formatex(tempData, charsmax(tempData), "\wCo chcesz zrobic z deklaracja \rwojny\w klanu \y%s\w?^n\wLiczba \rFragow\w: \y%s^n\wWysokosc \rNagrody\w: \y%s Honoru", dataParts[0], dataParts[3], dataParts[4]);
 
 	new menu = menu_create(tempData, "accept_war_confirm_handle");
 
 	menu_additem(menu, "\yAkceptuj", itemData);
-	menu_additem(menu, "Odrzuc");
+	menu_additem(menu, "\rOdrzuc", itemData);
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 
@@ -1879,6 +1881,8 @@ public accept_war_confirm_handle(id, menu, item)
 		remove_war(warId);
 
 		wars_menu(id);
+
+		cod_print_chat(id, "Pomyslnie odrzuciles deklaracje wojny.");
 
 		return PLUGIN_HANDLED;
 	}
@@ -2292,7 +2296,14 @@ public say_text(msgId, msgDest, msgEnt)
 
 public add_to_full_pack(esHandle, e, ent, host, hostFlags, player, pSet)
 {
-	if (!is_user_alive(host) || !is_user_alive(ent) || !clan[host] || !clan[ent] || !check_war_enemy(host, ent)) return;
+	if (!cvarEnemyGlow || !is_user_alive(host) || !is_user_alive(ent) || !clan[host] || !clan[ent] || !check_war_enemy(host, ent)) return;
+
+	if (cvarEnemyGlow == GLOW_EXCEPT) {
+		static Float:renderAmount;
+		pev(ent, pev_renderamt, renderAmount);
+
+		if (renderAmount <= 30.0) return;
+	}
 
 	set_es(esHandle, ES_RenderFx, kRenderFxGlowShell);
 	set_es(esHandle, ES_RenderColor, 255, 0, 0);
@@ -2865,18 +2876,18 @@ stock check_war(killer, victim)
 			get_clan_info(clan[victim], CLAN_NAME, victimClan, charsmax(victimClan));
 			get_user_name(victim, victimName, charsmax(victimName));
 
+			get_clan_info(clan[killer], CLAN_NAME, killerClan, charsmax(killerClan));
+			get_user_name(killer, killerName, charsmax(killerName));
+
 			if (codWar[progress] == codWar[WAR_DURATION]) {
-				get_clan_info(clan[killer], CLAN_NAME, killerClan, charsmax(killerClan));
-				get_user_name(killer, killerName, charsmax(killerName));
+				cod_print_chat(killer, "Zabijajac^x03 %s^x01 zakonczyles wojne z klanem^x03 %s^x01. Zwyciestwo!", victimName, victimClan);
+				cod_print_chat(victim, "Ginac z rak^x03 %s^x01 zakonczyles wojne z klanem^x03 %s^x01. Porazka...", killerName, killerClan);
 
-				cod_print_chat(i, "Zabijajac^x03 %s^x01 zakonczyles wojne z klanem^x03 %s^x01. Zwyciestwo!", victimName, victimClan);
-				cod_print_chat(i, "Ginac z rak^x03 %s^x01 zakonczyles wojne z klanem^x03 %s^x01. Porazka...", killerName, killerClan);
+				for (new j = 0; j <= MAX_PLAYERS; j++) {
+					if (!is_user_connected(j) || is_user_bot(j) || is_user_hltv(j) || !clan[j] || j == killer || j == victim) continue;
 
-				for (new i = 1; i <= MAX_PLAYERS; i++) {
-					if (!is_user_connected(i) || is_user_bot(i) || is_user_hltv(i) || !clan[i] || i == killer || i == victim) continue;
-
-					if (clan[i] == clan[killer]) cod_print_chat(i, "^x03 %s^x01 zabijajac^x03 %s^x01 zakonczyl wojne z klanem^x03 %s^x01. Zwyciestwo!", killerName, victimName, victimClan);
-					if (clan[i] == clan[victim]) cod_print_chat(i, "^x03 %s^x01 ginac z rak^x03 %s^x01 zakonczyl wojne z klanem^x03 %s^x01. Porazka...", victimName, killerName, killerClan);
+					if (clan[j] == clan[killer]) cod_print_chat(j, "^x03 %s^x01 zabijajac^x03 %s^x01 zakonczyl wojne z klanem^x03 %s^x01. Zwyciestwo!", killerName, victimName, victimClan);
+					if (clan[j] == clan[victim]) cod_print_chat(j, "^x03 %s^x01 ginac z rak^x03 %s^x01 zakonczyl wojne z klanem^x03 %s^x01. Porazka...", victimName, killerName, killerClan);
 				}
 
 				set_clan_info(clan[killer], CLAN_HONOR, codWar[WAR_REWARD]);
@@ -2887,7 +2898,7 @@ stock check_war(killer, victim)
 				ArrayDeleteItem(codWars, i);
 
 			} else {
-				cod_print_chat(i, "Zabijajac^x03 %s^x01 zdobyles fraga w wojnie z klanem^x03 %s^x01. Wynik:^x04 %i - %i / %i^x01.", victimName, victimClan, codWar[progress], codWar[progress == WAR_PROGRESS ? WAR_PROGRESS2 : WAR_PROGRESS], codWar[WAR_DURATION]);
+				cod_print_chat(killer, "Zabijajac^x03 %s^x01 zdobyles fraga w wojnie z klanem^x03 %s^x01. Wynik:^x04 %i - %i / %i^x01.", victimName, victimClan, codWar[progress], codWar[progress == WAR_PROGRESS ? WAR_PROGRESS2 : WAR_PROGRESS], codWar[WAR_DURATION]);
 
 				ArraySetArray(codWars, i, codWar);
 
