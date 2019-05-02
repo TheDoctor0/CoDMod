@@ -280,11 +280,9 @@ public select_mission(id, menu, item)
 		}
 	}
 
-	menu_addblank(menu);
-	menu_additem(menu, "\wWyjscie");
-
-	menu_setprop(menu, MPROP_PERPAGE, 0);
-	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
+	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
+	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
 
 	menu_display(id, menu);
 
@@ -295,7 +293,7 @@ public select_mission_handle(id, menu, item)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	if (item == TYPE_ITEM + 2) {
+	if (item == MENU_EXIT) {
 		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
 
 		menu_destroy(menu);

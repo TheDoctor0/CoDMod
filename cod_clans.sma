@@ -2300,6 +2300,7 @@ public add_to_full_pack(esHandle, e, ent, host, hostFlags, player, pSet)
 
 	if (cvarEnemyGlow == GLOW_EXCEPT) {
 		static Float:renderAmount;
+
 		pev(ent, pev_renderamt, renderAmount);
 
 		if (renderAmount <= 30.0) return;
