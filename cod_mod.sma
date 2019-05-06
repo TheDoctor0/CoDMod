@@ -4587,8 +4587,7 @@ public _cod_repeat_damage(attacker, victim, Float:damage, Float:time, counter, f
 
 public repeat_damage(data[])
 {
-	if (!is_user_alive(data[VICTIM]))
-	{
+	if (!is_user_alive(data[VICTIM])) {
 		remove_task(data[VICTIM] + data[ATTACKER] + TASK_DAMAGE);
 
 		return;

@@ -303,6 +303,7 @@ public buy_question_handle(id, menu, item)
 	ArrayDeleteItem(marketItems, item);
 
 	cod_set_user_item(id, marketItem[ITEM], marketItem[VALUE]);
+	cod_set_item_durability(id, marketItem[DURABILITY]);
 
 	cod_print_chat(id, "Przedmiot^x03 %s^x01 zostal pomyslnie zakupiony.", marketItem[NAME]);
 	cod_print_chat(marketItem[OWNER], "Twoj przedmiot^x03 %s^x01 zostal zakupiony przez^x03 %s^x01.", marketItem[NAME], playerName[id]);
@@ -432,6 +433,7 @@ public withdraw_question_handle(id, menu, item)
 	ArrayGetArray(marketItems, item, marketItem);
 
 	cod_set_user_item(id, marketItem[ITEM], marketItem[VALUE]);
+	cod_set_item_durability(id, marketItem[DURABILITY]);
 
 	ArrayDeleteItem(marketItems, item);
 
