@@ -2208,13 +2208,15 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 
 	check_level(attacker);
 
+	if (get_user_health(victim) <= 0) {
+		player_death(attacker, victim, weapon, hitPlace);
+	}
+
 	return HAM_IGNORED;
 }
 
-public client_death(killer, victim, weaponId, hitPlace, teamKill)
+public player_death(killer, victim, weapon, hitPlace)
 {
-	if (!is_user_connected(killer) || !is_user_connected(victim) || get_user_team(victim) == get_user_team(killer)) return PLUGIN_CONTINUE;
-
 	new playerName[MAX_NAME], className[MAX_NAME], itemName[MAX_NAME];
 
 	if (codPlayer[killer][PLAYER_CLASS] && get_playersnum() > cvarMinPlayers) {
@@ -2252,7 +2254,6 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 	}
 
 	get_user_name(killer, playerName, charsmax(playerName));
-
 	get_user_class_info(killer, codPlayer[killer][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
 	if (!codPlayer[killer][PLAYER_ITEM]) {
@@ -2289,7 +2290,7 @@ public client_death(killer, victim, weaponId, hitPlace, teamKill)
 
 	new ret;
 
-	ExecuteForward(codForwards[KILLED], ret, killer, victim, weaponId, hitPlace);
+	ExecuteForward(codForwards[KILLED], ret, killer, victim, weapon, hitPlace);
 
 	return PLUGIN_CONTINUE;
 }
@@ -2343,9 +2344,9 @@ public weapon_deploy_post(ent)
 
 	if (!is_user_alive(id)) return HAM_IGNORED;
 
-	new ret, weapon = codPlayer[id][PLAYER_WEAPON] = cs_get_weapon_id(ent);
+	new weapon = codPlayer[id][PLAYER_WEAPON] = cs_get_weapon_id(ent);
 
-	ExecuteForward(codForwards[WEAPON_DEPLOY], ret, id, weapon, ent);
+	execute_forward_ignore_three_params(codForwards[WEAPON_DEPLOY], id, weapon, ent);
 
 	render_change(id);
 
