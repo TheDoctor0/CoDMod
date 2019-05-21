@@ -102,8 +102,8 @@ enum _:playerClassInfo { PCLASS_LEVEL, PCLASS_EXP, PCLASS_HEAL, PCLASS_INT, PCLA
 enum _:renderInfo { RENDER_TYPE, RENDER_VALUE, RENDER_STATUS, RENDER_WEAPON };
 
 enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL, PLAYER_INT, PLAYER_STAM, PLAYER_STR,
-	PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTRA_HEAL, PLAYER_EXTRA_INT, PLAYER_EXTRA_STAM, PLAYER_EXTRA_STR, PLAYER_EXTRA_COND, PLAYER_EXTRA_WEAPONS, PLAYER_WEAPON, PLAYER_WEAPONS,
-	PLAYER_STATUS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_SPAWNED, PLAYER_RENDER, PLAYER_KS, PLAYER_TIME_KS, PLAYER_FLAGS, Float:PLAYER_LAST_ROCKET, Float:PLAYER_LAST_MINE,
+	PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTRA_HEAL, PLAYER_EXTRA_INT, PLAYER_EXTRA_STAM, PLAYER_EXTRA_STR, PLAYER_EXTRA_COND, PLAYER_EXTRA_WEAPONS, PLAYER_WEAPON, PLAYER_WEAPONS, PLAYER_STATUS,
+	PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_SPAWNED, PLAYER_RENDER, PLAYER_KS, PLAYER_TIME_KS, PLAYER_ALIVE, PLAYER_FLAGS, Float:PLAYER_LAST_ROCKET, Float:PLAYER_LAST_MINE,
 	Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, SKILL_USE,
 	PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1],
 	PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_RESISTANCE[ALL + 1], PLAYER_GODMODE[ALL + 1], PLAYER_NOCLIP[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1],
@@ -2059,6 +2059,7 @@ public player_spawn(id)
 	execute_forward_ignore_two_params(codForwards[SPAWNED], id, codPlayer[id][PLAYER_SPAWNED]);
 
 	codPlayer[id][PLAYER_SPAWNED] = true;
+	codPlayer[id][PLAYER_ALIVE] = true;
 
 	set_task(0.1, "set_attributes", id);
 
@@ -2188,7 +2189,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 
 public player_take_damage_post(victim, inflictor, attacker, Float:damage, damageBits)
 {
-	if (!is_user_connected(attacker) || !is_user_connected(victim) || !codPlayer[attacker][PLAYER_CLASS] || get_user_team(victim) == get_user_team(attacker)) return HAM_IGNORED;
+	if (!is_user_connected(attacker) || !is_user_connected(victim) || !codPlayer[attacker][PLAYER_CLASS] || !codPlayer[victim][PLAYER_ALIVE] || get_user_team(victim) == get_user_team(attacker)) return HAM_IGNORED;
 
 	static ret, weapon, hitPlace;
 
@@ -2209,6 +2210,8 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 	check_level(attacker);
 
 	if (get_user_health(victim) <= 0) {
+		codPlayer[victim][PLAYER_ALIVE] = false;
+
 		player_death(attacker, victim, weapon, hitPlace);
 	}
 
