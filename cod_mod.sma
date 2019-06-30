@@ -1274,16 +1274,18 @@ public assign_points_handler(id, menu, item)
 		(pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]] > codPlayer[id][PLAYER_POINTS] ? codPlayer[id][PLAYER_POINTS] : pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]]);
 
 	switch (item) {
-		case 0: if (++codPlayer[id][PLAYER_POINTS_SPEED] >= sizeof pointsDistribution) codPlayer[id][PLAYER_POINTS_SPEED] = 0;
-		case 1: {
+		case 0: {
+			if (++codPlayer[id][PLAYER_POINTS_SPEED] >= sizeof pointsDistribution) {
+				codPlayer[id][PLAYER_POINTS_SPEED] = 0;
+			}
+		} case 1: {
 			if (!statsLimit || codPlayer[id][PLAYER_HEAL] < statsLimit) {
 				if (statsLimit && pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_HEAL]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_HEAL];
 
 				codPlayer[id][PLAYER_HEAL] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
 			} else chat_print(id, "Maksymalny poziom zycia osiagniety!");
-		}
-		case 2: {
+		} case 2: {
 			if (!statsLimit || codPlayer[id][PLAYER_INT] < statsLimit) {
 				if (statsLimit && pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_INT]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_INT];
 
@@ -1291,24 +1293,21 @@ public assign_points_handler(id, menu, item)
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
 
 			} else chat_print(id, "Maksymalny poziom inteligencji osiagniety!");
-		}
-		case 3: {
+		} case 3: {
 			if (!statsLimit || codPlayer[id][PLAYER_STR] < statsLimit) {
 				if (statsLimit && pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_STR]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_STR];
 
 				codPlayer[id][PLAYER_STR] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
 			} else chat_print(id, "Maksymalny poziom sily osiagniety!");
-		}
-		case 4: {
+		} case 4: {
 			if (!statsLimit || codPlayer[id][PLAYER_STAM] < statsLimit) {
 				if (statsLimit && pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_STAM]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_STAM];
 
 				codPlayer[id][PLAYER_STAM] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
 			} else chat_print(id, "Maksymalny poziom wytrzymalosci osiagniety!");
-		}
-		case 5: {
+		} case 5: {
 			if (!statsLimit || codPlayer[id][PLAYER_COND] < statsLimit) {
 				if (statsLimit && pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_COND]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_COND];
 
@@ -3948,8 +3947,7 @@ public _cod_upgrade_user_item(id, check)
 			codPlayer[id][PLAYER_ITEM_DURA] = cvarMaxDurability;
 
 			chat_print(id, "Twoj przedmiot zostal pomyslnie^x03 ulepszony^x01.");
-		}
-		case 7 .. 9: {
+		} case 7 .. 9: {
 			new durability = random_num(cvarMinDamageDurability, cvarMaxDamageDurability);
 
 			codPlayer[id][PLAYER_ITEM_DURA] -= durability;
@@ -3959,8 +3957,7 @@ public _cod_upgrade_user_item(id, check)
 
 				chat_print(id, "Ulepszenie^x03 nieudane^x01! Twoj przedmiot ulegl^x03 zniszczeniu^x01.");
 			} else chat_print(id, "Ulepszenie^x03 nieudane^x01! Straciles^x03 %i^x01 wytrzymalosci przedmiotu.", durability);
-		}
-		case 10: {
+		} case 10: {
 			set_item(id);
 
 			chat_print(id, "Ulepszenie^x03 nieudane^x01! Twoj przedmiot ulegl^x03 zniszczeniu^x01.");
@@ -4008,7 +4005,15 @@ public _cod_get_item_durability(id)
 	return codPlayer[id][PLAYER_ITEM_DURA];
 
 public _cod_set_item_durability(id, value)
+{
 	codPlayer[id][PLAYER_ITEM_DURA] = min(max(0, value), cvarMaxDurability);
+
+	if (!codPlayer[id][PLAYER_ITEM_DURA]) {
+		set_item(id);
+
+		chat_print(id, "Twoj przedmiot ulegl^x03 zniszczeniu^x01.");
+	}
+}
 
 public _cod_max_item_durability(id)
 	return cvarMaxDurability;
@@ -4091,25 +4096,67 @@ public _cod_add_user_health(id, value, maximum)
 	set_user_health(id, maximum ? min(get_user_health(id) + value, get_health(id)) : get_user_health(id) + value);
 
 public _cod_get_user_rockets(id, type)
+{
+	if (type === USED) {
+		return calculate_rockets_left(id, false);
+	}
+
 	return codPlayer[id][PLAYER_ROCKETS][type];
+}
 
 public _cod_get_user_mines(id, type)
+{
+	if (type === USED) {
+		return calculate_mines_left(id, false);
+	}
+
 	return codPlayer[id][PLAYER_MINES][type];
+}
 
 public _cod_get_user_dynamites(id, type)
+{
+	if (type === USED) {
+		return calculate_dynamites_left(id, false);
+	}
+
 	return codPlayer[id][PLAYER_DYNAMITES][type];
+}
 
 public _cod_get_user_thunders(id, type)
+{
+	if (type === USED) {
+		return calculate_thunders_left(id, false);
+	}
+
 	return codPlayer[id][PLAYER_THUNDERS][type];
+}
 
 public _cod_get_user_medkits(id, type)
+{
+	if (type === USED) {
+		return calculate_medkits_left(id, false);
+	}
+
 	return codPlayer[id][PLAYER_MEDKITS][type];
+}
 
 public _cod_get_user_poisons(id, type)
+{
+	if (type === USED) {
+		return calculate_poisons_left(id, false);
+	}
+
 	return codPlayer[id][PLAYER_POISONS][type];
+}
 
 public _cod_get_user_teleports(id, type)
+{
+	if (type === USED) {
+		return calculate_teleports_left(id, false);
+	}
+
 	return codPlayer[id][PLAYER_TELEPORTS][type];
+}
 
 public _cod_get_user_multijumps(id, type)
 	return codPlayer[id][PLAYER_JUMPS][type];
@@ -4316,19 +4363,19 @@ public _cod_get_user_noclip(id, type)
 
 public _cod_get_user_unlimited_ammo(id, type, weapon)
 {
-	if (weapon) return (codPlayer[id][PLAYER_UNLIMITED_AMMO][type] && (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type]));
+	if (weapon) return (codPlayer[id][PLAYER_UNLIMITED_AMMO][type] && (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] == FULL || 1<<weapon & codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type]));
 	else return codPlayer[id][PLAYER_UNLIMITED_AMMO][type];
 }
 
 public _cod_get_user_recoil_eliminator(id, type, weapon)
 {
-	if (weapon) return (codPlayer[id][PLAYER_ELIMINATOR][type] && (codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type]));
+	if (weapon) return (codPlayer[id][PLAYER_ELIMINATOR][type] && (codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] == FULL || 1<<weapon & codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type]));
 	return codPlayer[id][PLAYER_ELIMINATOR][type];
 }
 
 public _cod_get_user_recoil_reducer(id, type, weapon)
 {
-	if (weapon) return (codPlayer[id][PLAYER_REDUCER][type] && (codPlayer[id][PLAYER_REDUCER_WEAPONS][type] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_REDUCER_WEAPONS][type]));
+	if (weapon) return (codPlayer[id][PLAYER_REDUCER][type] && (codPlayer[id][PLAYER_REDUCER_WEAPONS][type] == FULL || 1<<weapon & codPlayer[id][PLAYER_REDUCER_WEAPONS][type]));
 	return codPlayer[id][PLAYER_REDUCER][type];
 }
 
@@ -4535,7 +4582,7 @@ public _cod_set_user_render(id, value, type, status, weapon, Float:timer)
 
 		switch (type) {
 			case CLASS, ITEM, ADDITIONAL: ArraySetArray(codPlayerRender[id], type, codRender);
-			case ROUND, DEATH: ArrayPushArray(codPlayerRender[id], codRender);
+			case ROUND, DEATH, DAMAGE_GIVEN, DAMAGE_TAKEN: ArrayPushArray(codPlayerRender[id], codRender);
 		}
 
 		render_change(id);
@@ -5102,61 +5149,61 @@ stock calculate_left(id, type)
 	}
 }
 
-stock calculate_rockets_left(id)
+stock calculate_rockets_left(id, used = true)
 {
 	codPlayer[id][PLAYER_ROCKETS][ALL] = 0;
 
 	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_ROCKETS][ALL] += codPlayer[id][PLAYER_ROCKETS][i];
 
-	codPlayer[id][PLAYER_ROCKETS][ALL] = max(0, codPlayer[id][PLAYER_ROCKETS][ALL] - codPlayer[id][PLAYER_ROCKETS][USED]);
+	codPlayer[id][PLAYER_ROCKETS][ALL] = max(0, codPlayer[id][PLAYER_ROCKETS][ALL] - (used ? codPlayer[id][PLAYER_ROCKETS][USED] : 0));
 }
 
-stock calculate_mines_left(id)
+stock calculate_mines_left(id, used = true)
 {
 	codPlayer[id][PLAYER_MINES][ALL] = 0;
 
 	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_MINES][ALL] += codPlayer[id][PLAYER_MINES][i];
 
-	codPlayer[id][PLAYER_MINES][ALL] = max(0, codPlayer[id][PLAYER_MINES][ALL] - codPlayer[id][PLAYER_MINES][USED]);
+	codPlayer[id][PLAYER_MINES][ALL] = max(0, codPlayer[id][PLAYER_MINES][ALL] - (used ? codPlayer[id][PLAYER_MINES][USED] : 0));
 }
 
-stock calculate_dynamites_left(id)
+stock calculate_dynamites_left(id, used = true)
 {
 	codPlayer[id][PLAYER_DYNAMITES][ALL] = 0;
 
 	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_DYNAMITES][ALL] += codPlayer[id][PLAYER_DYNAMITES][i];
 
-	codPlayer[id][PLAYER_DYNAMITES][ALL] = max(0, codPlayer[id][PLAYER_DYNAMITES][ALL] - codPlayer[id][PLAYER_DYNAMITES][USED]);
+	codPlayer[id][PLAYER_DYNAMITES][ALL] = max(0, codPlayer[id][PLAYER_DYNAMITES][ALL] - (used ? codPlayer[id][PLAYER_DYNAMITES][USED] : 0));
 }
 
-stock calculate_thunders_left(id)
+stock calculate_thunders_left(id, used = true)
 {
 	codPlayer[id][PLAYER_THUNDERS][ALL] = 0;
 
 	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_THUNDERS][ALL] += codPlayer[id][PLAYER_THUNDERS][i];
 
-	codPlayer[id][PLAYER_THUNDERS][ALL] = max(0, codPlayer[id][PLAYER_THUNDERS][ALL] - codPlayer[id][PLAYER_THUNDERS][USED]);
+	codPlayer[id][PLAYER_THUNDERS][ALL] = max(0, codPlayer[id][PLAYER_THUNDERS][ALL] - (used ? codPlayer[id][PLAYER_THUNDERS][USED] : ));
 }
 
-stock calculate_medkits_left(id)
+stock calculate_medkits_left(id, used = true)
 {
 	codPlayer[id][PLAYER_MEDKITS][ALL] = 0;
 
 	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_MEDKITS][ALL] += codPlayer[id][PLAYER_MEDKITS][i];
 
-	codPlayer[id][PLAYER_MEDKITS][ALL] = max(0, codPlayer[id][PLAYER_MEDKITS][ALL] - codPlayer[id][PLAYER_MEDKITS][USED]);
+	codPlayer[id][PLAYER_MEDKITS][ALL] = max(0, codPlayer[id][PLAYER_MEDKITS][ALL] - (used ? codPlayer[id][PLAYER_MEDKITS][USED] : 0));
 }
 
-stock calculate_poisons_left(id)
+stock calculate_poisons_left(id, used = true)
 {
 	codPlayer[id][PLAYER_POISONS][ALL] = 0;
 
 	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_POISONS][ALL] += codPlayer[id][PLAYER_POISONS][i];
 
-	codPlayer[id][PLAYER_POISONS][ALL] = max(0, codPlayer[id][PLAYER_POISONS][ALL] - codPlayer[id][PLAYER_POISONS][USED]);
+	codPlayer[id][PLAYER_POISONS][ALL] = max(0, codPlayer[id][PLAYER_POISONS][ALL] - (used ? codPlayer[id][PLAYER_POISONS][USED] : 0));
 }
 
-stock calculate_teleports_left(id)
+stock calculate_teleports_left(id, used = true)
 {
 	codPlayer[id][PLAYER_TELEPORTS][ALL] = 0;
 
@@ -5168,7 +5215,7 @@ stock calculate_teleports_left(id)
 		} else codPlayer[id][PLAYER_TELEPORTS][ALL] += codPlayer[id][PLAYER_TELEPORTS][i];
 	}
 
-	codPlayer[id][PLAYER_TELEPORTS][ALL] = codPlayer[id][PLAYER_TELEPORTS][ALL] == FULL ? FULL : max(0, codPlayer[id][PLAYER_TELEPORTS][ALL] - codPlayer[id][PLAYER_TELEPORTS][USED]);
+	codPlayer[id][PLAYER_TELEPORTS][ALL] = codPlayer[id][PLAYER_TELEPORTS][ALL] == FULL ? FULL : max(0, codPlayer[id][PLAYER_TELEPORTS][ALL] - (used ? codPlayer[id][PLAYER_TELEPORTS][USED] : 0));
 }
 
 stock execute_forward_ignore(forwardHandle)
