@@ -10,6 +10,11 @@ Mod was tested on AMXX builds:
 
 In both cases with ReHLDS and ReGameDLL also installed.
 
+## Documentation
+Docs for all natives and forwards are available in [cod.inc](https://github.com/TheDoctor0/CoDMod/blob/master/cod.inc).
+
+It is recommended to read it, as there are many build-in features that make writing classes, items and others plugins much easier.
+
 ## Configuration
 The configuration can be changed by cvars loaded from [cod_mod.cfg](https://github.com/TheDoctor0/CoDMod/blob/master/resources/addons/amxmodx/configs/cod_mod.cfg).
 
@@ -23,6 +28,11 @@ Options for main menu are stored in [cod_menu.ini](https://github.com/TheDoctor0
 Missions configuration is stored in [cod_missions.ini](https://github.com/TheDoctor0/CoDMod/blob/master/resources/addons/amxmodx/configs/cod_missions.ini).
 
 Available skins are stored in [cod_skins.ini](https://github.com/TheDoctor0/CoDMod/blob/master/resources/addons/amxmodx/configs/cod_skins.ini).
+
+## Additional
+Do you want to add promiotions (advances) to classes?
+
+Check [this example](https://github.com/TheDoctor0/CoDMod/blob/master/classes/codclass_promotions_example.sma) to learn how to do it.
 
 ## Known issues
 **"Cache_TryAlloc: 2331984 is greater then free hunk"** crash can be caused on maps with big .bsp file by multiple sprites loaded by *cod_icons.amxx* plugin.
