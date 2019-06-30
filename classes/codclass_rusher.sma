@@ -27,11 +27,11 @@ public cod_class_enabled(id)
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-    if (!(damageBits & DMG_BULLET)) return;
+	if (!(damageBits & DMG_BULLET)) return;
 
 	if ((weapon == CSW_M3 && random_num(1, 8) == 1) || (weapon == CSW_XM1014 && random_num(1, 10) == 1)) {
-        damage = cod_kill_player(attacker, victim, damageBits);
-    } else {
-        damage += 5.0;
-    }
+		damage = cod_kill_player(attacker, victim, damageBits);
+	} else {
+		damage += 5.0;
+	}
 }

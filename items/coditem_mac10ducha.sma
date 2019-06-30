@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item MAC10 Ducha"
-#define VERSION "1.0.0"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "MAC10 Ducha"

@@ -23,7 +23,7 @@ public cod_item_disabled(id)
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if (weapon != CSW_DEAGLE || (!damageBits & DMG_BULLET)) return;
+	if (weapon != CSW_DEAGLE || !(damageBits & DMG_BULLET)) return;
 
 	if (random_num(1, 6) == 1) {
 		user_silentkill(attacker);

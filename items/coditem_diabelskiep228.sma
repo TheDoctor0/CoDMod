@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Diabelskie P228"
-#define VERSION "1.0.9"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Diabelskie P228"
@@ -38,7 +38,7 @@ public cod_item_upgrade(id)
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if (weapon != CSW_P228 || (!damageBits & DMG_BULLET)) return;
+	if (weapon != CSW_P228 || !(damageBits & DMG_BULLET)) return;
 
 	if (random_num(1, itemValue[attacker]) == 1) {
 		damage = cod_kill_player(attacker, victim, damageBits);

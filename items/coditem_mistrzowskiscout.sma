@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Mistrzowski Scout"
-#define VERSION "1.0.16"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Mistrzowski Scout"
@@ -26,3 +26,4 @@ public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageB
 	if (weapon == CSW_SCOUT && damageBits & DMG_BULLET) {
         damage = cod_kill_player(attacker, victim, damageBits);
     }
+}

@@ -61,7 +61,7 @@ public cod_class_skill_used(id)
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
 	if (weapon == CSW_USP && damageBits & DMG_BULLET) {
-		new bool:kill = false;
+		new kill = false;
 
 		switch (classPromotion[attacker]) {
 			case PROMOTION_NONE, PROMOTION_FIRST: kill = cod_percent_chance(10);

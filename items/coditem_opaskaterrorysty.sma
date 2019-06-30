@@ -40,8 +40,8 @@ public cod_item_upgrade(id)
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
 	if (damageBits & DMG_HEGRENADE && cod_percent_chance(50)) {
-        damage = cod_kill_player(attacker, victim, damageBits);
-    } else {
-        damage += itemValue[attacker];
-    }
+		damage = cod_kill_player(attacker, victim, damageBits);
+	} else {
+		damage += itemValue[attacker];
+	}
 }

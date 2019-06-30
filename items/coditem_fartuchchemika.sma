@@ -27,7 +27,7 @@ public cod_item_enabled(id, value)
 }
 
 public cod_item_skill_used(id)
-	cod_use_user_poisons(id);
+	cod_use_user_poison(id);
 
 public cod_item_value(id)
 	return itemValue[id];

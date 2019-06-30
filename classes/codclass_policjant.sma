@@ -27,13 +27,13 @@ public cod_class_enabled(id, promotion)
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-    if (!(damageBits & DMG_BULLET)) return;
+	if (!(damageBits & DMG_BULLET)) return;
 
 	if (weapon == CSW_DEAGLE) {
-        damage += 20.0;
-    }
+		damage += 20.0;
+	}
 
 	if ((weapon == CSW_USP || weapon == CSW_GLOCK18) && cod_percent_chance(20)) {
-        damage = cod_kill_player(attacker, victim, damageBits);
-    }
+		damage = cod_kill_player(attacker, victim, damageBits);
+	}
 }

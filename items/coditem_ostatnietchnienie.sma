@@ -52,7 +52,7 @@ public check_damage(attacker, victim, Float:damage, damageBits)
 {
 	if (!get_bit(victim, itemActive)) return COD_CONTINUE;
 
-	if (task_exists(victim + TASK_DEATH)) return COD_BLOCK;
+	if (task_exists(victim + TASK_DEATH)) return _:COD_BLOCK;
 
 	if (cod_get_user_health(victim) <= damage) {
 		new data[3];
@@ -65,7 +65,7 @@ public check_damage(attacker, victim, Float:damage, damageBits)
 
 		cod_set_user_godmode(victim, true, ITEM);
 
-		return COD_BLOCK;
+		return _:COD_BLOCK;
 	}
 
 	return COD_CONTINUE;
