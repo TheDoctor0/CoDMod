@@ -466,6 +466,12 @@ Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - stat
 native cod_get_user_medkits(id, type = ALL);
 
 /*------------------------------
+Return player's poisons amount.
+Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
+------------------------------*/
+native cod_get_user_poisons(id, type = ALL);
+
+/*------------------------------
 Return player's dynamites amount.
 Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
 ------------------------------*/
@@ -523,6 +529,12 @@ Set player's medkits amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
 ------------------------------*/
 native cod_set_user_medkits(id, value, type = ROUND);
+
+/*------------------------------
+Set player's poisons amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
+------------------------------*/
+native cod_set_user_poisons(id, value, type = ROUND);
 
 /*------------------------------
 Set player's dynamites amount.
@@ -586,6 +598,12 @@ Add value to player's medkits amount.
 Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
 ------------------------------*/
 native cod_add_user_medkits(id, value, type = ROUND);
+
+/*------------------------------
+Add value to player's poisons amount.
+Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
+------------------------------*/
+native cod_add_user_poisons(id, value, type = ROUND);
 
 /*------------------------------
 Add value to player's dynamites amount.
@@ -652,6 +670,11 @@ native cod_use_user_thunder(id);
 Use player's medkit.
 ------------------------------*/
 native cod_use_user_medkit(id);
+
+/*------------------------------
+Use player's poison.
+------------------------------*/
+native cod_use_user_poison(id);
 
 /*------------------------------
 Use player's teleport.
@@ -1198,6 +1221,16 @@ Healing will be blocked if COD_BLOCK is returned.
 Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
 ------------------------------*/
 forward cod_medkit_heal(id, player, Float:healed);
+
+/*------------------------------
+Multiforward executed on poison damage.
+Id is poison owner.
+Player is poisoned player.
+Damage is damage that poison made to player.
+Damage will be blocked if COD_BLOCK is returned.
+Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
+------------------------------*/
+forward cod_poison_infect(id, player, Float:damage);
 
 /*------------------------------
 Multiforward executed on rocket explosion (when there is damage).
