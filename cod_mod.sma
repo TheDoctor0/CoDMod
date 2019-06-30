@@ -42,7 +42,7 @@ new const commandPoints[][] = { "punkty", "say /statystyki", "say_team /statysty
 new const commandHud[][] = { "hud", "say /hud", "say_team /hud", "say /zmienhud", "say_team /zmienhud", "say /change_hud", "say_team /change_hud" };
 new const commandBinds[][] = { "bindy", "binny", "say /bind", "say_team /bind", "say /bindy", "say_team /bindy", "say /binds", "say_team /binds" };
 new const commandTop[][] = { "top", "say /toplvl", "say_team /toplvl", "say /toplevel", "say_team /toplevel", "say /toppoziom", "say_team /toppoziom", "say /ltop15", "say_team /ltop15", "say /ptop15", "say_team /ptop15" };
-new const commandBlock[][] = { "fullupdate", "cl_autobuy", "cl_rebuy", "cl_setautobuy", "rebuy", "autobuy", "hegren", "sgren", "flash", "-rocket", "-mine", "-dynamite", "-medkit", "-teleport", "-class", "-item" };
+new const commandBlock[][] = { "fullupdate", "cl_autobuy", "cl_rebuy", "cl_setautobuy", "rebuy", "autobuy", "hegren", "sgren", "flash", "-rocket", "-mine", "-dynamite", "-medkit", "-poison", "-teleport", "-class", "-item" };
 
 new const weapons[][] = { "", "weapon_p228", "", "weapon_scout", "weapon_hegrenade", "weapon_xm1014", "weapon_c4", "weapon_mac10",
 		"weapon_aug", "weapon_smokegrenade", "weapon_elite", "weapon_fiveseven", "weapon_ump45", "weapon_sg550", "weapon_galil",
@@ -57,13 +57,14 @@ new const maxBpAmmo[] = { -1, 52, -1, 90, 1, 32, 1, 100, 90, 1, 120, 100, 100, 9
 
 new const pointsDistribution[] = { 1, 3, 5, 10, 25, FULL };
 
-enum _:models { MODEL_ROCKET, MODEL_MINE, MODEL_DYNAMITE, MODEL_MEDKIT };
+enum _:models { MODEL_ROCKET, MODEL_MINE, MODEL_DYNAMITE, MODEL_MEDKIT, MODEL_POISON };
 
 new const codModels[models][] = {
 	"models/CoDMod/rocket.mdl",
 	"models/CoDMod/mine.mdl",
 	"models/CoDMod/dynamite.mdl",
-	"models/CoDMod/medkit.mdl"
+	"models/CoDMod/medkit.mdl",
+	"models/CoDMod/poison.mdl"
 };
 
 enum _:sprites { SPRITE_EXPLOSION, SPRITE_WHITE, SPRITE_THUNDER, SPRITE_FIRE, SPRITE_SMOKE };
@@ -87,8 +88,9 @@ enum _:weaponSlots { PRIMARY = 1, SECONDARY, KNIFE, GRENADES, C4 };
 enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, SPEED_CHANGED, DAMAGE_PRE, DAMAGE_POST,
 	DAMAGE_INFLICT, WEAPON_DEPLOY, CUR_WEAPON, KILLED, SPAWNED, CMD_START, BOMB_DROPPED, BOMB_PICKED, BOMB_PLANTING,
 	BOMB_PLANTED, BOMB_DEFUSING, BOMB_DEFUSED, BOMB_EXPLODED, HOSTAGE_KILLED, HOSTAGE_RESCUED, HOSTAGES_RESCUED,
-	TEAM_ASSIGN, NEW_ROUND, START_ROUND, RESTART_ROUND, END_ROUND, WIN_ROUND, END_MAP, MEDKIT_HEAL, ROCKET_EXPLODE,
-	MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH, TELEPORT_USED, RESET_DATA, RESET_STATS_DATA, RESET_ALL_DATA, FLAGS_CHANGED };
+	TEAM_ASSIGN, NEW_ROUND, START_ROUND, RESTART_ROUND, END_ROUND, WIN_ROUND, END_MAP, MEDKIT_HEAL, POISON_INFECT,
+	ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH, TELEPORT_USED, RESET_DATA, RESET_STATS_DATA,
+	RESET_ALL_DATA, FLAGS_CHANGED };
 
 enum _:itemInfo { ITEM_NAME[MAX_NAME], ITEM_DESC[MAX_DESC], ITEM_PLUGIN, ITEM_RANDOM_MIN, ITEM_RANDOM_MAX, ITEM_GIVE, ITEM_DROP,
 	ITEM_SPAWNED, ITEM_KILL, ITEM_KILLED, ITEM_SKILL_USED, ITEM_UPGRADE, ITEM_VALUE, ITEM_DAMAGE_ATTACKER, ITEM_DAMAGE_VICTIM };
@@ -103,12 +105,12 @@ enum _:renderInfo { RENDER_TYPE, RENDER_VALUE, RENDER_STATUS, RENDER_WEAPON };
 
 enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_PROMOTION, PLAYER_LEVEL, PLAYER_GAINED_LEVEL, PLAYER_EXP, PLAYER_GAINED_EXP, PLAYER_HEAL, PLAYER_INT, PLAYER_STAM,
 	PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTRA_HEAL, PLAYER_EXTRA_INT, PLAYER_EXTRA_STAM, PLAYER_EXTRA_STR, PLAYER_EXTRA_COND, PLAYER_EXTRA_WEAPONS, PLAYER_WEAPON,
-	PLAYER_WEAPONS, PLAYER_STATUS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_SPAWNED, PLAYER_DAMAGE_TAKEN, PLAYER_DAMAGE_GIVEN, PLAYER_RENDER, PLAYER_KS, PLAYER_TIME_KS,
-	PLAYER_ALIVE, PLAYER_FLAGS, Float:PLAYER_LAST_ROCKET, Float:PLAYER_LAST_MINE, Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_THUNDER, Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_RED,
-	PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, SKILL_USE, PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1], PLAYER_MEDKITS[ALL + 1], PLAYER_THUNDERS[ALL + 1],
-	PLAYER_TELEPORTS[ALL + 1], PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1], PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1], PLAYER_RESISTANCE[ALL + 1], PLAYER_GODMODE[ALL + 1], PLAYER_NOCLIP[ALL + 1],
-	PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1], PLAYER_ELIMINATOR[ALL + 1], PLAYER_ELIMINATOR_WEAPONS[ALL + 1], PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1],
-	Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_SAFE_NAME] };
+	PLAYER_WEAPONS, PLAYER_STATUS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_SPAWNED, PLAYER_DAMAGE_TAKEN, PLAYER_DAMAGE_GIVEN, PLAYER_RENDER, PLAYER_KS,
+	PLAYER_TIME_KS, PLAYER_ALIVE, PLAYER_FLAGS, Float:PLAYER_LAST_ROCKET, Float:PLAYER_LAST_MINE, Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_POISON, Float:PLAYER_LAST_THUNDER,
+	Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, SKILL_USE, PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1],
+	PLAYER_MEDKITS[ALL + 1], PLAYER_POISONS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1], PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1],
+	PLAYER_RESISTANCE[ALL + 1], PLAYER_GODMODE[ALL + 1], PLAYER_NOCLIP[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1], PLAYER_ELIMINATOR[ALL + 1], PLAYER_ELIMINATOR_WEAPONS[ALL + 1],
+	PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_SAFE_NAME] };
 
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 
@@ -182,6 +184,7 @@ public plugin_init()
 	register_clcmd("+mine", "bind_use_mine");
 	register_clcmd("+dynamite", "bind_use_dynamite");
 	register_clcmd("+medkit", "bind_use_medkit");
+	register_clcmd("+poison", "bind_use_poison");
 	register_clcmd("+thunder", "bind_use_thunder");
 	register_clcmd("+teleport", "bind_use_teleport");
 	register_clcmd("+class", "use_class");
@@ -192,6 +195,7 @@ public plugin_init()
 	register_touch("rocket", "*" , "touch_rocket");
 	register_touch("mine", "player" , "touch_mine");
 	register_think("medkit", "think_medkit");
+	register_think("poison", "think_poison");
 
 	RegisterHam(Ham_Spawn, "player", "player_spawn", 1);
 	RegisterHam(Ham_TakeDamage, "player", "player_take_damage_pre", 0);
@@ -269,6 +273,7 @@ public plugin_init()
 	codForwards[WIN_ROUND] = CreateMultiForward("cod_win_round", ET_IGNORE, FP_CELL);
 	codForwards[END_MAP] = CreateMultiForward("cod_end_map", ET_IGNORE);
 	codForwards[MEDKIT_HEAL] = CreateMultiForward("cod_medkit_heal", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
+	codForwards[POISON_INFECT] = CreateMultiForward("cod_poison_infect", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
 	codForwards[ROCKET_EXPLODE] = CreateMultiForward("cod_rocket_explode", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
 	codForwards[MINE_EXPLODE] = CreateMultiForward("cod_mine_explode", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
 	codForwards[DYNAMITE_EXPLODE] = CreateMultiForward("cod_dynamite_explode", ET_CONTINUE, FP_CELL, FP_CELL, FP_FLOAT);
@@ -352,6 +357,7 @@ public plugin_natives()
 	register_native("cod_get_user_dynamites", "_cod_get_user_dynamites", 1);
 	register_native("cod_get_user_thunders", "_cod_get_user_thunders", 1);
 	register_native("cod_get_user_medkits", "_cod_get_user_medkits", 1);
+	register_native("cod_get_user_poisons", "_cod_get_user_poisons", 1);
 	register_native("cod_get_user_teleports", "_cod_get_user_teleports", 1);
 	register_native("cod_get_user_multijumps", "_cod_get_user_multijumps", 1);
 	register_native("cod_get_user_gravity", "_cod_get_user_gravity", 1);
@@ -363,6 +369,7 @@ public plugin_natives()
 	register_native("cod_set_user_dynamites", "_cod_set_user_dynamites", 1);
 	register_native("cod_set_user_thunders", "_cod_set_user_thunders", 1);
 	register_native("cod_set_user_medkits", "_cod_set_user_medkits", 1);
+	register_native("cod_set_user_poisons", "_cod_set_user_poisons", 1);
 	register_native("cod_set_user_teleports", "_cod_set_user_teleports", 1);
 	register_native("cod_set_user_multijumps", "_cod_set_user_multijumps", 1);
 	register_native("cod_set_user_gravity", "_cod_set_user_gravity", 1);
@@ -374,6 +381,7 @@ public plugin_natives()
 	register_native("cod_add_user_dynamites", "_cod_add_user_dynamites", 1);
 	register_native("cod_add_user_thunders", "_cod_add_user_thunders", 1);
 	register_native("cod_add_user_medkits", "_cod_add_user_medkits", 1);
+	register_native("cod_add_user_poisons", "_cod_add_user_poisons", 1);
 	register_native("cod_add_user_teleports", "_cod_add_user_teleports", 1);
 	register_native("cod_add_user_multijumps", "_cod_add_user_multijumps", 1);
 	register_native("cod_add_user_gravity", "_cod_add_user_gravity", 1);
@@ -385,6 +393,7 @@ public plugin_natives()
 	register_native("cod_use_user_dynamite", "_cod_use_user_dynamite", 1);
 	register_native("cod_use_user_thunder", "_cod_use_user_thunder", 1);
 	register_native("cod_use_user_medkit", "_cod_use_user_medkit", 1);
+	register_native("cod_use_user_poison", "_cod_use_user_poison", 1);
 	register_native("cod_use_user_teleport", "_cod_use_user_teleport", 1);
 
 	register_native("cod_get_user_bunnyhop", "_cod_get_user_bunnyhop", 1);
@@ -1417,6 +1426,7 @@ public show_binds(id, sound)
 	menu_additem(menu, "\wDynamit \y[\r+dynamite\y]");
 	menu_additem(menu, "\wBlyskawica \y[\r+thunder\y]");
 	menu_additem(menu, "\wApteczka \y[\r+medkit\y]");
+	menu_additem(menu, "\wTrucizna \y[\r+poison\y]");
 	menu_additem(menu, "\wTeleport \y[\r+teleport\y]");
 	menu_additem(menu, "\wKlasa \y[\r+class\y]");
 	menu_additem(menu, "\wPrzedmiot \y[\r+item\y]");
@@ -1785,7 +1795,7 @@ public use_medkit(id)
 	entity_set_float(ent, EV_FL_ltime, halflife_time() + 7 + 0.1);
 
 	entity_set_model(ent, codModels[MODEL_MEDKIT]);
-	set_rendering(ent, kRenderFxGlowShell, 255,0,0, kRenderFxNone, 255);
+	set_rendering(ent, kRenderFxGlowShell, 255, 0, 0, kRenderFxNone, 120);
 	drop_to_floor(ent);
 
 	entity_set_float(ent, EV_FL_nextthink, halflife_time() + 0.1);
@@ -1809,7 +1819,7 @@ public think_medkit(ent)
 		make_explosion(ent, 300, 0, 300.0, -5.0, 0.5, _, MEDKIT_HEAL);
 
 		entity_set_edict(ent, EV_ENT_euser2, 0);
-		entity_set_float(ent, EV_FL_nextthink, halflife_time() + 1.5);
+		entity_set_float(ent, EV_FL_nextthink, halflife_time() + 1.25);
 
 		return PLUGIN_CONTINUE;
 	}
@@ -1820,9 +1830,102 @@ public think_medkit(ent)
 		return PLUGIN_CONTINUE;
 	}
 
-	if (entity_get_float(ent, EV_FL_ltime) - 2.0 < halflife_time()) set_rendering(ent, kRenderFxNone, 255, 255, 255, kRenderTransAlpha, 100);
+	if (entity_get_float(ent, EV_FL_ltime) - 0.5 < halflife_time()) {
+		set_rendering(ent, kRenderFxNone, 255, 255, 255, kRenderTransAlpha, 100);
+	}
 
 	make_explosion(ent, 300, 0);
+
+	entity_set_edict(ent, EV_ENT_euser2, 1);
+	entity_set_float(ent, EV_FL_nextthink, halflife_time() + 0.5);
+
+	return PLUGIN_CONTINUE;
+}
+
+public bind_use_poison(id)
+{
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id) || codPlayer[id][SKILL_USE] > NONE) return PLUGIN_HANDLED;
+
+	use_poison(id);
+
+	return PLUGIN_HANDLED;
+}
+
+public use_poison(id)
+{
+	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_HANDLED;
+
+	if (!codPlayer[id][PLAYER_POISONS][ALL]) {
+		set_dhudmessage(0, 255, 210, -1.0, 0.32, 0, 0.0, 1.25, 0.0, 0.0);
+		show_dhudmessage(id, "Wykorzystales juz wszystkie trucizny!");
+
+		return PLUGIN_HANDLED;
+	}
+
+	if (codPlayer[id][PLAYER_LAST_POISON] + 3.0 > get_gametime()) {
+		set_dhudmessage(0, 255, 210, -1.0, 0.32, 0, 0.0, 1.25, 0.0, 0.0);
+		show_dhudmessage(id, "Trucizny mozesz klasc co 3 sekundy!");
+
+		return PLUGIN_HANDLED;
+	}
+
+	codPlayer[id][SKILL_USE] = 0;
+
+	codPlayer[id][PLAYER_LAST_POISON] = get_gametime();
+	codPlayer[id][PLAYER_POISONS][ALL]--;
+	codPlayer[id][PLAYER_POISONS][USED]++;
+
+	new Float:origin[3], ent = create_entity("info_target");
+
+	entity_get_vector(id, EV_VEC_origin, origin);
+
+	entity_set_string(ent, EV_SZ_classname, "poison");
+	entity_set_edict(ent, EV_ENT_owner, id);
+	entity_set_int(ent, EV_INT_solid, SOLID_NOT);
+	entity_set_vector(ent, EV_VEC_origin, origin);
+	entity_set_float(ent, EV_FL_ltime, halflife_time() + 7 + 0.1);
+
+	entity_set_model(ent, codModels[MODEL_POISON]);
+	set_rendering(ent, kRenderFxGlowShell, 0, 255, 0, kRenderFxNone, 120);
+	drop_to_floor(ent);
+
+	entity_set_float(ent, EV_FL_nextthink, halflife_time() + 0.1);
+
+	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+	return PLUGIN_HANDLED;
+}
+
+public think_poison(ent)
+{
+	if (!is_valid_ent(ent)) return PLUGIN_CONTINUE;
+
+	new id = entity_get_edict(ent, EV_ENT_owner);
+
+	if (entity_get_edict(ent, EV_ENT_euser2) == 1) {
+		new Float:origin[3];
+
+		entity_get_vector(ent, EV_VEC_origin, origin);
+
+		make_explosion(ent, 300, 0, 300.0, 1.0, 0.5, _, POISON_INFECT);
+
+		entity_set_edict(ent, EV_ENT_euser2, 0);
+		entity_set_float(ent, EV_FL_nextthink, halflife_time() + 1.25);
+
+		return PLUGIN_CONTINUE;
+	}
+
+	if (entity_get_float(ent, EV_FL_ltime) < halflife_time() || !is_user_alive(id)) {
+		remove_entity(ent);
+
+		return PLUGIN_CONTINUE;
+	}
+
+	if (entity_get_float(ent, EV_FL_ltime) - 0.5 < halflife_time()) {
+		set_rendering(ent, kRenderFxNone, 255, 255, 255, kRenderTransAlpha, 100);
+	}
+
+	make_explosion(ent, 300, 0, .type=POISON_INFECT);
 
 	entity_set_edict(ent, EV_ENT_euser2, 1);
 	entity_set_float(ent, EV_FL_nextthink, halflife_time() + 0.5);
@@ -1844,7 +1947,7 @@ public use_thunder(id)
 	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_HANDLED;
 
 	if (!codPlayer[id][PLAYER_THUNDERS][ALL]) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.32, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Wykorzystales juz wszystkie pioruny!");
 
 		return PLUGIN_HANDLED;
@@ -1857,7 +1960,7 @@ public use_thunder(id)
 	if (!is_user_alive(victim) || get_user_team(victim) == get_user_team(id)) return PLUGIN_HANDLED;
 
 	if (codPlayer[id][PLAYER_LAST_THUNDER] + 3.0 > get_gametime()) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.32, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Piorunow mozesz uzywac co 3 sekundy!");
 
 		return PLUGIN_HANDLED;
@@ -1920,21 +2023,21 @@ public use_teleport(id)
 	if (!is_user_alive(id) || freezeTime || skills_blocked(id)) return PLUGIN_HANDLED;
 
 	if (codPlayer[id][PLAYER_TELEPORTS][ALL] == 0) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.38, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Wykorzystales juz wszystkie teleporty!");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (roundStart + 15.0 > get_gametime()) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.38, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Teleportowac mozesz sie po 15 sekundach od rozpoczecia rundy!");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (codPlayer[id][PLAYER_LAST_TELEPORT] + 15.0 > get_gametime()) {
-		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
+		set_dhudmessage(0, 255, 210, -1.0, 0.38, 0, 0.0, 1.25, 0.0, 0.0);
 		show_dhudmessage(id, "Teleportowac mozesz sie co 15 sekund!");
 
 		return PLUGIN_HANDLED;
@@ -3083,6 +3186,7 @@ public reset_attributes(id, type)
 	codPlayer[id][PLAYER_DYNAMITES][type] = 0;
 	codPlayer[id][PLAYER_THUNDERS][type] = 0;
 	codPlayer[id][PLAYER_MEDKITS][type] = 0;
+	codPlayer[id][PLAYER_POISONS][type] = 0;
 	codPlayer[id][PLAYER_JUMPS][type] = 0;
 	codPlayer[id][PLAYER_RESISTANCE][type] = 0;
 	codPlayer[id][PLAYER_BUNNYHOP][type] = 0;
@@ -3119,7 +3223,7 @@ public reset_attributes(id, type)
 		codPlayer[id][PLAYER_MINES][USED] = 0;
 		codPlayer[id][PLAYER_DYNAMITES][USED] = 0;
 		codPlayer[id][PLAYER_THUNDERS][USED] = 0;
-		codPlayer[id][PLAYER_MEDKITS][USED] = 0;
+		codPlayer[id][PLAYER_POISONS][USED] = 0;
 		codPlayer[id][PLAYER_TELEPORTS][USED] = 0;
 
 		if (task_exists(id + TASK_END_KILL_STREAK)) remove_task(id + TASK_END_KILL_STREAK);
@@ -3135,6 +3239,7 @@ public reset_attributes(id, type)
 		calculate_dynamites_left(id);
 		calculate_thunders_left(id);
 		calculate_medkits_left(id);
+		calculate_poisons_left(id);
 		calculate_teleports_left(id);
 	}
 
@@ -3205,6 +3310,7 @@ public set_attributes(id)
 	calculate_dynamites_left(id);
 	calculate_thunders_left(id);
 	calculate_medkits_left(id);
+	calculate_poisons_left(id);
 	calculate_teleports_left(id);
 
 	set_gravity(id);
@@ -3326,6 +3432,7 @@ public reset_player(id)
 		codPlayer[id][PLAYER_DYNAMITES][i] = 0;
 		codPlayer[id][PLAYER_THUNDERS][i] = 0;
 		codPlayer[id][PLAYER_MEDKITS][i] = 0;
+		codPlayer[id][PLAYER_POISONS][i] = 0;
 		codPlayer[id][PLAYER_TELEPORTS][i] = 0;
 		codPlayer[id][PLAYER_JUMPS][i] = 0;
 		codPlayer[id][PLAYER_BUNNYHOP][i] = 0;
@@ -3386,7 +3493,7 @@ public remove_tasks(id)
 stock remove_ents(id = 0, const className[] = "")
 {
 	if (!strlen(className)) {
-		new const ents[][] = { "rocket", "mine", "dynamite", "medkit" };
+		new const ents[][] = { "rocket", "mine", "dynamite", "medkit", "poison" };
 
 		for (new i = 0; i < sizeof(ents); i++) {
 			new ent = find_ent_by_class(-1, ents[i]);
@@ -3998,6 +4105,9 @@ public _cod_get_user_thunders(id, type)
 public _cod_get_user_medkits(id, type)
 	return codPlayer[id][PLAYER_MEDKITS][type];
 
+public _cod_get_user_poisons(id, type)
+	return codPlayer[id][PLAYER_POISONS][type];
+
 public _cod_get_user_teleports(id, type)
 	return codPlayer[id][PLAYER_TELEPORTS][type];
 
@@ -4046,6 +4156,13 @@ public _cod_set_user_medkits(id, value, type)
 	codPlayer[id][PLAYER_MEDKITS][type] = max(0, value);
 
 	calculate_medkits_left(id);
+}
+
+public _cod_set_user_poisons(id, value, type)
+{
+	codPlayer[id][PLAYER_POISONS][type] = max(0, value);
+
+	calculate_poisons_left(id);
 }
 
 public _cod_set_user_teleports(id, value, type)
@@ -4117,6 +4234,13 @@ public _cod_add_user_medkits(id, value, type)
 	calculate_medkits_left(id);
 }
 
+public _cod_add_user_poisons(id, value, type)
+{
+	codPlayer[id][PLAYER_POISONS][type] = max(0, codPlayer[id][PLAYER_POISONS][type] + value);
+
+	calculate_poisons_left(id);
+}
+
 public _cod_add_user_teleports(id, value, type)
 {
 	codPlayer[id][PLAYER_TELEPORTS][type] = codPlayer[id][PLAYER_TELEPORTS][type] == FULL ? FULL : max(0, codPlayer[id][PLAYER_TELEPORTS][type] + value);
@@ -4165,6 +4289,9 @@ public _cod_use_user_thunder(id)
 
 public _cod_use_user_medkit(id)
 	use_medkit(id);
+
+public _cod_use_user_poison(id)
+	use_poison(id);
 
 public _cod_use_user_teleport(id)
 	use_teleport(id);
@@ -5020,6 +5147,15 @@ stock calculate_medkits_left(id)
 	codPlayer[id][PLAYER_MEDKITS][ALL] = max(0, codPlayer[id][PLAYER_MEDKITS][ALL] - codPlayer[id][PLAYER_MEDKITS][USED]);
 }
 
+stock calculate_poisons_left(id)
+{
+	codPlayer[id][PLAYER_POISONS][ALL] = 0;
+
+	for (new i = CLASS; i <= DEATH; i++) codPlayer[id][PLAYER_POISONS][ALL] += codPlayer[id][PLAYER_POISONS][i];
+
+	codPlayer[id][PLAYER_POISONS][ALL] = max(0, codPlayer[id][PLAYER_POISONS][ALL] - codPlayer[id][PLAYER_POISONS][USED]);
+}
+
 stock calculate_teleports_left(id)
 {
 	codPlayer[id][PLAYER_TELEPORTS][ALL] = 0;
@@ -5234,8 +5370,15 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 		write_byte(10);
 		write_byte(10);
 		write_byte(255);
-		write_byte(255);
-		write_byte(100);
+
+		if (type == POISON_INFECT) {
+			write_byte(100);
+			write_byte(255);
+		} else {
+			write_byte(255);
+			write_byte(100);
+		}
+
 		write_byte(100);
 		write_byte(128);
 		write_byte(0);
@@ -5257,14 +5400,18 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damage_distance = 0
 
 				switch (type) {
 					case MEDKIT_HEAL: codPlayer[id][PLAYER_LAST_MEDKIT] += ret;
+					case POISON_INFECT: codPlayer[id][PLAYER_LAST_POISON] += ret;
 					case MINE_EXPLODE: codPlayer[id][PLAYER_LAST_MINE] += ret;
 					case ROCKET_EXPLODE: codPlayer[id][PLAYER_LAST_ROCKET] += ret;
 					case DYNAMITE_EXPLODE: codPlayer[id][PLAYER_LAST_DYNAMITE] += ret;
 				}
 			}
 
-			if (damage < 0.0) cod_add_user_health(player, floatround(floatabs(damage) + codPlayer[id][PLAYER_INT] * factor), 1);
-			else {
+			if (damage < 0.0) {
+				cod_add_user_health(player, floatround(floatabs(damage) + codPlayer[id][PLAYER_INT] * factor), 1);
+			} else if (type == POISON_INFECT) {
+				_cod_repeat_damage(id, player, 5.0 + cod_get_user_intelligence(id) * 0.02, 1.0, 10, POISON, 1);
+			} else {
 				switch (type) {
 					case MINE_EXPLODE: flag = DMG_MINE;
 					case ROCKET_EXPLODE: flag = DMG_ROCKET;
