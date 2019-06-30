@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Tajemnica Mysliwego"
-#define VERSION "1.0.13"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Tajemnica Mysliwego"
@@ -51,4 +51,8 @@ public cod_item_value(id)
 	return itemValue[id];
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (weapon == CSW_SCOUT && damageBits & DMG_BULLET && cod_percent_chance(50)) damage = cod_kill_player(attacker, victim, damageBits);
+{
+	if (weapon == CSW_SCOUT && damageBits & DMG_BULLET && cod_percent_chance(50)) {
+		damage = cod_kill_player(attacker, victim, damageBits);
+	}
+}

@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Latarka"
-#define VERSION "1.0.10"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Latarka"
@@ -41,7 +41,9 @@ public cod_item_spawned(id, respawn)
 {
 	rem_bit(id, flashlightActive);
 
-	if (!respawn) flashlightBattery[id] = FLASHLIGHT;
+	if (!respawn) {
+		flashlightBattery[id] = FLASHLIGHT;
+	}
 }
 
 public cod_item_skill_used(id)
@@ -50,11 +52,15 @@ public cod_item_skill_used(id)
 		rem_bit(id, flashlightActive);
 	} else if (flashlightBattery[id]) set_bit(id, flashlightActive);
 
-	if (!task_exists(id + TASK_CHARGE)) set_task(1.0, "flashlight_charge", id + TASK_CHARGE, .flags = "b");
+	if (!task_exists(id + TASK_CHARGE)) {
+		set_task(1.0, "flashlight_charge", id + TASK_CHARGE, .flags = "b");
+	}
 
 	static msgFlashlight;
 
-	if (!msgFlashlight) msgFlashlight = get_user_msgid("Flashlight");
+	if (!msgFlashlight) {
+		msgFlashlight = get_user_msgid("Flashlight");
+	}
 
 	message_begin(MSG_ONE, msgFlashlight, {0, 0, 0}, id);
 	write_byte(get_bit(id, flashlightActive));
@@ -71,9 +77,17 @@ public cod_cmd_start(id, button, oldButton, flags, playerState)
 	if (get_bit(id, flashlightActive) && flashlightBattery[id]) {
 		static flashlightR, flashlightG, flashlightB;
 
-		if ((flashlightR += 1 + random_num(0, 2)) > 250) flashlightR -= 245;
-		if ((flashlightG += 1 + random_num(-1, 1)) > 250) flashlightG -= 245;
-		if ((flashlightB += -1 + random_num(-1, 1)) < 5) flashlightB += 240;
+		if ((flashlightR += 1 + random_num(0, 2)) > 250) {
+			flashlightR -= 245;
+		}
+
+		if ((flashlightG += 1 + random_num(-1, 1)) > 250) {
+			flashlightG -= 245;
+		}
+
+		if ((flashlightB += -1 + random_num(-1, 1)) < 5) {
+			flashlightB += 240;
+		}
 
 		static origin[3];
 
@@ -114,11 +128,19 @@ public flashlight_charge(id)
 
 	static msgFlashlight, msgFlashBat;
 
-	if (!msgFlashlight) msgFlashlight = get_user_msgid("Flashlight");
-	if (!msgFlashBat) msgFlashBat = get_user_msgid("FlashBat");
+	if (!msgFlashlight) {
+		msgFlashlight = get_user_msgid("Flashlight");
+	}
 
-	if (get_bit(id, flashlightActive)) flashlightBattery[id] = max(0, --flashlightBattery[id]);
-	else flashlightBattery[id] = min(++flashlightBattery[id], FLASHLIGHT);
+	if (!msgFlashBat) {
+		msgFlashBat = get_user_msgid("FlashBat");
+	}
+
+	if (get_bit(id, flashlightActive)) {
+		flashlightBattery[id] = max(0, --flashlightBattery[id]);
+	} else {
+		flashlightBattery[id] = min(++flashlightBattery[id], FLASHLIGHT);
+	}
 
 	message_begin(MSG_ONE, msgFlashBat, {0, 0, 0}, id);
 	write_byte(flashlightBattery[id]);

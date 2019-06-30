@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Dobra Krowka"
-#define VERSION "1.0.17"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Dobra Krowka"
@@ -39,4 +39,8 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, .valueMax = VALUE_MAX);
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (weapon == CSW_M249 && damageBits & DMG_BULLET) damage += float(itemValue[attacker]);
+{
+	if (weapon == CSW_M249 && damageBits & DMG_BULLET) {
+        damage += float(itemValue[attacker]);
+    }
+}

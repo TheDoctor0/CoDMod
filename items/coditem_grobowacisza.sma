@@ -1,14 +1,14 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Item Cios zza Grobu"
-#define VERSION "1.0.8"
+#define PLUGIN "CoD Item Grobowa Cisza"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-#define NAME        "Cios zza Grobu"
+#define NAME        "Grobowa Cisza"
 #define DESCRIPTION "Po smierci wybuchasz zadajac %s (+int) obrazen wrogom w poblizu"
-#define RANDOM_MIN  100
-#define RANDOM_MAX  125
+#define RANDOM_MIN  150
+#define RANDOM_MAX  175
 #define UPGRADE_MIN -5
 #define UPGRADE_MAX 7
 

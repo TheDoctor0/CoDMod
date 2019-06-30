@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Eliminator Rozrzutu"
-#define VERSION "1.0.4"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Eliminator Rozrzutu"

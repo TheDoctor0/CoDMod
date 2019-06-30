@@ -32,7 +32,9 @@ public cod_class_enabled(id)
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if ((weapon == CSW_AWP && damageBits & DMG_BULLET && cod_percent_chance(50)) || (weapon == CSW_KNIFE && cod_percent_chance(50) && !(pev(attacker, pev_button) & IN_ATTACK))) {
+	if ((weapon == CSW_AWP && damageBits & DMG_BULLET && cod_percent_chance(50))
+        || (weapon == CSW_KNIFE && cod_percent_chance(50) && !(pev(attacker, pev_button) & IN_ATTACK))
+    ) {
         damage = cod_kill_player(attacker, victim, damageBits);
     }
 }

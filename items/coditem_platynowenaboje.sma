@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Platynowe Naboje"
-#define VERSION "1.0.0"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Platynowe Naboje"
@@ -32,4 +32,8 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, .valueMax = VALUE_MAX);
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits & DMG_BULLET) damage += float(itemValue[attacker]);
+{
+	if (damageBits & DMG_BULLET) {
+        damage += float(itemValue[attacker]);
+    }
+}

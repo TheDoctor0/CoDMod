@@ -52,7 +52,9 @@ public cod_class_spawned(id, respawn)
 {
 	rem_bit(id, flashlightActive);
 
-	if (!respawn) flashlightBattery[id] = FLASHLIGHT;
+	if (!respawn) {
+		flashlightBattery[id] = FLASHLIGHT;
+	}
 
 	if (cod_get_user_weapon(id) == CSW_KNIFE) {
 		cod_repeat_damage(id, id, 3.0 + 0.1 * cod_get_user_intelligence(id), 1.0, 0, HEAL, 0);
@@ -72,8 +74,11 @@ public cod_weapon_deploy(id, weapon, ent)
 
 public cod_class_skill_used(id)
 {
-	if (get_bit(id, flashlightActive)) rem_bit(id, flashlightActive);
-	else if (flashlightBattery[id]) set_bit(id, flashlightActive);
+	if (get_bit(id, flashlightActive)) {
+		rem_bit(id, flashlightActive);
+	} else if (flashlightBattery[id]) {
+		set_bit(id, flashlightActive);
+	}
 
 	if (!task_exists(id + TASK_CHARGE)) {
 		set_task(1.0, "flashlight_charge", id + TASK_CHARGE, .flags = "b");
@@ -81,7 +86,9 @@ public cod_class_skill_used(id)
 
 	static msgFlashlight;
 
-	if (!msgFlashlight) msgFlashlight = get_user_msgid("Flashlight");
+	if (!msgFlashlight) {
+		msgFlashlight = get_user_msgid("Flashlight");
+	}
 
 	message_begin(MSG_ONE, msgFlashlight, {0, 0, 0}, id);
 	write_byte(get_bit(id, flashlightActive));
@@ -141,11 +148,19 @@ public flashlight_charge(id)
 
 	static msgFlashlight, msgFlashBat;
 
-	if (!msgFlashlight) msgFlashlight = get_user_msgid("Flashlight");
-	if (!msgFlashBat) msgFlashBat = get_user_msgid("FlashBat");
+	if (!msgFlashlight) {
+		msgFlashlight = get_user_msgid("Flashlight");
+	}
 
-	if (get_bit(id, flashlightActive)) flashlightBattery[id] = max(0, --flashlightBattery[id]);
-	else flashlightBattery[id] = min(++flashlightBattery[id], FLASHLIGHT);
+	if (!msgFlashBat) {
+		msgFlashBat = get_user_msgid("FlashBat");
+	}
+
+	if (get_bit(id, flashlightActive)) {
+		flashlightBattery[id] = max(0, --flashlightBattery[id]);
+	} else {
+		flashlightBattery[id] = min(++flashlightBattery[id], FLASHLIGHT);
+	}
 
 	message_begin(MSG_ONE, msgFlashBat, {0, 0, 0}, id);
 	write_byte(flashlightBattery[id]);

@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Ruska Czapka"
-#define VERSION "1.0.9"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Ruska Czapka"

@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Wyposazenie Wsparcia"
-#define VERSION "1.0.20"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Wyposazenie Wsparcia"

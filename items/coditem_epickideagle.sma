@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Epicki Deagle"
-#define VERSION "1.0.10"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Epicki Deagle"
@@ -40,8 +40,11 @@ public cod_item_upgrade(id)
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if (damageBits & DMG_BULLET && weapon == CSW_DEAGLE) {
-		if(random_num(1, 6) == 1) damage = cod_kill_player(attacker, victim, damageBits);
-		else damage += float(itemValue[attacker]);
+	if (weapon != CSW_DEAGLE || !(damageBits & DMG_BULLET)) return;
+
+	if (random_num(1, 6) == 1) {
+		damage = cod_kill_player(attacker, victim, damageBits);
+	} else {
+		damage += float(itemValue[attacker]);
 	}
 }

@@ -153,8 +153,13 @@ public radar_scan(id)
 
 	static playerOrigin[3], msgHostageAdd, msgHostageDel;
 
-	if (!msgHostageAdd) msgHostageAdd = get_user_msgid("HostagePos");
-	if (!msgHostageDel) msgHostageDel = get_user_msgid("HostageK");
+	if (!msgHostageAdd) {
+		msgHostageAdd = get_user_msgid("HostagePos");
+	}
+
+	if (!msgHostageDel) {
+		msgHostageDel = get_user_msgid("HostageK");
+	}
 
 	for (new i = 1; i <= MAX_PLAYERS; i++) {
 		if (!is_user_alive(i) || get_user_team(i) == get_user_team(id)) continue;

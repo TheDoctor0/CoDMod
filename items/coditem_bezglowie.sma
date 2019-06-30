@@ -2,15 +2,15 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Bezglowie"
-#define VERSION "1.0.14"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define TASK_ITEM 783426
 
 #define NAME        "Bezglowie"
 #define DESCRIPTION "Po aktywacji przez %ss jestes odporny na strzaly w glowe"
-#define RANDOM_MIN  15
-#define RANDOM_MAX  20
+#define RANDOM_MIN  25
+#define RANDOM_MAX  30
 #define UPGRADE_MIN -2
 #define UPGRADE_MAX 3
 
@@ -39,7 +39,9 @@ public cod_item_spawned(id, respawn)
 
 	rem_bit(id, itemActive);
 
-	if (!respawn) rem_bit(id, itemUsed);
+	if (!respawn) {
+		rem_bit(id, itemUsed);
+	}
 }
 
 public cod_item_upgrade(id)
@@ -68,4 +70,8 @@ public deactivate_item(id)
 	rem_bit(id - TASK_ITEM, itemActive);
 
 public cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits & DMG_BULLET && get_bit(victim, itemActive) && hitPlace == HIT_HEAD) damage = COD_BLOCK;
+{
+	if (damageBits & DMG_BULLET && get_bit(victim, itemActive) && hitPlace == HIT_HEAD) {
+		damage = COD_BLOCK;
+	}
+}

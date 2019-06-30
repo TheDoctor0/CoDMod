@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Cien"
-#define VERSION "1.0.9"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Cien"
@@ -44,13 +44,15 @@ public cod_item_disabled(id)
 public cod_item_spawned(id)
 {
 	playerHealth[id] = cod_get_user_max_health(id);
-	
+
 	cod_set_user_health(id, 1);
 }
 
 public set_health(id)
 {
 	id -= TASK_HEALTH;
-	
-	if (get_bit(id, itemActive) && get_user_health(id) > 1) cod_set_user_health(id, 1);
+
+	if (get_bit(id, itemActive) && get_user_health(id) > 1) {
+		cod_set_user_health(id, 1);
+	}
 }

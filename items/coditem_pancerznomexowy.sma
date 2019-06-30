@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Pancerz Nomexowy"
-#define VERSION "1.0.12"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Pancerz Nomexowy"

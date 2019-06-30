@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Pakiet Granatow"
-#define VERSION "1.0.16"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Pakiet Granatow"

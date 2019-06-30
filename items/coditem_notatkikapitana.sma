@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Notatki Kapitana"
-#define VERSION "1.0.12"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Notatki Kapitana"
@@ -24,7 +24,11 @@ public cod_item_enabled(id, value)
 	itemUse[id] = itemValue[id] = value;
 
 public cod_item_spawned(id, respawn)
-	if (!respawn) itemUse[id] = itemValue[id];
+{
+	if (!respawn) {
+		itemUse[id] = itemValue[id];
+	}
+}
 
 public cod_item_value(id)
 	return itemValue[id];

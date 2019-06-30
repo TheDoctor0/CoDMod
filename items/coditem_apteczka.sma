@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Apteczka"
-#define VERSION "1.0.7"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Apteczka"
@@ -21,8 +21,12 @@ public cod_item_enabled(id, value)
 	rem_bit(id, itemUsed);
 
 public cod_item_spawned(id, respawn)
-	if (!respawn) rem_bit(id, itemUsed);
-	
+{
+	if (!respawn) {
+		rem_bit(id, itemUsed);
+	}
+}
+
 public cod_item_skill_used(id)
 {
 	if (get_bit(id, itemUsed)) {
@@ -34,6 +38,6 @@ public cod_item_skill_used(id)
 	if (cod_get_user_health(id, 1) == cod_get_user_max_health(id)) return;
 
 	cod_set_user_health(id, cod_get_user_max_health(id));
-		
+
 	set_bit(id, itemUsed);
 }

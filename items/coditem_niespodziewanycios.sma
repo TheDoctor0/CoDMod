@@ -3,11 +3,11 @@
 #include <fakemeta_util>
 #include <cod>
 
-#define PLUGIN "CoD Item Atak od tylu"
-#define VERSION "1.2.0"
+#define PLUGIN "CoD Item Niespodziewany Cios"
+#define VERSION "1.2"
 #define AUTHOR "O'Zone"
 
-#define NAME        "Atak od tylu"
+#define NAME        "Niespodziewany Cios"
 #define DESCRIPTION "Przy trafieniu masz 1/%s szansy na teleport za gracza"
 #define RANDOM_MIN  5
 #define RANDOM_MAX  7
@@ -32,7 +32,11 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id],.valueMin = VALUE_MIN);
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits & DMG_BULLET && random_num(1, itemValue[attacker]) == 1) teleport_behind(attacker, victim);
+{
+	if (damageBits & DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
+		teleport_behind(attacker, victim);
+	}
+}
 
 public teleport_behind(id, target)
 {

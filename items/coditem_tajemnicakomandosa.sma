@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Tajemnica Komandosa"
-#define VERSION "1.0.7"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Tajemnica Komandosa"

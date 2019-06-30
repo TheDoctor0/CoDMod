@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Krolicza Lapka"
-#define VERSION "1.0.16"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Krolicza Lapka"

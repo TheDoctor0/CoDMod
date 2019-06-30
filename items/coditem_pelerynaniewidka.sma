@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Peleryna Niewidka"
-#define VERSION "1.0.16"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Peleryna Niewidka"
@@ -24,7 +24,9 @@ public cod_item_spawned(id, respawn)
 {
 	cod_set_user_render(id, 256, ITEM);
 
-	if (!respawn) rem_bit(id, itemUsed);
+	if (!respawn) {
+		rem_bit(id, itemUsed);
+	}
 }
 
 public cod_item_skill_used(id)

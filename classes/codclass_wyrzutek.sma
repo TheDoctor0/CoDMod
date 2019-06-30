@@ -7,7 +7,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Wyrzutek"
-#define DESCRIPTION  "Ma 1/6 szansy na wyrzucenie wroga w powietrze. Wrogom w powietrzu zadaje mu podwojne obrazenia."
+#define DESCRIPTION  "Ma 1/6 szansy na wyrzucenie wroga w powietrze. Wrogom w powietrzu zadaje mu podwojne obrazenia"
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_M4A1)|(1<<CSW_USP)
 #define HEALTH       20

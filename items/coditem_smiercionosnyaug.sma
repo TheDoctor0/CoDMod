@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Smiercionosny AUG"
-#define VERSION "1.0.0"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Smiercionosny AUG"
@@ -37,4 +37,8 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], .valueMin = VALUE_MIN);
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (weapon == CSW_AUG && damageBits & DMG_BULLET && random_num(1, itemValue[attacker]) == 1) damage = cod_kill_player(attacker, victim, damageBits);
+{
+	if (weapon == CSW_AUG && damageBits & DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
+        damage = cod_kill_player(attacker, victim, damageBits);
+    }
+}

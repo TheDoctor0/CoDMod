@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Mistrzowskie AWP"
-#define VERSION "1.0.17"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Mistrzowskie AWP"
@@ -22,4 +22,8 @@ public cod_item_disabled(id)
 	cod_take_weapon(id, CSW_AWP);
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (weapon == CSW_AWP && damageBits & DMG_BULLET) damage = cod_kill_player(attacker, victim, damageBits);
+{
+	if (weapon == CSW_AWP && damageBits & DMG_BULLET) {
+        damage = cod_kill_player(attacker, victim, damageBits);
+    }
+}

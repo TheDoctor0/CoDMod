@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Pociski Spowalniajace"
-#define VERSION "1.0.39"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Pociski Spowalniajace"
@@ -46,16 +46,14 @@ public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageB
 }
 
 public cod_new_round()
-	for(new id = 1; id <= MAX_PLAYERS; id++) remove_task(id + TASK_SLOW);
+	for (new id = 1; id <= MAX_PLAYERS; id++) remove_task(id + TASK_SLOW);
 
 public remove_slow_effect(id)
 {
 	id -= TASK_SLOW;
 
-	if (is_user_connected(id))
-	{
+	if (is_user_connected(id)) {
 		cod_display_icon(id, "dmg_cold");
-
 		cod_set_user_speed(id, 0.0, ITEM);
 	}
 }

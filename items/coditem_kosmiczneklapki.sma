@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Kosmiczne Klapki"
-#define VERSION "1.0.6"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Kosmiczne Klapki"

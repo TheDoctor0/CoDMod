@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Licznik Zycia"
-#define VERSION "1.0.24"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Licznik Zycia"

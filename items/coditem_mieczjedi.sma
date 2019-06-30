@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Miecz Jedi"
-#define VERSION "1.0.0"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Miecz Jedi"
@@ -30,7 +30,11 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], .valueMin = VALUE_MIN);
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (weapon == CSW_KNIFE && cod_percent_chance(50)) damage = cod_kill_player(attacker, victim, damageBits);
+{
+	if (weapon == CSW_KNIFE && cod_percent_chance(50)) {
+		damage = cod_kill_player(attacker, victim, damageBits);
+	}
+}
 
 public cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {

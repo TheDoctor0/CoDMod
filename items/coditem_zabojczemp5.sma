@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Zabojcze MP5"
-#define VERSION "1.0.10"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Zabojcze MP5"
@@ -39,7 +39,15 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX, .valueMax = VALUE_MAX);
 
 public cod_item_kill(killer, victim, hitPlace)
-	if(cod_percent_chance(50)) cod_refill_ammo(killer);
+{
+	if (cod_percent_chance(50)) {
+		cod_refill_ammo(killer);
+	}
+}
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits & DMG_BULLET && weapon == CSW_MP5NAVY) damage += float(itemValue[attacker]);
+{
+	if (damageBits & DMG_BULLET && weapon == CSW_MP5NAVY) {
+		damage += float(itemValue[attacker]);
+	}
+}

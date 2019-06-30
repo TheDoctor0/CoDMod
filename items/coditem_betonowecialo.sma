@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Betonowe Cialo"
-#define VERSION "1.0.12"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Betonowe Cialo"
@@ -35,7 +35,7 @@ public cod_item_disabled(id)
 
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
-	
+
 public cod_item_value(id)
 	return itemValue[id];
 
@@ -45,7 +45,9 @@ public cod_item_spawned(id, respawn)
 
 	rem_bit(id, itemActive);
 
-	if (!respawn) rem_bit(id, itemUsed);
+	if (!respawn) {
+		rem_bit(id, itemUsed);
+	}
 }
 
 public cod_item_skill_used(id)
@@ -68,4 +70,8 @@ public deactivate_item(id)
 	rem_bit(id - TASK_ITEM, itemActive);
 
 public cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits & DMG_BULLET && get_bit(victim, itemActive) && hitPlace != HIT_HEAD) damage = COD_BLOCK;
+{
+	if (damageBits & DMG_BULLET && get_bit(victim, itemActive) && hitPlace != HIT_HEAD) {
+		damage = COD_BLOCK;
+	}
+}

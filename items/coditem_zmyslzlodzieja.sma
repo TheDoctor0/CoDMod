@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Zmysl Zlodzieja"
-#define VERSION "1.0.10"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Zmysl Zlodzieja"

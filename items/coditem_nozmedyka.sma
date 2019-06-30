@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Noz Medyka"
-#define VERSION "1.0.10"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Noz Medyka"
@@ -25,7 +25,9 @@ public cod_item_enabled(id, value)
 
 	set_bit(id, itemActive);
 
-	if (cod_get_user_weapon(id) == CSW_KNIFE) cod_repeat_damage(id, id, float(itemValue[id]), 1.0, 0, HEAL, 0);
+	if (cod_get_user_weapon(id) == CSW_KNIFE) {
+		cod_repeat_damage(id, id, float(itemValue[id]), 3.0, 0, HEAL, 0);
+	}
 }
 
 public cod_item_disabled(id)
@@ -39,13 +41,19 @@ public cod_weapon_deploy(id, weapon, ent)
 {
 	if (get_bit(id, itemActive)) {
 		cod_repeat_damage(id, id);
-	
-		if (cod_get_user_weapon(id) == CSW_KNIFE) cod_repeat_damage(id, id, float(itemValue[id]), 1.0, 0, HEAL, 0);
+
+		if (cod_get_user_weapon(id) == CSW_KNIFE) {
+			cod_repeat_damage(id, id, float(itemValue[id]), 3.0, 0, HEAL, 0);
+		}
 	}
 }
 
 public cod_item_spawned(id, respawn)
-	if (cod_get_user_weapon(id) == CSW_KNIFE) cod_repeat_damage(id, id, float(itemValue[id]), 1.0, 0, HEAL, 0);
+{
+	if (cod_get_user_weapon(id) == CSW_KNIFE) {
+		cod_repeat_damage(id, id, float(itemValue[id]), 1.0, 0, HEAL, 0);
+	}
+}
 
 public cod_item_value(id)
 	return itemValue[id];
@@ -53,8 +61,9 @@ public cod_item_value(id)
 public cod_item_upgrade(id)
 {
 	cod_repeat_damage(id, id);
-
 	cod_random_upgrade(itemValue[id]);
 
-	if (cod_get_user_weapon(id) == CSW_KNIFE) cod_repeat_damage(id, id, float(itemValue[id]), 1.0, 0, HEAL, 0);
+	if (cod_get_user_weapon(id) == CSW_KNIFE) {
+		cod_repeat_damage(id, id, float(itemValue[id]), 1.0, 0, HEAL, 0);
+	}
 }

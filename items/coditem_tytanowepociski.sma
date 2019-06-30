@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Tytanowe Pociski"
-#define VERSION "1.0.39"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Tytanowe Pociski"
@@ -29,4 +29,8 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id]);
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits & DMG_BULLET) damage += (float(itemValue[attacker]) + cod_get_user_intelligence(attacker) * 0.05);
+{
+	if (damageBits & DMG_BULLET) {
+        damage += (float(itemValue[attacker]) + cod_get_user_intelligence(attacker) * 0.05);
+    }
+}

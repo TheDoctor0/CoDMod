@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Stroj Ninjy"
-#define VERSION "1.0.12"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Stroj Ninjy"

@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Pierscien Doswiadczenia"
-#define VERSION "1.0.14"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Pierscien Doswiadczenia"
