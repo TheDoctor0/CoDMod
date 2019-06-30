@@ -10,15 +10,15 @@
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_M3)|(1<<CSW_XM1014)
 #define HEALTH       10
-#define INTELLIGENCE 0
+#define INTELLIGENCE -10
 #define STRENGTH     0
 #define STAMINA      0
 #define CONDITION    30
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
@@ -28,7 +28,10 @@ public cod_class_enabled(id)
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
 	if (damageBits & DMG_BULLET) {
-		if ((weapon == CSW_M3 && random_num(1, 8) == 1) || (weapon == CSW_XM1014 && random_num(1, 10) == 1)) damage = cod_kill_player(attacker, victim, damageBits);
-		else damage += 5.0;
+		if ((weapon == CSW_M3 && random_num(1, 8) == 1) || (weapon == CSW_XM1014 && random_num(1, 10) == 1)) {
+            damage = cod_kill_player(attacker, victim, damageBits);
+        } else {
+            damage += 5.0;
+        }
 	}
 }

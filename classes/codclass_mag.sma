@@ -8,10 +8,10 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Mag"
-#define DESCRIPTION  "Ma latarke (E) naswietlajaca niewidzialnych. Na nozu regeneruje sobie 2 (+ int) HP co sekunde."
+#define DESCRIPTION  "Ma latarke (E) naswietlajaca niewidzialnych. Na nozu regeneruje sobie 3 (+ int) HP co sekunde."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_AUG)|(1<<CSW_FIVESEVEN)
-#define HEALTH       -10
+#define HEALTH       0
 #define INTELLIGENCE 0
 #define STRENGTH     0
 #define STAMINA      20
@@ -36,7 +36,9 @@ public cod_class_enabled(id)
 
 	set_bit(id, classActive);
 
-	if (cod_get_user_weapon(id) == CSW_KNIFE) cod_repeat_damage(id, id, 2.0 + 0.1 * cod_get_user_intelligence(id), 1.0, 0, HEAL, 0);
+	if (cod_get_user_weapon(id) == CSW_KNIFE) {
+		cod_repeat_damage(id, id, 3.0 + 0.1 * cod_get_user_intelligence(id), 1.0, 0, HEAL, 0);
+	}
 }
 
 public cod_class_disabled(id)
@@ -52,7 +54,9 @@ public cod_class_spawned(id, respawn)
 
 	if (!respawn) flashlightBattery[id] = FLASHLIGHT;
 
-	if (cod_get_user_weapon(id) == CSW_KNIFE) cod_repeat_damage(id, id, 2.0 + 0.1 * cod_get_user_intelligence(id), 1.0, 0, HEAL, 0);
+	if (cod_get_user_weapon(id) == CSW_KNIFE) {
+		cod_repeat_damage(id, id, 3.0 + 0.1 * cod_get_user_intelligence(id), 1.0, 0, HEAL, 0);
+	}
 }
 
 public cod_weapon_deploy(id, weapon, ent)
@@ -60,7 +64,9 @@ public cod_weapon_deploy(id, weapon, ent)
 	if (get_bit(id, classActive)) {
 		cod_repeat_damage(id, id);
 
-		if (cod_get_user_weapon(id) == CSW_KNIFE) cod_repeat_damage(id, id, 2.0 + 0.1 * cod_get_user_intelligence(id), 1.0, 0, HEAL, 0);
+		if (cod_get_user_weapon(id) == CSW_KNIFE) {
+			cod_repeat_damage(id, id, 3.0 + 0.1 * cod_get_user_intelligence(id), 1.0, 0, HEAL, 0);
+		}
 	}
 }
 
@@ -69,7 +75,9 @@ public cod_class_skill_used(id)
 	if (get_bit(id, flashlightActive)) rem_bit(id, flashlightActive);
 	else if (flashlightBattery[id]) set_bit(id, flashlightActive);
 
-	if (!task_exists(id + TASK_CHARGE)) set_task(1.0, "flashlight_charge", id + TASK_CHARGE, .flags = "b");
+	if (!task_exists(id + TASK_CHARGE)) {
+		set_task(1.0, "flashlight_charge", id + TASK_CHARGE, .flags = "b");
+	}
 
 	static msgFlashlight;
 

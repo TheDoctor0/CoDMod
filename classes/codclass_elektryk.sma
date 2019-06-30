@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Elektryk"
-#define DESCRIPTION  "Posiada 3 blyskawice. Ma 20% szansy na podpalenie przeciwnika po trafieniu USP."
+#define DESCRIPTION  "Posiada 3 blyskawice. Ma 20 procent szansy na podpalenie przeciwnika po trafieniu USP."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_M4A1)|(1<<CSW_USP)
 #define HEALTH       15
@@ -23,12 +23,14 @@ public plugin_init()
 }
 
 public cod_class_enabled(id, promotion)
-{
 	cod_set_user_thunders(id, 3, CLASS);
-}
 
 public cod_class_skill_used(id)
 	cod_use_user_thunder(id);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (weapon == CSW_USP && damageBits & DMG_BULLET && cod_percent_chance(20)) cod_repeat_damage(attacker, victim, 5.0, 0.2, 10, DMG_BURN, FIRE);
+{
+	if (weapon == CSW_USP && damageBits & DMG_BULLET && cod_percent_chance(20)) {
+		cod_repeat_damage(attacker, victim, 5.0, 0.2, 10, DMG_BURN, FIRE);
+	}
+}

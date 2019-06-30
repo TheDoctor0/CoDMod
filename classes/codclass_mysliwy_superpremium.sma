@@ -26,9 +26,7 @@ public plugin_init()
 public cod_class_enabled(id)
 {
 	cod_set_user_render(id, 40, CLASS, RENDER_ALWAYS, 1<<CSW_KNIFE);
-
 	cod_set_user_multijumps(id, 1, CLASS);
-
 	cod_set_user_teleports(id, 1, CLASS);
 }
 
@@ -36,4 +34,8 @@ public cod_class_skill_used(id)
 	cod_use_user_teleport(id);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (weapon == CSW_SCOUT && damageBits & DMG_BULLET && cod_percent_chance(50)) damage = cod_kill_player(attacker, victim, damageBits);
+{
+	if (weapon == CSW_SCOUT && damageBits & DMG_BULLET && cod_percent_chance(50)) {
+        damage = cod_kill_player(attacker, victim, damageBits);
+    }
+}
