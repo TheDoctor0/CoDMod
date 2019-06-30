@@ -56,289 +56,529 @@ enum _:repeating { FIRE, POISON, HEAL };
 enum _:hud { TYPE_HUD, TYPE_DHUD };
 
 new const codSounds[sounds][] = {
-	"CoDMod/select.wav",
-	"CoDMod/close.wav",
-	"CoDMod/start.wav",
-	"CoDMod/start2.wav",
-	"CoDMod/levelup.wav",
-	"CoDMod/levelup2.wav",
-	"CoDMod/levelup3.wav",
-	"CoDMod/deploy.wav",
-	"CoDMod/activate.wav",
-	"CoDMod/charge.wav",
-	"CoDMod/pickup.wav",
-	"CoDMod/thunder.wav",
-	"CoDMod/one.wav",
-	"CoDMod/last.wav",
-	"CoDMod/force.wav",
-	"CoDMod/humiliation.wav",
-	"CoDMod/bomb.wav",
-	"CoDMod/applause.wav",
-	"CoDMod/laugh.wav"
+    "CoDMod/select.wav",
+    "CoDMod/close.wav",
+    "CoDMod/start.wav",
+    "CoDMod/start2.wav",
+    "CoDMod/levelup.wav",
+    "CoDMod/levelup2.wav",
+    "CoDMod/levelup3.wav",
+    "CoDMod/deploy.wav",
+    "CoDMod/activate.wav",
+    "CoDMod/charge.wav",
+    "CoDMod/pickup.wav",
+    "CoDMod/thunder.wav",
+    "CoDMod/one.wav",
+    "CoDMod/last.wav",
+    "CoDMod/force.wav",
+    "CoDMod/humiliation.wav",
+    "CoDMod/bomb.wav",
+    "CoDMod/applause.wav",
+    "CoDMod/laugh.wav"
 };
 
-/*------------------------------
-Return if player is logged in his account.
-Account menu is diplayed if not logged in.
-------------------------------*/
+/**
+ * Checks if player is logged in his account.
+ *
+ * @note Account menu will be diplayed for player if not logged in.
+ *
+ * @param id        Player index
+ *
+ * @return          1 if player is logged in, 0 otherwise
+ */
 native cod_check_account(id);
 
-/*------------------------------
-Return if player has a VIP.
-------------------------------*/
-native bool:cod_get_user_vip(id);
+/**
+ * Checks if player is a VIP.
+ *
+ * @note Account menu will be diplayed for client if not logged in.
+ *
+ * @param id        Player index
+ *
+ * @return          1 if player is a VIP, 0 otherwise
+ */
+native cod_get_user_vip(id);
 
-/*------------------------------
-Return player's honor amount.
-------------------------------*/
+/**
+ * Returns player honor amount.
+ *
+ * @param id        Player index
+ *
+ * @return          Honor amount
+ */
 native cod_get_user_honor(id);
 
-/*------------------------------
-Set player's honor amount.
-If bonus is true honor bonus will be calculated.
-------------------------------*/
+/**
+ * Checks how much honor player has.
+ *
+ * @param id        Player index
+ * @param value     Honor amount
+ * @param bonus     If true honor gain bonus will be applied
+ *
+ * @noreturn
+ */
 native cod_set_user_honor(id, value, bonus = false);
 
-/*------------------------------
-Add value to player's honor amount.
-If bonus is true honor bonus will be calculated.
-------------------------------*/
+/**
+ * Adds value to player honor amount.
+ *
+ * @param id        Player index
+ * @param value     Honor amount
+ * @param bonus     If true honor gain bonus will be applied
+ *
+ * @noreturn
+ */
 native cod_add_user_honor(id, value, bonus = false);
 
-/*------------------------------
-Return clan id.
-------------------------------*/
+/**
+ * Returns player clan index.
+ *
+ * @param id        Player index
+ *
+ * @return          Clan index
+ */
 native cod_get_user_clan(id);
 
-/*------------------------------
-Return clan exp bonus in percent.
-------------------------------*/
+/**
+ * Returns player clan percentage exp bonus.
+ *
+ * @param id        Player index
+ *
+ * @return          Clan exp bonus
+ */
 native cod_get_user_clan_bonus(id);
 
-/*------------------------------
-Return clan's name by clan id.
-------------------------------*/
-native cod_get_clan_name(clan, dataReturn[], dataLength);
+/**
+ * Retrieves the name of a clan with given index.
+ *
+ * @param clan      Clan index
+ * @param data      Buffer to copy name to
+ * @param lenth     Maximum buffer size
+ *
+ * @noreturn
+ */
+native cod_get_clan_name(clan, data[], length);
 
-/*------------------------------
-Return player's mission id.
-NONE (-1) if player have no mission in progress.
-------------------------------*/
+/**
+ * Returns player current mission index.
+ *
+ * @note NONE (-1) will be returned if player have no mission in progress.
+ *
+ * @param id        Player index
+ *
+ * @return          Mission index
+ */
 native cod_get_user_mission(id);
 
-/*------------------------------
-Return player's mission progress.
-------------------------------*/
+/**
+ * Returns player mission progress.
+ *
+ * @param id        Player index
+ *
+ * @return          Mission progress
+ */
 native cod_get_user_mission_progress(id);
 
-/*------------------------------
-Return player's mission need.
-------------------------------*/
+/**
+ * Returns player objectives count to mission end.
+ *
+ * @param id        Player index
+ *
+ * @return          Mission need
+ */
 native cod_get_user_mission_need(id);
 
-/*------------------------------
-Spawns an icon with defined type.
-Icon entity will be saved in ent pev_user1.
-------------------------------*/
+/**
+ * Spawns icon with specified type.
+ *
+ * @note Available icons: BOMBSITE_A, BOMBSITE_B, BOMB_DROP, BOMB_PLANT, BOMB_EXPLODE, BOX.
+ * @note Icon entity will be saved in ent pev_user1.
+ *
+ * @param ent       Entity index
+ *
+ * @noreturn
+ */
 native cod_spawn_icon(ent, type = BOX);
 
-/*------------------------------
-Return player's gametime in seconds.
-------------------------------*/
+/**
+ * Returns player gametime in seconds.
+ *
+ * @param id        Player index
+ *
+ * @return          Player gametime
+ */
 native cod_get_user_time(id);
 
-/*------------------------------
-Return player's gametime as text with hours, minutes, seconds.
-------------------------------*/
-native cod_get_user_time_text(id, dataReturn[], dataLength);
+/**
+ * Returns player gametime as text with hours, minutes, seconds.
+ *
+ * @note Text format: %i h %i min %i s.
+ *
+ * @param id        Player index
+ * @param data      Buffer to copy formatted time string to
+ * @param lenth     Maximum buffer size
+ *
+ * @noreturn
+ */
+native cod_get_user_time_text(id, data[], length);
 
-/*------------------------------
-Return player's exp.
-------------------------------*/
+/**
+ * Returns player exp.
+ *
+ * @param id        Player index
+ *
+ * @return          Player exp
+ */
 native cod_get_user_exp(id);
 
-/*------------------------------
-Set player's gained exp.
-If bonus = 1 exp bonus will be applied.
-To remove exp use negative value.
-------------------------------*/
-native cod_set_user_exp(id, value, bonus = 0);
+/**
+ * Sets player gained exp.
+ *
+ * @note To remove exp use negative value.
+ *
+ * @param id        Player index
+ * @param value     Exp amount
+ * @param bonus     If true exp gain bonus will be applied
+ *
+ * @return          Player exp
+ */
+native cod_set_user_exp(id, value, bonus = false);
 
-/*------------------------------
-Return exp multiplied by player's exp bonus.
-------------------------------*/
+/**
+ * Returns exp multiplied by player exp gain bonus.
+ *
+ * @param id        Player index
+ * @param value     Exp amount
+ *
+ * @return          Exp multiplied by bonus
+ */
 native cod_get_user_bonus_exp(id, value);
 
-/*------------------------------
-Return exp needed for level.
-------------------------------*/
+/**
+ * Returns exp needed for specified level.
+ *
+ * @param level     Level
+ *
+ * @return          Exp needed
+ */
 native cod_get_level_exp(level);
 
-/*------------------------------
-Return player's level.
-------------------------------*/
+/**
+ * Returns player level.
+ *
+ * @param id        Player index
+ *
+ * @return          Player level
+ */
 native cod_get_user_level(id);
 
-/*------------------------------
-Return player's highest level.
-------------------------------*/
+/**
+ * Returns player highest level of all classes.
+ *
+ * @param id        Player index
+ *
+ * @return          Player highest level
+ */
 native cod_get_user_highest_level(id);
 
-/*------------------------------
-Return player's class and promotion if necessary.
-------------------------------*/
+/**
+ * Returns player class and its promotion.
+ *
+ * @param id        Player index
+ * @param promotion Variable to store promotion
+ *
+ * @return          Player class
+ */
 native cod_get_user_class(id, &promotion = 0);
 
-/*------------------------------
-Return player's class name.
-------------------------------*/
-native cod_get_user_class_name(id, dataReturn[], dataLength);
+/**
+ * Returns player current class name.
+ *
+ * @param id        Player index
+ * @param data      Buffer to copy class name to
+ * @param lenth     Maximum buffer size
+ *
+ * @noreturn
+ */
+native cod_get_user_class_name(id, data[], length);
 
-/*------------------------------
-Return player's promotion.
-------------------------------*/
+/**
+ * Returns player class promotion.
+ *
+ * @param id        Player index
+ *
+ * @return          Player class promotion
+ */
 native cod_get_user_promotion(id);
 
-/*------------------------------
-Set player's class.
-When force = 1 the change is immediate.
-------------------------------*/
-native cod_set_user_class(id, class, force = 0);
+/**
+ * Sets player class.
+ *
+ * @param id        Player index
+ * @param class     Class index
+ * @param force     If true class will be changed immediately.
+ *
+ * @noreturn
+ */
+native cod_set_user_class(id, class, force = false);
 
-/*------------------------------
-Return class using class name.
-------------------------------*/
-native cod_get_class_id(szClass[]);
+/**
+ * Returns class index by correspoding class name.
+ *
+ * @param class     Class name
+ *
+ * @return          Class index
+ */
+native cod_get_class_id(class[]);
 
-/*------------------------------
-Return class name.
-------------------------------*/
-native cod_get_class_name(class, promotion = 0, dataReturn[], dataLength);
+/**
+ * Returns class name.
+ *
+ * @param class     Class index
+ * @param promotion If greater than 0 will return name for class promotion
+ * @param data      Buffer to copy class name to
+ * @param lenth     Maximum buffer size
+ *
+ * @noreturn
+ */
+native cod_get_class_name(class, promotion = 0, data[], length);
 
-/*------------------------------
-Return class description.
-------------------------------*/
-native cod_get_class_desc(class, promotion = 0, dataReturn[], dataLength);
+/**
+ * Returns class description.
+ *
+ * @param class     Class index
+ * @param promotion If greater than 0 will return description for class promotion
+ * @param data      Buffer to copy class description to
+ * @param lenth     Maximum buffer size
+ *
+ * @noreturn
+ */
+native cod_get_class_desc(class, promotion = 0, data[], length);
 
-/*------------------------------
-Return class health bonus.
-------------------------------*/
+/**
+ * Returns player class health.
+ *
+ * @param class     Class index
+ * @param promotion If greater than 0 will return health for class promotion
+ *
+ * @return          Class health
+ */
 native cod_get_class_health(class, promotion = 0);
 
-/*------------------------------
-Return class intelligence bonus.
-------------------------------*/
+/**
+ * Returns player class intelligence.
+ *
+ * @param class     Class index
+ * @param promotion If greater than 0 will return intelligence for class promotion
+ *
+ * @return          Class intelligence
+ */
 native cod_get_class_intelligence(class, promotion = 0);
 
-/*------------------------------
-Return class stamina bonus.
-------------------------------*/
+/**
+ * Returns player class intelligence.
+ *
+ * @param class     Class index
+ * @param promotion If greater than 0 will return intelligence for class promotion
+ *
+ * @return          Class intelligence
+ */
 native cod_get_class_stamina(class, promotion = 0);
 
-/*------------------------------
-Return class strength bonus.
-------------------------------*/
+/**
+ * Returns player class strength.
+ *
+ * @param class     Class index
+ * @param promotion If greater than 0 will return strength for class promotion
+ *
+ * @return          Class strength
+ */
 native cod_get_class_strength(class, promotion = 0);
 
-/*------------------------------
-Return class condition bonus.
-------------------------------*/
+/**
+ * Returns player class condition.
+ *
+ * @param class     Class index
+ * @param promotion If greater than 0 will return condition for class promotion
+ *
+ * @return          Class condition
+ */
 native cod_get_class_condition(class, promotion = 0);
 
-/*------------------------------
-Return classes number.
-------------------------------*/
+/**
+ * Returns classes count.
+ *
+ * @return          Classes count
+ */
 native cod_get_classes_num();
 
-/*------------------------------
-Return item and assigns value of item to variable.
-------------------------------*/
+/**
+ * Returns player item and its value.
+ *
+ * @note NONE (-1) will be assigned to value if item has no available value.
+ *
+ * @param id        Player index
+ * @param promotion Variable to item value
+ *
+ * @return          Player item
+ */
 native cod_get_user_item(id, &value = 0);
 
-/*------------------------------
-Return value of user item.
-------------------------------*/
+/**
+ * Returns player item value.
+ *
+ * @note NONE (-1) will be returned if item has no available value.
+ *
+ * @param id        Player index
+ *
+ * @return          Player item value
+ */
 native cod_get_user_item_value(id);
 
-/*------------------------------
-Return user item name.
-------------------------------*/
+/**
+ * Returns player item name.
+ *
+ * @param id        Player index
+ * @param data      Buffer to copy item name to
+ * @param lenth     Maximum buffer size
+ *
+ * @noreturn
+ */
 native cod_get_user_item_name(id, dataReturn[], dataLength);
 
-/*------------------------------
-Set player's item.
-If item = RANDOM (-3) an item will be random.
-If value = RANDOM (-3) item value will be random.
-------------------------------*/
+/**
+ * Sets player item with value.
+ *
+ * @note Set item index to 0 to remove player item.
+ * @note Set item index to RANDOM (-3) to give random item.
+ * @note Set value to RANDOM (-3) to set random value.
+ * @note COD_STOP (4) will be returned if item cannot be set.
+ *
+ * @param id        Player index
+ * @param item      Item index
+ *
+ * @return          Player item value
+ */
 native cod_set_user_item(id, item = 0, value = RANDOM);
 
-/*------------------------------
-Upgrades player's item.
-If check = 1 Return if item is upgradable.
-------------------------------*/
-native cod_upgrade_user_item(id, check = 0);
+/**
+ * Upgrades player item.
+ *
+ * @param id        Player index
+ * @param check     If true will only check if item can be upgraded
+ *
+ * @return          Returns 1 if item was upgraded / is upgradable, 0 otherwise
+ */
+native cod_upgrade_user_item(id, check = false);
 
-/*------------------------------
-Return item id using item name.
-------------------------------*/
+/**
+ * Returns item index by correspoding item name.
+ *
+ * @param class     Item name
+ *
+ * @return          Item index
+ */
 native cod_get_item_id(itemName[]);
 
-/*------------------------------
-Return item name.
-------------------------------*/
-native cod_get_item_name(item, dataReturn[], dataLength);
+/**
+ * Returns item name.
+ *
+ * @param item      Item index
+ * @param data      Buffer to copy item name to
+ * @param lenth     Maximum buffer size
+ *
+ * @noreturn
+ */
+native cod_get_item_name(item, data[], length);
 
-/*------------------------------
-Return item description.
-------------------------------*/
-native cod_get_item_desc(item, dataReturn[], dataLength);
+/**
+ * Returns item description.
+ *
+ * @param class     Item index
+ * @param data      Buffer to copy item description to
+ * @param lenth     Maximum buffer size
+ *
+ * @noreturn
+ */
+native cod_get_item_desc(item, data[], length);
 
-/*------------------------------
-Return items number.
-------------------------------*/
+/**
+ * Returns items count.
+ *
+ * @return          Items count
+ */
 native cod_get_items_num();
 
-/*------------------------------
-Retuns player's item durability.
-------------------------------*/
+/**
+ * Returns player item durability.
+ *
+ * @param id        Player index
+ *
+ * @return          Item durability
+ */
 native cod_get_item_durability(id);
 
-/*------------------------------
-Set's player's item durability.
-------------------------------*/
-native cod_set_item_durability(id, durability);
+/**
+ * Sets player item durability amount.
+ *
+ * @note Set durability to 0 to destroy item.
+ *
+ * @param id        Player index
+ * @param amount    Item durability amount
+ *
+ * @noreturn
+ */
+native cod_set_item_durability(id, amount);
 
-/*------------------------------
-Return max item durability.
-------------------------------*/
+/**
+ * Returns maximum item durability.
+ *
+ * @return          Max item durability
+ */
 native cod_max_item_durability();
 
-/*------------------------------
-Return player's maximum health points
-------------------------------*/
+/**
+ * Returns player maximum health points.
+ *
+ * @return          Max health points
+ */
 native cod_get_user_max_health(id);
 
-/*------------------------------
-Set player's health point.
-If maximum = 1 player's max health limit is applied.
-------------------------------*/
-native cod_set_user_health(id, value, maximum = 1);
+/**
+ * Sets player health points.
+ *
+ * @param id        Player index
+ * @param value     Health points
+ * @param maximum   If true player max health limit will be applied
+ *
+ * @noreturn
+ */
+native cod_set_user_health(id, value, maximum = true);
 
-/*------------------------------
-Add value to player's health point.
-If maximum = 1 player's max health limit is applied.
-------------------------------*/
-native cod_add_user_health(id, value, maximum = 1);
+/**
+ * Adds value to player health points.
+ *
+ * @param id        Player index
+ * @param value     Health points
+ * @param maximum   If true player max health limit will be applied
+ *
+ * @noreturn
+ */
+native cod_add_user_health(id, value, maximum = true);
 
-/*------------------------------
-Return health statistic points.
-If currentHealth = 1 Return current health points.
-If classHealth = 1 adds class health points.
-If statsHealth = 1 adds stats health points.
-If bonusHealth = 1 adds extra health points.
-If baseHealth = 1 adds base 100HP.
-------------------------------*/
-native cod_get_user_health(id, currentHealth = 0, classHealth = 1, statsHealth = 1, bonusHealth = 1, baseHealth = 0);
+/**
+ * Returns player health points.
+ *
+ * @param id        Player index
+ * @param current   If true will return only current health points
+ * @param class     If true will add class health points
+ * @param stats     If true will add stats health points
+ * @param bonus     If true will add bonus health points
+ * @param base      If true will add base 100 HP
+ *
+ * @return          Health points
+ */
+native cod_get_user_health(id, current = false, class = true, stats = true, bonus = true, base = false);
 
 /*------------------------------
 Return intelligence statistic points.
@@ -346,693 +586,1676 @@ If classIntelligence = 1 adds class intelligence points.
 If statsIntelligence = 1 adds stats intelligence points.
 If bonusIntelligence = 1 adds extra intelligence points.
 ------------------------------*/
-native cod_get_user_intelligence(id, classIntelligence = 1, statsIntelligence = 1, bonusIntelligence = 1);
+/**
+ * Returns player intelligence points.
+ *
+ * @param id        Player index
+ * @param class     If true will add class intelligence points
+ * @param stats     If true will add stats intelligence points
+ * @param bonus     If true will add bonus intelligence points
+ *
+ * @return          Intelligence points
+ */
+native cod_get_user_intelligence(id, class = true, stats = true, bonus = true);
 
-/*------------------------------
-Return stamina statistic points.
-If classStamina = 1 adds class stamina points.
-If statsStamina = 1 adds stats stamina points.
-If bonusStamina = 1 adds extra stamina points.
-------------------------------*/
-native cod_get_user_stamina(id, classStamina = 1, statsStamina = 1, bonusStamina = 1);
+/**
+ * Returns player stamina points.
+ *
+ * @param id        Player index
+ * @param class     If true will add class stamina points
+ * @param stats     If true will add stats stamina points
+ * @param bonus     If true will add bonus stamina points
+ *
+ * @return          Stamina points
+ */
+native cod_get_user_stamina(id, class = true, stats = true, bonus = true);
 
-/*------------------------------
-Return strength statistic points.
-If classStrength = 1 adds class strength points.
-If statsStrength = 1 adds stats strength points.
-If bonusStrength = 1 adds extra strength points.
-------------------------------*/
-native cod_get_user_strength(id, classStrength = 1, statsStrength = 1, bonusStrength = 1);
+/**
+ * Returns player strength points.
+ *
+ * @param id        Player index
+ * @param class     If true will add class strength points
+ * @param stats     If true will add stats strength points
+ * @param bonus     If true will add bonus strength points
+ *
+ * @return          Strength points
+ */
+native cod_get_user_strength(id, class = true, stats = true, bonus = true);
 
-/*------------------------------
-Return condition statistic points.
-If classCondition = 1 adds class condition points.
-If statsCondition = 1 adds stats condition points.
-If bonusCondition = 1 adds extra condition points.
-------------------------------*/
-native cod_get_user_condition(id, classCondition = 1, statsCondition = 1, bonusCondition = 1);
+/**
+ * Returns player condition points.
+ *
+ * @param id        Player index
+ * @param class     If true will add class condition points
+ * @param stats     If true will add stats condition points
+ * @param bonus     If true will add bonus condition points
+ *
+ * @return          Condition points
+ */
+native cod_get_user_condition(id, class = true, stats = true, bonus = true);
 
-/*------------------------------
-Return player's extra health points.
-------------------------------*/
+/**
+ * Returns player bonus health points.
+ *
+ * @param id        Player index
+ *
+ * @return          Bonus health points
+ */
 native cod_get_user_bonus_health(id);
 
-/*------------------------------
-Return player's extra intelligence points.
-------------------------------*/
+/**
+ * Returns player bonus intelligence points.
+ *
+ * @param id        Player index
+ *
+ * @return          Bonus intelligence points
+ */
 native cod_get_user_bonus_intelligence(id);
 
-/*------------------------------
-Return player's extra stamina points.
-------------------------------*/
+/**
+ * Returns player bonus stamina points.
+ *
+ * @param id        Player index
+ *
+ * @return          Bonus stamina points
+ */
 native cod_get_user_bonus_stamina(id);
 
-/*------------------------------
-Return player's extra strength points.
-------------------------------*/
+/**
+ * Returns player bonus strength points.
+ *
+ * @param id        Player index
+ *
+ * @return          Bonus strength points
+ */
 native cod_get_user_bonus_strength(id);
 
-/*------------------------------
-Return player's extra condition points.
-------------------------------*/
+/**
+ * Returns player bonus condition points.
+ *
+ * @param id        Player index
+ *
+ * @return          Bonus condition points
+ */
 native cod_get_user_bonus_condition(id);
 
-/*------------------------------
-Set player's extra health points.
-------------------------------*/
+/**
+ * Sets player bonus health points.
+ *
+ * @param id        Player index
+ * @param value     Bonus health amount
+ *
+ * @noreturn
+ */
 native cod_set_user_bonus_health(id, value);
 
-/*------------------------------
-Set player's extra intelligence points.
-------------------------------*/
+/**
+ * Sets player bonus intelligence points.
+ *
+ * @param id        Player index
+ * @param value     Bonus intelligence amount
+ *
+ * @noreturn
+ */
 native cod_set_user_bonus_intelligence(id, value);
 
-/*------------------------------
-Set player's extra stamina points.
-------------------------------*/
+/**
+ * Sets player bonus stamina points.
+ *
+ * @param id        Player index
+ * @param value     Bonus stamina amount
+ *
+ * @noreturn
+ */
 native cod_set_user_bonus_stamina(id, value);
 
-/*------------------------------
-Set player's extra strength points.
-------------------------------*/
+/**
+ * Sets player bonus strength points.
+ *
+ * @param id        Player index
+ * @param value     Bonus strength amount
+ *
+ * @noreturn
+ */
 native cod_set_user_bonus_strength(id, value);
 
-/*------------------------------
-Add value to player's extra condition points.
-------------------------------*/
+/**
+ * Sets player bonus condition points.
+ *
+ * @param id        Player index
+ * @param value     Bonus condition amount
+ *
+ * @noreturn
+ */
 native cod_set_user_bonus_condition(id, value);
 
-/*------------------------------
-Add value to player's extra health points.
-------------------------------*/
+/**
+ * Adds value to player bonus health points.
+ *
+ * @param id        Player index
+ * @param value     Bonus health amount
+ *
+ * @noreturn
+ */
 native cod_add_user_bonus_health(id, value);
 
-/*------------------------------
-Add value to player's extra intelligence points.
-------------------------------*/
+/**
+ * Adds value to player bonus intelligence points.
+ *
+ * @param id        Player index
+ * @param value     Bonus intelligence amount
+ *
+ * @noreturn
+ */
 native cod_add_user_bonus_intelligence(id, value);
 
-/*------------------------------
-Add value to player's extra stamina points.
-------------------------------*/
+/**
+ * Adds value to player bonus stamina points.
+ *
+ * @param id        Player index
+ * @param value     Bonus stamina amount
+ *
+ * @noreturn
+ */
 native cod_add_user_bonus_stamina(id, value);
 
-/*------------------------------
-Add value to player's extra strength points.
-------------------------------*/
+/**
+ * Adds value to player bonus strength points.
+ *
+ * @param id        Player index
+ * @param value     Bonus strength amount
+ *
+ * @noreturn
+ */
 native cod_add_user_bonus_strength(id, value);
 
-/*------------------------------
-Add value to player's extra condition points.
-------------------------------*/
+/**
+ * Adds value to player bonus condition points.
+ *
+ * @param id        Player index
+ * @param value     Bonus condition amount
+ *
+ * @noreturn
+ */
 native cod_add_user_bonus_condition(id, value);
 
-/*------------------------------
-Return player's rockets amount.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Returns player available rockets.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  USED - left to use in this round
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          Available rockets
+ */
 native cod_get_user_rockets(id, type = ALL);
 
-/*------------------------------
-Return player's mines amount.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Returns player available mines.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  USED - left to use in this round
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          Available mines
+ */
 native cod_get_user_mines(id, type = ALL);
 
-/*------------------------------
-Return player's medkits amount.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Returns player available medkits.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  USED - left to use in this round
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          Available medkits
+ */
 native cod_get_user_medkits(id, type = ALL);
 
-/*------------------------------
-Return player's poisons amount.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Returns player available poisons.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  USED - left to use in this round
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          Available poisons
+ */
 native cod_get_user_poisons(id, type = ALL);
 
-/*------------------------------
-Return player's dynamites amount.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Returns player available dynamites.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  USED - left to use in this round
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          Available dynamites
+ */
 native cod_get_user_dynamites(id, type = ALL);
 
-/*------------------------------
-Return player's thunders amount.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Returns player available medkits.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  USED - left to use in this round
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          Available medkits
+ */
 native cod_get_user_thunders(id, type = ALL);
 
-/*------------------------------
-Return player's teleports amount.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Returns player available teleports.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  USED - left to use in this round
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          Available teleports
+ */
 native cod_get_user_teleports(id, type = ALL);
 
-/*------------------------------
-Return player's multijumps amount.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Returns player available multijumps.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          Available multijumps
+ */
 native cod_get_user_multijumps(id, type = ALL);
 
-/*------------------------------
-Return player's gravity amount.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Returns player gravity amount.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          Gravity amount
+ */
 native Float:cod_get_user_gravity(id, type = ALL);
 
-/*------------------------------
-Return player's speed bonus amount.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Returns player speed amount.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          Speed amount
+ */
 native Float:cod_get_user_speed(id, type = ALL);
 
-/*------------------------------
-Return player's armor amount.
-------------------------------*/
+/**
+ * Returns player armor amount.
+ *
+ * @param id        Player index
+ *
+ * @return          Armor amount
+ */
 native cod_get_user_armor(id);
 
-/*------------------------------
-Set player's rockets amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Sets player rockets bonus.
+ *
+ * @param id        Player index
+ * @param value     Bonus value
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_rockets(id, value, type = ROUND);
 
-/*------------------------------
-Set player's mines amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Sets player mines bonus.
+ *
+ * @param id        Player index
+ * @param value     Bonus value
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_mines(id, value, type = ROUND);
 
-/*------------------------------
-Set player's medkits amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Sets player medkits bonus.
+ *
+ * @param id        Player index
+ * @param value     Bonus value
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_medkits(id, value, type = ROUND);
 
-/*------------------------------
-Set player's poisons amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Sets player poisons bonus.
+ *
+ * @param id        Player index
+ * @param value     Bonus value
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_poisons(id, value, type = ROUND);
 
-/*------------------------------
-Set player's dynamites amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Sets player dynamites bonus.
+ *
+ * @param id        Player index
+ * @param value     Bonus value
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_dynamites(id, value, type = ROUND);
 
-/*------------------------------
-Set player's thunders amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Sets player thunders bonus.
+ *
+ * @param id        Player index
+ * @param value     Bonus value
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_thunders(id, value, type = ROUND);
 
-/*------------------------------
-Set player's teleports amount. Value = FULL (-2) for unlimited teleports.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Sets player teleports bonus.
+ *
+ * @note Set value to FULL (-2) for unlimited teleports.
+ *
+ * @param id        Player index
+ * @param value     Bonus value
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_teleports(id, value, type = ROUND);
 
-/*------------------------------
-Set player's multijumps amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Sets player multijumps bonus.
+ *
+ * @param id        Player index
+ * @param value     Bonus value
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_multijumps(id, value, type = ROUND);
 
-/*------------------------------
-Set player's gravity amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-Lower gravity (but higher than 0) has priority and will be reduced by gravity lower than 0.
-------------------------------*/
+/**
+ * Sets player gravity bonus.
+ *
+ * @note Lower gravity has priority, but still will be reduced by bonuses with value lower than 0.
+ *
+ * @param id        Player index
+ * @param value     Bonus value, from -1.0 to 1.0
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_gravity(id, Float:value, type = ROUND);
 
-/*------------------------------
-Set player's speed bonus - can be lower than 0. Alternative to Condition bonus.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-Player speed is calculated from base speed, condition bonus and speed bonus.
-Higher speed bonus has priority, but still will be reduced by bonuses lower than 0.
-Set value to COD_FREEZE (0.1) to prevent player from moving.
-------------------------------*/
+/**
+ * Sets player speed bonus.
+ *
+ * @note Player speed is calculated from base speed, condition bonus and speed bonus.
+ * @note Higher speed bonus has priority, but still will be reduced by bonuses with value lower than 0.
+ * @note Set value to COD_FREEZE (0.1) to prevent player from moving.
+ *
+ * @param id        Player index
+ * @param value     Bonus value
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_speed(id, Float:value, type = ROUND);
 
-/*------------------------------
-Set player's armor amount.
-------------------------------*/
+/**
+ * Sets player armor.
+ *
+ * @param id        Player index
+ * @param value     Armor amount
+ *
+ * @noreturn
+ */
 native cod_set_user_armor(id, value);
 
-/*------------------------------
-Add value to player's rockets amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Add value to player rockets bonus.
+ *
+ * @param id        Player index
+ * @param value     Value amount
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_add_user_rockets(id, value, type = ROUND);
 
-/*------------------------------
-Add value to player's mines amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Add value to player mines bonus.
+ *
+ * @param id        Player index
+ * @param value     Value amount
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_add_user_mines(id, value, type = ROUND);
 
-/*------------------------------
-Add value to player's medkits amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Add value to player medkits bonus.
+ *
+ * @param id        Player index
+ * @param value     Value amount
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_add_user_medkits(id, value, type = ROUND);
 
-/*------------------------------
-Add value to player's poisons amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Add value to player poisons bonus.
+ *
+ * @param id        Player index
+ * @param value     Value amount
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_add_user_poisons(id, value, type = ROUND);
 
-/*------------------------------
-Add value to player's dynamites amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Add value to player dynamites bonus.
+ *
+ * @param id        Player index
+ * @param value     Value amount
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_add_user_dynamites(id, value, type = ROUND);
 
-/*------------------------------
-Add value to player's thunders amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Add value to player thunders bonus.
+ *
+ * @param id        Player index
+ * @param value     Value amount
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_add_user_thunders(id, value, type = ROUND);
 
-/*------------------------------
-Add value to player's teleports amount. Value = FULL (-2) for unlimited teleports.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Add value to player teleports bonus.
+ *
+ * @note Set value to FULL (-2) for unlimited teleports.
+ *
+ * @param id        Player index
+ * @param value     Value amount
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_add_user_teleports(id, value, type = ROUND);
 
-/*------------------------------
-Add value to player's multijumps amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Add value to player multijumps bonus.
+ *
+ * @param id        Player index
+ * @param value     Value amount
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_add_user_multijumps(id, value, type = ROUND);
 
-/*------------------------------
-Add value to player's gravity amount.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
-------------------------------*/
+/**
+ * Add value to player gravity bonus.
+ *
+ * @param id        Player index
+ * @param value     Value amount
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_add_user_gravity(id, Float:value, type = ROUND);
 
-/*------------------------------
-Add value to player's speed amount. Alternative to Condition bonus.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Add value to player speed bonus.
+ *
+ * @param id        Player index
+ * @param value     Value amount
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_add_user_speed(id, Float:value, type = ROUND);
 
-/*------------------------------
-Add value to player's armor amount.
-------------------------------*/
+/**
+ * Add value to player armor.
+ *
+ * @param id        Player index
+ * @param value     Value amount
+ *
+ * @noreturn
+ */
 native cod_add_user_armor(id, value);
 
-/*------------------------------
-Use player's rocket.
-------------------------------*/
+/**
+ * Forces player rocket use.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 native cod_use_user_rocket(id);
 
-/*------------------------------
-Use player's rocket.
-------------------------------*/
+/**
+ * Forces player mine use.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 native cod_use_user_mine(id);
 
-/*------------------------------
-Use player's dynamite.
-------------------------------*/
+/**
+ * Forces player dynamite use.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 native cod_use_user_dynamite(id);
 
-/*------------------------------
-Use player's thunder.
-------------------------------*/
+/**
+ * Forces player thunder use.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 native cod_use_user_thunder(id);
 
-/*------------------------------
-Use player's medkit.
-------------------------------*/
+/**
+ * Forces player medkit use.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 native cod_use_user_medkit(id);
 
-/*------------------------------
-Use player's poison.
-------------------------------*/
+/**
+ * Forces player poison use.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 native cod_use_user_poison(id);
 
-/*------------------------------
-Use player's teleport.
-------------------------------*/
+/**
+ * Forces player teleport use.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 native cod_use_user_teleport(id);
 
-/*------------------------------
-Return if player has resistance for cod skills.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
-------------------------------*/
+/**
+ * Returns if player has resistance for skills.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          1 if player has resistance, 0 otherwise
+ */
 native cod_get_user_resistance(id, type = ALL);
 
-/*------------------------------
-Return if player has god mode.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
-------------------------------*/
+/**
+ * Returns if player has god mode.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          1 if player has god mode, 0 otherwise
+ */
 native cod_get_user_godmode(id, type = ALL);
 
-/*------------------------------
-Return if player has noclip.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
-------------------------------*/
+/**
+ * Returns if player has noclip.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          1 if player has noclip, 0 otherwise
+ */
 native cod_get_user_noclip(id, type = ALL);
 
-/*------------------------------
-Return if player has bunnyhop.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others, ROUND - until round end.
-------------------------------*/
+/**
+ * Returns if player has bunnyhop.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          1 if player has bunnyhop, 0 otherwise
+ */
 native cod_get_user_bunnyhop(id, type = ALL);
 
-/*------------------------------
-Return if player has silent walk.
-Type can be ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - others.
-------------------------------*/
+/**
+ * Returns if player has silent walk.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          1 if player has silent walk, 0 otherwise
+ */
 native cod_get_user_footsteps(id, type = ALL);
 
-/*------------------------------
-Return if player has model of the opponent.
-Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
-------------------------------*/
+/**
+ * Returns if player has model of opponent team.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          1 if player has model of opponent team, 0 otherwise
+ */
 native cod_get_user_model(id, type = ALL);
 
-/*------------------------------
-Return if player has clip unlimited ammo.
-Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
-Weapon defines if defined weapons condition has to be checked.
-------------------------------*/
+/**
+ * Returns if player has unlimited ammo.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ * @param weapon    Weapon in CSW_ format to check for
+ *
+ * @return          1 if player has unlimited ammo, 0 otherwise
+ */
 native cod_get_user_unlimited_ammo(id, type = ALL, weapon = 0);
 
-/*------------------------------
-Return if player has recoil eliminator.
-Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
-Weapon defines if defined weapons condition has to be checked.
-------------------------------*/
+/**
+ * Returns if player has recoil eliminator.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ * @param weapon    Weapon in CSW_ format to check for
+ *
+ * @return          1 if player has recoil eliminator, 0 otherwise
+ */
 native cod_get_user_recoil_eliminator(id, type = ALL, weapon = 0);
 
-/*------------------------------
-Return if player has recoil reducer.
-Type can be ALL - overal, CLASS - for class, ITEM - for item, ADDITIONAL - others.
-Weapon defines if defined weapons condition has to be checked.
-------------------------------*/
+/**
+ * Returns if player has recoil reducer.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ * @param weapon    Weapon in CSW_ format to check for
+ *
+ * @return          1 if player has recoil reducer, 0 otherwise
+ */
 native cod_get_user_recoil_reducer(id, type = ALL, weapon = 0);
 
-/*------------------------------
-Set player's bunnyhop.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Sets player bunny hop bonus value.
+ *
+ * @param id        Player index
+ * @param value     True to enable bonus, false to disable
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_bunnyhop(id, value, type = ROUND);
 
-/*------------------------------
-Set player's silent walk.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Sets player silent walk bonus value.
+ *
+ * @param id        Player index
+ * @param value     True to enable bonus, false to disable
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_footsteps(id, value, type = ROUND);
 
-/*------------------------------
-Set player's model of the opponent.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Sets player model of opponent bonus value.
+ *
+ * @param id        Player index
+ * @param value     True to enable bonus, false to disable
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_model(id, value, type = ROUND);
 
-/*------------------------------
-Set player's resistance for powers.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Sets player resistance for skills bonus value.
+ *
+ * @param id        Player index
+ * @param value     True to enable bonus, false to disable
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_resistance(id, value, type = ROUND);
 
-/*------------------------------
-Set player's god mode.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Sets player god mode bonus value.
+ *
+ * @param id        Player index
+ * @param value     True to enable bonus, false to disable
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_godmode(id, value, type = ROUND);
 
-/*------------------------------
-Set player's noclip.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Sets player noclip bonus value.
+ *
+ * @param id        Player index
+ * @param value     True to enable bonus, false to disable
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @noreturn
+ */
 native cod_set_user_noclip(id, value, type = ROUND);
 
-/*------------------------------
-Set player's unlimited clip ammo.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-Weapon is weapon id (1<<CSW_ format - bitsums can be used) or FULL for all weapons.
-------------------------------*/
-native cod_set_user_unlimited_ammo(id, value, type = ROUND, weapon = FULL);
+/**
+ * Sets player unlimited ammo bonus value.
+ *
+ * @note Weapons can be bitsum, for example bonus for both M4A1 and AK47: (1<<CSW_M4A1)|(1<<CSW_AK47).
+ *
+ * @param id        Player index
+ * @param value     True to enable bonus, false to disable
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ * @param weapons   Weapons in 1<<CSW_ format or FULL for all weapons.
+ *
+ * @noreturn
+ */
+native cod_set_user_unlimited_ammo(id, value, type = ROUND, weapons = FULL);
 
-/*------------------------------
-Set player's recoil eliminator.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-Weapon is weapon id (1<<CSW_ format - bitsums can be used) or FULL for all weapons.
-------------------------------*/
-native cod_set_user_recoil_eliminator(id, value, type = ROUND, weapon = FULL);
+/**
+ * Sets player recoil eliminator bonus value.
+ *
+ * @note Weapons can be bitsum, for example bonus for both M4A1 and AK47: (1<<CSW_M4A1)|(1<<CSW_AK47).
+ *
+ * @param id        Player index
+ * @param value     True to enable bonus, false to disable
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ * @param weapons   Weapons in 1<<CSW_ format or FULL for all weapons.
+ *
+ * @noreturn
+ */
+native cod_set_user_recoil_eliminator(id, value, type = ROUND, weapons = FULL);
 
-/*------------------------------
-Set player's recoil reducer.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-Weapon is weapon id (1<<CSW_ format - bitsums can be used) or FULL for all weapons.
-------------------------------*/
-native cod_set_user_recoil_reducer(id, value, type = ROUND, weapon = FULL);
+/**
+ * Sets player recoil reducer bonus value.
+ *
+ * @note Weapons can be bitsum, for example bonus for both M4A1 and AK47: (1<<CSW_M4A1)|(1<<CSW_AK47).
+ *
+ * @param id        Player index
+ * @param value     True to enable bonus, false to disable
+ * @param type      Bonus type, valid types are:
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ * @param weapons   Weapons in 1<<CSW_ format or FULL for all weapons.
+ *
+ * @noreturn
+ */
+native cod_set_user_recoil_reducer(id, value, type = ROUND, weapons = FULL);
 
-/*------------------------------
-Give player a weapon and allows player to own it.
-Amount is only for adding multiple nades at once and is not used for normal weapons.
-------------------------------*/
+/**
+ * Gives player a weapon and allows player to own and pick it.
+ *
+ * @note Amount is only for adding multiple nades at once and is not used for other weapons.
+ *
+ * @param id        Player index
+ * @param weapon    Weapon in CSW_ format.
+ * @param amount    Amount value
+ *
+ * @noreturn
+ */
 native cod_give_weapon(id, weapon, amount = 0);
 
-/*------------------------------
-Remove a weapon from player's inventory and disallows to own it.
-------------------------------*/
+/**
+ * Removes a weapon from player inventory and disallows to own or pick it.
+ *
+ * @param id        Player index
+ * @param weapon    Weapon in CSW_ format.
+ *
+ * @noreturn
+ */
 native cod_take_weapon(id, weapon);
 
-/*------------------------------
-Return player's current weapon.
-------------------------------*/
+/**
+ * Returns player current weapon.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 native cod_get_user_weapon(id);
 
-/*------------------------------
-Return player's render amount.
-Type can be NONE - at this moment (with status and weapon rules applied), ALL - overall, CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-------------------------------*/
+/**
+ * Returns players render amount.
+ *
+ * @param id        Player index
+ * @param type      Bonus type, valid types are:
+ *                  NONE - at this moment (with status and weapon rules applied)
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ *
+ * @return          Render amount
+ */
 native cod_get_user_render(id, type = NONE);
 
-/*------------------------------
-Set player's render.
-Type can be CLASS - for class, ITEM - for item, ADDITIONAL - static bonus, ROUND - until round end, DEATH - until death.
-There can be only one render for CLASS, ITEM, ADDITIONAL, but multiple for ROUND - every set adds new render record.
-Value is number from -255 to 255 (256 to disable), but for CLASS type must be 0 or more
-(negative numbers substract it from player's current render value, positive and 0 sets it to this value).
-Status is player state for render. It can be a bitsum of RENDER_ALWAYS, RENDER_STAND, RENDER_MOVE, RENDER_DUCK, RENDER_SHIFT.
-Weapon is weapon id (1<<CSW_ format - bitsums can be used) or FULL for all weapons.
-Timer sets render value for certain amount of time - it ignores type, status and weapon.
-------------------------------*/
-native cod_set_user_render(id, value, type = ROUND, status = RENDER_ALWAYS, weapon = FULL, Float:timer = 0.0);
+/**
+ * Sets players render amount bonus.
+ *
+ * @note There can be only one render for CLASS, ITEM, ADDITIONAL,
+ *       but multiple all other types - every set adds new render record.
+ * @note Lower render has priority, but still will be reduced by bonuses with value lower than 0.
+ * @note Value for class type must be at least 0.
+ * @note Status can be bitsum, for example only while crouching while not moving: RENDER_STAND|RENDER_DUCK.
+ * @note Weapons can be bitsum, for example bonus for both M4A1 and AK47: (1<<CSW_M4A1)|(1<<CSW_AK47).
+ *
+ * @param id        Player index
+ * @param value     Render amount, value from -255 to 255 (256 to disable)
+ * @param type      Bonus type, valid types are:
+ *                  ALL - overall
+ *                  CLASS - for class
+ *                  ITEM - for item
+ *                  ADDITIONAL - static bonus
+ *                  ROUND - until round end
+ *                  DEATH - until death
+ *                  DAMAGE_GIVEN - until player damage enemy
+ *                  DAMAGE_TAKEN - until player is hurt
+ * @param status    Player state for render, valid values:
+ *                  RENDER_ALWAYS - always
+ *                  RENDER_STAND - only if player is standing still
+ *                  RENDER_MOVE - only if player is moving
+ *                  RENDER_DUCK - only if player is ducking
+ *                  RENDER_SHIFT - only if player is walking
+ * @param weapons   Weapons in 1<<CSW_ format or FULL for all weapons.
+ * @param timer     Timer sets static render value for certain amount of time.
+ *                  While active it blocks any other render bonuses.
+ *
+ * @noreturn
+ */
+native cod_set_user_render(id, value, type = ROUND, status = RENDER_ALWAYS, weapons = FULL, Float:timer = 0.0);
 
 /*------------------------------
-Set player's render glow.
+Set player render glow.
 Usage is the same as in set_user_rendering native.
 Timer sets glow for certain amount of time.
 ------------------------------*/
+/**
+ * Sets players render glow amount.
+ *
+ * @note Usage is the same as in set_user_rendering native.
+ *       https://www.amxmodx.org/api/fun/set_user_rendering
+ *
+ * @param id        Player index
+ * @param effect    Rendering effects, one of kRenderFx* constants
+ * @param red       The amount of red color, value 0 to 255
+ * @param green     The amount of green color, value 0 to 255
+ * @param blue      The amount of blue color, value 0 to 255
+ * @param render    Render mode, one of kRender* constants
+ * @param amount    Render amount, value 0 to 255
+ *                  While active it blocks any other render bonuses.
+ * @param timer     Timer sets render glow for certain amount of time.
+ *                  While active it blocks any other render bonuses.
+ *
+ * @noreturn
+ */
 native cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:timer = 0.0);
 
-/*------------------------------
-Print chat message with [CoD] prefix.
-Color formaters are allowed as in client_print_color.
-------------------------------*/
+/**
+ * Sends colored chat message with [CoD] prefix to players.
+ *
+ * @note The colors can be modified inside of the format string using special characters.
+ *       These characters can be included using the escape character:
+ *       green           x04 ; use location color from this point forward
+ *       red/blue/grey   x03 ; use team color from this point forward
+ *       red/blue/grey   x02 ; use team color to the end of the client name
+ *                           ; This only works at the start of the string,
+ *                           ; and precludes using other control characters
+ *       default         x01 ; use default color from this point forward
+ *
+ * @param index     Player index, use 0 to display to all players
+ * @param text      String to display
+ * @param ...       Variables to replace formatting parameters in text string
+ *
+ * @noreturn
+ */
 native cod_print_chat(id, const text[], any:...);
 
-/*------------------------------
-Log error to cod_mod.log file.
-For plugin param __BINARY__ or PLUGIN constants should be used.
-------------------------------*/
+/**
+ * Logs error to cod_mod.log file.
+ *
+ * @note For plugin param __BINARY__ or PLUGIN constant should be used.
+ *
+ * @param plugin    Plugin name
+ * @param text      String to display
+ * @param ...       Variables to replace formatting parameters in text string
+ *
+ * @noreturn
+ */
 native cod_log_error(const plugin[] = "CoD Mod", const text[], any:...);
 
-/*------------------------------
-Execute command on player with bypassing protectors (most of them).
-------------------------------*/
-native cod_cmd_execute(id, const text[], any:...);
+/**
+ * Executes command on player with bypassing protectors (at least some of them).
+ *
+ * @param id        Player index
+ * @param text      Command string
+ * @param ...       Variables to replace formatting parameters in command string
+ *
+ * @noreturn
+ */
+native cod_cmd_execute(id, const command[], any:...);
 
-/*------------------------------
-Prepare safe sql string for query.
-------------------------------*/
+/**
+ * Prepare safe SQL string for query.
+ *
+ * @param source    Raw SQL string to prepare
+ * @param dest      Buffer to copy safe SQL string to
+ * @param lenth     Maximum buffer size
+ *
+ * @noreturn
+ */
 native cod_sql_string(const source[], dest[], length);
 
-/*------------------------------
-Diplay text in HUD/DHUD.
-Type can be TYPE_HUD or TYPE_DHUD.
-HUD/DHUD params usage is the same as in set_hudmessage/set_dhudmessage.
-------------------------------*/
-native cod_show_hud(id, type = 0, red = 255, green = 255, blue = 255, Float:x = -1.0, Float:y = 0.35, effects = 0, Float:fxtime = 6.0, Float:holdTime = 12.0, Float:fadeInTime = 0.1, Float:fadeOutTime = 0.2, const text[], any:...);
 
-/*------------------------------
-Display screen fade.
-Duration and holdtime are time seconds.
-Fadetype is fade display type:
-- FFADE_IN 0x0000
-- FFADE_OUT 0x0001
-- FFADE_MODULATE 0x0002
-- FFADE_STAYOUT 0x0004
-Red, green, blue is fade color in RGB
-Alpha is fade power from 0 to 255
-------------------------------*/
+/**
+ * Diplays text in HUD / DHUD to players.
+ *
+ * @note Usage is the same as in set_hudmessage / set_dhudmessage.
+ *       https://www.amxmodx.org/api/amxmodx/set_hudmessage
+ *
+ * @param id            Player index, use 0 to display to all players
+ * @param type          Display method type, TYPE_HUD or TYPE_DHUD
+ * @param red           Red component of hudmessage color, value 0 to 255
+ * @param green         Green component of hudmessage color, value 0 to 255
+ * @param blue          Blue component of hudmessage color, value 0 to 255
+ * @param x             Location of the message on the x axis in percent
+ * @param y             Location of the message on the y axis in percent
+ * @param effects       Display effect
+ * @param fxTime        Duration of the effect in seconds
+ * @param holdTime      Time the message stays on screen in seconds
+ * @param fadeInTime    Time it takes the message to fully appear (fade-in) in seconds
+ * @param fadeOutTime   Time it takes the message to fully disappear (fade-out) in seconds
+ * @param channel       Channel to use on the client
+ * @param text          Command string
+ * @param ...           Variables to replace formatting parameters in command string
+ *
+ * @noreturn
+ */
+native cod_show_hud(id, type = TYPE_HUD, red = 255, green = 255, blue = 255, Float:x = -1.0, Float:y = 0.35, effects = 0, Float:fxTime = 6.0, Float:holdTime = 12.0, Float:fadeInTime = 0.1, Float:fadeOutTime = 0.2, const text[], any:...);
+
+/**
+ * Displays screen fade.
+ *
+ * @param id        Player index, use 0 to display to all players
+ * @param fxTime    Duration of the effect in seconds
+ * @param holdTime  Time the message stays on screen in seconds
+ * @param fadeType  Display type, available values:
+ *                  FFADE_IN 0x0000
+ *                  FFADE_OUT 0x0001
+ *                  FFADE_MODULATE 0x0002
+ *                  FFADE_STAYOUT 0x0004
+ * @param red       Red component of fade color, value 0 to 255
+ * @param green     Green component of fade color, value 0 to 255
+ * @param blue      Blue component of fade color, value 0 to 255
+ * @param alpha     Alpha is fade transparency, value from 0 to 255
+ *
+ * @noreturn
+ */
 native cod_display_fade(id, duration, holdTime, fadeType, red, green, blue, alpha);
 
-/*------------------------------
-Display status icon.
-Red, green, blue is status color in RGB - not required if hiding icon.
-Icon is status icon name - all icons can be found here: https://forums.alliedmods.net/showthread.php?t=52529.
-Enable defines if show or hide icon.
-------------------------------*/
-native cod_display_icon(id, const icon[], enable = 0, red = 0, green = 0, blue = 0);
+/**
+ * Displays status icon.
+ *
+ * @note All icons can be found here: https://forums.alliedmods.net/showthread.php?t=52529.
+ *
+ * @param id        Player index, use 0 to display to all players
+ * @param icon      Status icon name
+ * @param enable    If true will show icon, otherwise hide it
+ * @param red       Red component of icon color, value 0 to 255
+ * @param green     Green component of icon color, value 0 to 255
+ * @param blue      Blue component of icon color, value 0 to 255
+ *
+ * @noreturn
+ */
+native cod_display_icon(id, const icon[], enable = false, red = 0, green = 0, blue = 0);
 
-/*------------------------------
-Display bartimer.
-Duration is time in seconds.
-Start is value from 0-100 and specifies from what percent of bar it starts.
-------------------------------*/
+/**
+ * Displays bar timer.
+ *
+ * @param id        Player index, use 0 to display to all players
+ * @param duration  Duration of the bar time hold time in seconds
+ * @param start     Percentage of bar to start from, value 0 to 100
+ *
+ * @noreturn
+ */
 native cod_make_bartimer(id, duration = 0, start = 0);
 
-/*------------------------------
-Shake player's screen.
-Amplitude is power of shakes.
-Duration is time in seconds.
-Frequency is noise frequency.
-------------------------------*/
+/**
+ * Shakes player screen.
+ *
+ * @param id        Player index
+ * @param amplitude Power of shakes
+ * @param duration  Effect time in seconds
+ * @param frequency Noise frequency
+ *
+ * @noreturn
+ */
 native cod_screen_shake(id, amplitude = (7<<14), duration = (1<<13), frequency = (1<<14));
 
-/*------------------------------
-Refill player's clip ammo.
-------------------------------*/
+/**
+ * Refills player clip ammo.
+ *
+ * @param id            Player index
+ *
+ * @noreturn
+ */
 native cod_refill_ammo(id);
 
-/*------------------------------
-Make an explosion around ent.
-Distance specifies beam distance.
-Explosion is explosion effect.
-Damage_distance is distance from ent where players will be hurt.
-Damage specifies damage dealt to players in damage_distance.
-Factor is intelligence bonus for damage.
-Suicide is decision if player will die after explosion
-------------------------------*/
-native cod_make_explosion(ent, distance = 0, explosion = 1, Float:damageDistance = 0.0, Float:damage = 0.0, Float:factor = 0.5, suicide = 0);
+/**
+ * Makes an explosion effect around entity.
+ *
+ * @param ent           Entity index, can be player
+ * @param distance      Specifies beam distance
+ * @param explosion     If true shows explosion effect
+ * @param dmgDistance   Distance from entity where players will be hurt
+ * @param damage        Damage dealt to players in dmgDistance
+ * @param factor        Intelligence bonus for damage
+ * @param suicide       If true player will die after explosion
+ *
+ * @noreturn
+ */
+native cod_make_explosion(ent, distance = 0, explosion = true, Float:dmgDistance = 0.0, Float:damage = 0.0, Float:factor = 0.5, suicide = false);
 
-/*------------------------------
-Make repeating damage to player.
-Attacker is player that makes damage.
-Victim is player that is receiving damage.
-Damage is damage amount. If damage = 0.0 previous task will be removed and no task created.
-Time is interval between damage. If time = 0.0 previous task will be removed and no task created.
-Counter is how many times make damage. If counter = 0 effect will last till player death or round end - usefull for constant healing.
-Flags is damage flag (DMG_ format).
-Flags can also be FIRE, POISON or HEAL (healing player instead of huring) if want to use custom effects out of the box.
-Instant makes first damage immediately.
-------------------------------*/
-native cod_repeat_damage(attacker, victim, Float:damage = 0.0, Float:time = 0.0, counter = 1, flags = DMG_CODSKILL, instant = 1);
+/**
+ * Makes repeating damage to player.
+ *
+ * @note Uses cod_inflict_damage with DMG_REPEAT flag.
+ * @note If damage or time is set 0.0 previous task will be removed and no new task created.
+ * @note If counter is set 0 effect will last till player death or round end - usefull for constant healing.
+ *
+ * @param attacker  Player that makes damage
+ * @param victim    Player that is receiving damage
+ * @param damage    Damage amount to make
+ * @param time      Interval between damage events
+ * @param counter   Damage dealt to players in dmgDistance
+ * @param flags     Damage flag in DMG_ format, alternatively FIRE, POISON, or HEAL
+ *                  (healing player instead of hurting) to use custom effects out of the box.
+ * @param instant   If true makes first damage immediately
+ *
+ * @noreturn
+ */
+native cod_repeat_damage(attacker, victim, Float:damage = 0.0, Float:time = 0.0, counter = 1, flags = DMG_CODSKILL, instant = true);
 
-/*------------------------------
-Make damage with intelligence factor.
-Factor is intelligence bonus for damage.
-Flags are damage flags (DMG_CODSKILL flag will be added).
-------------------------------*/
+/**
+ * Makes damage as player to other player.
+ *
+ * @note Damage will be blocked if victim has god mode or resistance.
+ *
+ * @param attacker  Player that makes kill
+ * @param victim    Player that is killed
+ * @param damage    Damage amount to make
+ * @param factor    Intelligence bonus for damage
+ * @param flags     Damage flags (DMG_CODSKILL flag will be added)
+ *
+ * @noreturn
+ */
 native cod_inflict_damage(attacker, victim, Float:damage, Float:factor = 0.5, flags = 0);
 
-/*------------------------------
-Kill a player imitating kill by another player.
-Return COD_BLOCK.
-------------------------------*/
+/**
+ * Kills a player imitating kill by another player.
+ *
+ * @note Uses cod_inflict_damage with DMG_KILL flag.
+ *
+ * @param attacker      Player that makes kill
+ * @param victim        Player that is killed
+ * @param damageBits    Damage flags
+ *
+ * @returns             COD_BLOCK (-1.0)
+ */
 native Float:cod_kill_player(attacker, victim, damageBits);
 
-/*------------------------------
-Respawn player after defined time (0.1 for immediate respawn).
-If enemy is true will respawn player on enemy spawn.
-------------------------------*/
-native cod_respawn_player(id, enemy = 0, Float:time = 0.1);
+/**
+ * Respawns player after defined time.
+ *
+ * @param id        Player that makes kill
+ * @param enemy     If true will respawn player on enemy spawn
+ * @param time      Respawn delay in seconds, use 0.1 for immediate respawn
+ *
+ * @noreturn
+ */
+native cod_respawn_player(id, enemy = false, Float:time = 0.1);
 
-/*------------------------------
-Teleport player to spawn.
-If enemy is true will teleport player to enemy spawn.
-------------------------------*/
-native cod_teleport_to_spawn(id, enemy = 0);
+/**
+ * Teleports player to spawn.
+ *
+ * @param id        Player that makes kill
+ * @param enemy     If true will teleport player to enemy spawn
+ *
+ * @noreturn
+ */
+native cod_teleport_to_spawn(id, enemy = false);
 
-/*------------------------------
-Random item upgrade.
-Value is current item value.
-UpgradeMin is minimum upgrade value (can be lower than 0).
-UpgradeMax is maximum upgrade value.
-ValueMin is minimum item value. If reached function will return COD_STOP.
-ValueMax is maximum item value. If reached function will return COD_STOP.
-Returned item value will always be at least 0.
-------------------------------*/
+/**
+ * Makes random item upgrade.
+ *
+ * @note After upgrade item value will always be at least 0.
+ * @note COD_STOP will be returned if item is not upgradable
+ *       or valueMin / valueMax is already reached.
+ *
+ * @param value         Item value pointer to malipulate
+ * @param upgradeMin    Minimum upgrade value, can be smaller than 0
+ * @param upgradeMax    Maximum upgrade value
+ * @param valueMin      Minimum item value
+ * @param valueMax      Maximum item value
+ *
+ * @returns             COD_CONTINUE (0) if upgraded, otherwise COD_STOP (4)
+ */
 native cod_random_upgrade(&value, upgradeMin = -1, upgradeMax = 1, valueMin = NONE, valueMax = NONE);
 
-/*------------------------------
-Return true/false result for given percent chance.
-------------------------------*/
-native bool:cod_percent_chance(percent);
+/**
+ * Returns random bool with specified percentage chance for success (true).
+ *
+ * @param percent   Percentage change for success
+ *
+ * @returns         1 if success, 0 otherwise
+ */
+native cod_percent_chance(percent);
 
-/*------------------------------
-Return if there is enough space for ent (or origin) with defined minimum distance in units.
-------------------------------*/
-native bool:cod_is_enough_space(ent, Float:distance = 120.0);
+/**
+ * Returns if there is enough space for entity in current origin.
+ *
+ * @param ent       Entity index
+ * @param distance  Distance limit around entity, value in units
+ *
+ * @returns         1 if enough place, 0 otherwise
+ */
+native cod_is_enough_space(ent, Float:distance = 120.0);
 
-/*------------------------------
-Remove all ents with specified className.
-If id > 0 will remove only ents owned by that player.
-------------------------------*/
+/**
+ * Removes all entities with specified class name.
+ *
+ * @param id        Player index, will remove only entities owned by that player
+ * @param className Entities class name
+ *
+ * @noreturn
+ */
 native cod_remove_ents(id = 0, className[]);
 
-/*------------------------------
-Get player access flags.
-------------------------------*/
+/**
+ * Returns player access flags.
+ *
+ * @param id        Player index
+ *
+ * @return          Access flags
+ */
 native cod_get_user_flags(id);
 
-/*------------------------------
-Set player access flags.
-------------------------------*/
+/**
+ * Sets player access flags.
+ *
+ * @param id        Player index
+ * @param flags     Access flags
+ *
+ * @noreturn
+ */
 native cod_set_user_flags(id, flags);
 
-/*------------------------------
-Register new item and return its id.
-ValueMin is normal item value or random min value.
-ValueMax is random max value.
-Those values are used for item description and generating random value passed to item plugin.
-------------------------------*/
-native cod_register_item(const name[], const description[], valueMin = 0, valueMax = 0);
+/**
+ * Registers new item.
+ *
+ * @param name      Item name
+ * @param desc      Item description
+ * @param valueMin  Mininum value for item (used for random value)
+ * @param valueMax  Maximum value for item (used for random value)
+ *
+ * @return          Item index
+ */
+native cod_register_item(const name[], const desc[], valueMin = 0, valueMax = 0);
 
-/*------------------------------
-Register new class and return its id.
-------------------------------*/
-native cod_register_class(const name[], const description[], const fraction[], weapons, health, intelligence, strength, stamina, condition, flag = NONE);
+/**
+ * Registers new class.
+ *
+ * @note Weapons can be bitsum, for example for both M4A1 and AK47: (1<<CSW_M4A1)|(1<<CSW_AK47).
+ *
+ * @param name          Class name
+ * @param desc          Class description
+ * @param faction       Class faction, can be empty
+ * @param weapons       Class weapons
+ * @param health        Class health bonus
+ * @param intelligence  Class intelligence bonus
+ * @param strength      Class strength bonus
+ * @param stamina       Class stamina bonus
+ * @param condition     Class condition bonus
+ * @param flag          Class access flag
+ *
+ * @return          Class index
+ */
+native cod_register_class(const name[], const desc[], const faction[], weapons, health, intelligence, strength, stamina, condition, flag = NONE);
 
 /*------------------------------
 Register new class promotion and return its id.
 Values weapons to flag will be copied from class if not specified.
 ------------------------------*/
-native cod_register_promotion(const name[], const description[], const className[], level, promotion, weapons = NONE, health = NONE, intelligence = NONE, strength = NONE, stamina = NONE, condition = NONE, flag = NONE);
+/**
+ * Registers new class promotion.
+ *
+ * @note Weapons can be bitsum, for example for both M4A1 and AK47: (1<<CSW_M4A1)|(1<<CSW_AK47).
+ * @note Values from weapons to flag will be copied from base class if not specified.
+ *
+ * @param name          Class name
+ * @param desc          Class description
+ * @param baseClass     Base class for promotion
+ * @param level         Level to advance to this promotion
+ * @param promotion     Promotion step, available: PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION_THIRD.
+ * @param weapons       Class weapons
+ * @param health        Class health bonus
+ * @param intelligence  Class intelligence bonus
+ * @param strength      Class strength bonus
+ * @param stamina       Class stamina bonus
+ * @param condition     Class condition bonus
+ * @param flag          Class access flag
+ *
+ * @return              Class promotion index
+ */
+native cod_register_promotion(const name[], const desc[], const baseClass[], level, promotion, weapons = NONE, health = NONE, intelligence = NONE, strength = NONE, stamina = NONE, condition = NONE, flag = NONE);
 
 /*------------------------------
-Multiforward executed when player's class is changed.
+Multiforward executed when player class is changed.
 ------------------------------*/
 forward cod_class_changed(id, class);
 
 /*------------------------------
-Multiforward executed when player's item is changed.
+Multiforward executed when player item is changed.
 ------------------------------*/
 forward cod_item_changed(id, item);
 
 /*------------------------------
-Multiforward executed when player's render is changed.
+Multiforward executed when player render is changed.
 ------------------------------*/
 forward cod_render_changed(id, render);
 
 /*------------------------------
-Multiforward executed when player's gravity is changed.
+Multiforward executed when player gravity is changed.
 ------------------------------*/
 forward cod_gravity_changed(id, Float:gravity);
 
 /*------------------------------
-Multiforward executed when player's gravity is changed.
+Multiforward executed when player gravity is changed.
 ------------------------------*/
 forward cod_speed_changed(id, Float:speed);
 
@@ -1050,7 +2273,7 @@ forward cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitP
 
 /*------------------------------
 Multiforward executed on cod_inflict_damage use which is not registered by HamTakeDamage.
-Flags param will contain sum with custom DMG_ flags: DMG_DYNAMITE, DMG_MINE, DMG_ROCKET, DMG_THUNDER, DMG_KIll
+Flags param will contain sum with custom DMG_ flags: DMG_DYNAMITE, DMG_MINE, DMG_ROCKET, DMG_THUNDER, DMG_KILL
 so damage type can be easily identified.
 Damage will be blocked if COD_BLOCK is returned.
 ------------------------------*/
