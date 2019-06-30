@@ -30,7 +30,7 @@ Missions configuration is stored in [cod_missions.ini](https://github.com/TheDoc
 Available skins are stored in [cod_skins.ini](https://github.com/TheDoctor0/CoDMod/blob/master/resources/addons/amxmodx/configs/cod_skins.ini).
 
 ## Additional
-Do you want to add promiotions (advances) to classes?
+Do you want to add promotions (advances) to classes?
 
 Check [this example](https://github.com/TheDoctor0/CoDMod/blob/master/classes/codclass_promotions_example.sma) to learn how to do it.
 
