@@ -745,14 +745,14 @@ public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSiz
 
 public _cod_check_account(plugin_id, num_params)
 {
-	if (!cvarAccountsEnabled) return true;
+	if (!cvarAccountsEnabled) return 0;
 
 	new id = get_param(1);
 
 	if (!is_user_valid(id)) {
 		cod_log_error(PLUGIN, "Invalid Player (ID: %d)", id);
 
-		return false;
+		return 0;
 	}
 
 	if (playerData[id][STATUS] < LOGGED) {
@@ -760,8 +760,8 @@ public _cod_check_account(plugin_id, num_params)
 
 		account_menu(id, true);
 
-		return false;
+		return 0;
 	}
 
-	return true;
+	return 1;
 }
