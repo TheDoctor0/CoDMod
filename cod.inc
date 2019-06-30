@@ -580,12 +580,6 @@ native cod_add_user_health(id, value, maximum = true);
  */
 native cod_get_user_health(id, current = false, class = true, stats = true, bonus = true, base = false);
 
-/*------------------------------
-Return intelligence statistic points.
-If classIntelligence = 1 adds class intelligence points.
-If statsIntelligence = 1 adds stats intelligence points.
-If bonusIntelligence = 1 adds extra intelligence points.
-------------------------------*/
 /**
  * Returns player intelligence points.
  *
@@ -1850,11 +1844,6 @@ native cod_get_user_render(id, type = NONE);
  */
 native cod_set_user_render(id, value, type = ROUND, status = RENDER_ALWAYS, weapons = FULL, Float:timer = 0.0);
 
-/*------------------------------
-Set player render glow.
-Usage is the same as in set_user_rendering native.
-Timer sets glow for certain amount of time.
-------------------------------*/
 /**
  * Sets players render glow amount.
  *
