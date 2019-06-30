@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Chemik"
-#define DESCRIPTION  "Ma 15 procent na zatrucie przeciwnika po trafieniu. Ma jedna apteczke."
+#define DESCRIPTION  "Posiada dwie trucizny. Ma 5 procent szansy na zatrucie przeciwnika przy trafieniu."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_M4A1)|(1<<CSW_DEAGLE)
 #define HEALTH       25
@@ -23,10 +23,14 @@ public plugin_init()
 }
 
 public cod_class_enabled(id, promotion)
-	cod_set_user_medkits(id, 1, CLASS);
+	cod_set_user_poisons(id, 2, CLASS);
 
 public cod_class_skill_used(id)
-	cod_use_user_medkit(id);
+	cod_use_user_poison(id);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits & DMG_BULLET && cod_percent_chance(15)) cod_repeat_damage(attacker, victim, 3.0 + cod_get_user_intelligence(attacker) * 0.02, 0.5, 10, POISON);
+{
+	if (damageBits & DMG_BULLET && cod_percent_chance(5)) {
+		cod_repeat_damage(attacker, victim, 3.0 + cod_get_user_intelligence(attacker) * 0.02, 0.5, 10, POISON);
+	}
+}
