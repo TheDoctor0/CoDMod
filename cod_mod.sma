@@ -158,8 +158,8 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_min_bonus_players", "10"), cvarMinBonusPlayers);
 	bind_pcvar_num(create_cvar("cod_bonus_players_per", "10"), cvarBonusPlayersPer);
 	bind_pcvar_num(create_cvar("cod_max_durability", "100"), cvarMaxDurability);
-	bind_pcvar_num(create_cvar("cod_min_damage_durability", "10"), cvarMinDamageDurability);
-	bind_pcvar_num(create_cvar("cod_max_damage_durability", "25"), cvarMaxDamageDurability);
+	bind_pcvar_num(create_cvar("cod_min_damage_durability", "20"), cvarMinDamageDurability);
+	bind_pcvar_num(create_cvar("cod_max_damage_durability", "30"), cvarMaxDamageDurability);
 	bind_pcvar_num(create_cvar("cod_block_skills_time", "5"), cvarBlockSkillsTime);
 
 	register_cvar("cod_version", VERSION, FCVAR_SERVER);
@@ -5317,8 +5317,9 @@ stock remove_render_type(id, type)
 		ArrayGetArray(codPlayerRender[id], i, codRender);
 
 		if (codRender[RENDER_TYPE] == type) {
-		 	if (type == ROUND || type == DEATH) ArrayDeleteItem(codPlayerRender[id], i);
-			else {
+		 	if (type == ROUND || type == DEATH || type == DAMAGE_GIVEN || type == DAMAGE_TAKEN) {
+		 		ArrayDeleteItem(codPlayerRender[id], i);
+		 	} else {
 				codRender[RENDER_VALUE] = 256;
 				codRender[RENDER_STATUS] = 0;
 				codRender[RENDER_WEAPON] = 0;
