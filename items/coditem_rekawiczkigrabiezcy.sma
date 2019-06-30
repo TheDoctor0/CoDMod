@@ -2,11 +2,11 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Rekawiczki Grabiezcy"
-#define VERSION "1.0.6"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Rekawiczki Grabiezcy"
-#define DESCRIPTION "Dostajesz %sHP i pelny magazynek po zabiciu"
+#define DESCRIPTION "Dostajesz %s HP i pelny magazynek po zabiciu"
 #define RANDOM_MIN  20
 #define RANDOM_MAX  35
 #define UPGRADE_MIN -3

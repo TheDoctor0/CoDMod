@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Pierscien Skoczka"
-#define VERSION "1.0.8"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Pierscien Skoczka"

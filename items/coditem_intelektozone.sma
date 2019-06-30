@@ -3,14 +3,14 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Intelekt O'Zone"
-#define VERSION "1.1.0"
+#define VERSION "1.1"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Intelekt O'Zone"
 #define DESCRIPTION "Masz 1/%s szansy na zmiane trajektorii lotu kuli na glowe przy trafieniu"
-#define RANDOM_MIN  5
-#define RANDOM_MAX  6
-#define VALUE_MIN   3
+#define RANDOM_MIN  3
+#define RANDOM_MAX  5
+#define VALUE_MIN   2
 
 new itemValue[MAX_PLAYERS + 1], itemActive;
 

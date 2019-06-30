@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Nano Kamizelka"
-#define VERSION "1.0.11"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Nano Kamizelka"

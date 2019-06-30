@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Skrzydla Archaniola"
-#define VERSION "1.0.15"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Skrzydla Archaniola"

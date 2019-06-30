@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Amulet Zwinnosci"
-#define VERSION "1.0.5"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Amulet Zwinnosci"

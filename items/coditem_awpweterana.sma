@@ -1,11 +1,11 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Item AWP Nevermore"
-#define VERSION "1.0.20"
+#define PLUGIN "CoD Item AWP Weterana"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
-#define NAME        "AWP Nevermore"
+#define NAME        "AWP Weterana"
 #define DESCRIPTION "Masz 50 procent szansy na natychmiastowe zabicie z AWP i 30 procent widocznosci z nim. Dostajesz +%s zdrowia"
 #define RANDOM_MIN  20
 #define RANDOM_MAX  25
@@ -50,4 +50,8 @@ public cod_item_upgrade(id)
 }
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (weapon == CSW_AWP && damageBits & DMG_BULLET && cod_percent_chance(50)) damage = cod_kill_player(attacker, victim, damageBits);
+{
+	if (weapon == CSW_AWP && damageBits & DMG_BULLET && cod_percent_chance(50)) {
+		damage = cod_kill_player(attacker, victim, damageBits);
+	}
+}

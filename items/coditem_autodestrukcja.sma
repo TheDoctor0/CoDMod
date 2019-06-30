@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Autodestrukcja"
-#define VERSION "1.0.12"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Autodestrukcja"
@@ -16,4 +16,4 @@ public plugin_init()
 }
 
 public cod_item_skill_used(id)
-	cod_make_explosion(id, 250, 1, 250.0, 999.9, 0.0, 1);
+	cod_make_explosion(id, 300, 1, 300.0, 999.9, 0.0, 1);

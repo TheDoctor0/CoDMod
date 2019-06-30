@@ -44,7 +44,7 @@ public add_to_full_pack(handle, e, ent, host, hostFlags, player, pSet)
 
 		pev(ent, pev_classname, className, charsmax(className));
 
-		if(equal(className, "mine")) {
+		if (equal(className, "mine")) {
 			set_es(handle, ES_RenderMode, kRenderTransAdd);
 			set_es(handle, ES_RenderAmt, 120.0);
 		}

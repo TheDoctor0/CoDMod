@@ -2,13 +2,13 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Furia"
-#define VERSION "1.0.12"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Furia"
 #define DESCRIPTION "Po aktywacji przez %ss masz 1/3 szansy na natychmiastowe zabicie z kazdej broni."
-#define RANDOM_MIN  4
-#define RANDOM_MAX  5
+#define RANDOM_MIN  5
+#define RANDOM_MAX  6
 
 #define TASK_ITEM 78322
 
@@ -33,7 +33,7 @@ public cod_item_disabled(id)
 
 public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id]);
-	
+
 public cod_item_value(id)
 	return itemValue[id];
 
@@ -43,7 +43,9 @@ public cod_item_spawned(id, respawn)
 
 	rem_bit(id, itemActive);
 
-	if (!respawn) rem_bit(id, itemUsed);
+	if (!respawn) {
+		rem_bit(id, itemUsed);
+	}
 }
 
 public cod_item_skill_used(id)
@@ -66,4 +68,8 @@ public deactivate_item(id)
 	rem_bit(id - TASK_ITEM, itemActive);
 
 public cod_item_damage_killer(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (get_bit(victim, itemActive) && random_num(1, 3) == 1) damage = cod_kill_player(attacker, victim, damageBits);
+{
+	if (get_bit(victim, itemActive) && random_num(1, 3) == 1) {
+		damage = cod_kill_player(attacker, victim, damageBits);
+	}
+}

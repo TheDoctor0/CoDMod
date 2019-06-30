@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Opaska Terrorysty"
-#define VERSION "1.0.13"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Opaska Terrorysty"
@@ -39,6 +39,9 @@ public cod_item_upgrade(id)
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
-	if (damageBits & DMG_HEGRENADE && cod_percent_chance(50)) damage = cod_kill_player(attacker, victim, damageBits);
-	else damage += itemValue[attacker];
+	if (damageBits & DMG_HEGRENADE && cod_percent_chance(50)) {
+        damage = cod_kill_player(attacker, victim, damageBits);
+    } else {
+        damage += itemValue[attacker];
+    }
 }

@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Boskie P90"
-#define VERSION "1.0.10"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Boskie P90"

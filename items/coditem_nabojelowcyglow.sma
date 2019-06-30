@@ -1,9 +1,8 @@
 #include <amxmodx>
 #include <cod>
-#include <fakemeta>
 
 #define PLUGIN "CoD Item Naboje Lowcy Glow"
-#define VERSION "1.0.10"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Naboje Lowcy Glow"
@@ -33,4 +32,8 @@ public cod_item_value(id)
 	return itemValue[id];
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits & DMG_BULLET && hitPlace & HIT_HEAD) damage *= (1.0 + (itemValue[attacker] / 100.0));
+{
+	if (damageBits & DMG_BULLET && hitPlace & HIT_HEAD) {
+        damage *= (1.0 + (itemValue[attacker] / 100.0));
+    }
+}

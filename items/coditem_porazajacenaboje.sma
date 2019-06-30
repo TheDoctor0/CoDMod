@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Porazajace Naboje"
-#define VERSION "1.0.12"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Porazajace Naboje"
@@ -30,4 +30,8 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], .valueMin = VALUE_MIN);
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits & DMG_BULLET && random_num(1, itemValue[attacker]) == 1) cod_screen_shake(victim);
+{
+	if (damageBits & DMG_BULLET && random_num(1, itemValue[attacker]) == 1) {
+		cod_screen_shake(victim);
+	}
+}

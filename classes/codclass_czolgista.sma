@@ -69,7 +69,9 @@ public cod_class_spawned(id, respawn)
 {
 	rem_bit(id, bazookaActive);
 
-	if (!respawn) bazookaMissiles[id] = MISSILES;
+	if (!respawn) {
+		bazookaMissiles[id] = MISSILES;
+	}
 }
 
 public cod_new_round()

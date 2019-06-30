@@ -2,13 +2,13 @@
 #include <cod>
 
 #define PLUGIN "CoD Item AWP Snajpera"
-#define VERSION "1.0.23"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "AWP Snajpera"
 #define DESCRIPTION "Zadajesz %s (+int) procent obrazen z AWP"
-#define RANDOM_MIN  110
-#define RANDOM_MAX  150
+#define RANDOM_MIN  150
+#define RANDOM_MAX  160
 #define UPGRADE_MIN -4
 #define UPGRADE_MAX 6
 
@@ -38,4 +38,8 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id], UPGRADE_MIN, UPGRADE_MAX);
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (weapon == CSW_AWP && damageBits & DMG_BULLET) damage *= (1.0 + ((itemValue[attacker] + (cod_get_user_intelligence(attacker) * 0.2)) / 100.0));
+{
+	if (weapon == CSW_AWP && damageBits & DMG_BULLET) {
+        damage *= (1.0 + ((itemValue[attacker] + (cod_get_user_intelligence(attacker) * 0.2)) / 100.0));
+    }
+}

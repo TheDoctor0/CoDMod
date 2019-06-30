@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Pierscien Zeusa"
-#define VERSION "1.0.23"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Pierscien Zeusa"

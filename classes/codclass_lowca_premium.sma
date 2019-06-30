@@ -64,7 +64,9 @@ public cod_class_spawned(id, respawn)
 {
 	rem_bit(id, crossbowActive);
 
-	if (!respawn) crossbowBelts[id] = BELTS;
+	if (!respawn) {
+		crossbowBelts[id] = BELTS;
+	}
 }
 
 public cod_class_skill_used(id)
@@ -157,8 +159,7 @@ public touch_belt(ent)
 
 	new owner = entity_get_edict(ent, EV_ENT_owner), entList[33], playersFound = find_sphere_class(ent, "player", 15.0, entList, 32), player;
 
-	for (new i = 0; i < playersFound; i++)
-	{
+	for (new i = 0; i < playersFound; i++) {
 		player = entList[i];
 
 		if (!is_user_alive(player) || get_user_team(owner) == get_user_team(player)) continue;

@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Radar"
-#define VERSION "1.0.10"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Radar"
@@ -31,22 +31,27 @@ public radar_scan(id)
 
 	static playerOrigin[3], msgHostageAdd, msgHostageDel;
 
-	if (!msgHostageAdd) msgHostageAdd = get_user_msgid("HostagePos");
-	if (!msgHostageDel) msgHostageDel = get_user_msgid("HostageK");
+	if (!msgHostageAdd) {
+		msgHostageAdd = get_user_msgid("HostagePos");
+	}
 
-	for (new i = 1; i <= MAX_PLAYERS; i++) {       
+	if (!msgHostageDel) {
+		msgHostageDel = get_user_msgid("HostageK");
+	}
+
+	for (new i = 1; i <= MAX_PLAYERS; i++) {
 		if (!is_user_alive(i) || get_user_team(i) == get_user_team(id)) continue;
 
 		get_user_origin(i, playerOrigin);
-		
+
 		message_begin(MSG_ONE_UNRELIABLE, msgHostageAdd, {0, 0, 0}, id);
 		write_byte(id);
-		write_byte(i);                               
+		write_byte(i);
 		write_coord(playerOrigin[0]);
 		write_coord(playerOrigin[1]);
 		write_coord(playerOrigin[2]);
 		message_end();
-		
+
 		message_begin(MSG_ONE_UNRELIABLE, msgHostageDel, {0, 0, 0}, id);
 		write_byte(i);
 		message_end();

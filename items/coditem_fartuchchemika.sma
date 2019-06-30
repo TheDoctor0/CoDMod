@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Fartuch Chemika"
-#define VERSION "1.0.0"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Fartuch Chemika"

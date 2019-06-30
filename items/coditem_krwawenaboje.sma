@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Krwawe Naboje"
-#define VERSION "1.0.0"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Krwawe Naboje"
@@ -19,5 +19,7 @@ public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageB
 {
 	new health = cod_get_user_health(attacker, 1), maxHealth = cod_get_user_max_health(attacker);
 
-	if(health < maxHealth) damage *= (1.0 + 1.0 - float(health / maxHealth));
+	if (health < maxHealth) {
+        damage *= (1.0 + 1.0 - float(health / maxHealth));
+    }
 }

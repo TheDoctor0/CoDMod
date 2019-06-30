@@ -32,8 +32,11 @@ public cod_class_enabled(id, promotion)
 
 public cod_class_skill_used(id)
 {
-	if (cod_get_user_mines(id)) cod_use_user_mine(id);
-	else cod_use_user_rocket(id);
+	if (cod_get_user_mines(id)) {
+		cod_use_user_mine(id);
+	} else {
+		cod_use_user_rocket(id);
+	}
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)

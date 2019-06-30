@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Odwrotnosc"
-#define VERSION "1.1.0"
+#define VERSION "1.1"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Odwrotnosc"
@@ -43,7 +43,9 @@ public cod_item_spawned(id, respawn)
 
 	rem_bit(id, itemActive);
 
-	if (!respawn) rem_bit(id, itemUsed);
+	if (!respawn) {
+		rem_bit(id, itemUsed);
+	}
 }
 
 public cod_item_skill_used(id)

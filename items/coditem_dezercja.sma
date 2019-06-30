@@ -2,13 +2,13 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Dezercja"
-#define VERSION "1.0.0"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Dezercja"
 #define DESCRIPTION "Masz 1/%s na odrodzenie na respie wroga, masz M4A1 lub AK47 w zaleznosci od druzyny i +10 obrazen z tej broni."
-#define RANDOM_MIN  5
-#define RANDOM_MAX  6
+#define RANDOM_MIN  6
+#define RANDOM_MAX  7
 #define VALUE_MIN   2
 
 new itemValue[MAX_PLAYERS + 1], itemWeapon[MAX_PLAYERS + 1];
@@ -48,8 +48,14 @@ public cod_item_spawned(id, respawn)
 
 	cod_give_weapon(id, itemWeapon[id]);
 
-	if (random_num(1, itemValue[id]) == 1) cod_teleport_to_spawn(id, 1);
+	if (random_num(1, itemValue[id]) == 1) {
+		cod_teleport_to_spawn(id, 1);
+	}
 }
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits & DMG_BULLET && ((get_user_team(attacker) == 1 && weapon == CSW_AK47) || (get_user_team(attacker) == 2 && weapon == CSW_M4A1))) damage += 10.0;
+{
+	if (damageBits & DMG_BULLET && ((get_user_team(attacker) == 1 && weapon == CSW_AK47) || (get_user_team(attacker) == 2 && weapon == CSW_M4A1))) {
+		damage += 10.0;
+	}
+}

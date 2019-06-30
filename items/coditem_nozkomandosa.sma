@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Noz Komandosa"
-#define VERSION "1.0.0"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Noz Komandosa"
@@ -17,4 +17,8 @@ public plugin_init()
 }
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (weapon == CSW_KNIFE && !(pev(attacker, pev_button) & IN_ATTACK)) damage = cod_kill_player(attacker, victim, damageBits);
+{
+	if (weapon == CSW_KNIFE && !(pev(attacker, pev_button) & IN_ATTACK)) {
+        damage = cod_kill_player(attacker, victim, damageBits);
+    }
+}

@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Podrecznik Szpiega"
-#define VERSION "1.0.13"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Podrecznik Szpiega"
@@ -36,4 +36,8 @@ public cod_item_upgrade(id)
 	cod_random_upgrade(itemValue[id]);
 
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (damageBits & DMG_HEGRENADE && random_num(1, itemValue[attacker])) damage = cod_kill_player(attacker, victim, damageBits);
+{
+	if (damageBits & DMG_HEGRENADE && random_num(1, itemValue[attacker])) {
+        damage = cod_kill_player(attacker, victim, damageBits);
+    }
+}

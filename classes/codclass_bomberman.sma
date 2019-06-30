@@ -31,11 +31,7 @@ public cod_class_enabled(id, promotion)
 }
 
 public cod_class_spawned(id, respawn)
-{
-	if (!respawn) {
-		cod_give_weapon(id, CSW_SMOKEGRENADE, 2);
-	}
-}
+	if (!respawn) cod_give_weapon(id, CSW_SMOKEGRENADE, 2);
 
 public cod_class_skill_used(id)
 	cod_use_user_dynamite(id);

@@ -1,12 +1,12 @@
 #include <amxmodx>
 #include <cod>
 
-#define PLUGIN "CoD Item MAC-10 Ducha"
+#define PLUGIN "CoD Item MAC10 Ducha"
 #define VERSION "1.0.0"
 #define AUTHOR "O'Zone"
 
-#define NAME        "MAC-10 Ducha"
-#define DESCRIPTION "Dostajesz MAC-10, z ktorym jestes niemal niewidzialny"
+#define NAME        "MAC10 Ducha"
+#define DESCRIPTION "Dostajesz MAC10, z ktorym jestes niemal niewidzialny"
 
 public plugin_init()
 {

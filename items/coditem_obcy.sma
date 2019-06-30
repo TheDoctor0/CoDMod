@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Item Obcy"
-#define VERSION "1.0.12"
+#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME        "Obcy"
@@ -16,4 +16,4 @@ public plugin_init()
 }
 
 public cod_item_kill(killer, victim, hitPlace)
-	cod_make_explosion(victim, 200, 1, 200.0, 100.0 + cod_get_user_intelligence(killer) * 0.5);
+	cod_make_explosion(victim, 200, 1, 200.0, 100.0 + cod_get_user_intelligence(killer));
