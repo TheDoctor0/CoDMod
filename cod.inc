@@ -1549,7 +1549,7 @@ native cod_get_user_model(id, type = ALL);
  *                  DEATH - until death
  *                  DAMAGE_GIVEN - until player damage enemy
  *                  DAMAGE_TAKEN - until player is hurt
- * @param weapon    Weapon in CSW_ format to check for
+ * @param weapon    Weapon in CSW_* format to check for
  *
  * @return          1 if player has unlimited ammo, 0 otherwise
  */
@@ -1568,7 +1568,7 @@ native cod_get_user_unlimited_ammo(id, type = ALL, weapon = 0);
  *                  DEATH - until death
  *                  DAMAGE_GIVEN - until player damage enemy
  *                  DAMAGE_TAKEN - until player is hurt
- * @param weapon    Weapon in CSW_ format to check for
+ * @param weapon    Weapon in CSW_* format to check for
  *
  * @return          1 if player has recoil eliminator, 0 otherwise
  */
@@ -1587,7 +1587,7 @@ native cod_get_user_recoil_eliminator(id, type = ALL, weapon = 0);
  *                  DEATH - until death
  *                  DAMAGE_GIVEN - until player damage enemy
  *                  DAMAGE_TAKEN - until player is hurt
- * @param weapon    Weapon in CSW_ format to check for
+ * @param weapon    Weapon in CSW_* format to check for
  *
  * @return          1 if player has recoil reducer, 0 otherwise
  */
@@ -1716,7 +1716,7 @@ native cod_set_user_noclip(id, value, type = ROUND);
  *                  DEATH - until death
  *                  DAMAGE_GIVEN - until player damage enemy
  *                  DAMAGE_TAKEN - until player is hurt
- * @param weapons   Weapons in 1<<CSW_ format or FULL for all weapons.
+ * @param weapons   Weapons in 1<<CSW_* format or FULL for all weapons.
  *
  * @noreturn
  */
@@ -1737,7 +1737,7 @@ native cod_set_user_unlimited_ammo(id, value, type = ROUND, weapons = FULL);
  *                  DEATH - until death
  *                  DAMAGE_GIVEN - until player damage enemy
  *                  DAMAGE_TAKEN - until player is hurt
- * @param weapons   Weapons in 1<<CSW_ format or FULL for all weapons.
+ * @param weapons   Weapons in 1<<CSW_* format or FULL for all weapons.
  *
  * @noreturn
  */
@@ -1758,7 +1758,7 @@ native cod_set_user_recoil_eliminator(id, value, type = ROUND, weapons = FULL);
  *                  DEATH - until death
  *                  DAMAGE_GIVEN - until player damage enemy
  *                  DAMAGE_TAKEN - until player is hurt
- * @param weapons   Weapons in 1<<CSW_ format or FULL for all weapons.
+ * @param weapons   Weapons in 1<<CSW_* format or FULL for all weapons.
  *
  * @noreturn
  */
@@ -1770,7 +1770,7 @@ native cod_set_user_recoil_reducer(id, value, type = ROUND, weapons = FULL);
  * @note Amount is only for adding multiple nades at once and is not used for other weapons.
  *
  * @param id        Player index
- * @param weapon    Weapon in CSW_ format.
+ * @param weapon    Weapon in CSW_* format.
  * @param amount    Amount value
  *
  * @noreturn
@@ -1781,7 +1781,7 @@ native cod_give_weapon(id, weapon, amount = 0);
  * Removes a weapon from player inventory and disallows to own or pick it.
  *
  * @param id        Player index
- * @param weapon    Weapon in CSW_ format.
+ * @param weapon    Weapon in CSW_* format.
  *
  * @noreturn
  */
@@ -1842,7 +1842,7 @@ native cod_get_user_render(id, type = NONE);
  *                  RENDER_MOVE - only if player is moving
  *                  RENDER_DUCK - only if player is ducking
  *                  RENDER_SHIFT - only if player is walking
- * @param weapons   Weapons in 1<<CSW_ format or FULL for all weapons.
+ * @param weapons   Weapons in 1<<CSW_* format or FULL for all weapons.
  * @param timer     Timer sets static render value for certain amount of time.
  *                  While active it blocks any other render bonuses.
  *
@@ -2053,7 +2053,7 @@ native cod_make_explosion(ent, distance = 0, explosion = true, Float:dmgDistance
  * @param damage    Damage amount to make
  * @param time      Interval between damage events
  * @param counter   Damage dealt to players in dmgDistance
- * @param flags     Damage flag in DMG_ format, alternatively FIRE, POISON, or HEAL
+ * @param flags     Damage flag in DMG_* format, alternatively FIRE, POISON, or HEAL
  *                  (healing player instead of hurting) to use custom effects out of the box.
  * @param instant   If true makes first damage immediately
  *
@@ -2066,11 +2066,11 @@ native cod_repeat_damage(attacker, victim, Float:damage = 0.0, Float:time = 0.0,
  *
  * @note Damage will be blocked if victim has god mode or resistance.
  *
- * @param attacker  Player that makes kill
- * @param victim    Player that is killed
+ * @param attacker  Attacker index
+ * @param victim    Victim index
  * @param damage    Damage amount to make
  * @param factor    Intelligence bonus for damage
- * @param flags     Damage flags (DMG_CODSKILL flag will be added)
+ * @param flags     Damage flags in DMG_* format (DMG_CODSKILL flag will be added)
  *
  * @noreturn
  */
@@ -2081,13 +2081,13 @@ native cod_inflict_damage(attacker, victim, Float:damage, Float:factor = 0.5, fl
  *
  * @note Uses cod_inflict_damage with DMG_KILL flag.
  *
- * @param attacker      Player that makes kill
- * @param victim        Player that is killed
- * @param damageBits    Damage flags
+ * @param attacker      Killer index
+ * @param victim        Victim index
+ * @param damageBits    Damage flags in DMG_* format
  *
  * @returns             COD_BLOCK (-1.0)
  */
-native Float:cod_kill_player(attacker, victim, damageBits);
+native Float:cod_kill_player(killer, victim, damageBits);
 
 /**
  * Respawns player after defined time.
@@ -2207,10 +2207,6 @@ native cod_register_item(const name[], const desc[], valueMin = 0, valueMax = 0)
  */
 native cod_register_class(const name[], const desc[], const faction[], weapons, health, intelligence, strength, stamina, condition, flag = NONE);
 
-/*------------------------------
-Register new class promotion and return its id.
-Values weapons to flag will be copied from class if not specified.
-------------------------------*/
 /**
  * Registers new class promotion.
  *
@@ -2234,367 +2230,639 @@ Values weapons to flag will be copied from class if not specified.
  */
 native cod_register_promotion(const name[], const desc[], const baseClass[], level, promotion, weapons = NONE, health = NONE, intelligence = NONE, strength = NONE, stamina = NONE, condition = NONE, flag = NONE);
 
-/*------------------------------
-Multiforward executed when player class is changed.
-------------------------------*/
+/**
+ * Multiforward called on players access flags change.
+ *
+ * @param id        Player index
+ * @param flags     Access flags
+ *
+ * @noreturn
+ */
+forward cod_flags_changed(id, flags);
+
+/**
+ * Multiforward called when player class has changed.
+ *
+ * @param id        Player index
+ * @param class     Class index
+ *
+ * @noreturn
+ */
 forward cod_class_changed(id, class);
 
-/*------------------------------
-Multiforward executed when player item is changed.
-------------------------------*/
+/**
+ * Multiforward called when player item has changed.
+ *
+ * @param id        Player index
+ * @param item      Item index
+ *
+ * @noreturn
+ */
 forward cod_item_changed(id, item);
 
-/*------------------------------
-Multiforward executed when player render is changed.
-------------------------------*/
+/**
+ * Multiforward called when player item has changed.
+ *
+ * @param id        Player index
+ * @param render    Render amount, value 0 to 255
+ *
+ * @noreturn
+ */
 forward cod_render_changed(id, render);
 
-/*------------------------------
-Multiforward executed when player gravity is changed.
-------------------------------*/
+/**
+ * Multiforward called when player gravity has changed.
+ *
+ * @param id        Player index
+ * @param gravity   Gravity amount, value 0.0 to 1.0
+ *
+ * @noreturn
+ */
 forward cod_gravity_changed(id, Float:gravity);
 
-/*------------------------------
-Multiforward executed when player gravity is changed.
-------------------------------*/
+/**
+ * Multiforward called when player speed has changed.
+ *
+ * @note Speed COD_FREEZE (0.1) means that player cannot move.
+ *
+ * @param id        Player index
+ * @param speed     Speed amount
+ *
+ * @noreturn
+ */
 forward cod_speed_changed(id, Float:speed);
 
-/*------------------------------
-Multiforward executed on damage event before armor reduce.
-Damage will be blocked if COD_BLOCK is returned.
-------------------------------*/
+/**
+ * Multiforward called before player receives damage.
+ *
+ * @note It is called before armor damage reduction.
+ * @note Damage forwards are called in this order:
+ *       cod_class_damage_victim
+ *       cod_item_damage_victim
+ *       cod_class_damage_attacker
+ *       cod_item_damage_attacker
+ *       cod_damage_pre
+ *       cod_damage_post
+ *
+ * @param attacker      Attacker index
+ * @param victim        Victim index
+ * @param weapon        Weapon used to make this damage
+ * @param damage        Amount of damage to deal
+ * @param damageBits    Damage flags in DMG_* format
+ * @param hitPlace      Body hit place in HIT_* format
+ *
+ * @return              Set to COD_BLOCK (-1.0) to block damage
+ */
 forward cod_damage_pre(attacker, victim, weapon, Float:damage, damageBits, hitPlace);
 
-/*------------------------------
-Multiforward executed on damage event after armor reduce.
-Damage will be blocked if COD_BLOCK is returned.
-------------------------------*/
+/**
+ * Multiforward called after player receives damage.
+ *
+ * @note It is called after armor damage reduction.
+ *
+ * @param attacker      Attacker index
+ * @param victim        Victim index
+ * @param weapon        Weapon used to make this damage
+ * @param damage        Amount of damage to deal
+ * @param damageBits    Damage flags in DMG_* format
+ * @param hitPlace      Body hit place in HIT_* format
+ *
+ * @noreturn
+ */
 forward cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace);
 
-/*------------------------------
-Multiforward executed on cod_inflict_damage use which is not registered by HamTakeDamage.
-Flags param will contain sum with custom DMG_ flags: DMG_DYNAMITE, DMG_MINE, DMG_ROCKET, DMG_THUNDER, DMG_KILL
-so damage type can be easily identified.
-Damage will be blocked if COD_BLOCK is returned.
-------------------------------*/
+/**
+ * Multiforward called before cod_inflict_damage (custom HamTakeDamage) is executed.
+ *
+ * @note Flags bitsum can contain custom DMG_ flags, so damage type can be easily identified:
+ *       DMG_CODSKILL (always), DMG_DYNAMITE, DMG_MINE, DMG_ROCKET, DMG_THUNDER, DMG_KILL, DMG_REPEAT.
+ *
+ * @param attacker      Attacker index
+ * @param victim        Victim index
+ * @param damage        Amount of damage to deal
+ * @param factor        Intelligence bonus for damage
+ * @param flags         Damage flags in DMG_* format
+ *
+ * @return              Set to COD_BLOCK (-1.0) to block damage
+ */
 forward cod_damage_inflict(attacker, victim, Float:damage, Float:factor, flags);
 
-/*------------------------------
-Multiforward executed on weapon deploy event.
-Id is player id.
-Weapon is CSW_ format.
-Ent is weapon entity.
-------------------------------*/
+/**
+ * Multiforward called when player weapon has been deployed.
+ *
+ * @param id        Player index
+ * @param weapon    Weapon index in CSW_* format
+ * @param ent       Weapon entity index
+ *
+ * @noreturn
+ */
 forward cod_weapon_deploy(id, weapon, ent);
 
-/*------------------------------
-Multiforward executed on cur weapon event.
-Id is player id.
-Weapon is CSW_ format.
-------------------------------*/
+/**
+ * Multiforward called when cur weapon event has been executed.
+ *
+ * @param id        Player index
+ * @param weapon    Weapon index in CSW_* format
+ *
+ * @noreturn
+ */
 forward cod_cur_weapon(id, weapon);
 
-/*------------------------------
-Multiforward executed on team assign event.
-Id is player id.
-Team is player team.
-0 - unassigned
-1 - terrorist
-2 - counter-terrorist
-3 - spectator
-------------------------------*/
+/**
+ * Multiforward called on player team assignment.
+ *
+ * @param id        Player index
+ * @param team      Player team index, availables:
+ *                  0 - unassigned
+ *                  1 - terrorist
+ *                  2 - counter-terrorist
+ *                  3 - spectator
+ *
+ * @noreturn
+ */
 forward cod_team_assign(id, team);
 
-/*------------------------------
-Multiforward executed on death event.
-------------------------------*/
+/**
+ * Multiforward called on player death.
+ *
+ * @param killer    Killer index
+ * @param victim    Victim index
+ * @param weapon    Weapon that was used to kill player
+ * @param hitPlace  Body hit place in HIT_* format
+ *
+ * @noreturn
+ */
 forward cod_killed(killer, victim, weapon, hitPlace);
 
-/*------------------------------
-Multiforward executed on player spawn event.
-Respawn is true if it's not first spawn of this player in this round.
-------------------------------*/
+/**
+ * Multiforward called on player spawn.
+ *
+ * @param id        Player index
+ * @param respawn   If true then its not first spawn for this player in this round
+ *
+ * @noreturn
+ */
 forward cod_spawned(id, respawn);
 
-/*------------------------------
-Multiforward executed on cmd start event.
-Id is player id.
-Button is button pressed right now.
-Oldbutton is last pressed button.
-Flags are FL_ flags.
-Player state have types RENDER_ALWAYS, RENDER_STAND, RENDER_MOVE, RENDER_DUCK, RENDER_SHIFT.
-------------------------------*/
+/**
+ * Multiforward called on player spawn.
+ *
+ * @param id            Player index
+ * @param button        Button that is being pressed right now in IN_* format
+ * @param oldButton     Last pressed button in IN_* format
+ * @param flags         Player flags in FL_* format
+ * @param playerState   Player state used also for render, valid values:
+ *                      RENDER_ALWAYS - always
+ *                      RENDER_STAND - only if player is standing still
+ *                      RENDER_MOVE - only if player is moving
+ *                      RENDER_DUCK - only if player is ducking
+ *                      RENDER_SHIFT - only if player is walking
+ *
+ * @noreturn
+ */
 forward cod_cmd_start(id, button, oldButton, flags, playerState);
 
-/*------------------------------
-Multiforward executed on bomb planting event.
-Id is player id.
-------------------------------*/
+/**
+ * Multiforward called on bomb planting event.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 forward cod_bomb_planting(id);
 
-/*------------------------------
-Multiforward executed on bomb planted event.
-Id is player id.
-------------------------------*/
+/**
+ * Multiforward called on bomb planted event.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 forward cod_bomb_planted(id);
 
-/*------------------------------
-Multiforward executed on bomb defusing event.
-Id is player id.
-------------------------------*/
+/**
+ * Multiforward called on bomb defusing event.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 forward cod_bomb_defusing(id);
 
-/*------------------------------
-Multiforward executed on bomb defused event.
-Id is player id.
-------------------------------*/
+/**
+ * Multiforward called on bomb defused event.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 forward cod_bomb_defused(id);
 
-/*------------------------------
-Multiforward executed on bomb explode event.
-Planter is id for player that planted the bomb.
-Defuser is id for player that was defusing the bomb (can be empty).
-------------------------------*/
+/**
+ * Multiforward called on bomb explode event.
+ *
+ * @param planter   Planter index
+ * @param defuser   Defuser index, empty if no player was defusing bomb
+ *
+ * @noreturn
+ */
 forward cod_bomb_explode(planter, defuser);
 
-/*------------------------------
-Multiforward executed on bomb dropped event.
-Id is player id.
-------------------------------*/
+/**
+ * Multiforward called on bomb drop event.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 forward cod_bomb_dropped(id);
 
-/*------------------------------
-Multiforward executed on bomb picked event.
-Id is player id.
-------------------------------*/
+/**
+ * Multiforward called on bomb pick event.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 forward cod_bomb_picked(id);
 
-/*------------------------------
-Multiforward executed on hostage killed event.
-Id is player id.
-------------------------------*/
+/**
+ * Multiforward called on hostage kill event.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 forward cod_hostage_killed(id);
 
-/*------------------------------
-Multiforward executed on hostage rescued event.
-Id is player id.
-------------------------------*/
+/**
+ * Multiforward called on hostage rescue event.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 forward cod_hostage_rescued(id);
 
-/*------------------------------
-Multiforward executed on hostages rescued event.
-Id is player id.
-------------------------------*/
+/**
+ * Multiforward called when all hostages have been rescued.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 forward cod_hostages_rescued(id);
 
-/*------------------------------
-Multiforward executed on new round event.
-------------------------------*/
+/**
+ * Multiforward called on new round event.
+ *
+ * @noreturn
+ */
 forward cod_new_round();
 
-/*------------------------------
-Multiforward executed on round start event.
-------------------------------*/
+/**
+ * Multiforward called on round start event.
+ *
+ * @noreturn
+ */
 forward cod_start_round();
 
-/*------------------------------
-Multiforward executed on round restart event.
-------------------------------*/
+/**
+ * Multiforward called on round restart event.
+ *
+ * @noreturn
+ */
 forward cod_restart_round();
 
-/*------------------------------
-Multiforward executed on round end event.
-------------------------------*/
+/**
+ * Multiforward called on round end event.
+ *
+ * @noreturn
+ */
 forward cod_end_round();
 
-/*------------------------------
-Multiforward executed on round win event.
-Team is team that won this round.
-1 - terrorist
-2 - counter-terrorist
-------------------------------*/
+/**
+ * Multiforward called on round win event.
+ *
+ * @param team      Team index that won round:
+ *                  1 - terrorist
+ *                  2 - counter-terrorist
+ *
+ * @noreturn
+ */
 forward cod_win_round(team);
 
-/*------------------------------
-Multiforward executed on map end (message intermission) event.
-------------------------------*/
+/**
+ * Multiforward called on map end (message intermission) event.
+ *
+ * @noreturn
+ */
 forward cod_end_map();
 
-/*------------------------------
-Multiforward executed on data reset.
-------------------------------*/
+/**
+ * Multiforward called on data reset.
+ *
+ * @noreturn
+ */
 forward cod_reset_data();
 
-/*------------------------------
-Multiforward executed on stats data reset.
-------------------------------*/
+/**
+ * Multiforward called on stats data reset.
+ *
+ * @noreturn
+ */
 forward cod_reset_stats_data();
 
-/*------------------------------
-Multiforward executed on full data reset.
-------------------------------*/
+/**
+ * Multiforward called on full data reset.
+ *
+ * @noreturn
+ */
 forward cod_reset_all_data();
 
-/*------------------------------
-Multiforward executed on medkit player heal.
-Id is medkit owner.
-Player is healed player.
-Healed is healed hp.
-Healing will be blocked if COD_BLOCK is returned.
-Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
-------------------------------*/
+/**
+ * Multiforward called on medkit heal.
+ *
+ * @param id        Medkit owner index
+ * @param player    Healed player index
+ * @param healed    HP amount that will be healed
+ *
+ * @return          Value greater than 0 will reduce time to next use,
+ *                  lower than 0 will make this period longer,
+ *                  healing will be blocked if COD_BLOCK (-1.0) is returned
+ */
 forward cod_medkit_heal(id, player, Float:healed);
 
-/*------------------------------
-Multiforward executed on poison damage.
-Id is poison owner.
-Player is poisoned player.
-Damage is damage that poison made to player.
-Damage will be blocked if COD_BLOCK is returned.
-Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
-------------------------------*/
+/**
+ * Multiforward called on poison damage.
+ *
+ * @param id        Poison owner index
+ * @param player    Hurt player index
+ * @param damage    Damage amount that will be taken
+ *
+ * @return          Value greater than 0 will reduce time to next use,
+ *                  lower than 0 will make this period longer,
+ *                  damage will be blocked if COD_BLOCK (-1.0) is returned
+ */
 forward cod_poison_infect(id, player, Float:damage);
 
-/*------------------------------
-Multiforward executed on rocket explosion (when there is damage).
-Id is rocket owner.
-Player is hurt player.
-Damage is damage that rocket made to player.
-Damage will be blocked if COD_BLOCK is returned.
-Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
-------------------------------*/
+/**
+ * Multiforward called on rocket damage.
+ *
+ * @param id        Rocket owner index
+ * @param player    Hurt player index
+ * @param damage    Damage amount that will be taken
+ *
+ * @return          Value greater than 0 will reduce time to next use,
+ *                  lower than 0 will make this period longer,
+ *                  damage will be blocked if COD_BLOCK (-1.0) is returned
+ */
 forward cod_rocket_explode(id, player, Float:damage);
 
-/*------------------------------
-Multiforward executed on mine explosion (when there is damage).
-Id is mine owner.
-Player is hurt player.
-Damage is damage that mine made to player.
-Damage will be blocked if COD_BLOCK is returned.
-Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
-------------------------------*/
+/**
+ * Multiforward called on mine damage.
+ *
+ * @param id        Mine owner index
+ * @param player    Hurt player index
+ * @param damage    Damage amount that will be taken
+ *
+ * @return          Value greater than 0 will reduce time to next use,
+ *                  lower than 0 will make this period longer,
+ *                  damage will be blocked if COD_BLOCK (-1.0) is returned
+ */
 forward cod_mine_explode(id, player, Float:damage);
 
-/*------------------------------
-Multiforward executed on dynamite explosion (when there is damage).
-Id is dynamite owner.
-Player is hurt player.
-Damage is damage that dynamite made to player.
-Damage will be blocked if COD_BLOCK is returned.
-Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
-------------------------------*/
+/**
+ * Multiforward called on dynamite damage.
+ *
+ * @param id        Dynamite owner index
+ * @param player    Hurt player index
+ * @param damage    Damage amount that will be taken
+ *
+ * @return          Value greater than 0 will reduce time to next use,
+ *                  lower than 0 will make this period longer,
+ *                  damage will be blocked if COD_BLOCK (-1.0) is returned
+ */
 forward cod_dynamite_explode(id, player, Float:damage);
 
-/*------------------------------
-Multiforward executed on thunder player reach.
-Id is thunder owner.
-Player is hurt player.
-Damage is damage that thunder made to player.
-Damage will be blocked if COD_BLOCK is returned.
-Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
-------------------------------*/
+/**
+ * Multiforward called on thunder damage.
+ *
+ * @param id        Thunder owner index
+ * @param player    Hurt player index
+ * @param damage    Damage amount that will be taken
+ *
+ * @return          Value greater than 0 will reduce time to next use,
+ *                  lower than 0 will make this period longer,
+ *                  damage will be blocked if COD_BLOCK (-1.0) is returned
+ */
 forward cod_thunder_reach(id, player, Float:damage);
 
-/*------------------------------
-Multiforward executed on teleport use.
-Id is player that used teleport.
-Returned greater than 0 will reduce time to next use, lower than 0 will make this period longer.
-------------------------------*/
+/**
+ * Multiforward called on teleport use.
+ *
+ * @param id        Player index
+ *
+ * @return          Value greater than 0 will reduce time to next use,
+ *                  lower than 0 will make this period longer
+ */
 forward cod_teleport_used(id);
 
-/*------------------------------
-Item forward executed on item give.
-------------------------------*/
+/**
+ * Player item forward called on item give.
+ *
+ * @param id        Player index
+ * @param value     Item value
+ *
+ * @return          COD_STOP (4) to block item give
+ */
 forward cod_item_enabled(id, value);
 
-/*------------------------------
-Item forward executed on item remove.
-------------------------------*/
+/**
+ * Player item forward called on item drop.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 forward cod_item_disabled(id);
 
-/*------------------------------
-Item forward executed on spawn event.
-Respawn is true if it's not first spawn of this player in this round.
-------------------------------*/
+/**
+ * Player item forward called on spawn event.
+ *
+ * @param id        Player index
+ * @param respawn   True if it's not first spawn of this player in this round
+ *
+ * @noreturn
+ */
 forward cod_item_spawned(id, respawn);
 
-/*------------------------------
-Item forward executed on kill event.
-------------------------------*/
+/**
+ * Player item forward called on kill event.
+ *
+ * @param killer    Killer index
+ * @param victim    Victim index
+ * @param hitPlace  Body hit place in HIT_* format
+ *
+ * @noreturn
+ */
 forward cod_item_kill(killer, victim, hitPlace);
 
-/*------------------------------
-Item forward executed on death event.
-------------------------------*/
+/**
+ * Player item forward called on death event.
+ *
+ * @param killer    Killer index
+ * @param victim    Victim index
+ * @param hitPlace  Body hit place in HIT_* format
+ *
+ * @noreturn
+ */
 forward cod_item_killed(killer, victim, hitPlace);
 
-/*------------------------------
-Item forward executed on skill use.
-------------------------------*/
+/**
+ * Player item forward called on item skill use.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 forward cod_item_skill_used(id);
 
-/*------------------------------
-Item forward executed on item upgrade.
-------------------------------*/
+/**
+ * Player item forward called on item upgrade.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 forward cod_item_upgrade(id);
 
-/*------------------------------
-Item function for getting value of item.
-------------------------------*/
+/**
+ * Player item forward used for getting value of item.
+ *
+ * @param id        Player index
+ *
+ * @return          Item value if available
+ */
 forward cod_item_value(id);
 
-/*------------------------------
-Item function for attacker damage change.
-------------------------------*/
+/**
+ * Player item called before player deals damage.
+ *
+ * @param attacker      Attacker index
+ * @param victim        Victim index
+ * @param weapon        Weapon used to make this damage
+ * @param damage        Amount of damage to deal, can be manipulated,
+ *                      set to COD_BLOCK (-1.0) to block damage
+ * @param damageBits    Damage flags in DMG_* format
+ * @param hitPlace      Body hit place in HIT_* format
+ *
+ * @noreturn
+ */
 forward cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace);
 
-/*------------------------------
-Item function for victim damage change.
-------------------------------*/
+/**
+ * Player item called before player receives damage.
+ *
+ * @param attacker      Attacker index
+ * @param victim        Victim index
+ * @param weapon        Weapon used to make this damage
+ * @param damage        Amount of damage to deal, can be manipulated,
+ *                      set to COD_BLOCK (-1.0) to block damage
+ * @param damageBits    Damage flags in DMG_* format
+ * @param hitPlace      Body hit place in HIT_* format
+ *
+ * @noreturn
+ */
 forward cod_item_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace);
 
-/*------------------------------
-Class forward executed on class set.
-------------------------------*/
+/**
+ * Player class forward called on class enable.
+ *
+ * @param id        Player index
+ * @param promotion Class promotion step
+ *
+ * @return          COD_STOP (4) to block class change
+ */
 forward cod_class_enabled(id, promotion);
 
-/*------------------------------
-Class forward executed on class remove.
-------------------------------*/
+/**
+ * Player class forward called on class disable.
+ *
+ * @param id        Player index
+ * @param promotion Class promotion step
+ *
+ * @noreturn
+ */
 forward cod_class_disabled(id, promotion);
 
-/*------------------------------
-Class forward executed on spawn event.
-Respawn is true if it's not first spawn of this player in this round.
-------------------------------*/
+/**
+ * Player class forward called on spawn event.
+ *
+ * @param id        Player index
+ * @param respawn   True if it's not first spawn of this player in this round
+ *
+ * @noreturn
+ */
 forward cod_class_spawned(id, respawn);
 
-/*------------------------------
-Class forward executed on kill event.
-------------------------------*/
+/**
+ * Player class forward called on kill event.
+ *
+ * @param killer    Killer index
+ * @param victim    Victim index
+ * @param hitPlace  Body hit place in HIT_* format
+ *
+ * @noreturn
+ */
 forward cod_class_kill(killer, victim, hitPlace);
 
-/*------------------------------
-Class forward executed on death event.
-------------------------------*/
+/**
+ * Player class forward called on death event.
+ *
+ * @param killer    Killer index
+ * @param victim    Victim index
+ * @param hitPlace  Body hit place in HIT_* format
+ *
+ * @noreturn
+ */
 forward cod_class_killed(killer, victim, hitPlace);
 
-/*------------------------------
-Class forward executed on skill use.
-------------------------------*/
+/**
+ * Player class forward called on class skill use.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
 forward cod_class_skill_used(id);
 
-/*------------------------------
-Class function for attacker damage change.
-------------------------------*/
+/**
+ * Player class called before player take damage.
+ *
+ * @param attacker      Attacker index
+ * @param victim        Victim index
+ * @param weapon        Weapon used to make this damage
+ * @param damage        Amount of damage to deal, can be manipulated,
+ *                      set to COD_BLOCK (-1.0) to block damage
+ * @param damageBits    Damage flags in DMG_* format
+ * @param hitPlace      Body hit place in HIT_* format
+ *
+ * @noreturn
+ */
 forward cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace);
 
-/*------------------------------
-Class function for victim damage change.
-------------------------------*/
+/**
+ * Player class called before player receives damage.
+ *
+ * @param attacker      Attacker index
+ * @param victim        Victim index
+ * @param weapon        Weapon used to make this damage
+ * @param damage        Amount of damage to deal, can be manipulated,
+ *                      set to COD_BLOCK (-1.0) to block damage
+ * @param damageBits    Damage flags in DMG_* format
+ * @param hitPlace      Body hit place in HIT_* format
+ *
+ * @noreturn
+ */
 forward cod_class_damage_victim(attacker, victim, weapon, &Float:damage, damageBits, hitPlace);
-
-/*------------------------------
-Class forward executed on player flags change.
-------------------------------*/
-forward cod_flags_changed(id, flags);
