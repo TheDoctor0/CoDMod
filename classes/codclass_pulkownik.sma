@@ -17,10 +17,10 @@
 #define STAMINA      5
 #define CONDITION    5
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
@@ -37,4 +37,8 @@ public cod_class_skill_used(id)
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (weapon == CSW_M249 && damageBits & DMG_BULLET) cod_inflict_damage(attacker, victim, (100 - cs_get_weapon_ammo(get_pdata_cbase(attacker, 373))) * 0.2, 0.0, damageBits);
+{
+	if (weapon == CSW_M249 && damageBits & DMG_BULLET) {
+		cod_inflict_damage(attacker, victim, (100 - cs_get_weapon_ammo(get_pdata_cbase(attacker, 373))) * 0.2, 0.0, damageBits);
+	}
+}

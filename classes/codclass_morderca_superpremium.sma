@@ -16,17 +16,16 @@
 #define CONDITION    20
 #define FLAG         ADMIN_LEVEL_E
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION, FLAG);
 }
 
 public cod_class_enabled(id)
 {
 	cod_set_user_render(id, 50, CLASS, RENDER_DUCK);
-
 	cod_set_user_rockets(id, 2, CLASS);
 }
 
@@ -34,4 +33,8 @@ public cod_class_skill_used(id)
 	cod_use_user_rocket(id);
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if ((weapon == CSW_M4A1 || weapon == CSW_AK47) && damageBits & DMG_BULLET && random_num(1, 7) == 1) damage = cod_kill_player(attacker, victim, damageBits);
+{
+	if ((weapon == CSW_M4A1 || weapon == CSW_AK47) && damageBits & DMG_BULLET && random_num(1, 7) == 1) {
+        damage = cod_kill_player(attacker, victim, damageBits);
+    }
+}

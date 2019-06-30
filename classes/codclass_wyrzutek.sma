@@ -21,7 +21,7 @@
 public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
@@ -41,5 +41,7 @@ public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damage
 		set_pev(victim, pev_velocity, velocity);
 	}
 
-	if (!(pev(victim, pev_flags) & FL_ON_GROUND)) cod_inflict_damage(attacker, victim, damage, 0.0, damageBits);
+	if (!(pev(victim, pev_flags) & FL_ON_GROUND)) {
+		cod_inflict_damage(attacker, victim, damage, 0.0, damageBits);
+	}
 }

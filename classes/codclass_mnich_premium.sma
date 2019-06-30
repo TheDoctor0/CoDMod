@@ -8,7 +8,7 @@
 #define NAME         "Mnich"
 #define DESCRIPTION  "Cicho biega i posiada 3 teleporty, ktorych moze uzyc co 15 sekund."
 #define FRACTION     "Premium"
-#define WEAPONS      (1<<CSW_AK47)|(1<<CSW_P228)
+#define WEAPONS      (1<<CSW_AK47)|(1<<CSW_USP)
 #define HEALTH       10
 #define INTELLIGENCE 0
 #define STRENGTH     10
@@ -16,10 +16,10 @@
 #define CONDITION    10
 #define FLAG         ADMIN_LEVEL_D
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION, FLAG);
 }
 

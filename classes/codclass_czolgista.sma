@@ -12,11 +12,11 @@
 #define DESCRIPTION  "Ma podwojny skok, posiada Bazooke (R na nozu) i 10 pociskow do niej."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_GALIL)|(1<<CSW_GLOCK18)
-#define HEALTH       20
+#define HEALTH       10
 #define INTELLIGENCE 0
-#define STRENGTH     20
+#define STRENGTH     10
 #define STAMINA      0
-#define CONDITION    0
+#define CONDITION    10
 
 #define MISSILES     10
 
@@ -104,8 +104,8 @@ public shoot_missile(id)
 		return;
 	}
 
-	if (lastBazookaMissile[id] + 5.0 > get_gametime()) {
-		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Pocisk mozesz wystrzelic raz na 5 sekund!");
+	if (lastBazookaMissile[id] + 3.0 > get_gametime()) {
+		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Pocisk mozesz wystrzelic raz na 3 sekundy!");
 
 		return;
 	}
@@ -130,7 +130,7 @@ public shoot_missile(id)
 	set_pev(ent, pev_maxs, Float:{1.0, 1.0, 1.0});
 	set_pev(ent, pev_gravity, 0.3);
 
-	velocity_by_aim(id, 1000, velocity);
+	velocity_by_aim(id, 1250, velocity);
 
 	angle[0] *= -1.0;
 

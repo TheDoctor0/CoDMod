@@ -6,7 +6,7 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Skrytobojca"
-#define DESCRIPTION  "Po uzyciu mocy klasy jest niemal niewidzialny przez 5s. Posiada podwojny skok."
+#define DESCRIPTION  "Po uzyciu mocy klasy jest niemal niewidzialny przez 10s. Posiada podwojny skok."
 #define FRACTION     "Podstawowe"
 #define WEAPONS      (1<<CSW_UMP45)|(1<<CSW_USP)
 #define HEALTH       0
@@ -32,7 +32,11 @@ public cod_class_enabled(id, promotion)
 }
 
 public cod_class_spawned(id, respawn)
-	if (!respawn) rem_bit(id, classUsed);
+{
+	if (!respawn) {
+		rem_bit(id, classUsed);
+	}
+}
 
 public cod_class_skill_used(id)
 {
@@ -44,7 +48,7 @@ public cod_class_skill_used(id)
 
 	set_bit(id, classUsed);
 
-	cod_set_user_render(id, 40, CLASS, .timer = 5.0);
+	cod_set_user_render(id, 20, CLASS, .timer = 10.0);
 
 	return PLUGIN_CONTINUE;
 }

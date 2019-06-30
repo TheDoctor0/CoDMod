@@ -9,12 +9,12 @@
 #define NAME         "Jasnowidz"
 #define DESCRIPTION  "Co 30 sekund moze przechodzic w cialo przeciwnika, zeby go sledzic i oznaczyc na radarze."
 #define FRACTION     "Podstawowe"
-#define WEAPONS      (1<<CSW_SG552)|(1<<CSW_DEAGLE)
+#define WEAPONS      (1<<CSW_AUG)|(1<<CSW_DEAGLE)
 #define HEALTH       20
 #define INTELLIGENCE 5
 #define STRENGTH     5
 #define STAMINA      0
-#define CONDITION    0
+#define CONDITION    10
 
 #define TASK_RADAR 84722
 
@@ -78,7 +78,6 @@ public cod_class_skill_used_handle(id, menu, item)
 	new playerName[32], playerId[3], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, playerId, charsmax(playerId), playerName, charsmax(playerName), itemCallback);
-
 	menu_destroy(menu);
 
 	new player = str_to_num(playerId);
@@ -178,7 +177,7 @@ public radar_scan(id)
 
 public camera_think(ent)
 {
-	if(!pev_valid(ent)) return FMRES_IGNORED;
+	if (!pev_valid(ent)) return FMRES_IGNORED;
 
 	static className[32], owner;
 

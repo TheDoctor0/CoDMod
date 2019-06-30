@@ -8,9 +8,9 @@
 #define AUTHOR "O'Zone"
 
 #define NAME         "Lowca"
-#define DESCRIPTION  "Dostaje kusze (R na nozu) i 10 beltow, ktore zabijaja po trafieniu. Ma jedna mine."
+#define DESCRIPTION  "Dostaje kusze (R na nozu) i 10 beltow, ktore zabijaja po trafieniu. Ma dwie miny."
 #define FRACTION     "Premium"
-#define WEAPONS      (1<<CSW_M4A1)|(1<<CSW_FIVESEVEN)
+#define WEAPONS      (1<<CSW_AK47)|(1<<CSW_FIVESEVEN)
 #define HEALTH       15
 #define INTELLIGENCE 0
 #define STRENGTH     10
@@ -45,7 +45,7 @@ public client_disconnected(id)
 
 public cod_class_enabled(id, promotion)
 {
-	cod_set_user_mines(id, 1, CLASS);
+	cod_set_user_mines(id, 2, CLASS);
 
 	set_bit(id, classActive);
 

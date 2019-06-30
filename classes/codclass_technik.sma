@@ -15,19 +15,26 @@
 #define STAMINA      0
 #define CONDITION    10
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
 public cod_class_enabled(id, promotion)
 {
 	cod_give_weapon(id, CSW_FLASHBANG, 2);
-	
+
 	cod_set_user_rockets(id, 1, CLASS);
 	cod_set_user_medkits(id, 1, CLASS);
+}
+
+public cod_class_spawned(id, respawn)
+{
+	if (!respawn) {
+		cod_give_weapon(id, CSW_FLASHBANG, 2);
+	}
 }
 
 public cod_class_skill_used(id)
@@ -37,4 +44,8 @@ public cod_class_skill_used(id)
 }
 
 public cod_class_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
-	if (weapon == CSW_DEAGLE && damageBits & DMG_BULLET && random_num(1, 8) == 1) damage = cod_kill_player(attacker, victim, damageBits);
+{
+	if (weapon == CSW_DEAGLE && damageBits & DMG_BULLET && random_num(1, 8) == 1) {
+		damage = cod_kill_player(attacker, victim, damageBits);
+	}
+}

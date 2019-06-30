@@ -16,10 +16,10 @@
 #define STAMINA      0
 #define CONDITION    15
 
-public plugin_init() 
+public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR);
-	
+
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
@@ -27,7 +27,9 @@ public cod_class_kill(killer, victim)
 {
 	cod_refill_ammo(killer);
 
-	if (cod_get_user_item(victim) && cod_get_user_item(killer) != cod_get_user_item(victim) && cod_percent_chance(25)) show_question(killer, victim);
+	if (cod_get_user_item(victim) && cod_get_user_item(killer) != cod_get_user_item(victim) && cod_percent_chance(25)) {
+		show_question(killer, victim);
+	}
 }
 
 public show_question(id, victim)
@@ -41,10 +43,10 @@ public show_question(id, victim)
 	format(menuTitle, charsmax(menuTitle), "\yCzy chcesz ukrasc item: \r%s\y?", itemName);
 
 	new menu = menu_create(menuTitle, "show_question_handle");
-	
+
 	menu_additem(menu, "Tak", tempId);
 	menu_setprop(menu, MPROP_EXITNAME, "Nie");
-	
+
 	menu_display(id, menu);
 }
 
@@ -71,7 +73,7 @@ public show_question_handle(id, menu, item)
 	menu_destroy(menu);
 
 	if (!cod_get_user_item(victim) || cod_get_user_item(id) == cod_get_user_item(victim)) return;
-	
+
 	new thiefName[32];
 
 	get_user_name(id, thiefName, charsmax(thiefName));
