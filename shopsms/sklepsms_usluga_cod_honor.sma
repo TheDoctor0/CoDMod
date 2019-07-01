@@ -4,7 +4,10 @@
 
 #define PLUGIN "Sklep-SMS: Usluga CoD Honor"
 #define AUTHOR "O'Zone"
+
+#if !defined VERSION
 #define VERSION "3.3.7"
+#endif
 
 new const service_id[MAX_ID] = "cod_honor";
 
@@ -20,7 +23,7 @@ public plugin_cfg()
 public ss_service_bought(id,amount)
 	cod_add_user_honor(id, amount);
 
-public native_filter(const native_name[], index, trap) 
+public native_filter(const native_name[], index, trap)
 {
 	if (trap == 0) {
 		register_plugin(PLUGIN, VERSION, AUTHOR);

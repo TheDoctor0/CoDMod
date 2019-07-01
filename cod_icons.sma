@@ -25,7 +25,7 @@
 new const commandIcons[][] = { "ikony", "say /ikona", "say_team /ikona", "say /ikony", "say_team /ikony", "say /icon", "say_team /icon", "say /icons", "say_team /icons" };
 
 #if defined LITE
-new const iconSprite[icons][] = {
+new const iconSprite[BOX + 1][] = {
 	"sprites/CoDMod/bs_a_lite.spr",
 	"sprites/CoDMod/bs_b_lite.spr",
 	"sprites/CoDMod/dropped_lite.spr",
@@ -34,7 +34,7 @@ new const iconSprite[icons][] = {
 	"sprites/CoDMod/box_lite.spr"
 };
 #else
-new const iconSprite[icons][] = {
+new const iconSprite[BOX + 1][] = {
 	"sprites/CoDMod/bs_a.spr",
 	"sprites/CoDMod/bs_b.spr",
 	"sprites/CoDMod/dropped.spr",
@@ -44,7 +44,7 @@ new const iconSprite[icons][] = {
 };
 #endif
 
-new playerName[MAX_PLAYERS + 1][MAX_NAME], bombEntity[icons], iconEntity[icons], playerTeam[MAX_PLAYERS + 1],
+new playerName[MAX_PLAYERS + 1][MAX_NAME], bombEntity[BOX + 1], iconEntity[BOX + 1], playerTeam[MAX_PLAYERS + 1],
 	bool:mapEnd, dataLoaded, iconBombSites, iconDropped, iconPlanted, iconBox, bombTimer, cvarC4, iconsVault;
 
 public plugin_init()

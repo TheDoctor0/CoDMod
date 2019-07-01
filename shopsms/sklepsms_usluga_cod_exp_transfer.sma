@@ -4,14 +4,17 @@
 
 #define PLUGIN "Sklep-SMS: Usluga CoD Exp Transfer"
 #define AUTHOR "O'Zone"
+
+#if !defined VERSION
 #define VERSION "3.3.7"
+#endif
 
 #define TASK_CHECK_FIRST 1000
 #define TASK_CHECK_SECOND 2000
 
 new const serviceID[MAX_ID] = "cod_exp_transfer";
 
-new fromClass[33], toClass[33], currentClass[33], fromClassExp[33];
+new fromClass[MAX_PLAYERS + 1], toClass[MAX_PLAYERS + 1], currentClass[MAX_PLAYERS + 1], fromClassExp[MAX_PLAYERS + 1];
 
 public plugin_init()
 	register_plugin(PLUGIN, VERSION, AUTHOR);
@@ -33,64 +36,64 @@ public ss_service_chosen(id)
 
 	for (new i = 1; i <= cod_get_classes_num(); i++) {
 		cod_get_class_name(i, _, className, charsmax(className));
-		
+
 		menu_additem(menu, className);
 	}
-	
+
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
-	
+
 	menu_display(id,menu);
-	
+
 	return SS_STOP;
 }
 
-public from_class_menu_handle(id, menu, item) 
+public from_class_menu_handle(id, menu, item)
 {
 	if (item == MENU_EXIT) {
 		menu_destroy(menu);
 
 		return SS_STOP;
 	}
-	
+
 	fromClass[id] = item + 1;
 
 	menu_destroy(menu);
-		
+
 	new className[64], menu = menu_create("\yNa jaka \rKlase\y chcesz przeniesc exp?", "to_class_menu_handle");
 
 	for (new i = 1; i <= cod_get_classes_num(); i++) {
 		if (fromClass[id] == i) continue;
 
 		cod_get_class_name(i, _, className, charsmax(className));
-		
+
 		menu_additem(menu, className);
 	}
-		
+
 	menu_setprop(menu, MPROP_BACKNAME, "Poprzednia strona");
 	menu_setprop(menu, MPROP_NEXTNAME, "Nastepna strona");
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjdz");
-	
+
 	menu_display(id, menu);
 
 	return SS_STOP;
 }
 
-public to_class_menu_handle(id, menu, item) 
+public to_class_menu_handle(id, menu, item)
 {
 	if(item == MENU_EXIT) {
 		menu_destroy(menu);
 
 		return SS_STOP;
 	}
-	
+
 	toClass[id] = item + 1;
-		
+
 	menu_destroy(menu);
-	
+
 	currentClass[id] = cod_get_user_class(id);
-	
+
 	cod_set_user_class(id, fromClass[id]);
 
 	check_first_class(TASK_CHECK_FIRST + id);
@@ -98,11 +101,11 @@ public to_class_menu_handle(id, menu, item)
 	return SS_STOP;
 }
 
-public check_first_class(id) 
+public check_first_class(id)
 {
 	id -= TASK_CHECK_FIRST;
 
-	if (cod_get_user_class(id) == fromClass[id]) 
+	if (cod_get_user_class(id) == fromClass[id])
 	{
 		cod_set_user_class(id,toClass[id]);
 
@@ -111,7 +114,7 @@ public check_first_class(id)
 	else if (!cod_get_user_class(id)) client_print_color(id, id,"^x04[SKLEP-SMS] ^x01Nie masz uprawnien, aby skorzystac z klasy z ktorej chcesz przeniesc exp.");
 }
 
-public check_second_class(id) 
+public check_second_class(id)
 {
 	id -= TASK_CHECK_SECOND;
 
@@ -123,44 +126,44 @@ public check_second_class(id)
 	else if (!cod_get_user_class(id)) client_print_color(id, id,"^x04[SKLEP-SMS] ^x01Nie masz uprawnien, aby skorzystac z klasy z ktorej chcesz przeniesc exp.");
 }
 
-public ss_service_bought(id, amount) 
-{	
+public ss_service_bought(id, amount)
+{
 	cod_set_user_class(id,fromClass[id]);
-	
+
 	bought_check_first_class(TASK_CHECK_FIRST + id);
 }
 
-public bought_check_first_class(id) 
+public bought_check_first_class(id)
 {
 	id -= TASK_CHECK_FIRST;
 
 	if (cod_get_user_class(id) == fromClass[id]) {
 		fromClassExp[id] = cod_get_user_exp(id);
-		
+
 		cod_set_user_exp(id, -fromClassExp[id]);
-		
-		new playerName[32], className[64]; 
+
+		new playerName[32], className[64];
 
 		get_user_name(id, playerName, charsmax(playerName));
 		cod_get_class_name(fromClass[id], _, className, charsmax(className));
 
 		log_to_file("sklep_sms.log", "Zabrano graczowi %s %d EXPa z klasy %s", playerName, fromClassExp[id], className);
-		
+
 		cod_set_user_class(id, toClass[id]);
 
 		bought_check_second_class(TASK_CHECK_SECOND + id);
 	} else if (cod_get_user_class(id) == currentClass[id]) set_task(0.2, "bought_check_first_class", TASK_CHECK_FIRST + id);
 }
 
-public bought_check_second_class(id) 
+public bought_check_second_class(id)
 {
 	id -= TASK_CHECK_SECOND;
 
 	if (cod_get_user_class(id) == toClass[id]) {
 		cod_set_user_exp(id, fromClassExp[id]);
 		cod_set_user_class(id, currentClass[id]);
-		
-		new playerName[32], fromClassName[64], toClassName[64]; 
+
+		new playerName[32], fromClassName[64], toClassName[64];
 
 		get_user_name(id, playerName, charsmax(playerName));
 		cod_get_class_name(fromClass[id], _, fromClassName, charsmax(fromClassName));
@@ -171,7 +174,7 @@ public bought_check_second_class(id)
 	else if (cod_get_user_class(id) == fromClass[id]) set_task(0.2, "bought_check_second_class", TASK_CHECK_SECOND + id);
 }
 
-public native_filter(const native_name[], index, trap) 
+public native_filter(const native_name[], index, trap)
 {
 	if (trap == 0) {
 		register_plugin(PLUGIN, VERSION, AUTHOR);

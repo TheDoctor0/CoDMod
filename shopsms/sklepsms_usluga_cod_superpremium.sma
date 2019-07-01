@@ -3,7 +3,10 @@
 
 #define PLUGIN "Sklep-SMS: Usluga CoD Premium"
 #define AUTHOR "O'Zone"
+
+#if !defined VERSION
 #define VERSION "3.3.7"
+#endif
 
 new const serviceID[MAX_ID] = "cod_superpremium";
 
