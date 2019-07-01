@@ -9,53 +9,135 @@
 
 #pragma unused codSounds
 
+#define FL_WATERJUMP    (1<<11)
+#define FL_ONGROUND     (1<<9)
+
+/**
+ * User helpers
+ */
 #define is_user_valid(%1) (1 <= %1 <= MAX_PLAYERS)
 
+/**
+ * Bitfield helpers
+ */
 #define get_bit(%2,%1) (%1 & (1<<(%2&31)))
 #define set_bit(%2,%1) (%1 |= (1<<(%2&31)))
 #define rem_bit(%2,%1) (%1 &= ~(1 <<(%2&31)))
 
-#define MAX_NAME      MAX_NAME_LENGTH
-#define MAX_SAFE_NAME MAX_NAME * 2
-#define MAX_DESC      256
+/**
+ * Length constants
+ */
+#define MAX_NAME        MAX_NAME_LENGTH
+#define MAX_SAFE_NAME   MAX_NAME * 2
+#define MAX_DESC        256
 
-#define COD_STOP      4
-#define COD_CONTINUE  0
-#define COD_BLOCK     -1.0
-#define COD_FREEZE    0.1
+/**
+ * Return values
+ */
+#define COD_STOP        4
+#define COD_CONTINUE    0
+#define COD_BLOCK       -1.0
+#define COD_FREEZE      0.1
 
-#define FL_WATERJUMP  (1<<11)
-#define FL_ONGROUND   (1<<9)
+/**
+ * Damage flags
+ */
+#define DMG_BULLET      (1<<1)
+#define DMG_BURN        (1<<3)
+#define DMG_FREEZE      (1<<4)
+#define DMG_FALL        (1<<5)
+#define DMG_NERVEGAS    (1<<16)
+#define DMG_HEGRENADE   (1<<24)
+#define DMG_DYNAMITE    (1<<25)
+#define DMG_MINE        (1<<26)
+#define DMG_ROCKET      (1<<27)
+#define DMG_THUNDER     (1<<28)
+#define DMG_KILL        (1<<29)
+#define DMG_REPEAT      (1<<30)
+#define DMG_CODSKILL    (1<<31)
 
-#define DMG_BULLET    (1<<1)
-#define DMG_BURN      (1<<3)
-#define DMG_FREEZE    (1<<4)
-#define DMG_FALL      (1<<5)
-#define DMG_NERVEGAS  (1<<16)
-#define DMG_HEGRENADE (1<<24)
-#define DMG_DYNAMITE  (1<<25)
-#define DMG_MINE      (1<<26)
-#define DMG_ROCKET    (1<<27)
-#define DMG_THUNDER   (1<<28)
-#define DMG_KILL      (1<<29)
-#define DMG_REPEAT    (1<<30)
-#define DMG_CODSKILL  (1<<31)
+/**
+ * Render flags
+ */
+#define RENDER_ALWAYS   (1<<1)
+#define RENDER_MOVE     (1<<2)
+#define RENDER_STAND    (1<<3)
+#define RENDER_DUCK     (1<<4)
+#define RENDER_SHIFT    (1<<5)
 
-#define RENDER_ALWAYS (1<<1)
-#define RENDER_MOVE   (1<<2)
-#define RENDER_STAND  (1<<3)
-#define RENDER_DUCK   (1<<4)
-#define RENDER_SHIFT  (1<<5)
+/**
+ * Icons
+ */
+#define BOMBSITE_A      0
+#define BOMBSITE_B      1
+#define BOMB_DROP       2
+#define BOMB_PLANT      3
+#define BOMB_EXPLODE    4
+#define BOX             5
 
-enum _:sounds { SOUND_SELECT, SOUND_EXIT, SOUND_START, SOUND_START2, SOUND_LVLUP, SOUND_LVLUP2, SOUND_LVLUP3, SOUND_DEPLOY, SOUND_ACTIVATE,
-    SOUND_CHARGE, SOUND_PICKUP, SOUND_THUNDER, SOUND_ONE, SOUND_LAST, SOUND_FORCE, SOUND_HUMILIATION, SOUND_BOMB, SOUND_APPLAUSE, SOUND_LAUGH };
-enum _:icons { BOMBSITE_A, BOMBSITE_B, BOMB_DROP, BOMB_PLANT, BOMB_EXPLODE, BOX };
-enum _:promotions { PROMOTION_NONE, PROMOTION_FIRST, PROMOTION_SECOND, PROMOTION_THIRD };
-enum _:types { RANDOM = -3, FULL, NONE, CLASS, ITEM, ADDITIONAL, ROUND, DAMAGE_GIVEN, DAMAGE_TAKEN, DEATH, USED, ALL };
-enum _:repeating { FIRE, POISON, HEAL };
-enum _:hud { TYPE_HUD, TYPE_DHUD };
+/**
+ * Built-in repeating damage effects
+ */
+#define FIRE    0
+#define POISON  1
+#define HEAL    2
 
-new const codSounds[sounds][] = {
+/**
+ * Promotions
+ */
+#define PROMOTION_NONE      0
+#define PROMOTION_FIRST     1
+#define PROMOTION_SECOND    2
+#define PROMOTION_THIRD     3
+
+/**
+ * HUD types
+ */
+#define TYPE_HUD    0
+#define TYPE_DHUD   1
+
+/**
+ * Parameter types
+ */
+#define RANDOM          -3
+#define FULL            -2
+#define NONE            -1
+#define CLASS           0
+#define ITEM            1
+#define ADDITIONAL      2
+#define ROUND           3
+#define DAMAGE_GIVEN    4
+#define DAMAGE_TAKEN    5
+#define DEATH           6
+#define USED            7
+#define ALL             8
+
+/**
+ * Sound effects
+ *
+ * @note Can be used as codSounds[SOUND_TYPE].
+ */
+#define SOUND_SELECT        0
+#define SOUND_EXIT          1
+#define SOUND_START         2
+#define SOUND_START2        3
+#define SOUND_LVLUP         4
+#define SOUND_LVLUP2        5
+#define SOUND_LVLUP3        6
+#define SOUND_DEPLOY        7
+#define SOUND_ACTIVATE      8
+#define SOUND_CHARGE        9
+#define SOUND_PICKUP        10
+#define SOUND_THUNDER       11
+#define SOUND_ONE           12
+#define SOUND_LAST          13
+#define SOUND_FORCE         14
+#define SOUND_BOMB          15
+#define SOUND_HUMILIATION   16
+#define SOUND_APPLAUSE      17
+#define SOUND_LAUGH         18
+
+new const codSounds[SOUND_LAUGH + 1][] = {
     "CoDMod/select.wav",
     "CoDMod/close.wav",
     "CoDMod/start.wav",
@@ -2004,7 +2086,7 @@ native cod_make_bartimer(id, duration = 0, start = 0);
  *
  * @noreturn
  */
-native cod_screen_shake(id, amplitude = (7<<14), duration = (1<<13), frequency = (1<<14));
+native cod_screen_shake(id, amplitude = 7<<14, duration = 1<<13, frequency = 1<<14);
 
 /**
  * Refills player clip ammo.
