@@ -273,10 +273,16 @@ native cod_get_user_mission_need(id);
 /**
  * Spawns icon with specified type.
  *
- * @note Available icons: BOMBSITE_A, BOMBSITE_B, BOMB_DROP, BOMB_PLANT, BOMB_EXPLODE, BOX.
  * @note Icon entity will be saved in ent pev_user1.
  *
  * @param ent       Entity index
+ * @param type      Icon type, available:
+ *                  BOMBSITE_A
+ *                  BOMBSITE_B
+ *                  BOMB_DROP
+ *                  BOMB_PLANT
+ *                  BOMB_EXPLODE
+ *                  BOX
  *
  * @noreturn
  */
@@ -1952,12 +1958,12 @@ native cod_set_user_glow(id, effect, red, green, blue, model, amount, Float:time
  *
  * @note The colors can be modified inside of the format string using special characters.
  *       These characters can be included using the escape character:
- *       green           x04 ; use location color from this point forward
- *       red/blue/grey   x03 ; use team color from this point forward
- *       red/blue/grey   x02 ; use team color to the end of the client name
- *                           ; This only works at the start of the string,
- *                           ; and precludes using other control characters
- *       default         x01 ; use default color from this point forward
+ *          green           x04   ; use location color from this point forward
+ *          red/blue/grey   x03   ; use team color from this point forward
+ *          red/blue/grey   x02   ; use team color to the end of the client name
+ *                                ; This only works at the start of the string,
+ *                                ; and precludes using other control characters
+ *          default         x01   ; use default color from this point forward
  *
  * @param index     Player index, use 0 to display to all players
  * @param text      String to display
