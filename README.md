@@ -11,9 +11,9 @@ Mod was tested on AMXX builds:
 In both cases with ReHLDS and ReGameDLL also installed.
 
 ## Documentation
-Docs for all natives and forwards are available in [cod.inc](https://github.com/TheDoctor0/CoDMod/blob/master/cod.inc).
+Online documentation with all natives, forwards and constants is available on [codmod.5v.pl](http://codmod.5v.pl/). You can also find it in [cod.inc](https://github.com/TheDoctor0/CoDMod/blob/master/cod.inc).
 
-It is recommended to read it, as there are many build-in features that make writing classes, items and others plugins much easier.
+It is recommended to read docs, as there are many build-in features that make writing classes, items and others plugins much easier.
 
 ## Configuration
 The configuration can be changed by cvars loaded from [cod_mod.cfg](https://github.com/TheDoctor0/CoDMod/blob/master/resources/addons/amxmodx/configs/cod_mod.cfg).
