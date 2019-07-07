@@ -38,6 +38,6 @@ public cod_item_upgrade(id)
 public cod_item_damage_attacker(attacker, victim, weapon, &Float:damage, damageBits, hitPlace)
 {
 	if (damageBits & DMG_HEGRENADE && random_num(1, itemValue[attacker])) {
-        damage = cod_kill_player(attacker, victim, damageBits);
-    }
+		damage = cod_kill_player(attacker, victim, damageBits);
+	}
 }
