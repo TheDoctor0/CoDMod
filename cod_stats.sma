@@ -613,7 +613,7 @@ public check_time(id)
 
 	if (get_bit(id, visitInfo)) return;
 
-	if (get_bit(id, dataLoaded)) {
+	if (!get_bit(id, dataLoaded)) {
 		set_task(3.0, "check_time", id + TASK_TIME);
 
 		return;
