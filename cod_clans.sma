@@ -715,7 +715,7 @@ public skills_menu_handle(id, menu, item)
 			codClan[CLAN_HEALTH]++;
 			codClan[CLAN_HONOR] = remainingHonor;
 
-			cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + get_clan_info(clan[id], CLAN_HEALTH) * cvarHealthPerLevel);
+			cod_add_user_bonus_health(id, cvarHealthPerLevel);
 
 			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Zycie^x01 na^x03 %i^x01 poziom!", codClan[CLAN_HEALTH]);
 		} case 2: {
@@ -807,7 +807,7 @@ public skills_menu_handle(id, menu, item)
 	for (new player = 1; player <= MAX_PLAYERS; player++) {
 		if (!is_user_connected(id) || player == id || clan[player] != clan[id]) continue;
 
-		cod_set_user_bonus_health(player, cod_get_user_bonus_health(player) + get_clan_info(clan[player], CLAN_HEALTH) * cvarHealthPerLevel);
+		cod_add_user_bonus_health(player, cvarHealthPerLevel);
 
 		cod_print_chat(player, "^x03 %s^x01 ulepszyl klan na^x03 %i Poziom^x01!", name, codClan[upgradedSkill]);
 	}
@@ -2468,6 +2468,8 @@ stock set_user_clan(id, playerClan = 0, owner = 0)
 	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return;
 
 	if (playerClan == 0) {
+		cod_add_user_bonus_health(id, -get_clan_info(clan[id], CLAN_HEALTH) * cvarHealthPerLevel);
+
 		set_clan_info(clan[id], CLAN_MEMBERS, -1);
 
 		TrieDeleteKey(Trie:get_clan_info(clan[id], CLAN_STATUS), playerName[id]);
@@ -2477,6 +2479,8 @@ stock set_user_clan(id, playerClan = 0, owner = 0)
 		clan[id] = 0;
 	} else {
 		clan[id] = playerClan;
+
+		cod_add_user_bonus_health(id, get_clan_info(clan[id], CLAN_HEALTH) * cvarHealthPerLevel);
 
 		set_clan_info(clan[id], CLAN_MEMBERS, 1);
 
@@ -2644,7 +2648,7 @@ public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], da
 
 		new status = SQL_ReadResult(query, SQL_FieldNameToNum(query, "flag"));
 
-		cod_set_user_bonus_health(id, cod_get_user_bonus_health(id) + get_clan_info(clan[id], CLAN_HEALTH) * cvarHealthPerLevel);
+		cod_add_user_bonus_health(id, get_clan_info(clan[id], CLAN_HEALTH) * cvarHealthPerLevel);
 
 		TrieSetCell(Trie:get_clan_info(clan[id], CLAN_STATUS), playerName[id], status);
 	} else {
