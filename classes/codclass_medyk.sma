@@ -28,5 +28,5 @@ public cod_class_enabled(id, promotion)
 public cod_class_skill_used(id)
 	cod_use_user_medkit(id);
 
-public cod_class_kill(killer, victim)
+public cod_class_kill(killer, victim, hitPlace)
 	cod_refill_ammo(killer);

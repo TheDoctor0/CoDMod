@@ -23,7 +23,7 @@ public plugin_init()
 	cod_register_class(NAME, DESCRIPTION, FRACTION, WEAPONS, HEALTH, INTELLIGENCE, STRENGTH, STAMINA, CONDITION);
 }
 
-public cod_class_kill(killer, victim)
+public cod_class_kill(killer, victim, hitPlace)
 {
 	cod_refill_ammo(killer);
 
