@@ -113,7 +113,7 @@ public message_show_menu(msgId, dest, id)
 
 	get_msg_arg_string(4, menuData, charsmax(menuData));
 
-	if (equal(menuData, Team_Select) && playerData[id][STATUS] < LOGGED && sql != Empty_Handle) {
+	if (equal(menuData, Team_Select) && get_bit(id, dataLoaded) && playerData[id][STATUS] < LOGGED && sql != Empty_Handle) {
 		set_pdata_int(id, 205, 0, 5);
 
 		set_task(0.1, "account_menu", id);
@@ -126,7 +126,7 @@ public message_show_menu(msgId, dest, id)
 
 public message_vgui_menu(msgId, dest, id)
 {
-	if (get_msg_arg_int(1) == 2 && cvarAccountsEnabled && playerData[id][STATUS] < LOGGED && sql != Empty_Handle) {
+	if (get_msg_arg_int(1) == 2 && cvarAccountsEnabled && get_bit(id, dataLoaded) && playerData[id][STATUS] < LOGGED && sql != Empty_Handle) {
 		set_task(0.1, "account_menu", id);
 
 		return PLUGIN_HANDLED;

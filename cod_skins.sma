@@ -669,6 +669,8 @@ stock get_weapon_name(weaponId, weaponName[] = "", weaponNameLength = 0)
 
 stock remove_active_skin(id, weapon[])
 {
+	if (!get_bit(id, loaded)) return;
+
 	static queryData[256];
 
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_skins` SET active = '0' WHERE name = ^"%s^" AND weapon = '%s';", playerData[id][NAME], weapon);
@@ -678,6 +680,8 @@ stock remove_active_skin(id, weapon[])
 
 stock set_active_skin(id, weapon[], name[])
 {
+	if (!get_bit(id, loaded)) return;
+
 	static queryData[256];
 
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_skins` SET active = '1' WHERE name = ^"%s^" AND weapon = '%s' AND skin = '%s';", playerData[id][NAME], weapon, name);
@@ -687,6 +691,8 @@ stock set_active_skin(id, weapon[], name[])
 
 stock add_skin(id, weapon[], name[])
 {
+	if (!get_bit(id, loaded)) return;
+
 	static queryData[256];
 
 	formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_skins` (`name`, `weapon`, `skin`) VALUES (^"%s^", '%s', '%s');", playerData[id][NAME], weapon, name);
@@ -707,7 +713,7 @@ stock has_skin(id, skinId)
 	return false;
 }
 
-stock set_skin(id, weapon[], skin)
+stock set_skin(id, weapon[], skin = NONE)
 {
 	if (skin >= ArraySize(skins)) return;
 
