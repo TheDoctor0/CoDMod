@@ -5399,7 +5399,7 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damageDistance = 0.
 {
 	new Float:tempOrigin[3], origin[3], id;
 
-	if (is_user_valid(ent)) id = ent;
+	if (is_user_connected(ent)) id = ent;
 	else id = entity_get_edict(ent, EV_ENT_owner);
 
 	entity_get_vector(ent, EV_VEC_origin, tempOrigin);

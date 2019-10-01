@@ -132,8 +132,8 @@
 #define SOUND_ONE           12
 #define SOUND_LAST          13
 #define SOUND_FORCE         14
-#define SOUND_BOMB          15
-#define SOUND_HUMILIATION   16
+#define SOUND_HUMILIATION   15
+#define SOUND_BOMB          16
 #define SOUND_APPLAUSE      17
 #define SOUND_LAUGH         18
 
