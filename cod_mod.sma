@@ -10,7 +10,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.4.0"
+#define VERSION "1.4.1"
 #define AUTHOR "O'Zone"
 
 #pragma dynamic              65536
@@ -2293,7 +2293,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 
 public player_take_damage_post(victim, inflictor, attacker, Float:damage, damageBits)
 {
-	if (!is_user_connected(attacker) || !is_user_connected(victim) || !codPlayer[attacker][PLAYER_CLASS] || !codPlayer[victim][PLAYER_ALIVE] || get_user_team(victim) == get_user_team(attacker)) return HAM_IGNORED;
+	if (!is_user_connected(attacker) || !is_user_connected(victim) || !codPlayer[attacker][PLAYER_CLASS] || !codPlayer[victim][PLAYER_ALIVE] || get_user_team(victim) == get_user_team(attacker) || damage <= 0.0) return HAM_IGNORED;
 
 	static ret, weapon, hitPlace;
 
