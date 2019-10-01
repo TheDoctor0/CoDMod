@@ -34,7 +34,7 @@ new playerName[MAX_PLAYERS + 1][MAX_SAFE_NAME], playerStats[MAX_PLAYERS + 1][sta
 	Handle:sql, Handle:connection, bool:sqlConnected, bool:blockCount, bool:showedOneAndOnly, bool:mapEnd, round, dataLoaded, visitInfo;
 
 new cvarMinPlayers, cvarMedalsEnabled, cvarGoldMedalExp, cvarSilverMedalExp, cvarBronzeMedalExp, cvarAssistEnabled,
-	cvarAssistDamage, cvarAssistHonor, cvarAssistExp, cvarRevengeEnabled, cvarRevengeHonor, cvarRevengeExp;
+	cvarAssistDamage, cvarAssistHonor, cvarAssistExp, cvarRevengeEnabled, cvarRevengeHonor, cvarRevengeExp, cvarSoundsDefault;
 
 new soundsVault, soundMayTheForce, soundOneAndOnly, soundPrepare, soundHumiliation, soundLastLeft;
 
@@ -56,6 +56,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_revenge_enabled", "1"), cvarRevengeEnabled);
 	bind_pcvar_num(create_cvar("cod_revenge_honor", "1"), cvarRevengeHonor);
 	bind_pcvar_num(create_cvar("cod_revenge_exp", "15"), cvarRevengeExp);
+	bind_pcvar_num(create_cvar("cod_sounds_default", "1"), cvarSoundsDefault);
 
 	for (new i; i < sizeof commandMenu; i++) register_clcmd(commandMenu[i], "stats_menu");
 	for (new i; i < sizeof commandTime; i++) register_clcmd(commandTime[i], "command_time");
@@ -96,11 +97,20 @@ public client_putinserver(id)
 
 	rem_bit(id, dataLoaded);
 	rem_bit(id, visitInfo);
-	rem_bit(id, soundOneAndOnly);
-	rem_bit(id, soundLastLeft);
-	rem_bit(id, soundPrepare);
-	set_bit(id, soundMayTheForce);
-	set_bit(id, soundHumiliation);
+
+	if (cvarSoundsDefault) {
+		set_bit(id, soundOneAndOnly);
+		set_bit(id, soundLastLeft);
+		set_bit(id, soundPrepare);
+		set_bit(id, soundMayTheForce);
+		set_bit(id, soundHumiliation);
+	} else {
+		rem_bit(id, soundOneAndOnly);
+		rem_bit(id, soundLastLeft);
+		rem_bit(id, soundPrepare);
+		rem_bit(id, soundMayTheForce);
+		rem_bit(id, soundHumiliation);
+	}
 
 	if (is_user_bot(id) || is_user_hltv(id)) return;
 
