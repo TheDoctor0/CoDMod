@@ -114,7 +114,7 @@ enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_
 
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 
-new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpDamagePer, cvarExpWinRound, cvarExpPlant, cvarExpDefuse, cvarExpRescue, cvarNightExpEnabled, cvarNightExpFrom, cvarNightExpTo,
+new cvarExpKill, cvarExpKillHS, cvarExpDamage, cvarExpDamagePer, cvarExpWinRound, cvarExpPlant, cvarExpDefuse, cvarExpRescue, cvarVipExpBonus, cvarNightExpEnabled, cvarNightExpFrom, cvarNightExpTo,
 	cvarNightExpBonus, cvarLevelLimit, cvarLevelRatio, cvarPointsPerLevel, cvarPointsLimitEnabled, cvarKillStreakTime, cvarMinPlayers, cvarMinBonusPlayers, cvarBonusPlayersPer,
 	cvarMaxDurability, cvarMinDamageDurability, cvarMaxDamageDurability, cvarBlockSkillsTime;
 
@@ -145,6 +145,7 @@ public plugin_init()
 	bind_pcvar_num(create_cvar("cod_bomb_exp", "25"), cvarExpPlant);
 	bind_pcvar_num(create_cvar("cod_defuse_exp", "25"), cvarExpDefuse);
 	bind_pcvar_num(create_cvar("cod_host_exp", "25"), cvarExpRescue);
+	bind_pcvar_num(create_cvar("cod_vip_exp_bonus", "25"), cvarVipExpBonus);
 	bind_pcvar_num(create_cvar("cod_night_exp", "1"), cvarNightExpEnabled);
 	bind_pcvar_num(create_cvar("cod_night_exp_from", "22"), cvarNightExpFrom);
 	bind_pcvar_num(create_cvar("cod_night_exp_to", "8"), cvarNightExpTo);
@@ -2573,11 +2574,11 @@ public cur_weapon(id)
 {
 	if (!is_user_alive(id)) return;
 
-	execute_forward_ignore_two_params(codForwards[CUR_WEAPON], id, get_user_weapon(id));
-
 	new weapon = read_data(2);
 
 	if (!weapon || excludedWeapons & (1<<weapon)) return;
+
+	execute_forward_ignore_two_params(codForwards[CUR_WEAPON], id, weapon);
 
 	if (codPlayer[id][PLAYER_UNLIMITED_AMMO][ALL] && (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL] == FULL || 1<<codPlayer[id][PLAYER_WEAPON] & codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][ALL])) {
 		set_pdata_int(get_pdata_cbase(id, 373), 51, maxClipAmmo[weapon], 4);
@@ -5050,7 +5051,7 @@ stock get_exp_bonus(id, exp)
 {
 	new Float:bonus = 1.0;
 
-	if (cod_get_user_vip(id)) bonus += 0.25;
+	if (cod_get_user_vip(id)) bonus += (cvarVipExpBonus / 100.0);
 
 	if (nightExp) bonus += cvarNightExpBonus / 100.0;
 
@@ -5399,7 +5400,7 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damageDistance = 0.
 {
 	new Float:tempOrigin[3], origin[3], id;
 
-	if (is_user_connected(ent)) id = ent;
+	if (is_user_valid(ent)) id = ent;
 	else id = entity_get_edict(ent, EV_ENT_owner);
 
 	entity_get_vector(ent, EV_VEC_origin, tempOrigin);
@@ -5474,7 +5475,7 @@ stock make_explosion(ent, distance = 0, explosion = 1, Float:damageDistance = 0.
 			if (damage < 0.0) {
 				cod_add_user_health(player, floatround(floatabs(damage) + codPlayer[id][PLAYER_INT] * factor), 1);
 			} else if (type == POISON_INFECT) {
-				_cod_repeat_damage(id, player, 5.0 + cod_get_user_intelligence(id) * 0.02, 1.0, 10, POISON, 1);
+				_cod_repeat_damage(id, player, 5.0 + get_intelligence(id) * 0.02, 1.0, 10, POISON, 1);
 			} else {
 				switch (type) {
 					case MINE_EXPLODE: flag = DMG_MINE;
