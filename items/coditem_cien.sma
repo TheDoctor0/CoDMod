@@ -19,6 +19,19 @@ public plugin_init()
 	cod_register_item(NAME, DESCRIPTION);
 }
 
+public cod_item_check(id)
+{
+	new className[MAX_NAME];
+
+	cod_get_user_class_name(id, className, charsmax(className));
+
+	if (contain(className, "Komandos") != -1) {
+		return COD_STOP;
+	}
+
+	return COD_CONTINUE;
+}
+
 public cod_item_enabled(id, value)
 {
 	cod_set_user_render(id, 0, ITEM);

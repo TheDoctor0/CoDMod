@@ -93,8 +93,8 @@ enum _:forwards { CLASS_CHANGED, ITEM_CHANGED, RENDER_CHANGED, GRAVITY_CHANGED, 
 	ROCKET_EXPLODE, MINE_EXPLODE, DYNAMITE_EXPLODE, THUNDER_REACH, TELEPORT_USED, RESET_DATA, RESET_STATS_DATA,
 	RESET_ALL_DATA, FLAGS_CHANGED };
 
-enum _:itemInfo { ITEM_NAME[MAX_NAME], ITEM_DESC[MAX_DESC], ITEM_PLUGIN, ITEM_RANDOM_MIN, ITEM_RANDOM_MAX, ITEM_GIVE, ITEM_DROP,
-	ITEM_SPAWNED, ITEM_KILL, ITEM_KILLED, ITEM_SKILL_USED, ITEM_UPGRADE, ITEM_VALUE, ITEM_DAMAGE_ATTACKER, ITEM_DAMAGE_VICTIM };
+enum _:itemInfo { ITEM_NAME[MAX_NAME], ITEM_DESC[MAX_DESC], ITEM_PLUGIN, ITEM_RANDOM_MIN, ITEM_RANDOM_MAX, ITEM_FLAG, ITEM_GIVE, ITEM_DROP,
+	ITEM_SPAWNED, ITEM_KILL, ITEM_KILLED, ITEM_SKILL_USED, ITEM_UPGRADE, ITEM_VALUE, ITEM_CHECK, ITEM_DAMAGE_ATTACKER, ITEM_DAMAGE_VICTIM };
 
 enum _:classInfo { CLASS_NAME[MAX_NAME], CLASS_DESC[MAX_DESC], CLASS_FRACTION[MAX_NAME], CLASS_HEAL, CLASS_INT, CLASS_STR,
 	CLASS_COND, CLASS_STAM, CLASS_WEAPONS, CLASS_PROMOTION, CLASS_DEGREE, CLASS_LEVEL, CLASS_FLAG, CLASS_PLUGIN, CLASS_ENABLED,
@@ -3082,17 +3082,44 @@ public set_new_class(id)
 	return PLUGIN_CONTINUE;
 }
 
-stock set_item(id, item = 0, value = 0)
+stock check_item(id, item)
+{
+	if (!ArraySize(codItems) || !is_user_connected(id) || !item) return false;
+
+	new ret, flag = get_item_info(item, ITEM_FLAG);
+
+	if (flag != NONE && !(codPlayer[id][PLAYER_FLAGS] & flag)) {
+		return false;
+	}
+
+	if (get_item_info(item, ITEM_CHECK) > 0) {
+		ExecuteForward(get_item_info(item, ITEM_CHECK), ret, id);
+	}
+
+	return ret == COD_STOP ? false : true;
+}
+
+stock set_item(id, item = 0, value = 0, force = false)
 {
 	if (!ArraySize(codItems) || !is_user_connected(id)) return PLUGIN_CONTINUE;
 
 	reset_attributes(id, ITEM);
 
-	item = (item == RANDOM) ? random_num(1, ArraySize(codItems) - 1): item;
+	new bool:random = (item == RANDOM);
 
-	new ret;
+	item = random ? random_num(1, ArraySize(codItems) - 1): item;
 
 	if (item) {
+		if (!force && !check_item(id, item)) {
+			if (random) {
+				set_item(id, RANDOM, RANDOM);
+
+				return PLUGIN_CONTINUE;
+			}
+
+			return COD_STOP;
+		}
+
 		if (value == RANDOM) {
 			new valueMin = get_item_info(item, ITEM_RANDOM_MIN), valueMax = get_item_info(item, ITEM_RANDOM_MAX);
 
@@ -3100,13 +3127,7 @@ stock set_item(id, item = 0, value = 0)
 			else if (valueMin) value = valueMin;
 		}
 
-		ExecuteForward(get_item_info(item, ITEM_GIVE), ret, id, value);
-	}
-
-	if (ret == COD_STOP) {
-		set_item(id, RANDOM, RANDOM);
-
-		return COD_STOP;
+		execute_forward_ignore_two_params(get_item_info(item, ITEM_GIVE), id, value);
 	}
 
 	if (codPlayer[id][PLAYER_ITEM]) execute_forward_ignore_one_param(get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_DROP), id);
@@ -3930,8 +3951,11 @@ public _cod_get_user_item_value(id)
 	return value;
 }
 
-public _cod_set_user_item(id, item, value)
-	return set_item(id, item, value);
+public _cod_set_user_item(id, item, value, force)
+	return set_item(id, item, value, force);
+
+public _cod_check_item(id, item)
+	return check_item(id, item);
 
 public _cod_upgrade_user_item(id, check)
 {
@@ -5010,6 +5034,7 @@ public _cod_register_item(plugin, params)
 
 	codItem[ITEM_RANDOM_MIN] = get_param(3);
 	codItem[ITEM_RANDOM_MAX] = get_param(4);
+	codItem[ITEM_FLAG] = get_param(5);
 
 	codItem[ITEM_PLUGIN] = plugin;
 
@@ -5021,6 +5046,7 @@ public _cod_register_item(plugin, params)
 	codItem[ITEM_SKILL_USED] = CreateOneForward(plugin, "cod_item_skill_used", FP_CELL);
 	codItem[ITEM_UPGRADE] = CreateOneForward(plugin, "cod_item_upgrade", FP_CELL);
 	codItem[ITEM_VALUE] = CreateOneForward(plugin, "cod_item_value", FP_CELL);
+	codItem[ITEM_CHECK] = CreateOneForward(plugin, "cod_item_check", FP_CELL);
 	codItem[ITEM_DAMAGE_ATTACKER] = get_func_id("cod_item_damage_attacker", plugin);
 	codItem[ITEM_DAMAGE_VICTIM] = get_func_id("cod_item_damage_victim", plugin);
 

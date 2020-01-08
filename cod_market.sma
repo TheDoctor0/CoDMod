@@ -3,7 +3,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Market"
-#define VERSION "1.2.2"
+#define VERSION "1.3.0"
 #define AUTHOR "O'Zone"
 
 new const commandMarket[][] = { "rynek", "say /market", "say_team /market", "say /rynek", "say_team /rynek" };
@@ -234,9 +234,17 @@ public buy_item_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	new marketItem[itemInfo], menuData[512], itemDescription[MAX_DESC], length = 0, maxLength = charsmax(menuData);
+	new marketItem[itemInfo];
 
 	ArrayGetArray(marketItems, item, marketItem);
+
+	if (!cod_check_item(id, marketItem[MARKET_ITEM])) {
+		cod_print_chat(id, "Nie masz dostepu do przedmiotu, ktory chcesz kupic.");
+
+		return PLUGIN_HANDLED;
+	}
+
+	new menuData[512], itemDescription[MAX_DESC], length = 0, maxLength = charsmax(menuData);
 
 	cod_get_item_desc(marketItem[MARKET_ITEM], itemDescription, charsmax(itemDescription));
 

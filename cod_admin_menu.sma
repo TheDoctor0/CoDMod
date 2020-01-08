@@ -27,7 +27,7 @@ enum _:options {
 	ADD_HONOR
 };
 
-new const commandMenu[][] = { "codadmin", "say /codadmin", "say_team /codadmin" };
+new const commandMenu[][] = { "codadmin", "say /codadmin", "say /ca", "say_team /codadmin", "say_team /ca" };
 
 new selectedOption[MAX_PLAYERS + 1], selectedPlayer[MAX_PLAYERS + 1];
 
@@ -262,7 +262,7 @@ public select_menu_handle(id, menu, item)
 
 	switch (selectedOption[id]) {
 		case GIVE_ITEM: {
-			cod_set_user_item(selectedPlayer[id], selected, RANDOM);
+			cod_set_user_item(selectedPlayer[id], selected, RANDOM, true);
 
 			cod_print_chat(id, "Dales przedmiot^x04 %s^x01 graczowi^x03 %s^x01.", itemName, playerName);
 		} case EXCHANGE_EXP: {

@@ -2,7 +2,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Exchange"
-#define VERSION "1.1.2"
+#define VERSION "1.2.0"
 #define AUTHOR "O'Zone"
 
 new const commandExchange[][] = { "wymien", "say /exchange", "say_team /exchange", "say /zamien", "say_team /zamien", "say /wymien", "say_team /wymien" };
@@ -168,6 +168,18 @@ public exchange_item_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
+	if (!cod_check_item(id, cod_get_user_item(player))) {
+		cod_print_chat(id, "Nie masz dostepu do przedmiotu, za ktory chcesz cie wymienic.");
+
+		return PLUGIN_HANDLED;
+	}
+
+	if (!cod_check_item(player, cod_get_user_item(id))) {
+		cod_print_chat(id, "Gracz, z ktorym chcesz sie wymienic nie ma dostepu do twojego przedmiotu.");
+
+		return PLUGIN_HANDLED;
+	}
+
 	new menuData[128], playerName[MAX_NAME], itemName[MAX_NAME];
 
 	cod_get_item_name(cod_get_user_item(id), itemName, charsmax(itemName));
@@ -231,6 +243,18 @@ public exchange_item_question(id, menu, item)
 
 	if (!cod_get_user_item(id)) {
 		cod_print_chat(id, "Nie masz zadnego przedmiotu.");
+
+		return PLUGIN_HANDLED;
+	}
+
+	if (!cod_check_item(id, cod_get_user_item(player))) {
+		cod_print_chat(id, "Nie masz dostepu do przedmiotu, ktory posiada gracz proponujacy wymiane.");
+
+		return PLUGIN_HANDLED;
+	}
+
+	if (!cod_check_item(player, cod_get_user_item(id))) {
+		cod_print_chat(id, "Gracz proponujacy wymiane nie ma dostepu do twojego przedmiotu.");
 
 		return PLUGIN_HANDLED;
 	}
@@ -340,6 +364,12 @@ public give_item_handle(id, menu, item)
 
 	if (!cod_get_user_item(id)) {
 		cod_print_chat(id, "Nie masz zadnego przedmiotu.");
+
+		return PLUGIN_HANDLED;
+	}
+
+	if (!cod_check_item(player, cod_get_user_item(id))) {
+		cod_print_chat(id, "Gracz, ktoremu chcesz sie oddac przedmiot nie ma do niego dostepu.");
 
 		return PLUGIN_HANDLED;
 	}

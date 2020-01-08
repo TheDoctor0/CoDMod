@@ -540,14 +540,16 @@ native cod_get_user_item_name(id, dataReturn[], dataLength);
  * @note Set item index to 0 to remove player item.
  * @note Set item index to RANDOM (-3) to give random item.
  * @note Set value to RANDOM (-3) to set random value.
- * @note COD_STOP (4) will be returned if item cannot be set.
+ * @note COD_STOP (4) will be returned if item is not random and cannot be set.
  *
  * @param id        Player index
  * @param item      Item index
+ * @param value     Item value
+ * @param force     Disable restrictions
  *
- * @return          Player item value
+ * @noreturn
  */
-native cod_set_user_item(id, item = 0, value = RANDOM);
+native cod_set_user_item(id, item = 0, value = RANDOM, force = false);
 
 /**
  * Upgrades player item.
@@ -558,6 +560,16 @@ native cod_set_user_item(id, item = 0, value = RANDOM);
  * @return          Returns 1 if item was upgraded / is upgradable, 0 otherwise
  */
 native cod_upgrade_user_item(id, check = false);
+
+/**
+ * Check players access to item.
+ *
+ * @param id        Player index
+ * @param item      Item index
+ *
+ * @return          Returns 1 if item can be used by player, 0 otherwise
+ */
+native cod_check_item(id, item);
 
 /**
  * Returns item index by correspoding item name.
@@ -2270,10 +2282,11 @@ native cod_set_user_flags(id, flags);
  * @param desc      Item description
  * @param valueMin  Mininum value for item (used for random value)
  * @param valueMax  Maximum value for item (used for random value)
+ * @param flag      Item access flag
  *
  * @return          Item index
  */
-native cod_register_item(const name[], const desc[], valueMin = 0, valueMax = 0);
+native cod_register_item(const name[], const desc[], valueMin = 0, valueMax = 0, flag = NONE);
 
 /**
  * Registers new class.
@@ -2291,7 +2304,7 @@ native cod_register_item(const name[], const desc[], valueMin = 0, valueMax = 0)
  * @param condition     Class condition bonus
  * @param flag          Class access flag
  *
- * @return          Class index
+ * @return              Class index
  */
 native cod_register_class(const name[], const desc[], const faction[], weapons, health, intelligence, strength, stamina, condition, flag = NONE);
 
@@ -2757,12 +2770,23 @@ forward cod_thunder_reach(id, player, Float:damage);
 forward cod_teleport_used(id);
 
 /**
+ * Player item forward called on access check.
+ * Should be used to ensure that player can use this item.
+ *
+ * @param id        Player index
+ * @param value     Item value
+ *
+ * @return          COD_STOP (4) to refuse access
+ */
+forward cod_item_check(id);
+
+/**
  * Player item forward called on item give.
  *
  * @param id        Player index
  * @param value     Item value
  *
- * @return          COD_STOP (4) to block item give
+ * @noreturn
  */
 forward cod_item_enabled(id, value);
 

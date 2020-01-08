@@ -81,5 +81,5 @@ public show_question_handle(id, menu, item)
 	cod_print_chat(victim, "Twoj item zostal skradziony przez^x03 %s^x01.", thiefName);
 
 	cod_set_user_item(victim);
-	cod_set_user_item(id, item, itemValue);
+	cod_set_user_item(id, item, itemValue, true);
 }
