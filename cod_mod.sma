@@ -437,6 +437,7 @@ public plugin_natives()
 	register_native("cod_display_fade", "_cod_display_fade", 1);
 	register_native("cod_display_icon", "_cod_display_icon", 1);
 	register_native("cod_screen_shake", "_cod_screen_shake", 1);
+	register_native("cod_drop_weapon", "_cod_drop_weapon", 1);
 	register_native("cod_refill_ammo", "_cod_refill_ammo", 1);
 	register_native("cod_make_explosion", "_cod_make_explosion", 1);
 	register_native("cod_repeat_damage", "_cod_repeat_damage", 1);
