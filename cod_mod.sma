@@ -111,7 +111,7 @@ enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_
 	Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, SKILL_USE, PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1],
 	PLAYER_MEDKITS[ALL + 1], PLAYER_POISONS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1], PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1],
 	PLAYER_RESISTANCE[ALL + 1], PLAYER_GODMODE[ALL + 1], PLAYER_NOCLIP[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1], PLAYER_ELIMINATOR[ALL + 1], PLAYER_ELIMINATOR_WEAPONS[ALL + 1],
-	PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_SAFE_NAME] };
+	PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_NAME], PLAYER_SAFE_NAME[MAX_SAFE_NAME] };
 
 new codPlayer[MAX_PLAYERS + 1][playerInfo];
 
@@ -522,9 +522,9 @@ public client_connect(id)
 
 	for (new i = 0; i < ArraySize(codClasses); i++) ArrayPushArray(codPlayerClasses[id], codPlayerClass);
 
-	get_user_name(id, codPlayer[id][PLAYER_NAME], charsmax(codPlayer[]));
+	get_user_name(id, codPlayer[id][PLAYER_NAME], charsmax(codPlayer[][PLAYER_NAME]));
 
-	sql_string(codPlayer[id][PLAYER_NAME], codPlayer[id][PLAYER_NAME], charsmax(codPlayer[]));
+	sql_string(codPlayer[id][PLAYER_NAME], codPlayer[id][PLAYER_SAFE_NAME], charsmax(codPlayer[][PLAYER_SAFE_NAME]));
 
 	set_task(0.1, "load_data", id);
 }
@@ -601,11 +601,7 @@ public reset_data(id)
 {
 	if (!(codPlayer[id][PLAYER_FLAGS] & RESET_FLAG)) return PLUGIN_HANDLED;
 
-	new adminName[MAX_NAME];
-
-	get_user_name(id, adminName, charsmax(adminName));
-
-	log_to_file(LOG_FILE, "[%s] Admin %s wymusil przeprowadzenie resetu danych.", PLUGIN, adminName);
+	log_to_file(LOG_FILE, "[%s] Admin %s wymusil przeprowadzenie resetu danych.", PLUGIN, codPlayer[id][PLAYER_NAME]);
 
 	client_print(id, print_console, "[CoD] Trwa przeprowadzanie resetu danych...");
 	client_print(id, print_console, "[CoD] Za 10 sekund nastapi restart mapy.");
@@ -624,11 +620,7 @@ public reset_stats_data(id)
 {
 	if (!(codPlayer[id][PLAYER_FLAGS] & RESET_FLAG)) return PLUGIN_HANDLED;
 
-	new adminName[MAX_NAME];
-
-	get_user_name(id, adminName, charsmax(adminName));
-
-	log_to_file(LOG_FILE, "[%s] Admin %s wymusil przeprowadzenie resetu danych statystyk.", PLUGIN, adminName);
+	log_to_file(LOG_FILE, "[%s] Admin %s wymusil przeprowadzenie resetu danych statystyk.", PLUGIN, codPlayer[id][PLAYER_NAME]);
 
 	client_print(id, print_console, "[CoD] Trwa przeprowadzanie resetu danych statystyk...");
 	client_print(id, print_console, "[CoD] Za 10 sekund nastapi restart mapy.");
@@ -647,11 +639,7 @@ public reset_all_data(id)
 {
 	if (!(codPlayer[id][PLAYER_FLAGS] & RESET_FLAG)) return PLUGIN_HANDLED;
 
-	new adminName[MAX_NAME];
-
-	get_user_name(id, adminName, charsmax(adminName));
-
-	log_to_file(LOG_FILE, "[%s] Admin %s wymusil przeprowadzenie pelnego resetu danych.", PLUGIN, adminName);
+	log_to_file(LOG_FILE, "[%s] Admin %s wymusil przeprowadzenie pelnego resetu danych.", PLUGIN, codPlayer[id][PLAYER_NAME]);
 
 	client_print(id, print_console, "[CoD] Trwa przeprowadzanie pelnego resetu danych...");
 	client_print(id, print_console, "[CoD] Za 10 sekund nastapi restart mapy.");
@@ -2336,7 +2324,7 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 
 public player_death(killer, victim, weapon, hitPlace)
 {
-	new playerName[MAX_NAME], className[MAX_NAME], itemName[MAX_NAME];
+	new className[MAX_NAME], itemName[MAX_NAME];
 
 	if (codPlayer[killer][PLAYER_CLASS] && get_playersnum() > cvarMinPlayers) {
 		if (cvarExpKill || cvarExpKillHS) {
@@ -2348,9 +2336,7 @@ public player_death(killer, victim, weapon, hitPlace)
 
 			get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
-			get_user_name(victim, playerName, charsmax(playerName));
-
-			chat_print(killer, "Zabiles%s^x03 %s^x04 (%s - %i)^x01, dostajesz^x03 %i^x01 doswiadczenia.", hitPlace == HIT_HEAD ? " z HS" : "", playerName, className, codPlayer[victim][PLAYER_LEVEL], exp);
+			chat_print(killer, "Zabiles%s^x03 %s^x04 (%s - %i)^x01, dostajesz^x03 %i^x01 doswiadczenia.", hitPlace == HIT_HEAD ? " z HS" : "", codPlayer[victim][PLAYER_NAME], className, codPlayer[victim][PLAYER_LEVEL], exp);
 
 			set_dhudmessage(255, 206, 85, -1.0, 0.6, 0, 0.0, 2.0, 0.0, 0.0);
 			show_dhudmessage(killer, "+%i XP", exp);
@@ -2367,22 +2353,19 @@ public player_death(killer, victim, weapon, hitPlace)
 	} else {
 		get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
-		get_user_name(victim, playerName, charsmax(playerName));
-
-		chat_print(killer, "Zabiles^x03 %s^x04 (%s - %i)^x01.", playerName, className, codPlayer[victim][PLAYER_LEVEL]);
+		chat_print(killer, "Zabiles^x03 %s^x04 (%s - %i)^x01.", codPlayer[victim][PLAYER_NAME], className, codPlayer[victim][PLAYER_LEVEL]);
 	}
 
-	get_user_name(killer, playerName, charsmax(playerName));
 	get_user_class_info(killer, codPlayer[killer][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
 	if (!codPlayer[killer][PLAYER_ITEM]) {
 		set_item(killer, RANDOM, RANDOM);
 
-		chat_print(victim, "Zostales zabity przez^x03 %s^x04 (%s - %i)^x01, ktoremu zostalo^x04 %i^x01 HP.", playerName, className, codPlayer[killer][PLAYER_LEVEL], get_user_health(killer));
+		chat_print(victim, "Zostales zabity przez^x03 %s^x04 (%s - %i)^x01, ktoremu zostalo^x04 %i^x01 HP.", codPlayer[killer][PLAYER_NAME], className, codPlayer[killer][PLAYER_LEVEL], get_user_health(killer));
 	} else {
 		get_item_info(codPlayer[killer][PLAYER_ITEM], ITEM_NAME, itemName, charsmax(itemName));
 
-		chat_print(victim, "Zostales zabity przez^x03 %s^x04 (%s - %i - %s)^x01, ktoremu zostalo^x04 %i^x01 HP.", playerName, className, codPlayer[killer][PLAYER_LEVEL], itemName, get_user_health(killer));
+		chat_print(victim, "Zostales zabity przez^x03 %s^x04 (%s - %i - %s)^x01, ktoremu zostalo^x04 %i^x01 HP.", codPlayer[killer][PLAYER_NAME], className, codPlayer[killer][PLAYER_LEVEL], itemName, get_user_health(killer));
 	}
 
 	check_level(killer);
@@ -2842,7 +2825,7 @@ public say_text(msgId, msgDest, msgEnt)
 	new id = get_msg_arg_int(1);
 
 	if (is_user_connected(id) && codPlayer[id][PLAYER_CLASS]) {
-		new tempMessage[192], message[192], chatPrefix[64], playerName[32];
+		new tempMessage[192], message[192], chatPrefix[64];
 
 		get_msg_arg_string(2, tempMessage, charsmax(tempMessage));
 
@@ -2855,14 +2838,12 @@ public say_text(msgId, msgDest, msgEnt)
 			add(message, charsmax(message), " ");
 			add(message, charsmax(message), tempMessage);
 		} else {
-			get_user_name(id, playerName, charsmax(playerName));
-
 			get_msg_arg_string(4, tempMessage, charsmax(tempMessage));
 			set_msg_arg_string(4, "");
 
 			add(message, charsmax(message), chatPrefix);
 			add(message, charsmax(message), "^x03 ");
-			add(message, charsmax(message), playerName);
+			add(message, charsmax(message), codPlayer[id][PLAYER_NAME]);
 			add(message, charsmax(message), "^x01 :  ");
 			add(message, charsmax(message), tempMessage);
 		}
@@ -3658,7 +3639,7 @@ public load_data(id)
 
 	playerId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_mod` WHERE name = ^"%s^"", codPlayer[id][PLAYER_NAME]);
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_mod` WHERE name = ^"%s^"", codPlayer[id][PLAYER_SAFE_NAME]);
 
 	SQL_ThreadQuery(sql, "load_data_handle", queryData, playerId, sizeof playerId);
 }
@@ -3718,7 +3699,7 @@ public save_data(id, end)
 	get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_mod` SET `exp` = (`exp` + %d), `level` = (`level` + %d), `intelligence` = '%d', `health` = '%d', `stamina` = '%d', `strength` = '%d', `condition` = '%d' WHERE `name` = ^"%s^" AND `class` = '%s'",
-	codPlayer[id][PLAYER_GAINED_EXP], codPlayer[id][PLAYER_GAINED_LEVEL], codPlayer[id][PLAYER_INT], codPlayer[id][PLAYER_HEAL], codPlayer[id][PLAYER_STAM], codPlayer[id][PLAYER_STR], codPlayer[id][PLAYER_COND], codPlayer[id][PLAYER_NAME], className);
+	codPlayer[id][PLAYER_GAINED_EXP], codPlayer[id][PLAYER_GAINED_LEVEL], codPlayer[id][PLAYER_INT], codPlayer[id][PLAYER_HEAL], codPlayer[id][PLAYER_STAM], codPlayer[id][PLAYER_STR], codPlayer[id][PLAYER_COND], codPlayer[id][PLAYER_SAFE_NAME], className);
 
 	if (end == MAP_END) {
 		new error[128], errorNum, Handle:query;
@@ -3786,7 +3767,7 @@ public load_class(id, class)
 
 		get_class_info(class, CLASS_NAME, className, charsmax(className));
 
-		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`) VALUES (^"%s^", '%s')", codPlayer[id][PLAYER_NAME], className);
+		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`) VALUES (^"%s^", '%s')", codPlayer[id][PLAYER_SAFE_NAME], className);
 
 		SQL_ThreadQuery(sql, "ignore_handle", tempData);
 	}
