@@ -27,6 +27,7 @@
 #define TASK_BLOCK           12731
 #define TASK_BLOCK_INFO      13935
 #define TASK_RESPAWN         14294
+#define TASK_DEATH           15907
 
 #define LOG_FILE             "cod_mod.log"
 
@@ -4884,6 +4885,41 @@ public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
 		if (float(ret) == COD_BLOCK || damage <= 0.0) return;
 
 		ExecuteHam(Ham_TakeDamage, victim, attacker, attacker, damage + get_intelligence(attacker) * factor, DMG_CODSKILL | flags);
+
+		new data[3];
+
+		data[0] = attacker;
+		data[1] = victim;
+		data[2] = HIT_GENERIC;
+
+		remove_task(victim + TASK_DEATH);
+
+		set_task(0.1, "check_player_death", victim + TASK_DEATH, data, sizeof(data));
+	}
+}
+
+public check_player_death(data[])
+{
+	new victim = data[1];
+
+	if (!codPlayer[victim][PLAYER_ALIVE]) return;
+
+	new attacker = data[0];
+
+	if (get_user_health(victim) <= 0) {
+		codPlayer[victim][PLAYER_ALIVE] = false;
+
+		player_death(attacker, victim, data[2], HIT_GENERIC);
+	} else if (!codPlayer[victim][PLAYER_DAMAGE_TAKEN]) {
+		codPlayer[victim][PLAYER_DAMAGE_TAKEN] = true;
+
+		reset_attributes(victim, DAMAGE_TAKEN);
+	}
+
+	if (!codPlayer[attacker][PLAYER_DAMAGE_GIVEN]) {
+		codPlayer[attacker][PLAYER_DAMAGE_GIVEN] = true;
+
+		reset_attributes(attacker, DAMAGE_GIVEN);
 	}
 }
 
