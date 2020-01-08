@@ -5144,27 +5144,6 @@ stock get_weapons(weapons)
 	return weaponsList;
 }
 
-stock calculate_left(id, type)
-{
-	codPlayer[id][type][ALL] = 0;
-
-	if (type == PLAYER_TELEPORTS) {
-		for (new i = CLASS; i <= DEATH; i++) {
-			if (codPlayer[id][PLAYER_TELEPORTS][i] == FULL) {
-				codPlayer[id][PLAYER_TELEPORTS][ALL] = FULL;
-
-				break;
-			} else codPlayer[id][PLAYER_TELEPORTS][ALL] += codPlayer[id][PLAYER_TELEPORTS][i];
-		}
-
-		codPlayer[id][PLAYER_TELEPORTS][ALL] = codPlayer[id][PLAYER_TELEPORTS][ALL] == FULL ? FULL : max(0, codPlayer[id][PLAYER_TELEPORTS][ALL] - codPlayer[id][PLAYER_TELEPORTS][USED]);
-	} else {
-		for (new i = CLASS; i <= DEATH; i++) codPlayer[id][type][ALL] += codPlayer[id][type][i];
-
-		codPlayer[id][type][ALL] = max(0, codPlayer[id][type][ALL] - codPlayer[id][type][USED]);
-	}
-}
-
 stock calculate_rockets_left(id)
 {
 	codPlayer[id][PLAYER_ROCKETS][ALL] = 0;
