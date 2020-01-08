@@ -10,7 +10,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.4.2"
+#define VERSION "1.5.0"
 #define AUTHOR "O'Zone"
 
 #pragma dynamic              65536
@@ -315,7 +315,8 @@ public plugin_natives()
 	register_native("cod_get_user_item_value", "_cod_get_user_item_value", 1);
 	register_native("cod_get_user_item_name", "_cod_get_user_item_name", 1);
 	register_native("cod_set_user_item", "_cod_set_user_item", 1);
-	register_native("cod_upgrade_user_item", "_cod_upgrade_user_item", 1)
+	register_native("cod_upgrade_user_item", "_cod_upgrade_user_item", 1);
+	register_native("cod_check_item", "_cod_check_item", 1);
 	register_native("cod_get_item_id", "_cod_get_item_id", 1);
 	register_native("cod_get_item_name", "_cod_get_item_name", 1);
 	register_native("cod_get_item_desc", "_cod_get_item_desc", 1);
@@ -2131,6 +2132,8 @@ public show_block_info(id)
 
 public player_spawn(id)
 {
+	codPlayer[id][PLAYER_ALIVE] = true;
+
 	if (!cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (codPlayer[id][PLAYER_NEW_CLASS] != NONE) set_new_class(id);
@@ -2153,7 +2156,6 @@ public player_spawn(id)
 	execute_forward_ignore_two_params(codForwards[SPAWNED], id, codPlayer[id][PLAYER_SPAWNED]);
 
 	codPlayer[id][PLAYER_SPAWNED] = true;
-	codPlayer[id][PLAYER_ALIVE] = true;
 
 	set_task(0.1, "set_attributes", id);
 
@@ -2301,6 +2303,8 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 		codPlayer[attacker][PLAYER_GAINED_EXP] += get_exp_bonus(attacker, cvarExpDamage);
 	}
 
+	if (!codPlayer[victim][PLAYER_ALIVE]) return HAM_IGNORED;
+
 	check_level(attacker);
 
 	if (get_user_health(victim) <= 0) {
@@ -2324,6 +2328,8 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 
 public player_death(killer, victim, weapon, hitPlace)
 {
+	remove_task(victim + TASK_DEATH);
+
 	new className[MAX_NAME], itemName[MAX_NAME];
 
 	if (codPlayer[killer][PLAYER_CLASS] && get_playersnum() > cvarMinPlayers) {
@@ -4883,6 +4889,10 @@ public repeat_damage(data[])
 
 public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
 {
+	if (!is_user_alive(victim) || !codPlayer[victim][PLAYER_ALIVE] || get_user_health(victim) <= 0) {
+		return;
+	}
+
 	if (!codPlayer[victim][PLAYER_GODMODE][ALL] || !codPlayer[victim][PLAYER_RESISTANCE][ALL] || (codPlayer[victim][PLAYER_RESISTANCE][ALL] && !(flags & DMG_CODSKILL))) {
 		new ret;
 
@@ -5007,7 +5017,7 @@ public _cod_remove_ents(id, className[])
 
 public _cod_register_item(plugin, params)
 {
-	if (params != 4) return PLUGIN_CONTINUE;
+	if (params != 5) return PLUGIN_CONTINUE;
 
 	new codItem[itemInfo];
 
