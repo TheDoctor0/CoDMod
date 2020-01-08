@@ -132,7 +132,7 @@ public change_knife_handle(id, menu, item)
 public cod_weapon_deploy(id, weapon, ent)
 	if (weapon == CSW_KNIFE) set_knife(id);
 
-public cod_spawn(id)
+public cod_spawned(id, respawn)
 {
 	if (!cod_get_user_vip(id) && playerKnife[id] == VIP) {
 		set_bonus(id, playerKnife[id], DEFAULT);
