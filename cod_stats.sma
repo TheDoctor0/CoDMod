@@ -943,7 +943,7 @@ public cod_end_map()
 
 			get_user_name(winnersId[i], playerName, charsmax(playerName));
 
-			if (cvarMinPlayers >= get_playersnum() && exp) {
+			if (get_playersnum() >= cvarMinPlayers && exp) {
 				cod_set_user_exp(winnersId[i], exp);
 
 				cod_print_chat(0, "^x03 %s^x01 -^x03 %i^x01 Zabojstw - %s Medal (+^x03%i^x01 Doswiadczenia).", playerName, winnersFrags[i], medals[i], exp);
