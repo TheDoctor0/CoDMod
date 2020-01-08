@@ -3222,9 +3222,10 @@ public reset_attributes(id, type)
 		codPlayer[id][PLAYER_DAMAGE_TAKEN] = false;
 	}
 
-	if (type != ITEM) {
+	if (type != ITEM && type != DEATH && type != DAMAGE_GIVEN && type != DAMAGE_TAKEN) {
 		codPlayer[id][PLAYER_ROCKETS][USED] = 0;
 		codPlayer[id][PLAYER_MINES][USED] = 0;
+		codPlayer[id][PLAYER_MEDKITS][USED] = 0;
 		codPlayer[id][PLAYER_DYNAMITES][USED] = 0;
 		codPlayer[id][PLAYER_THUNDERS][USED] = 0;
 		codPlayer[id][PLAYER_POISONS][USED] = 0;
