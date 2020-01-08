@@ -2095,13 +2095,15 @@ native cod_make_bartimer(id, duration = 0, start = 0);
 native cod_screen_shake(id, amplitude = 7<<14, duration = 1<<13, frequency = 1<<14);
 
 /**
- * Force player to drop current weapon.
+ * Force player to drop weapon.
+ * If weapon is not specified drops current weapon.
  *
- * @param id        Player index
+ * @param id            Player index
+ * @param weaponName    Weapon name (in weapon_* format)
  *
  * @noreturn
  */
-native cod_drop_weapon(id);
+native cod_drop_weapon(id, const weaponName[] = "");
 
 /**
  * Refills player clip ammo.

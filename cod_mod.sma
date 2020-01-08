@@ -4773,8 +4773,24 @@ public _cod_make_explosion(ent, distance, explosion, Float:damageDistance, Float
 public _cod_make_bartimer(id, duration, start)
 	make_bar_timer(id, duration, start);
 
-public _cod_drop_weapon(id)
-	engclient_cmd(id, "drop");
+public _cod_drop_weapon(id, weaponName[])
+{
+	param_convert(2);
+
+	new dropWeaponName[32];
+
+	if (!strlen(weaponName)) {
+		new weapon = get_user_weapon(id);
+
+		if (!weapon || excludedWeapons & (1<<weapon)) return;
+
+		get_weaponname(weapon, dropWeaponName, charsmax(dropWeaponName));
+	} else {
+		copy(dropWeaponName, charsmax(dropWeaponName), weaponName);
+	}
+
+	engclient_cmd(id, "drop", dropWeaponName);
+}
 
 public _cod_repeat_damage(attacker, victim, Float:damage, Float:time, counter, flags, instant)
 {
