@@ -333,11 +333,11 @@ public shop_menu_handle(id, menu, item)
 		} case ROCKET: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowa Rakiete^x01!");
 
-			cod_add_user_mines(id, 1, ADDITIONAL);
+			cod_add_user_rockets(id, 1, ADDITIONAL);
 		} case MINE: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowa Mine^x01!");
 
-			cod_add_user_rockets(id, 1, ADDITIONAL);
+			cod_add_user_mines(id, 1, ADDITIONAL);
 		} case DYNAMITE: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Dynamit^x01!");
 
