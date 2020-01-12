@@ -4889,11 +4889,11 @@ public repeat_damage(data[])
 
 public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
 {
-	if (!is_user_alive(victim) || !codPlayer[victim][PLAYER_ALIVE] || get_user_health(victim) <= 0) {
+	if (!is_user_alive(victim) || !codPlayer[victim][PLAYER_ALIVE] || get_user_health(victim) <= 0 || codPlayer[victim][PLAYER_GODMODE][ALL]) {
 		return;
 	}
 
-	if (!codPlayer[victim][PLAYER_GODMODE][ALL] || !codPlayer[victim][PLAYER_RESISTANCE][ALL] || (codPlayer[victim][PLAYER_RESISTANCE][ALL] && !(flags & DMG_CODSKILL))) {
+	if (!codPlayer[victim][PLAYER_RESISTANCE][ALL] || (codPlayer[victim][PLAYER_RESISTANCE][ALL] && !(flags & DMG_CODSKILL))) {
 		new ret;
 
 		ExecuteForward(codForwards[DAMAGE_INFLICT], ret, attacker, victim, Float:damage, Float:factor, flags);
