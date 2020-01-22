@@ -1,0 +1,27 @@
+[en]
+CORE_MESSAGE=^4[CoD]^1 %s
+CORE_EXP_ERROR=The possible value of experience for maximum level has been exceeded. Decrease value of the cvar cod_level_ratio or cod_max_level.
+CORE_NONE=None
+CORE_NO_ITEM=Kill someone to get an item
+CORE_ITEM=Item:^3 %s^1.
+CORE_ITEM_DESC=Description:^3 %s^1.
+CORE_HUD_CLAN=^n[Clan : %s]
+CORE_HUD_MISSION=^n[Mission : %i/%i (%0.1f%s)]
+CORE_HUD_MAIN=[Class : %s]%s^n[Level : %i]^n[Experience : %0.1f%s]^n[Item : %s%s]%s^n[Health : %i]^n[Honor : %i]^n[Game Time : %s]
+CORE_HUD_EXP_BONUS=%s^n[Exp Bonus : %i%s]
+CORE_HUD_KILL_STREAK=%s^n[Kill Streak : %i (%i s)]
+STATS_TIME_TEXT=%i h %i min %i s
+
+[pl]
+CORE_MESSAGE=^4[COD]^1 %s
+CORE_EXP_ERROR=Przekroczono mozliwa wartosc doswiadczenia dla maksymalnego poziomu. Zmniejsz wartosc cvaru cod_level_ratio lub cod_max_level.
+CORE_NONE=Brak
+CORE_NO_ITEM=Zabij kogos, aby zdobyc przedmiot
+CORE_ITEM=Przedmiot:^3 %s^1.
+CORE_ITEM_DESC=Opis:^3 %s^1.
+CORE_HUD_CLAN=^n[Klan : %s]
+CORE_HUD_MISSION=^n[Misja : %i/%i (%0.1f%s)]
+CORE_HUD_MAIN=[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot : %s%s]%s^n[Zycie : %i]^n[Honor : %i]^n[Czas Gry : %s]
+CORE_HUD_EXP_BONUS=%s^n[Bonus Expa : %i%s]
+CORE_HUD_KILL_STREAK=%s^n[Kill Streak : %i (%i s)]
+STATS_TIME_TEXT=%i godz. %i min %i s
