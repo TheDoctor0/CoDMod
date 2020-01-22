@@ -133,6 +133,8 @@ public plugin_init()
 
 	create_arrays();
 
+	register_dictionary("cod.txt");
+
 	create_cvar("cod_sql_host", "127.0.0.1", FCVAR_SPONLY | FCVAR_PROTECTED);
 	create_cvar("cod_sql_user", "user", FCVAR_SPONLY | FCVAR_PROTECTED);
 	create_cvar("cod_sql_pass", "password", FCVAR_SPONLY | FCVAR_PROTECTED);
@@ -468,7 +470,13 @@ public plugin_cfg()
 
 	server_cmd("sv_maxspeed 500");
 
-	if (get_level_exp(cvarLevelLimit - 1) < 0) set_fail_state("Przekroczono mozliwa wartosc doswiadczenia dla maksymalnego poziomu. Zmniejsz wartosc cvaru cod_level_ratio lub cod_level_ratio.");
+	if (get_level_exp(cvarLevelLimit - 1) < 0) {
+		new failState[192];
+
+		formatex(failState, charsmax(failState), "%L", LANG_SERVER, "CORE_EXP_ERROR");
+
+		set_fail_state(failState);
+	}
 
 	sql_init();
 
@@ -477,8 +485,8 @@ public plugin_cfg()
 		set_task(300.0, "night_exp_info", _, _, _, "b");
 	}
 
-	log_amx("Call of Duty Mod autorstwa O'Zone (v%s).", VERSION);
-	log_amx("Zaladowano %i klas i %i przedmiotow.", ArraySize(codClasses) - 1, ArraySize(codItems) - 1);
+	log_amx("Call of Duty Mod by O'Zone (v%s).", VERSION);
+	log_amx("Loaded %i classes and %i items.", ArraySize(codClasses) - 1, ArraySize(codItems) - 1);
 }
 
 public plugin_end()
@@ -578,12 +586,12 @@ public create_arrays()
 		codPlayerRender[i] = ArrayCreate(renderInfo);
 	}
 
-	formatex(codItem[ITEM_NAME], charsmax(codItem[ITEM_NAME]), "Brak");
-	formatex(codItem[ITEM_DESC], charsmax(codItem[ITEM_DESC]), "Zabij kogos, aby zdobyc przedmiot");
+	formatex(codItem[ITEM_NAME], charsmax(codItem[ITEM_NAME]), "%L", LANG_SERVER, "CORE_NONE");
+	formatex(codItem[ITEM_DESC], charsmax(codItem[ITEM_DESC]), "%L", LANG_SERVER, "CORE_NO_ITEM");
 
 	ArrayPushArray(codItems, codItem);
 
-	formatex(codClass[CLASS_NAME], charsmax(codClass[CLASS_NAME]), "Brak");
+	formatex(codClass[CLASS_NAME], charsmax(codClass[CLASS_NAME]), "%L", LANG_SERVER, "CORE_NONE");
 
 	ArrayPushArray(codClasses, codClass);
 
@@ -1123,14 +1131,26 @@ public display_items_description_handle(id, menu, item)
 
 public show_item_description(id, item, info)
 {
-	new itemDescription[MAX_DESC], itemName[MAX_NAME], valueRandom[MAX_NAME / 4];
+	new itemDescription[MAX_DESC], itemName[MAX_NAME];
+
+	if (!item) {
+		formatex(itemName, charsmax(itemName), "%L", id, "CORE_NONE");
+		chat_print(id, "%L", id, "CORE_ITEM", itemName);
+
+		formatex(itemDescription, charsmax(itemDescription), "%L", id, "CORE_NO_ITEM");
+		chat_print(id, "%L", id, "CORE_ITEM_DESC", itemDescription);
+
+		return PLUGIN_HANDLED;
+	}
+
+	new valueRandom[MAX_NAME / 4];
 
 	get_item_info(item, ITEM_DESC, itemDescription, charsmax(itemDescription));
 	get_item_info(item, ITEM_NAME, itemName, charsmax(itemName));
 
 	new valueMin = get_item_info(item, ITEM_RANDOM_MIN), valueMax = get_item_info(item, ITEM_RANDOM_MAX);
 
-	chat_print(id, "Przedmiot:^x03 %s^x01.", itemName);
+	chat_print(id, "%L", id, "CORE_ITEM", itemName);
 
 	if (get_item_info(item, ITEM_VALUE) > 0) {
 		if (!info) {
@@ -1139,18 +1159,16 @@ public show_item_description(id, item, info)
 			num_to_str(itemTempValue, itemValue, charsmax(itemValue));
 
 			format(itemDescription, charsmax(itemDescription), itemDescription, itemValue);
-
-			chat_print(id, "Opis:^x03 %s^x01.", itemDescription);
 		} else {
 			if (valueMin & valueMax) formatex(valueRandom, charsmax(valueRandom), "%i-%i", valueMin, valueMax);
 			else if (valueMin) formatex(valueRandom, charsmax(valueRandom), "%i", valueMin);
 			else valueRandom = "x";
 
 			format(itemDescription, charsmax(itemDescription), itemDescription, valueRandom);
-
-			chat_print(id, "Opis:^x03 %s^x01.", itemDescription);
 		}
-	} else chat_print(id, "Opis:^x03 %s^x01.", itemDescription);
+	}
+
+	chat_print(id, "%L", "CORE_ITEM_DESC", id, itemDescription);
 
 	return PLUGIN_HANDLED;
 }
@@ -2901,6 +2919,9 @@ public show_info(id)
 
 	clanName = ""; missionProgress = "", itemDurability = "";
 
+	formatex(className, charsmax(className), "%L", id, "CORE_NONE");
+	formatex(itemName, charsmax(itemName), "%L", id, "CORE_NONE");
+
 	target = id;
 
 	if (!is_user_alive(id)) {
@@ -2921,19 +2942,26 @@ public show_info(id)
 		return PLUGIN_CONTINUE;
 	}
 
-	get_user_class_info(target, codPlayer[target][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
-	get_item_info(codPlayer[target][PLAYER_ITEM], ITEM_NAME, itemName, charsmax(itemName));
+	if (codPlayer[target][PLAYER_CLASS]) {
+		get_user_class_info(target, codPlayer[target][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
+	}
+
+	if (codPlayer[target][PLAYER_ITEM]) {
+		get_item_info(codPlayer[target][PLAYER_ITEM], ITEM_NAME, itemName, charsmax(itemName));
+	}
 
 	if (cod_get_user_clan(target)) {
 		cod_get_clan_name(cod_get_user_clan(target), clanName, charsmax(clanName));
 
-		format(clanName, charsmax(clanName), "^n[Klan : %s]", clanName);
+		format(clanName, charsmax(clanName), "%L", id, "CORE_HUD_CLAN", clanName);
 	}
 
-	if (cod_get_user_mission(target) > NONE) formatex(missionProgress, charsmax(missionProgress), "^n[Misja : %i/%i (%0.1f%s)]",
-		cod_get_user_mission_progress(target), cod_get_user_mission_need(target), float(cod_get_user_mission_progress(target)) / float(cod_get_user_mission_need(target)) * 100.0, "%%");
+	if (cod_get_user_mission(target) > NONE) {
+		formatex(missionProgress, charsmax(missionProgress), "%L", id, "CORE_HUD_MISSION", cod_get_user_mission_progress(target),
+			cod_get_user_mission_need(target), float(cod_get_user_mission_progress(target)) / float(cod_get_user_mission_need(target)) * 100.0, "%%");
+	}
 
-	cod_get_user_time_text(target, gameTime, charsmax(gameTime));
+	cod_get_user_time_text(target, gameTime, charsmax(gameTime), id);
 
 	exp = codPlayer[target][PLAYER_LEVEL] - 1 >= 0 ? get_level_exp(codPlayer[target][PLAYER_LEVEL] - 1) : 0;
 	levelPercent = codPlayer[target][PLAYER_LEVEL] < cvarLevelLimit ? (float((codPlayer[target][PLAYER_EXP] - exp)) / float((get_level_exp(codPlayer[target][PLAYER_LEVEL]) - exp))) * 100.0 : 0.0;
@@ -2942,12 +2970,12 @@ public show_info(id)
 		formatex(itemDurability, charsmax(itemDurability), " (%0.0f%s)", codPlayer[target][PLAYER_ITEM_DURA] * 100.0 / cvarMaxDurability, "%%");
 	}
 
-	formatex(hudData, charsmax(hudData), "[Klasa : %s]%s^n[Poziom : %i]^n[Doswiadczenie : %0.1f%s]^n[Przedmiot : %s%s]%s^n[Zycie : %i]^n[Honor : %i]^n[Czas Gry : %s]",
-	className, clanName, codPlayer[target][PLAYER_LEVEL], levelPercent, "%%", itemName, itemDurability, missionProgress, get_user_health(target), cod_get_user_honor(target), gameTime);
+	formatex(hudData, charsmax(hudData), "%L", id, "CORE_HUD_MAIN", className, clanName, codPlayer[target][PLAYER_LEVEL],
+		levelPercent, "%%", itemName, itemDurability, missionProgress, get_user_health(target), cod_get_user_honor(target), gameTime);
 
-	if (get_exp_bonus(target, NONE)) format(hudData, charsmax(hudData), "%s^n[Exp Bonus : %i%s]", hudData, get_exp_bonus(target, NONE), "%%");
+	if (get_exp_bonus(target, NONE)) format(hudData, charsmax(hudData), "%L", id, "CORE_HUD_EXP_BONUS", hudData, get_exp_bonus(target, NONE), "%%");
 
-	if (codPlayer[target][PLAYER_KS]) format(hudData, charsmax(hudData), "%s^n[KillStreak : %i (%i s)]", hudData, codPlayer[target][PLAYER_KS], codPlayer[target][PLAYER_TIME_KS]);
+	if (codPlayer[target][PLAYER_KS]) format(hudData, charsmax(hudData), "%L", id, "CORE_HUD_KILL_STREAK", hudData, codPlayer[target][PLAYER_KS], codPlayer[target][PLAYER_TIME_KS]);
 
 	ShowSyncHudMsg(id, hudInfo, hudData);
 
@@ -4001,16 +4029,14 @@ public _cod_get_item_name(item, dataReturn[], dataLength)
 {
 	param_convert(2);
 
-	if (!item) formatex(dataReturn, dataLength, "Brak");
-	else get_item_info(item, ITEM_NAME, dataReturn, dataLength);
+	get_item_info(item, ITEM_NAME, dataReturn, dataLength);
 }
 
 public _cod_get_item_desc(item, dataReturn[], dataLength)
 {
 	param_convert(2);
 
-	if (!item) formatex(dataReturn, dataLength, "Brak");
-	else get_item_info(item, ITEM_DESC, dataReturn, dataLength);
+	get_item_info(item, ITEM_DESC, dataReturn, dataLength);
 }
 
 public _cod_get_items_num()
@@ -5560,7 +5586,7 @@ stock chat_print(id, const text[], any:...)
 	if (numargs() == 2) copy(message, charsmax(message), text);
 	else vformat(message, charsmax(message), text, 3);
 
-	client_print_color(id, id, "^x04[CoD]^x01 %s", message);
+	client_print_color(id, id, "%L", id, "CORE_MESSAGE", message);
 }
 
 stock show_hud(id, const text[], type=0, red=255, green=255, blue=255, Float:x=-1.0, Float:y=0.35, effects=0, Float:fxtime=6.0, Float:holdtime=12.0, Float:fadeintime=0.1, Float:fadeouttime=0.2)

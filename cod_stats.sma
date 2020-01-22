@@ -1193,7 +1193,7 @@ public _cod_get_user_time(id)
 	return playerStats[id][TIME] + get_user_time(id);
 }
 
-public _cod_get_user_time_text(id, dataReturn[], dataLength)
+public _cod_get_user_time_text(id, dataReturn[], dataLength, lang)
 {
 	if (!is_user_valid(id)) return;
 
@@ -1215,5 +1215,5 @@ public _cod_get_user_time_text(id, dataReturn[], dataLength)
 
 	param_convert(2);
 
-	formatex(dataReturn, dataLength, "%i h %i min %i s", hours, minutes, seconds);
+	formatex(dataReturn, dataLength, "%L", lang, "STATS_TIME_TEXT", hours, minutes, seconds);
 }
