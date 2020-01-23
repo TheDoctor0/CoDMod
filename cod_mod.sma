@@ -610,13 +610,10 @@ public reset_data(id)
 {
 	if (!(codPlayer[id][PLAYER_FLAGS] & RESET_FLAG)) return PLUGIN_HANDLED;
 
-	log_to_file(LOG_FILE, "[%s] Admin %s wymusil przeprowadzenie resetu danych.", PLUGIN, codPlayer[id][PLAYER_NAME]);
+	log_to_file(LOG_FILE,  "[%s] Admin %s forced a data reset.", PLUGIN, codPlayer[id][PLAYER_NAME]);
 
-	client_print(id, print_console, "[CoD] Trwa przeprowadzanie resetu danych...");
-	client_print(id, print_console, "[CoD] Za 10 sekund nastapi restart mapy.");
-
-	chat_print(0, "Trwa przeprowadzanie resetu danych...");
-	chat_print(0, "Za 10 sekund nastapi restart mapy.");
+	chat_print(0, "%L", LANG_PLAYER, "CORE_RESET_DATA");
+	chat_print(0, "%L", LANG_PLAYER, "CORE_MAP_RESTART");
 
 	clear_database(id);
 
@@ -629,13 +626,10 @@ public reset_stats_data(id)
 {
 	if (!(codPlayer[id][PLAYER_FLAGS] & RESET_FLAG)) return PLUGIN_HANDLED;
 
-	log_to_file(LOG_FILE, "[%s] Admin %s wymusil przeprowadzenie resetu danych statystyk.", PLUGIN, codPlayer[id][PLAYER_NAME]);
+	log_to_file(LOG_FILE,  "[%s] Admin %s forced a stats reset.", PLUGIN, codPlayer[id][PLAYER_NAME]);
 
-	client_print(id, print_console, "[CoD] Trwa przeprowadzanie resetu danych statystyk...");
-	client_print(id, print_console, "[CoD] Za 10 sekund nastapi restart mapy.");
-
-	chat_print(0, "Trwa przeprowadzanie resetu danych statystyk...");
-	chat_print(0, "Za 10 sekund nastapi restart mapy.");
+	chat_print(0, "%L", LANG_PLAYER, "CORE_RESET_STATS");
+	chat_print(0, "%L", LANG_PLAYER, "CORE_MAP_RESTART");
 
 	execute_forward_ignore(codForwards[RESET_STATS_DATA]);
 
@@ -648,13 +642,10 @@ public reset_all_data(id)
 {
 	if (!(codPlayer[id][PLAYER_FLAGS] & RESET_FLAG)) return PLUGIN_HANDLED;
 
-	log_to_file(LOG_FILE, "[%s] Admin %s wymusil przeprowadzenie pelnego resetu danych.", PLUGIN, codPlayer[id][PLAYER_NAME]);
+	log_to_file(LOG_FILE,  "[%s] Admin %s forced a full data reset.", PLUGIN, codPlayer[id][PLAYER_NAME]);
 
-	client_print(id, print_console, "[CoD] Trwa przeprowadzanie pelnego resetu danych...");
-	client_print(id, print_console, "[CoD] Za 10 sekund nastapi restart mapy.");
-
-	chat_print(0, "Trwa przeprowadzanie pelnego resetu danych...");
-	chat_print(0, "Za 10 sekund nastapi restart mapy.");
+	chat_print(0, "%L", LANG_PLAYER, "CORE_RESET_FULL");
+	chat_print(0, "%L", LANG_PLAYER, "CORE_MAP_RESTART");
 
 	clear_database(id);
 
@@ -692,7 +683,7 @@ public select_faction(id)
 	if (!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (!get_bit(id, dataLoaded)) {
-		chat_print(id, "Trwa wczytywanie twoich klas...");
+		chat_print(id, "%L", id, "CORE_LOADING_DATA");
 
 		return PLUGIN_HANDLED;
 	}
@@ -700,7 +691,11 @@ public select_faction(id)
 	if (ArraySize(codFactions)) {
 		client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-		new factionName[MAX_NAME], menu = menu_create("\yWybierz \rFrakcje\w:", "select_faction_handle");
+		new menuData[128], factionName[MAX_NAME];
+
+		formatex(menuData, charsmax(menuData), "%L", id, "CORE_SELECT_FACTION");
+
+		new menu = menu_create(menuData, "select_faction_handle");
 
 		for (new i = 0; i < ArraySize(codFactions); i++) {
 			ArrayGetString(codFactions, i, factionName, charsmax(factionName));
@@ -708,9 +703,14 @@ public select_faction(id)
 			menu_additem(menu, factionName, factionName);
 		}
 
-		menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-		menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
-		menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+		formatex(factionName, charsmax(factionName), "%L", id, "CORE_MENU_EXIT");
+		menu_setprop(menu, MPROP_EXITNAME, factionName);
+
+		formatex(factionName, charsmax(factionName), "%L", id, "CORE_MENU_PREVIOUS");
+		menu_setprop(menu, MPROP_BACKNAME, factionName);
+
+		formatex(factionName, charsmax(factionName), "%L", id, "CORE_MENU_NEXT");
+		menu_setprop(menu, MPROP_NEXTNAME, factionName);
 
 		menu_display(id, menu);
 	} else select_class(id);
@@ -738,7 +738,9 @@ public select_faction_handle(id, menu, item)
 
 	menu_destroy(menu);
 
-	new menu = menu_create("\yWybierz \rKlase\w:", "select_class_confirm");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_SELECT_CLASS");
+
+	new menu = menu_create(menuData, "select_class_confirm");
 
 	for (new i = 1; i < ArraySize(codClasses); i++) {
 		ArrayGetArray(codClasses, i, codClass);
@@ -749,7 +751,7 @@ public select_faction_handle(id, menu, item)
 			if (codPlayer[id][PLAYER_PROMOTION]) get_user_class_info(id, i, CLASS_NAME, menuClassName, charsmax(menuClassName));
 			else formatex(menuClassName, charsmax(menuClassName), codClass[CLASS_NAME]);
 
-			formatex(menuData, charsmax(menuData), "%s \yPoziom: %i \d(%s)", menuClassName, codPlayer[id][PLAYER_LEVEL], get_weapons(codPlayer[id][PLAYER_WEAPONS]));
+			formatex(menuData, charsmax(menuData), "%L", id, "CORE_SELECT_CLASS_ITEM", menuClassName, codPlayer[id][PLAYER_LEVEL], get_weapons(codPlayer[id][PLAYER_WEAPONS]));
 
 			num_to_str(i, menuClassId, charsmax(menuClassId));
 
@@ -759,9 +761,14 @@ public select_faction_handle(id, menu, item)
 
 	load_class(id, classId);
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
-	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
+	menu_setprop(menu, MPROP_EXITNAME, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_PREVIOUS");
+	menu_setprop(menu, MPROP_BACKNAME, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_NEXT");
+	menu_setprop(menu, MPROP_NEXTNAME, menuData);
 
 	menu_display(id, menu);
 
@@ -774,7 +781,11 @@ public select_class(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new menuData[128], menuClassName[MAX_NAME], menuClassId[5], codClass[classInfo], classId = codPlayer[id][PLAYER_CLASS], menu = menu_create("\yWybierz \rKlase\w:", "select_class_confirm");
+	new menuData[128], menuClassName[MAX_NAME], menuClassId[5], codClass[classInfo], classId = codPlayer[id][PLAYER_CLASS];
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_SELECT_CLASS");
+
+	new menu = menu_create(menuData, "select_class_confirm");
 
 	for (new i = 1; i < ArraySize(codClasses); i++) {
 		ArrayGetArray(codClasses, i, codClass);
@@ -784,7 +795,7 @@ public select_class(id)
 		if (codPlayer[id][PLAYER_PROMOTION]) get_user_class_info(id, i, CLASS_NAME, menuClassName, charsmax(menuClassName));
 		else formatex(menuClassName, charsmax(menuClassName), codClass[CLASS_NAME]);
 
-		formatex(menuData, charsmax(menuData), "%s \yPoziom: %i \d(%s)", menuClassName, codPlayer[id][PLAYER_LEVEL], get_weapons(codPlayer[id][PLAYER_WEAPONS]));
+		formatex(menuData, charsmax(menuData), "%L", id, "CORE_SELECT_CLASS_ITEM", menuClassName, codPlayer[id][PLAYER_LEVEL], get_weapons(codPlayer[id][PLAYER_WEAPONS]));
 
 		num_to_str(i, menuClassId, charsmax(menuClassId));
 
@@ -793,9 +804,14 @@ public select_class(id)
 
 	load_class(id, classId);
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
-	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
+	menu_setprop(menu, MPROP_EXITNAME, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_PREVIOUS");
+	menu_setprop(menu, MPROP_BACKNAME, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_NEXT");
+	menu_setprop(menu, MPROP_NEXTNAME, menuData);
 
 	menu_display(id, menu);
 
@@ -825,7 +841,7 @@ public select_class_confirm(id, menu, item)
 	menu_destroy(menu);
 
 	if (class == codPlayer[id][PLAYER_CLASS] && codPlayer[id][PLAYER_NEW_CLASS] == NONE) {
-		chat_print(id, "To twoja aktualnie wybrana klasa.");
+		chat_print(id, "%L", id, "CORE_CLASS_SAME");
 
 		return PLUGIN_CONTINUE;
 	}
@@ -833,7 +849,7 @@ public select_class_confirm(id, menu, item)
 	new flag = get_class_info(class, CLASS_FLAG);
 
 	if (flag != NONE && !(codPlayer[id][PLAYER_FLAGS] & flag)) {
-		chat_print(id, "Nie posiadasz uprawnien do korzystania z tej klasy!");
+		chat_print(id, "%L", id, "CORE_CLASS_NO_ACCESS");
 
 		return PLUGIN_CONTINUE;
 	}
@@ -854,13 +870,16 @@ public select_class_confirm(id, menu, item)
 		else format(descSecondLine, charsmax(descSecondLine), "%s%s%s", descSecondLine, strlen(descSecondLine) > 2 ? " " : "", classDesc[i]);
 	}
 
-	format(menuData, charsmax(menuData), "\yKlasa: \r%s^n\yBronie:\w %s^n\yZdrowie: \w%i^n\yInteligencja: \w%i^n\ySila: \w%i^n\yWytrzymalosc: \w%i^n\yKondycja: \w%i^n\yOpis: \w%s%s^n",
-		codClass[CLASS_NAME], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_HEAL], codClass[CLASS_INT], codClass[CLASS_STR], codClass[CLASS_STAM], codClass[CLASS_COND], descFirstLine, descSecondLine);
+	format(menuData, charsmax(menuData), "%L", id, "CORE_CLASS_DATA", codClass[CLASS_NAME], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_HEAL],
+		codClass[CLASS_INT], codClass[CLASS_STR], codClass[CLASS_STAM], codClass[CLASS_COND], descFirstLine, descSecondLine);
 
 	menu = menu_create(menuData, "select_class_confirm_handle");
 
-	menu_additem(menu, "\wGraj ta \rKlasa", itemData);
-	menu_additem(menu, "\wWroc");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_CLASS_PLAY");
+	menu_additem(menu, menuData, itemData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_BACK");
+	menu_additem(menu, menuData);
 
 	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
 
@@ -895,7 +914,7 @@ public select_class_confirm_handle(id, menu, item)
 
 		codPlayer[id][PLAYER_NEW_CLASS] = class;
 
-		if (codPlayer[id][PLAYER_CLASS]) chat_print(id, "Klasa zostanie zmieniona w nastepnej rundzie.");
+		if (codPlayer[id][PLAYER_CLASS]) chat_print(id, "%L", id, "CORE_CLASS_SELECTED");
 		else set_new_class(id);
 	}
 
@@ -910,7 +929,11 @@ public display_classes_description(id, class, sound)
 
 	if (sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new className[MAX_NAME * 2], classId[5], menu = menu_create("\yWybierz \rKlase\w:", "display_classes_description_handle");
+	new menuData[128], className[MAX_NAME * 2], classId[5];
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_SELECT_CLASS");
+
+	new menu = menu_create(menuData, "display_classes_description_handle");
 
 	for (new i = 1; i < ArraySize(codClasses); i++) {
 		get_class_info(i, CLASS_NAME, className, charsmax(className));
@@ -928,9 +951,14 @@ public display_classes_description(id, class, sound)
 		menu_additem(menu, className, classId);
 	}
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
-	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
+	menu_setprop(menu, MPROP_EXITNAME, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_PREVIOUS");
+	menu_setprop(menu, MPROP_BACKNAME, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_NEXT");
+	menu_setprop(menu, MPROP_NEXTNAME, menuData);
 
 	menu_display(id, menu, class / 7);
 
@@ -972,8 +1000,8 @@ public display_classes_description_handle(id, menu, item)
 		else format(descSecondLine, charsmax(descSecondLine), "%s%s%s", descSecondLine, strlen(descSecondLine) > 2 ? " " : "", classDesc[i]);
 	}
 
-	format(menuData, charsmax(menuData), "\yKlasa: \r%s^n\yBronie:\w %s^n\yZdrowie: \w%i^n\yInteligencja: \w%i^n\ySila: \w%i^n\yWytrzymalosc: \w%i^n\yKondycja: \w%i^n\yOpis: \w%s%s^n",
-		codClass[CLASS_NAME], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_HEAL], codClass[CLASS_INT], codClass[CLASS_STR], codClass[CLASS_STAM], codClass[CLASS_COND], descFirstLine, descSecondLine);
+	format(menuData, charsmax(menuData), "%L", id, "CORE_CLASS_DATA", codClass[CLASS_NAME], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_HEAL],
+		codClass[CLASS_INT], codClass[CLASS_STR], codClass[CLASS_STAM], codClass[CLASS_COND], descFirstLine, descSecondLine);
 
 	menu = menu_create(menuData, "classes_description_handle");
 
@@ -984,13 +1012,16 @@ public display_classes_description_handle(id, menu, item)
 
 		get_class_promotion_info(class, promotion, CLASS_NAME, className, charsmax(className));
 
-		formatex(menuData, charsmax(menuData), "\wPokaz \yAwans\w - \r%s \w(\r%i Poziom\w)", className, get_class_promotion_info(class, promotion, CLASS_LEVEL));
+		formatex(menuData, charsmax(menuData), "%L", id, "CORE_SHOW_PROMOTION", className, get_class_promotion_info(class, promotion, CLASS_LEVEL));
 
 		menu_additem(menu, menuData, promotionData);
 	}
 
-	menu_additem(menu, "Wroc", classId);
-	menu_additem(menu, "Wyjscie");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_BACK");
+	menu_additem(menu, menuData, classId);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
+	menu_additem(menu, menuData);
 
 	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
 
@@ -1049,8 +1080,8 @@ public display_promotions_description(id, class, promotion)
 		else format(descSecondLine, charsmax(descSecondLine), "%s%s%s", descSecondLine, strlen(descSecondLine) > 2 ? " " : "", classDesc[i]);
 	}
 
-	format(menuData, charsmax(menuData), "\yKlasa: \w%s^n\yBronie:\w %s^n\yZdrowie: \w%i^n\yInteligencja: \w%i^n\ySila: \w%i^n\yWytrzymalosc: \w%i^n\yKondycja: \w%i^n\yOpis: \w%s%s^n",
-		codClass[CLASS_NAME], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_HEAL], codClass[CLASS_INT], codClass[CLASS_STR], codClass[CLASS_STAM], codClass[CLASS_COND], descFirstLine, descSecondLine);
+	format(menuData, charsmax(menuData), "%L", id, "CORE_CLASS_DATA", codClass[CLASS_NAME], get_weapons(codClass[CLASS_WEAPONS]), codClass[CLASS_HEAL],
+		codClass[CLASS_INT], codClass[CLASS_STR], codClass[CLASS_STAM], codClass[CLASS_COND], descFirstLine, descSecondLine);
 
 	new menu = menu_create(menuData, "classes_description_handle"), classPromotion = find_class_promotion(class, promotion);
 
@@ -1061,13 +1092,16 @@ public display_promotions_description(id, class, promotion)
 
 		get_class_promotion_info(class, classPromotion, CLASS_NAME, className, charsmax(className));
 
-		formatex(menuData, charsmax(menuData), "\wPokaz \yAwans\w - \r%s \w(\r%i Poziom\w)", className, get_class_promotion_info(class, classPromotion, CLASS_LEVEL));
+		formatex(menuData, charsmax(menuData), "%L", id, "CORE_SHOW_PROMOTION", className, get_class_promotion_info(class, classPromotion, CLASS_LEVEL));
 
 		menu_additem(menu, menuData, promotionData);
 	}
 
-	menu_additem(menu, "Wroc", classId);
-	menu_additem(menu, "Wyjscie");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_BACK");
+	menu_additem(menu, menuData, classId);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
+	menu_additem(menu, menuData);
 
 	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
 
@@ -1089,7 +1123,11 @@ public display_items_description(id, page, sound)
 
 	if (sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new itemName[MAX_NAME], menu = menu_create("\yWybierz \rPrzedmiot\w:", "display_items_description_handle");
+	new menuData[128], itemName[MAX_NAME];
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_SELECT_ITEM");
+
+	new menu = menu_create(menuData, "display_items_description_handle");
 
 	for (new i = 1; i < ArraySize(codItems); i++) {
 		get_item_info(i, ITEM_NAME, itemName, charsmax(itemName));
@@ -1097,9 +1135,14 @@ public display_items_description(id, page, sound)
 		menu_additem(menu, itemName);
 	}
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
-	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
+	menu_setprop(menu, MPROP_EXITNAME, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_PREVIOUS");
+	menu_setprop(menu, MPROP_BACKNAME, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_NEXT");
+	menu_setprop(menu, MPROP_NEXTNAME, menuData);
 
 	menu_display(id, menu, page);
 
@@ -1168,7 +1211,7 @@ public show_item_description(id, item, info)
 		}
 	}
 
-	chat_print(id, "%L", "CORE_ITEM_DESC", id, itemDescription);
+	chat_print(id, "%L", id, "CORE_ITEM_DESC", itemDescription);
 
 	return PLUGIN_HANDLED;
 }
@@ -1180,10 +1223,10 @@ public drop_item(id)
 
 		get_item_info(codPlayer[id][PLAYER_ITEM], ITEM_NAME, itemName, charsmax(itemName));
 
-		chat_print(id, "Wyrzuciles przedmiot:^x03 %s^x01.", itemName);
+		chat_print(id, "%L", id, "CORE_ITEM_DROPPED", itemName);
 
 		set_item(id);
-	} else chat_print(id, "Nie masz zadnego^x03 przedmiotu^x01.");
+	} else chat_print(id, "%L", id, "CORE_ITEM_NONE");
 
 	return PLUGIN_HANDLED;
 }
@@ -1200,7 +1243,7 @@ public reset_stats(id)
 
 	set_bit(id, resetStats);
 
-	chat_print(id, "Twoje punkty umiejetnosci zostana zresetowane w kolejnej rudzie.");
+	chat_print(id, "%L", id, "CORE_STATS_RESET");
 
 	return PLUGIN_HANDLED;
 }
@@ -1255,7 +1298,8 @@ public assign_points(id, sound)
 	format(menuData, charsmax(menuData), "Kondycja: \r%i \y(Zwieksza o %0.1f%s predkosc poruszania)", get_condition(id), get_condition(id) * 0.85 / 250.0 * 100.0, "%");
 	menu_additem(menu, menuData);
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_NEXT");
+	menu_setprop(menu, MPROP_NEXTNAME, menuData);
 
 	menu_display(id, menu);
 
@@ -1362,7 +1406,8 @@ public change_hud(id, sound)
 	format(menuData, charsmax(menuData), "\yDomyslne \rUstawienia");
 	menu_additem(menu, menuData);
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_NEXT");
+	menu_setprop(menu, MPROP_NEXTNAME, menuData);
 
 	menu_display(id, menu);
 
@@ -1428,6 +1473,8 @@ public show_binds(id, sound)
 
 	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
+	new menuData[128];
+
 	new menu = menu_create("\yInformacje o \rBindach\w", "show_binds_handle");
 
 	menu_additem(menu, "\wRakieta \y[\r+rocket\y]");
@@ -1444,9 +1491,14 @@ public show_binds(id, sound)
 	menu_addtext(menu, "\yMozesz zbindowac \wwiele \yumiejetnosci pod \wjeden klawisz\y.", 0);
 	menu_addtext(menu, "\yWystarczy, ze wpiszesz np. \rbind ^"z^" ^"+rocket;+mine;+dynamite^"\y.", 0);
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
-	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
+	menu_setprop(menu, MPROP_EXITNAME, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_PREVIOUS");
+	menu_setprop(menu, MPROP_BACKNAME, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_NEXT");
+	menu_setprop(menu, MPROP_NEXTNAME, menuData);
 
 	menu_display(id, menu);
 
@@ -4852,7 +4904,7 @@ public _cod_repeat_damage(attacker, victim, Float:damage, Float:time, counter, f
 
 public repeat_damage(data[])
 {
-	if (!is_user_alive(data[VICTIM])) {
+	if (!is_user_alive(data[VICTIM]) || !is_user_connected(data[ATTACKER])) {
 		remove_task(data[VICTIM] + data[ATTACKER] + TASK_DAMAGE);
 
 		return;
