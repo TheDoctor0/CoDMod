@@ -4916,11 +4916,9 @@ public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
 
 public check_player_death(data[])
 {
-	new victim = data[1];
+	new victim = data[1], attacker = data[0];
 
-	if (!codPlayer[victim][PLAYER_ALIVE]) return;
-
-	new attacker = data[0];
+	if (!is_user_connected(victim) || !is_user_connected(attacker) || !codPlayer[victim][PLAYER_ALIVE]) return;
 
 	if (get_user_health(victim) <= 0) {
 		codPlayer[victim][PLAYER_ALIVE] = false;
