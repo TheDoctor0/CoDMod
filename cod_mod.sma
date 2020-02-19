@@ -1272,30 +1272,30 @@ public assign_points(id, sound)
 
 	new menuData[128];
 
-	format(menuData, charsmax(menuData), "\yPrzydziel \rPunkty \y(\r%i\y)\w:", codPlayer[id][PLAYER_POINTS]);
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_POINTS_ASSIGN", codPlayer[id][PLAYER_POINTS]);
 
 	new menu = menu_create(menuData, "assign_points_handler");
 
-	if (pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]] == FULL) format(menuData, charsmax(menuData), "Ile dodawac: \rWszystko \y(Ile punktow dodac do statystyk)");
-	else format(menuData, charsmax(menuData), "Ile dodawac: \r%d \y(Ile punktow dodac do statystyk)", pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]]);
+	if (pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]] == FULL) formatex(menuData, charsmax(menuData), "%L", id, "CORE_POINTS_ALL");
+	else formatex(menuData, charsmax(menuData), "%L", id, "CORE_POINTS_ADD", pointsDistribution[codPlayer[id][PLAYER_POINTS_SPEED]]);
 
 	menu_additem(menu, menuData);
 
 	menu_addblank(menu, 0);
 
-	format(menuData, charsmax(menuData), "Zdrowie: \r%i \y(Zwieksza o %i liczbe punktow zycia)", get_health(id, 1, 1, 1, 0), get_health(id, 1, 1, 1, 0));
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_POINTS_HEALTH", get_health(id, 1, 1, 1, 0), get_health(id, 1, 1, 1, 0));
 	menu_additem(menu, menuData);
 
-	format(menuData, charsmax(menuData), "Inteligencja: \r%i \y(Zwieksza o %0.1f%s sile itemow i umiejetnosci klas)",  get_intelligence(id), get_intelligence(id) / 2.0, "%");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_POINTS_INTELLIGENCE",  get_intelligence(id), get_intelligence(id) / 2.0, "%");
 	menu_additem(menu, menuData);
 
-	format(menuData, charsmax(menuData), "Sila: \r%i \y(Zwieksza o %0.1f zadawane obrazenia)", get_strength(id), get_strength(id) / 10.0);
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_POINTS_STRENGTH", get_strength(id), get_strength(id) / 10.0);
 	menu_additem(menu, menuData);
 
-	format(menuData, charsmax(menuData), "Wytrzymalosc: \r%i \y(Zmniejsza o %0.1f%s otrzymywane obrazenia)", get_stamina(id), get_stamina(id) / 4.0, "%");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_POINTS_STAMINA", get_stamina(id), get_stamina(id) / 4.0, "%");
 	menu_additem(menu, menuData);
 
-	format(menuData, charsmax(menuData), "Kondycja: \r%i \y(Zwieksza o %0.1f%s predkosc poruszania)", get_condition(id), get_condition(id) * 0.85 / 250.0 * 100.0, "%");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_POINTS_CONDITION", get_condition(id), get_condition(id) * 0.85 / 250.0 * 100.0, "%");
 	menu_additem(menu, menuData);
 
 	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_NEXT");
@@ -1338,7 +1338,7 @@ public assign_points_handler(id, menu, item)
 
 				codPlayer[id][PLAYER_HEAL] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
-			} else chat_print(id, "Maksymalny poziom zycia osiagniety!");
+			} else chat_print(id, "%L", id, "CORE_POINTS_HEALTH_MAX");
 		} case 2: {
 			if (!statsLimit || codPlayer[id][PLAYER_INT] < statsLimit) {
 				if (statsLimit && pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_INT]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_INT];
@@ -1346,28 +1346,28 @@ public assign_points_handler(id, menu, item)
 				codPlayer[id][PLAYER_INT] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
 
-			} else chat_print(id, "Maksymalny poziom inteligencji osiagniety!");
+			} else chat_print(id, "%L", id, "CORE_POINTS_INTELLIGENCE_MAX");
 		} case 3: {
 			if (!statsLimit || codPlayer[id][PLAYER_STR] < statsLimit) {
 				if (statsLimit && pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_STR]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_STR];
 
 				codPlayer[id][PLAYER_STR] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
-			} else chat_print(id, "Maksymalny poziom sily osiagniety!");
+			} else chat_print(id, "%L", id, "CORE_POINTS_STRENGTH_MAX");
 		} case 4: {
 			if (!statsLimit || codPlayer[id][PLAYER_STAM] < statsLimit) {
 				if (statsLimit && pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_STAM]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_STAM];
 
 				codPlayer[id][PLAYER_STAM] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
-			} else chat_print(id, "Maksymalny poziom wytrzymalosci osiagniety!");
+			} else chat_print(id, "%L", id, "CORE_POINTS_STAMINA_MAX");
 		} case 5: {
 			if (!statsLimit || codPlayer[id][PLAYER_COND] < statsLimit) {
 				if (statsLimit && pointsDistributionAmount > statsLimit - codPlayer[id][PLAYER_COND]) pointsDistributionAmount = statsLimit - codPlayer[id][PLAYER_COND];
 
 				codPlayer[id][PLAYER_COND] += pointsDistributionAmount;
 				codPlayer[id][PLAYER_POINTS] -= pointsDistributionAmount;
-			} else chat_print(id, "Maksymalny poziom kondycji osiagniety!");
+			} else chat_print(id, "%L", id, "CORE_POINTS_CONDITION_MAX");
 		}
 	}
 
