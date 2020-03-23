@@ -745,7 +745,7 @@ public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSiz
 
 public _cod_check_account(plugin_id, num_params)
 {
-	if (!cvarAccountsEnabled) return 0;
+	if (!cvarAccountsEnabled) return 1;
 
 	new id = get_param(1);
 
