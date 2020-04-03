@@ -30,9 +30,16 @@ Missions configuration is stored in [cod_missions.ini](https://github.com/TheDoc
 Available skins are stored in [cod_skins.ini](https://github.com/TheDoctor0/CoDMod/blob/master/resources/addons/amxmodx/configs/cod_skins.ini).
 
 ## Additional
+
+### Class promotion
 Do you want to add promotions (advances) to classes?
 
 Check [this example](https://github.com/TheDoctor0/CoDMod/blob/master/classes/codclass_promotions_example.sma) to learn how to do it.
+
+### Item access
+There are two supported options for defining access to item:
+1. **Flag** (easy) - use *flag* parameter in *cod_register_item* native.
+2. **Forward** (harder) - implement *cod_item_check* function in item plugin - [example in item Cien](https://github.com/TheDoctor0/CoDMod/blob/master/items/coditem_cien.sma#L22).
 
 ## Known issues
 **"Cache_TryAlloc: 2331984 is greater then free hunk"** crash can be caused on maps with big .bsp file by multiple sprites loaded by *cod_icons.amxx* plugin.
