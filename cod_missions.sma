@@ -358,7 +358,7 @@ public select_item(id)
 
 	new menuData[128], itemName[MAX_NAME], itemId[6], menu = menu_create("\yWybierz \rItem \ydo \yMisji\w:", "select_handle");
 
-	for (new i = 1; i < cod_get_items_num(); i++) {
+	for (new i = 1; i <= cod_get_items_num(); i++) {
 		cod_get_item_name(i, itemName, charsmax(itemName));
 
 		formatex(menuData,charsmax(menuData), itemName);

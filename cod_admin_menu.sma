@@ -42,7 +42,7 @@ public plugin_init()
 
 public admin_menu(id)
 {
-	if (!(get_user_flags(id) & ACCESS_FLAG)) return PLUGIN_HANDLED;
+	if (!(cod_get_user_flags(id) & ACCESS_FLAG)) return PLUGIN_HANDLED;
 
 	new menu = menu_create("\yMenu \rAdmina\w:", "admin_menu_handle");
 
@@ -174,7 +174,7 @@ public select_item_menu(id)
 
 	new menuData[128], itemName[MAX_NAME], itemId[6], menu = menu_create("\yWybierz \rPrzedmiot\w:", "select_menu_handle");
 
-	for (new i = 1; i < cod_get_items_num(); i++) {
+	for (new i = 1; i <= cod_get_items_num(); i++) {
 		cod_get_item_name(i, itemName, charsmax(itemName));
 
 		formatex(menuData,charsmax(menuData), itemName);
@@ -307,7 +307,7 @@ public select_menu_handle(id, menu, item)
 
 public amount_handle(id)
 {
-	if (!is_user_connected(id) || !(get_user_flags(id) & ACCESS_FLAG)) return PLUGIN_HANDLED;
+	if (!is_user_connected(id) || !(cod_get_user_flags(id) & ACCESS_FLAG)) return PLUGIN_HANDLED;
 
 	if (!is_user_connected(selectedPlayer[id])) {
 		cod_print_chat(id, "Wybranego gracza nie ma juz na serwerze.");
