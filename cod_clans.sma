@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD Clans"
-#define VERSION "1.3.1"
+#define VERSION "1.3.2"
 #define AUTHOR "O'Zone"
 
 #define TASK_INFO 9843
@@ -1310,7 +1310,7 @@ public applications_confirm_menu(id, menu, item)
 		menu_additem(menu, "Przymij", userName);
 	}
 
-	menu_additem(menu, "Odrzuc");
+	menu_additem(menu, "Odrzuc", userName);
 
 	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
 
@@ -1331,7 +1331,7 @@ public applications_confirm_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	new userName[32], itemAccess, itemCallback;
+	new userName[MAX_NAME], itemAccess, itemCallback;
 
 	menu_item_getinfo(menu, item, itemAccess, userName, charsmax(userName), _, _, itemCallback);
 
