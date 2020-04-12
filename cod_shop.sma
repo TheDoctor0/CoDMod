@@ -333,23 +333,23 @@ public shop_menu_handle(id, menu, item)
 		} case ROCKET: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowa Rakiete^x01!");
 
-			cod_add_user_rockets(id, 1, ADDITIONAL);
+			cod_add_user_rockets(id, 1, ROUND);
 		} case MINE: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowa Mine^x01!");
 
-			cod_add_user_mines(id, 1, ADDITIONAL);
+			cod_add_user_mines(id, 1, ROUND);
 		} case DYNAMITE: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Dynamit^x01!");
 
-			cod_add_user_dynamites(id, 1, ADDITIONAL);
+			cod_add_user_dynamites(id, 1, ROUND);
 		} case MEDKIT: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowa Apteczke^x01!");
 
-			cod_add_user_medkits(id, 1, ADDITIONAL);
+			cod_add_user_medkits(id, 1, ROUND);
 		} case THUNDER: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Piorun^x01!");
 
-			cod_add_user_thunders(id, 1, ADDITIONAL);
+			cod_add_user_thunders(id, 1, ROUND);
 		} case TELEPORT: {
 			if (cod_get_user_teleports(id) == FULL) {
 				cod_print_chat(id, "Masz juz nielimitowany^x03 Teleport^x01!");
@@ -359,7 +359,7 @@ public shop_menu_handle(id, menu, item)
 
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Teleport^x01!");
 
-			cod_add_user_teleports(id, 1, ADDITIONAL);
+			cod_add_user_teleports(id, 1, ROUND);
 		} case JUMP: {
 			if (cod_get_user_multijumps(id) >= 3) {
 				cod_print_chat(id, "Mozesz miec maksymalnie^x03 3 Dodatkowe Skoki^x01!");
