@@ -1386,24 +1386,28 @@ public change_hud(id, sound)
 
 	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new menuData[128], menu = menu_create("\yKonfiguracja \rHUD\w", "change_hud_handle");
+	new menuData[128];
 
-	format(menuData, charsmax(menuData), "\wKolor \yCzerwony: \r%i", codPlayer[id][PLAYER_HUD_RED]);
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_HUD_TITLE");
+
+	new menu = menu_create(menuData, "change_hud_handle");
+
+	format(menuData, charsmax(menuData), "%L", id, "CORE_HUD_RED", codPlayer[id][PLAYER_HUD_RED]);
 	menu_additem(menu, menuData);
 
-	format(menuData, charsmax(menuData), "\wKolor \yZielony: \r%i", codPlayer[id][PLAYER_HUD_GREEN]);
+	format(menuData, charsmax(menuData), "%L", id, "CORE_HUD_GREEN", codPlayer[id][PLAYER_HUD_GREEN]);
 	menu_additem(menu, menuData);
 
-	format(menuData, charsmax(menuData), "\wKolor \yNiebieski: \r%i", codPlayer[id][PLAYER_HUD_BLUE]);
+	format(menuData, charsmax(menuData), "%L", id, "CORE_HUD_BLUE", codPlayer[id][PLAYER_HUD_BLUE]);
 	menu_additem(menu, menuData);
 
-	format(menuData, charsmax(menuData), "\wPolozenie \yOs X: \r%i%%", codPlayer[id][PLAYER_HUD_POSX]);
+	format(menuData, charsmax(menuData), "%L", id, "CORE_HUD_POSITION_X", codPlayer[id][PLAYER_HUD_POSX]);
 	menu_additem(menu, menuData);
 
-	format(menuData, charsmax(menuData), "\wPolozenie \yOs Y: \r%i%%^n", codPlayer[id][PLAYER_HUD_POSY]);
+	format(menuData, charsmax(menuData), "%L", id, "CORE_HUD_POSITION_Y", codPlayer[id][PLAYER_HUD_POSY]);
 	menu_additem(menu, menuData);
 
-	format(menuData, charsmax(menuData), "\yDomyslne \rUstawienia");
+	format(menuData, charsmax(menuData), "%L", id, "CORE_HUD_DEFAULT");
 	menu_additem(menu, menuData);
 
 	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_NEXT");
@@ -1475,21 +1479,48 @@ public show_binds(id, sound)
 
 	new menuData[128];
 
-	new menu = menu_create("\yInformacje o \rBindach\w", "show_binds_handle");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_BINDS_TITLE");
 
-	menu_additem(menu, "\wRakieta \y[\r+rocket\y]");
-	menu_additem(menu, "\wMina \y[\r+mine\y]");
-	menu_additem(menu, "\wDynamit \y[\r+dynamite\y]");
-	menu_additem(menu, "\wBlyskawica \y[\r+thunder\y]");
-	menu_additem(menu, "\wApteczka \y[\r+medkit\y]");
-	menu_additem(menu, "\wTrucizna \y[\r+poison\y]");
-	menu_additem(menu, "\wTeleport \y[\r+teleport\y]");
-	menu_additem(menu, "\wKlasa \y[\r+class\y]");
-	menu_additem(menu, "\wPrzedmiot \y[\r+item\y]");
-	menu_addtext(menu, "^nAby zbindowac uzycie \wumiejetnosci\y pod wybrany \wklawisz", 0);
-	menu_addtext(menu, "\ywpisz w \wkonsoli \rbind ^"klawisz^" ^"bind^"\y, np. \rbind ^"z^" ^"+rocket^"\y.", 0);
-	menu_addtext(menu, "\yMozesz zbindowac \wwiele \yumiejetnosci pod \wjeden klawisz\y.", 0);
-	menu_addtext(menu, "\yWystarczy, ze wpiszesz np. \rbind ^"z^" ^"+rocket;+mine;+dynamite^"\y.", 0);
+	new menu = menu_create(menuData, "show_binds_handle");
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_BINDS_ROCKET");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_BINDS_MINE");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_BINDS_DYNAMITE");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_BINDS_THUNDER");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_BINDS_MEDKIT");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_BINDS_POISON");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_BINDS_TELEPORT");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_BINDS_CLASS");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_BINDS_ITEM");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_BINDS_INFO");
+	menu_addtext(menu, menuData, 0);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_BINDS_INFO2");
+	menu_addtext(menu, menuData, 0);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_BINDS_INFO3");
+	menu_addtext(menu, menuData, 0);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_BINDS_INFO4");
+	menu_addtext(menu, menuData, 0);
 
 	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
 	menu_setprop(menu, MPROP_EXITNAME, menuData);
@@ -1533,6 +1564,7 @@ public level_top(id)
 	tempId[0] = id;
 
 	formatex(queryData, charsmax(queryData), "SELECT name, class, level, exp FROM `cod_mod` ORDER BY exp DESC LIMIT 15");
+
 	SQL_ThreadQuery(sql, "show_level_top", queryData, tempId, sizeof tempId);
 
 	return PLUGIN_HANDLED;
@@ -1553,12 +1585,12 @@ public show_level_top(failState, Handle:query, error[], errorNum, tempData[], da
 
 	new const rankColors[][] = { "#FFCC33", "#CCFFFF", "#8B4513" };
 
-	static motdData[2048], name[32], class[MAX_NAME], motdLength, rank, level, exp;
+	static motdData[2048], name[MAX_NAME], class[MAX_NAME], motdLength, rank, level, exp;
 
 	rank = 0;
 
 	motdLength = format(motdData, charsmax(motdData), "<html><body bgcolor=^"#666666^"><center><table style=^"color:#FFFFFF;width:600%^">");
-	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "<tr style=color:#000000;font-weight:bold;><td>#<td>Nick<td>Klasa<td>Poziom<td>Doswiadczenie");
+	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%L", id, "CORE_TOP15_TABLE");
 
 	while (SQL_MoreResults(query)) {
 		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), name, charsmax(name));
@@ -1578,7 +1610,9 @@ public show_level_top(failState, Handle:query, error[], errorNum, tempData[], da
 		SQL_NextRow(query);
 	}
 
-	show_motd(id, motdData, "Top15 Poziomow");
+	formatex(name, charsmax(name), "%L", id, "CORE_TOP15_TITLE");
+
+	show_motd(id, motdData, name);
 
 	return PLUGIN_HANDLED;
 }
@@ -1601,14 +1635,14 @@ public use_rocket(id)
 
 	if (!codPlayer[id][PLAYER_ROCKETS][ALL]) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.2, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Wykorzystales juz wszystkie rakiety!");
+		show_dhudmessage(id, "%L", id, "CORE_ROCKETS_USED");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (codPlayer[id][PLAYER_LAST_ROCKET] + 3.0 > get_gametime()) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.2, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Rakiet mozesz uzywac co 3 sekundy!");
+		show_dhudmessage(id, "%L", id, "CORE_ROCKETS_TIME");
 
 		return PLUGIN_HANDLED;
 	}
@@ -1672,28 +1706,28 @@ public use_mine(id)
 
 	if (!codPlayer[id][PLAYER_MINES][ALL]) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.23, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Wykorzystales juz wszystkie miny!");
+		show_dhudmessage(id, "%L", id, "CORE_MINES_USED");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (codPlayer[id][PLAYER_LAST_MINE] + 3.0 > get_gametime()) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.23, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Miny mozesz stawiac co 3 sekundy!");
+		show_dhudmessage(id, "%L", id, "CORE_MINES_TIME");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (!(pev(id, pev_flags) & FL_ONGROUND)) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.23, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Musisz stac na podlozu, aby podlozyc mine!");
+		show_dhudmessage(id, "%L", id, "CORE_MINES_GROUND");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (!is_enough_space(id, 80.0)) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.23, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Nie mozesz postawic miny w przejsciu!");
+		show_dhudmessage(id, "%L", id, "CORE_MINES_PASSAGE");
 
 		return PLUGIN_HANDLED;
 	}
@@ -1765,21 +1799,21 @@ public use_dynamite(id)
 
 	if (!codPlayer[id][PLAYER_DYNAMITES][ALL]) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.26, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Wykorzystales juz wszystkie dynamity!");
+		show_dhudmessage(id, "%L", id, "CORE_DYNAMITES_USED");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (codPlayer[id][PLAYER_LAST_DYNAMITE] + 3.0 > get_gametime()) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.26, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Dynamity mozesz klasc co 3 sekundy!");
+		show_dhudmessage(id, "%L", id, "CORE_DYNAMITES_TIME");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (!(pev(id, pev_flags) & FL_ONGROUND)) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.26, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Musisz stac na podlozu, aby postawic dynamit!");
+		show_dhudmessage(id, "%L", id, "CORE_DYNAMITES_GROUND");
 
 		return PLUGIN_HANDLED;
 	}
@@ -1827,14 +1861,14 @@ public use_medkit(id)
 
 	if (!codPlayer[id][PLAYER_MEDKITS][ALL]) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.29, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Wykorzystales juz wszystkie apteczki!");
+		show_dhudmessage(id, "%L", id, "CORE_MEDKITS_USED");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (codPlayer[id][PLAYER_LAST_MEDKIT] + 3.0 > get_gametime()) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.29, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Apteczki mozesz klasc co 3 sekundy!");
+		show_dhudmessage(id, "%L", id, "CORE_MEDKITS_TIME");
 
 		return PLUGIN_HANDLED;
 	}
@@ -1918,14 +1952,14 @@ public use_poison(id)
 
 	if (!codPlayer[id][PLAYER_POISONS][ALL]) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.32, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Wykorzystales juz wszystkie trucizny!");
+		show_dhudmessage(id, "%L", id, "CORE_POISONS_USED");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (codPlayer[id][PLAYER_LAST_POISON] + 3.0 > get_gametime()) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.32, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Trucizny mozesz klasc co 3 sekundy!");
+		show_dhudmessage(id, "%L", id, "CORE_POISONS_TIME");
 
 		return PLUGIN_HANDLED;
 	}
@@ -2009,7 +2043,7 @@ public use_thunder(id)
 
 	if (!codPlayer[id][PLAYER_THUNDERS][ALL]) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Wykorzystales juz wszystkie pioruny!");
+		show_dhudmessage(id, "%L", id, "CORE_THUNDERS_USED");
 
 		return PLUGIN_HANDLED;
 	}
@@ -2022,7 +2056,7 @@ public use_thunder(id)
 
 	if (codPlayer[id][PLAYER_LAST_THUNDER] + 3.0 > get_gametime()) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Piorunow mozesz uzywac co 3 sekundy!");
+		show_dhudmessage(id, "%L", id, "CORE_THUNDERS_TIME");
 
 		return PLUGIN_HANDLED;
 	}
@@ -2085,21 +2119,21 @@ public use_teleport(id)
 
 	if (codPlayer[id][PLAYER_TELEPORTS][ALL] == 0) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.38, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Wykorzystales juz wszystkie teleporty!");
+		show_dhudmessage(id, "%L", id, "CORE_TELEPORTS_USED");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (roundStart + 15.0 > get_gametime()) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.38, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Teleportowac mozesz sie po 15 sekundach od rozpoczecia rundy!");
+		show_dhudmessage(id, "%L", id, "CORE_TELEPORTS_ROUND");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (codPlayer[id][PLAYER_LAST_TELEPORT] + 15.0 > get_gametime()) {
 		set_dhudmessage(0, 255, 210, -1.0, 0.38, 0, 0.0, 1.25, 0.0, 0.0);
-		show_dhudmessage(id, "Teleportowac mozesz sie co 15 sekund!");
+		show_dhudmessage(id, "%L", id, "CORE_TELEPORTS_TIME");
 
 		return PLUGIN_HANDLED;
 	}
@@ -2197,7 +2231,7 @@ public show_block_info(id)
 		return;
 	}
 
-	client_print(id, print_center, "Umiejetnosci zostana odblokowane za %0.1fs", currentTime);
+	client_print(id, print_center, "%L", id, "CORE_BLOCK_INFO", currentTime);
 }
 
 public player_spawn(id)
