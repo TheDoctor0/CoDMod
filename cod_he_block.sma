@@ -60,8 +60,6 @@ public show_info(id)
 		return;
 	}
 
-	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
-
 	client_print(id, print_center, "%L", id, "HE_BLOCK_TIME", currentTime);
 }
 

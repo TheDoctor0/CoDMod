@@ -108,7 +108,7 @@ enum _:playerInfo { PLAYER_CLASS, PLAYER_NEW_CLASS, PLAYER_PROMOTION_ID, PLAYER_
 	PLAYER_STR, PLAYER_COND, PLAYER_POINTS, PLAYER_POINTS_SPEED, PLAYER_EXTRA_HEAL, PLAYER_EXTRA_INT, PLAYER_EXTRA_STAM, PLAYER_EXTRA_STR, PLAYER_EXTRA_COND, PLAYER_EXTRA_WEAPONS, PLAYER_WEAPON,
 	PLAYER_WEAPONS, PLAYER_STATUS, PLAYER_ITEM, PLAYER_ITEM_DURA, PLAYER_DYNAMITE, PLAYER_LEFT_JUMPS, PLAYER_SPAWNED, PLAYER_DAMAGE_TAKEN, PLAYER_DAMAGE_GIVEN, PLAYER_RENDER, PLAYER_KS,
 	PLAYER_TIME_KS, PLAYER_ALIVE, PLAYER_FLAGS, Float:PLAYER_LAST_ROCKET, Float:PLAYER_LAST_MINE, Float:PLAYER_LAST_DYNAMITE, Float:PLAYER_LAST_MEDKIT, Float:PLAYER_LAST_POISON, Float:PLAYER_LAST_THUNDER,
-	Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, SKILL_USE, PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1],
+	Float:PLAYER_LAST_TELEPORT, PLAYER_HUD_RED, PLAYER_HUD_GREEN, PLAYER_HUD_BLUE, PLAYER_HUD_POSX, PLAYER_HUD_POSY, SKILL_USE, HIT_PLACE[MAX_PLAYERS + 1], PLAYER_ROCKETS[ALL + 1], PLAYER_MINES[ALL + 1], PLAYER_DYNAMITES[ALL + 1],
 	PLAYER_MEDKITS[ALL + 1], PLAYER_POISONS[ALL + 1], PLAYER_THUNDERS[ALL + 1], PLAYER_TELEPORTS[ALL + 1], PLAYER_JUMPS[ALL + 1], PLAYER_BUNNYHOP[ALL + 1], PLAYER_FOOTSTEPS[ALL + 1], PLAYER_MODEL[ALL + 1],
 	PLAYER_RESISTANCE[ALL + 1], PLAYER_GODMODE[ALL + 1], PLAYER_NOCLIP[ALL + 1], PLAYER_UNLIMITED_AMMO[ALL + 1], PLAYER_UNLIMITED_AMMO_WEAPONS[ALL + 1], PLAYER_ELIMINATOR[ALL + 1], PLAYER_ELIMINATOR_WEAPONS[ALL + 1],
 	PLAYER_REDUCER[ALL + 1], PLAYER_REDUCER_WEAPONS[ALL + 1], Float:PLAYER_GRAVITY[ALL + 1], Float:PLAYER_SPEED[ALL + 1], PLAYER_NAME[MAX_NAME], PLAYER_SAFE_NAME[MAX_SAFE_NAME] };
@@ -2277,6 +2277,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 	if (!(0 < inflictor <= MAX_PLAYERS)) weapon = CSW_HEGRENADE;
 
 	hitPlace = get_pdata_int(victim, 75, 5);
+	codPlayer[victim][HIT_PLACE][attacker] = hitPlace;
 
 	if (codPlayer[victim][PLAYER_CLASS]) {
 		damage -= damage * (get_stamina(victim) / 4.0) / 100.0;
@@ -2398,6 +2399,7 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 	if (!(0 < inflictor <= MAX_PLAYERS)) weapon = CSW_HEGRENADE;
 
 	hitPlace = get_pdata_int(victim, 75, 5);
+	codPlayer[victim][HIT_PLACE][attacker] = hitPlace;
 
 	ExecuteForward(codForwards[DAMAGE_POST], ret, attacker, victim, weapon, damage, damageBits, hitPlace);
 
@@ -2446,7 +2448,7 @@ public player_death(killer, victim, weapon, hitPlace)
 
 			get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
-			chat_print(killer, "Zabiles%s^x03 %s^x04 (%s - %i)^x01, dostajesz^x03 %i^x01 doswiadczenia.", hitPlace == HIT_HEAD ? " z HS" : "", codPlayer[victim][PLAYER_NAME], className, codPlayer[victim][PLAYER_LEVEL], exp);
+			chat_print(killer, "Zabiles%s gracza^x03 %s^x04 (%s - %i)^x01, dostajesz^x03 %i^x01 doswiadczenia.", hitPlace == HIT_HEAD ? " z HS" : "", codPlayer[victim][PLAYER_NAME], className, codPlayer[victim][PLAYER_LEVEL], exp);
 
 			set_dhudmessage(255, 206, 85, -1.0, 0.6, 0, 0.0, 2.0, 0.0, 0.0);
 			show_dhudmessage(killer, "+%i XP", exp);
@@ -2463,7 +2465,7 @@ public player_death(killer, victim, weapon, hitPlace)
 	} else {
 		get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
-		chat_print(killer, "Zabiles^x03 %s^x04 (%s - %i)^x01.", codPlayer[victim][PLAYER_NAME], className, codPlayer[victim][PLAYER_LEVEL]);
+		chat_print(killer, "Zabiles%s gracza^x03 %s^x04 (%s - %i)^x01.", hitPlace == HIT_HEAD ? " z HS" : "", codPlayer[victim][PLAYER_NAME], className, codPlayer[victim][PLAYER_LEVEL]);
 	}
 
 	get_user_class_info(killer, codPlayer[killer][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
@@ -2614,7 +2616,12 @@ public new_round()
 
 		codPlayer[i][PLAYER_SPAWNED] = false;
 
-		for (new j = 1; j <= MAX_PLAYERS; j++) remove_task(i + j + TASK_DAMAGE);
+		for (new j = 1; j <= MAX_PLAYERS; j++) {
+			remove_task(i + j + TASK_DAMAGE);
+
+			codPlayer[i][HIT_PLACE][j] = HIT_GENERIC;
+			codPlayer[j][HIT_PLACE][i] = HIT_GENERIC;
+		}
 	}
 
 	execute_forward_ignore(codForwards[NEW_ROUND]);
@@ -5018,7 +5025,7 @@ public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
 
 		data[0] = attacker;
 		data[1] = victim;
-		data[2] = HIT_GENERIC;
+		data[2] = codPlayer[victim][HIT_PLACE][attacker];
 
 		remove_task(victim + TASK_DEATH);
 
@@ -5035,7 +5042,7 @@ public check_player_death(data[])
 	if (get_user_health(victim) <= 0) {
 		codPlayer[victim][PLAYER_ALIVE] = false;
 
-		player_death(attacker, victim, data[2], HIT_GENERIC);
+		player_death(attacker, victim, HIT_GENERIC, data[2]);
 	} else if (!codPlayer[victim][PLAYER_DAMAGE_TAKEN]) {
 		codPlayer[victim][PLAYER_DAMAGE_TAKEN] = true;
 
