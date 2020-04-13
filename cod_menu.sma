@@ -70,8 +70,8 @@ public display_menu(id)
 
 	new menu = menu_create(menuData, "display_menu_handle");
 
-	for (new i; i < ArraySize(menuData); i++) {
-		ArrayGetString(menuTitles, i, menuData, charsmax(menuTitle));
+	for (new i; i < ArraySize(menuTitles); i++) {
+		ArrayGetString(menuTitles, i, menuData, charsmax(menuData));
 
 		menu_additem(menu, menuData);
 	}
@@ -80,7 +80,7 @@ public display_menu(id)
 	menu_setprop(menu, MPROP_EXITNAME, menuData);
 
 	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_PREVIOUS");
-	menu_setprop(menu, MPROP_BACKNAME, factionName);
+	menu_setprop(menu, MPROP_BACKNAME, menuData);
 
 	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_NEXT");
 	menu_setprop(menu, MPROP_NEXTNAME, menuData);

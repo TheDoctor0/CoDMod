@@ -707,7 +707,7 @@ public select_faction(id)
 		menu_setprop(menu, MPROP_EXITNAME, menuData);
 
 		formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_PREVIOUS");
-		menu_setprop(menu, MPROP_BACKNAME, factionName);
+		menu_setprop(menu, MPROP_BACKNAME, menuData);
 
 		formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_NEXT");
 		menu_setprop(menu, MPROP_NEXTNAME, menuData);

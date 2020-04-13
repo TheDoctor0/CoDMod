@@ -91,6 +91,10 @@ STATS_TIME_TEXT=%i h %i min %i s
 HE_BLOCK_TIME=Grenades will be unlocked in %0.1fs
 MENU_FILE_ERROR=No file cod_menu.ini found with content of main menu!
 MENU_DISPLAY_TITLE=\yMenu \rCoD Mod\w
+VIP_MOTD=Information about VIP
+VIP_LIST=^3VIPs^1 on server:^4 %s
+VIP_KILL=Kill! +10HP
+VIP_KILL_HS=HeadShot! +15HP
 
 [pl]
 CORE_MESSAGE=^4[COD]^1 %s
@@ -185,3 +189,7 @@ STATS_TIME_TEXT=%i h %i min %i s
 HE_BLOCK_TIME=Granaty zostana odblokowane za %0.1fs
 MENU_FILE_ERROR=Brak pliku cod_menu.ini z zawartoscia glownego menu!
 MENU_DISPLAY_TITLE=\yMenu \rCoD Mod\w
+VIP_MOTD=Informacje o VIPie
+VIP_LIST=^3VIPy^1 na serwerze:^4 %s
+VIP_KILL=Zabiles! +10HP
+VIP_KILL_HS=HeadShot! +15HP
