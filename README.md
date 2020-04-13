@@ -1,5 +1,8 @@
 # CoD Mod
-New generation of Call of Duty Mod for Counter-Strike 1.6 (AMXX 1.8.3 / 1.9).
+Call of Duty Mod for Counter-Strike 1.6 (AMXX 1.8.3 / 1.9 / 1.10).
+
+[Release pack](https://github.com/TheDoctor0/
+CoDMod/releases/latest) contains configuration and plugins with all needed resources: models, sounds, sprites etc.
 
 Feel free to suggest new functionality, changes and of course please report any found bugs.
 
@@ -7,6 +10,7 @@ Feel free to suggest new functionality, changes and of course please report any 
 Mod was tested on AMXX builds:
 - 1.8.3-dev+5142
 - 1.9-dev+5235
+- 1.10-dev+5392
 
 In both cases with ReHLDS and ReGameDLL also installed.
 
