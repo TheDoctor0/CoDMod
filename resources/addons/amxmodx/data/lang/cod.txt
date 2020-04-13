@@ -89,6 +89,8 @@ CORE_TELEPORTS_ROUND=You have to wait to use teleport 15 seconds after round sta
 CORE_BLOCK_INFO=The skills will be unlocked in %0.1fs
 STATS_TIME_TEXT=%i h %i min %i s
 HE_BLOCK_TIME=Grenades will be unlocked in %0.1fs
+MENU_FILE_ERROR=No file cod_menu.ini found with content of main menu!
+MENU_DISPLAY_TITLE=\yMenu \rCoD Mod\w
 
 [pl]
 CORE_MESSAGE=^4[COD]^1 %s
@@ -181,3 +183,5 @@ CORE_TELEPORTS_ROUND=Teleportowac mozesz sie po 15 sekundach od rozpoczecia rund
 CORE_BLOCK_INFO=Umiejetnosci zostana odblokowane za %0.1fs
 STATS_TIME_TEXT=%i h %i min %i s
 HE_BLOCK_TIME=Granaty zostana odblokowane za %0.1fs
+MENU_FILE_ERROR=Brak pliku cod_menu.ini z zawartoscia glownego menu!
+MENU_DISPLAY_TITLE=\yMenu \rCoD Mod\w

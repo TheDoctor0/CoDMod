@@ -2,10 +2,11 @@
 #include <cod>
 
 #define PLUGIN "CoD Menu"
-#define VERSION "1.1.1"
+#define VERSION "1.1.2"
 #define AUTHOR "O'Zone"
 
-new const commandMenu[][] = { "say /help", "say_team /help", "say /pomoc", "say_team /pomoc", "say /komendy", "say_team /komendy", "say /menu", "say_team /menu", "menu" };
+new const commandMenu[][] = { "say /help", "say_team /help", "say /pomoc", "say_team /pomoc", "say /commands",
+	"say_team /commands", "say /komendy", "say_team /komendy", "say /menu", "say_team /menu", "menu" };
 
 new Array:menuTitles, Array:menuCommands;
 
@@ -26,7 +27,13 @@ public plugin_cfg()
 	get_localinfo("amxx_configsdir", menuFile, charsmax(menuFile));
 	format(menuFile, charsmax(menuFile), "%s/cod_menu.ini", menuFile);
 
-	if (!file_exists(menuFile)) set_fail_state("[CoD Menu] Brak pliku cod_menu.ini z zawartoscia glownego menu!");
+	if (!file_exists(menuFile)) {
+		new failState[64];
+
+		formatex(failState, charsmax(failState), "%L", LANG_SERVER, "MENU_FILE_ERROR");
+
+		set_fail_state(failState);
+	}
 
 	new lineContent[128], menuTitle[64], menuCommand[64], file = fopen(menuFile, "r");
 
@@ -57,17 +64,26 @@ public display_menu(id)
 
 	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
 
-	new menuTitle[64], menu = menu_create("\yMenu \rCoD Mod\w", "display_menu_handle");
+	new menuData[64];
 
-	for (new i; i < ArraySize(menuTitles); i++) {
-		ArrayGetString(menuTitles, i, menuTitle, charsmax(menuTitle));
+	formatex(menuData, charsmax(menuData), "%L", id, "MENU_DISPLAY_TITLE");
 
-		menu_additem(menu, menuTitle);
+	new menu = menu_create(menuData, "display_menu_handle");
+
+	for (new i; i < ArraySize(menuData); i++) {
+		ArrayGetString(menuTitles, i, menuData, charsmax(menuTitle));
+
+		menu_additem(menu, menuData);
 	}
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
-	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
+	menu_setprop(menu, MPROP_EXITNAME, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_PREVIOUS");
+	menu_setprop(menu, MPROP_BACKNAME, factionName);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_NEXT");
+	menu_setprop(menu, MPROP_NEXTNAME, menuData);
 
 	menu_display(id, menu);
 

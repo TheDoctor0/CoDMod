@@ -703,14 +703,14 @@ public select_faction(id)
 			menu_additem(menu, factionName, factionName);
 		}
 
-		formatex(factionName, charsmax(factionName), "%L", id, "CORE_MENU_EXIT");
-		menu_setprop(menu, MPROP_EXITNAME, factionName);
+		formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
+		menu_setprop(menu, MPROP_EXITNAME, menuData);
 
-		formatex(factionName, charsmax(factionName), "%L", id, "CORE_MENU_PREVIOUS");
+		formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_PREVIOUS");
 		menu_setprop(menu, MPROP_BACKNAME, factionName);
 
-		formatex(factionName, charsmax(factionName), "%L", id, "CORE_MENU_NEXT");
-		menu_setprop(menu, MPROP_NEXTNAME, factionName);
+		formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_NEXT");
+		menu_setprop(menu, MPROP_NEXTNAME, menuData);
 
 		menu_display(id, menu);
 	} else select_class(id);
