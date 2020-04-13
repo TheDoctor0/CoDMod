@@ -333,23 +333,23 @@ public shop_menu_handle(id, menu, item)
 		} case ROCKET: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowa Rakiete^x01!");
 
-			cod_add_user_rockets(id, 1, ROUND);
+			cod_add_user_rockets(id, 1, DEATH);
 		} case MINE: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowa Mine^x01!");
 
-			cod_add_user_mines(id, 1, ROUND);
+			cod_add_user_mines(id, 1, DEATH);
 		} case DYNAMITE: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Dynamit^x01!");
 
-			cod_add_user_dynamites(id, 1, ROUND);
+			cod_add_user_dynamites(id, 1, DEATH);
 		} case MEDKIT: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowa Apteczke^x01!");
 
-			cod_add_user_medkits(id, 1, ROUND);
+			cod_add_user_medkits(id, 1, DEATH);
 		} case THUNDER: {
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Piorun^x01!");
 
-			cod_add_user_thunders(id, 1, ROUND);
+			cod_add_user_thunders(id, 1, DEATH);
 		} case TELEPORT: {
 			if (cod_get_user_teleports(id) == FULL) {
 				cod_print_chat(id, "Masz juz nielimitowany^x03 Teleport^x01!");
@@ -359,7 +359,7 @@ public shop_menu_handle(id, menu, item)
 
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Teleport^x01!");
 
-			cod_add_user_teleports(id, 1, ROUND);
+			cod_add_user_teleports(id, 1, DEATH);
 		} case JUMP: {
 			if (cod_get_user_multijumps(id) >= 3) {
 				cod_print_chat(id, "Mozesz miec maksymalnie^x03 3 Dodatkowe Skoki^x01!");
@@ -369,7 +369,7 @@ public shop_menu_handle(id, menu, item)
 
 			cod_print_chat(id, "Kupiles^x03 Dodatkowy Skok^x01!");
 
-			cod_add_user_multijumps(id, 1, ROUND);
+			cod_add_user_multijumps(id, 1, DEATH);
 		} case BUNNY_HOP: {
 			if (cod_get_user_bunnyhop(id)) {
 				cod_print_chat(id, "Masz juz ^x03 Bunny Hop^x01!");
@@ -379,7 +379,7 @@ public shop_menu_handle(id, menu, item)
 
 			cod_print_chat(id, "Kupiles^x03 BunnyHop^x01!");
 
-			cod_set_user_bunnyhop(id, 1, ROUND);
+			cod_set_user_bunnyhop(id, 1, DEATH);
 		} case SILENT: {
 			if (cod_get_user_footsteps(id)) {
 				cod_print_chat(id, "Masz juz ^x03 Ciche Chodzenie^x01!");
@@ -389,7 +389,7 @@ public shop_menu_handle(id, menu, item)
 
 			cod_print_chat(id, "Kupiles^x03 Ciche Chodzenie^x01!");
 
-			cod_set_user_footsteps(id, 1, ROUND);
+			cod_set_user_footsteps(id, 1, DEATH);
 		} case ARMOR: {
 			if (cod_get_user_armor(id) >= 300) {
 				cod_print_chat(id, "Mozesz miec maksymalnie^x03 300 Pancerza^x01!");
@@ -419,7 +419,7 @@ public shop_menu_handle(id, menu, item)
 
 			cod_print_chat(id, "Kupiles^x03 Peleryne Niewidke^x01!");
 
-			cod_set_user_render(id, 0, ROUND);
+			cod_set_user_render(id, 0, DEATH);
 		}
 	}
 
