@@ -88,6 +88,7 @@ CORE_TELEPORTS_TIME=The teleport can be used every 15 seconds!
 CORE_TELEPORTS_ROUND=You have to wait to use teleport 15 seconds after round start!
 CORE_BLOCK_INFO=The skills will be unlocked in %0.1fs
 STATS_TIME_TEXT=%i h %i min %i s
+HE_BLOCK_TIME=Grenades will be unlocked in %0.1fs
 
 [pl]
 CORE_MESSAGE=^4[COD]^1 %s
@@ -179,3 +180,4 @@ CORE_TELEPORTS_TIME=Teleportowac mozesz sie co 15 sekund!
 CORE_TELEPORTS_ROUND=Teleportowac mozesz sie po 15 sekundach od rozpoczecia rundy!
 CORE_BLOCK_INFO=Umiejetnosci zostana odblokowane za %0.1fs
 STATS_TIME_TEXT=%i h %i min %i s
+HE_BLOCK_TIME=Granaty zostana odblokowane za %0.1fs
