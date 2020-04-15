@@ -1,8 +1,7 @@
 # CoD Mod
 Call of Duty Mod for Counter-Strike 1.6 (AMXX 1.8.3 / 1.9 / 1.10).
 
-[Release pack](https://github.com/TheDoctor0/
-CoDMod/releases/latest) contains configuration and plugins with all needed resources: models, sounds, sprites etc.
+[Release pack](https://github.com/TheDoctor0/CoDMod/releases/latest) contains configuration and plugins with all needed resources: models, sounds, sprites etc.
 
 Feel free to suggest new functionality, changes and of course please report any found bugs.
 
