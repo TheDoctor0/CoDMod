@@ -300,8 +300,8 @@ public show_time(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 		hours++;
 	}
 
-	cod_print_chat(id, "Spedziles na serwerze lacznie^x04 %i h %i min %i s^x01.", hours, minutes, seconds);
-	cod_print_chat(id, "Zajmujesz^x04 %i/%i^x01 miejsce w rankingu czasu gry.", rank, count);
+	cod_print_chat(id, "Spedziles na serwerze lacznie^4 %i h %i min %i s^1.", hours, minutes, seconds);
+	cod_print_chat(id, "Zajmujesz^4 %i/%i^1 miejsce w rankingu czasu gry.", rank, count);
 
 	return PLUGIN_HANDLED;
 }
@@ -430,14 +430,14 @@ public show_best_stats(failState, Handle:query, error[], errorNum, tempId[], dat
 	new rank = SQL_ReadResult(query, 0) + 1, players = SQL_ReadResult(query, 1);
 
 	if (playerStats[id][CURRENT_STATS] > playerStats[id][BEST_STATS]) {
-		cod_print_chat(id, "Twoje najlepsze staty to^x04 %i^x01 zabic (w tym^x04 %i^x01 z HS) i^x04 %i^x01 zgonow^x01.",
+		cod_print_chat(id, "Twoje najlepsze staty to^4 %i^1 zabic (w tym^4 %i^1 z HS) i^4 %i^1 zgonow^1.",
 			playerStats[id][CURRENT_KILLS], playerStats[id][CURRENT_HS_KILLS], playerStats[id][CURRENT_DEATHS]);
 	} else {
-		cod_print_chat(id, "Twoje najlepsze staty to^x04 %i^x01 zabic (w tym^x04 %i^x01 z HS) i^x04 %i^x01 zgonow^x01.",
+		cod_print_chat(id, "Twoje najlepsze staty to^4 %i^1 zabic (w tym^4 %i^1 z HS) i^4 %i^1 zgonow^1.",
 			playerStats[id][BEST_KILLS], playerStats[id][BEST_HS_KILLS], playerStats[id][BEST_DEATHS]);
 	}
 
-	cod_print_chat(id, "Zajmujesz^x04 %i/%i^x01 miejsce w rankingu najlepszych statystyk.", rank, players);
+	cod_print_chat(id, "Zajmujesz^4 %i/%i^1 miejsce w rankingu najlepszych statystyk.", rank, players);
 
 	return PLUGIN_HANDLED;
 }
@@ -530,8 +530,8 @@ public show_medals(failState, Handle:query, error[], errorNum, tempId[], dataSiz
 
 	new rank = SQL_ReadResult(query, 0) + 1, players = SQL_ReadResult(query, 1);
 
-	cod_print_chat(id, "Twoje medale:^x04 %i Zlote^x01,^x04 %i Srebre^x01,^x04 %i Brazowe^x01.", playerStats[id][GOLD], playerStats[id][SILVER], playerStats[id][BRONZE]);
-	cod_print_chat(id, "Zajmujesz^x04 %i/%i^x01 miejsce w rankingu medalowym.", rank, players);
+	cod_print_chat(id, "Twoje medale:^4 %i Zlote^1,^4 %i Srebre^1,^4 %i Brazowe^1.", playerStats[id][GOLD], playerStats[id][SILVER], playerStats[id][BRONZE]);
+	cod_print_chat(id, "Zajmujesz^4 %i/%i^1 miejsce w rankingu medalowym.", rank, players);
 
 	return PLUGIN_HANDLED;
 }
@@ -666,18 +666,18 @@ public check_time(id)
 
 	unix_to_time(time, currentYear, currentMonth, currentDay, hour, minute, second, UT_TIMEZONE_SERVER);
 
-	cod_print_chat(id, "Aktualnie jest godzina^x03 %02d:%02d:%02d (Data: %02d.%02d.%02d)^x01.", hour, minute, second, currentDay, currentMonth, currentYear);
+	cod_print_chat(id, "Aktualnie jest godzina^3 %02d:%02d:%02d (Data: %02d.%02d.%02d)^1.", hour, minute, second, currentDay, currentMonth, currentYear);
 
-	if (playerStats[id][FIRST_VISIT] == playerStats[id][LAST_VISIT]) cod_print_chat(id, "To twoja^x03 pierwsza wizyta^x01 na serwerze. Zyczymy milej gry!" );
+	if (playerStats[id][FIRST_VISIT] == playerStats[id][LAST_VISIT]) cod_print_chat(id, "To twoja^3 pierwsza wizyta^1 na serwerze. Zyczymy milej gry!" );
 	else {
 		unix_to_time(playerStats[id][LAST_VISIT], lastYear, lastMonth, lastDay, hour, minute, second, UT_TIMEZONE_SERVER);
 
 		if (currentYear == lastYear && currentMonth == lastMonth && currentDay == lastDay) {
-			cod_print_chat(id, "Twoja ostatnia wizyta miala miejsce^x04 dzisiaj^x01 o^x03 %02d:%02d:%02d^x01. Zyczymy milej gry!", hour, minute, second);
+			cod_print_chat(id, "Twoja ostatnia wizyta miala miejsce^4 dzisiaj^1 o^3 %02d:%02d:%02d^1. Zyczymy milej gry!", hour, minute, second);
 		} else if (currentYear == lastYear && currentMonth == lastMonth && (currentDay - 1) == lastDay) {
-			cod_print_chat(id, "Twoja ostatnia wizyta miala miejsce^x04 wczoraj^x01 o^x03 %02d:%02d:%02d^x01. Zyczymy milej gry!", hour, minute, second);
+			cod_print_chat(id, "Twoja ostatnia wizyta miala miejsce^4 wczoraj^1 o^3 %02d:%02d:%02d^1. Zyczymy milej gry!", hour, minute, second);
 		} else {
-			cod_print_chat(id, "Twoja ostatnia wizyta:^x03 %02d:%02d:%02d (Data: %02d.%02d.%02d)^x01. Zyczymy milej gry!", hour, minute, second, lastDay, lastMonth, lastYear);
+			cod_print_chat(id, "Twoja ostatnia wizyta:^3 %02d:%02d:%02d (Data: %02d.%02d.%02d)^1. Zyczymy milej gry!", hour, minute, second, lastDay, lastMonth, lastYear);
 		}
 	}
 }
@@ -738,7 +738,7 @@ public cod_new_round()
 
 		get_user_name(bestRoundId, bestRoundName, charsmax(bestRoundName));
 
-		cod_print_chat(0, "^x03%s^x01 byl najlepszym graczem rundy. Ustrzelil^x04 %i^x01 frag%s, w tym^x04 %i^x01 z HeadShotem.", bestRoundName, bestRoundFrags, bestRoundFrags > 1 ? "i" : "a", bestRoundHS);
+		cod_print_chat(0, "^3%s^1 byl najlepszym graczem rundy. Ustrzelil^4 %i^1 frag%s, w tym^4 %i^1 z HeadShotem.", bestRoundName, bestRoundFrags, bestRoundFrags > 1 ? "i" : "a", bestRoundHS);
 	}
 
 	if (is_user_connected(bestId)) {
@@ -746,7 +746,7 @@ public cod_new_round()
 
 		get_user_name(bestId, bestName, charsmax(bestName));
 
-		cod_print_chat(0, "^x03%s^x01 prowadzi w grze z^x04 %i^x01 fragami i^x04 %i^x01 zgonami.", bestName, bestFrags, bestDeaths);
+		cod_print_chat(0, "^3%s^1 prowadzi w grze z^4 %i^1 fragami i^4 %i^1 zgonami.", bestName, bestFrags, bestDeaths);
 	}
 }
 
@@ -795,8 +795,8 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 			cod_set_user_exp(killer, exp);
 
-			cod_print_chat(killer, "Zemsciles sie na^x03 %s^x01. Dostajesz fraga i^x03 %i^x01 expa!", nameVictim, exp);
-		} else cod_print_chat(killer, "Zemsciles sie na^x03 %s^x01. Dostajesz fraga!", nameVictim);
+			cod_print_chat(killer, "Zemsciles sie na^3 %s^1. Dostajesz fraga i^3 %i^1 expa!", nameVictim, exp);
+		} else cod_print_chat(killer, "Zemsciles sie na^3 %s^1. Dostajesz fraga!", nameVictim);
 	}
 
 	if (cvarAssistEnabled) {
@@ -830,8 +830,8 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 				cod_set_user_exp(assist, exp);
 
-				cod_print_chat(assist, "Pomogles^x03 %s^x01 w zabiciu^x03 %s^x01. Dostajesz fraga i^x03 %i^x01 expa!", nameKiller, nameVictim, exp);
-			} else cod_print_chat(assist, "Pomogles^x03 %s^x01 w zabiciu^x03 %s^x01. Dostajesz fraga!", nameKiller, nameVictim);
+				cod_print_chat(assist, "Pomogles^3 %s^1 w zabiciu^3 %s^1. Dostajesz fraga i^3 %i^1 expa!", nameKiller, nameVictim, exp);
+			} else cod_print_chat(assist, "Pomogles^3 %s^1 w zabiciu^3 %s^1. Dostajesz fraga!", nameKiller, nameVictim);
 		}
 	}
 
@@ -966,7 +966,7 @@ public cod_end_map()
 
 		new const medals[][] = { "Brazowy", "Srebrny", "Zloty" };
 
-		cod_print_chat(0, "Gratulacje dla^x03 Najlepszych Graczy^x01!");
+		cod_print_chat(0, "Gratulacje dla^3 Najlepszych Graczy^1!");
 
 		for (new i = 2; i >= 0; i--) {
 			if (!is_user_connected(winnersId[i])) continue;
@@ -991,8 +991,10 @@ public cod_end_map()
 			if (get_playersnum() >= cvarMinPlayers && exp) {
 				cod_set_user_exp(winnersId[i], exp);
 
-				cod_print_chat(0, "^x03 %s^x01 -^x03 %i^x01 Zabojstw - %s Medal (+^x03%i^x01 Doswiadczenia).", playerName, winnersFrags[i], medals[i], exp);
-			} else cod_print_chat(0, "^x03 %s^x01 -^x03 %i^x01 Zabojstw - %s Medal.", playerName, winnersFrags[i], medals[i]);
+				cod_print_chat(0, "^3 %s^1 -^3 %i^1 Zabojstw - %s Medal (+^3%i^1 Doswiadczenia).", playerName, winnersFrags[i], medals[i], exp);
+			} else {
+				cod_print_chat(0, "^3 %s^1 -^3 %i^1 Zabojstw - %s Medal.", playerName, winnersFrags[i], medals[i]);
+			}
 		}
 	}
 
@@ -1018,9 +1020,9 @@ public say_text(msgId, msgDest, msgEnt)
 		if (rank > 3) return PLUGIN_CONTINUE;
 
 		switch (rank) {
-			case 1: formatex(chatPrefix, charsmax(chatPrefix), "^x04[TOP1]");
-			case 2: formatex(chatPrefix, charsmax(chatPrefix), "^x04[TOP2]");
-			case 3: formatex(chatPrefix, charsmax(chatPrefix), "^x04[TOP3]");
+			case 1: formatex(chatPrefix, charsmax(chatPrefix), "^4[TOP1]");
+			case 2: formatex(chatPrefix, charsmax(chatPrefix), "^4[TOP2]");
+			case 3: formatex(chatPrefix, charsmax(chatPrefix), "^4[TOP3]");
 		}
 
 		if (!equal(tempMessage, "#Cstrike_Chat_All")) {
@@ -1034,9 +1036,9 @@ public say_text(msgId, msgDest, msgEnt)
 	        set_msg_arg_string(4, "");
 
 	        add(message, charsmax(message), chatPrefix);
-	        add(message, charsmax(message), "^x03 ");
+	        add(message, charsmax(message), "^3 ");
 	        add(message, charsmax(message), playerName);
-	        add(message, charsmax(message), "^x01 :  ");
+	        add(message, charsmax(message), "^1 :  ");
 	        add(message, charsmax(message), tempMessage);
 		}
 

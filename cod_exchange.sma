@@ -65,11 +65,11 @@ public exchange_menu_handle(id, menu, item)
 			if (get_bit(id, blockExchange)) {
 				rem_bit(id, blockExchange);
 
-				cod_print_chat(id, "^x03Odblokowales^x01 mozliwosc wysylania ci propozycji wymiany przedmiotu!");
+				cod_print_chat(id, "^3Odblokowales^1 mozliwosc wysylania ci propozycji wymiany przedmiotu!");
 			} else {
 				set_bit(id, blockExchange);
 
-				cod_print_chat(id, "^x03Zablokowales^x01 mozliwosc wysylania ci propozycji wymiany przedmiotu!");
+				cod_print_chat(id, "^3Zablokowales^1 mozliwosc wysylania ci propozycji wymiany przedmiotu!");
 			}
 		}
 	}
@@ -145,13 +145,13 @@ public exchange_item_handle(id, menu, item)
 	}
 
 	if (get_bit(player, cooldown)) {
-		cod_print_chat(id, "Wybrany gracz musi poczekac^x03 jedna runde^x01, aby wymienic sie przedmiotem.");
+		cod_print_chat(id, "Wybrany gracz musi poczekac^3 jedna runde^1, aby wymienic sie przedmiotem.");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (get_bit(id, cooldown)) {
-		cod_print_chat(id, "Musisz poczekac^x03 jedna runde^x01, aby wymienic sie tym przedmiotem.");
+		cod_print_chat(id, "Musisz poczekac^3 jedna runde^1, aby wymienic sie tym przedmiotem.");
 
 		return PLUGIN_HANDLED;
 	}
@@ -230,7 +230,7 @@ public exchange_item_question(id, menu, item)
 	}
 
 	if (get_bit(player, cooldown)) {
-		cod_print_chat(id, "Gracz proponujacy wymiane musi poczekac^x03 jedna runde^x01, aby wymienic sie przedmiotem.");
+		cod_print_chat(id, "Gracz proponujacy wymiane musi poczekac^3 jedna runde^1, aby wymienic sie przedmiotem.");
 
 		return PLUGIN_HANDLED;
 	}
@@ -280,8 +280,8 @@ public exchange_item_question(id, menu, item)
 			set_bit(player, cooldown);
 			set_bit(id, cooldown);
 
-			cod_print_chat(player, "Wymieniles sie przedmiotem z^x03 %s^x01. Otrzymales^x03 %s^x01.", name, itemName);
-			cod_print_chat(id, "Wymieniles sie przedmiotem z^x03 %s^x01. Otrzymales^x03 %s^x01.", playerName, playerItemName);
+			cod_print_chat(player, "Wymieniles sie przedmiotem z^3 %s^1. Otrzymales^3 %s^1.", name, itemName);
+			cod_print_chat(id, "Wymieniles sie przedmiotem z^3 %s^1. Otrzymales^3 %s^1.", playerName, playerItemName);
 		} case 1: cod_print_chat(player, "Wybrany gracz nie zgodzil sie na wymiane przedmiotami.");
 	}
 
@@ -350,7 +350,7 @@ public give_item_handle(id, menu, item)
 	}
 
 	if (get_bit(id, cooldown)) {
-		cod_print_chat(id, "Musisz poczekac^x03 jedna runde^x01, aby oddac ten przedmiot.");
+		cod_print_chat(id, "Musisz poczekac^3 jedna runde^1, aby oddac ten przedmiot.");
 
 		return PLUGIN_HANDLED;
 	}
@@ -389,8 +389,8 @@ public give_item_handle(id, menu, item)
 	cod_set_item_durability(player, itemDurability);
 	cod_set_user_item(id);
 
-	cod_print_chat(id, "Oddales przedmiot^x03 %s^x01 graczowi^x03 %s^x01.", itemName, name);
-	cod_print_chat(player, "Dostales przedmiot^x03 %s^x01 od gracza^x03 %s^x01.", itemName, playerName);
+	cod_print_chat(id, "Oddales przedmiot^3 %s^1 graczowi^3 %s^1.", itemName, name);
+	cod_print_chat(player, "Dostales przedmiot^3 %s^1 od gracza^3 %s^1.", itemName, playerName);
 
 	return PLUGIN_HANDLED;
 }

@@ -106,14 +106,14 @@ public sell_item(id, sound)
 	}
 
 	if (cvarMaxItems && get_items_amount(id) >= cvarMaxItems) {
-		cod_print_chat(id, "Wystawiles juz maksymalne^x03 %i^x01 przedmiotow!", cvarMaxItems);
+		cod_print_chat(id, "Wystawiles juz maksymalne^3 %i^1 przedmiotow!", cvarMaxItems);
 
 		return PLUGIN_HANDLED;
 	}
 
 	client_cmd(id, "messagemode CENA_PRZEDMIOTU");
 
-	cod_print_chat(id, "Wpisz^x03 cene (honor)^x01, za ktora chcesz sprzedac item.");
+	cod_print_chat(id, "Wpisz^3 cene (honor)^1, za ktora chcesz sprzedac item.");
 
 	client_print(id, print_center, "Wpisz cene (honor), za ktora chcesz sprzedac item.");
 
@@ -133,7 +133,7 @@ public set_item_price(id)
 	}
 
 	if (cvarMaxItems && get_items_amount(id) >= cvarMaxItems) {
-		cod_print_chat(id, "Wystawiles juz maksymalne^x03 %i^x01 przedmiotow!", cvarMaxItems);
+		cod_print_chat(id, "Wystawiles juz maksymalne^3 %i^1 przedmiotow!", cvarMaxItems);
 
 		return PLUGIN_HANDLED;
 	}
@@ -146,7 +146,7 @@ public set_item_price(id)
 	price = str_to_num(priceData);
 
 	if (price  < 1 || price > 99999) {
-		cod_print_chat(id, "Cena musi nalezec do przedzialu^x03 1 - 99999^x01 Honoru!");
+		cod_print_chat(id, "Cena musi nalezec do przedzialu^3 1 - 99999^1 Honoru!");
 
 		return PLUGIN_HANDLED;
 	}
@@ -165,7 +165,7 @@ public set_item_price(id)
 
 	cod_set_user_item(id);
 
-	cod_print_chat(0, "^x03%s^x01 wystawil^x03 %s^x01 na rynek za^x03 %i^x01 Honoru.", playerName[id], marketItem[MARKET_NAME], marketItem[MARKET_PRICE]);
+	cod_print_chat(0, "^3%s^1 wystawil^3 %s^1 na rynek za^3 %i^1 Honoru.", playerName[id], marketItem[MARKET_NAME], marketItem[MARKET_PRICE]);
 
 	return PLUGIN_HANDLED;
 }
@@ -313,9 +313,9 @@ public buy_question_handle(id, menu, item)
 	cod_set_user_item(id, marketItem[MARKET_ITEM], marketItem[MARKET_VALUE]);
 	cod_set_item_durability(id, marketItem[MARKET_DURABILITY]);
 
-	cod_print_chat(id, "Przedmiot^x03 %s^x01 zostal pomyslnie zakupiony.", marketItem[MARKET_NAME]);
-	cod_print_chat(marketItem[MARKET_OWNER], "Twoj przedmiot^x03 %s^x01 zostal zakupiony przez^x03 %s^x01.", marketItem[MARKET_NAME], playerName[id]);
-	cod_print_chat(marketItem[MARKET_OWNER], "Za sprzedaz otrzymujesz^x03 %i^x01 Honoru.", marketItem[MARKET_PRICE])
+	cod_print_chat(id, "Przedmiot^3 %s^1 zostal pomyslnie zakupiony.", marketItem[MARKET_NAME]);
+	cod_print_chat(marketItem[MARKET_OWNER], "Twoj przedmiot^3 %s^1 zostal zakupiony przez^3 %s^1.", marketItem[MARKET_NAME], playerName[id]);
+	cod_print_chat(marketItem[MARKET_OWNER], "Za sprzedaz otrzymujesz^3 %i^1 Honoru.", marketItem[MARKET_PRICE])
 
 	return PLUGIN_CONTINUE;
 }
@@ -445,7 +445,7 @@ public withdraw_question_handle(id, menu, item)
 
 	ArrayDeleteItem(marketItems, item);
 
-	cod_print_chat(id, "Przedmiot^x03 %s^x01 zostal pomyslnie wycofany z rynku.", marketItem[MARKET_NAME]);
+	cod_print_chat(id, "Przedmiot^3 %s^1 zostal pomyslnie wycofany z rynku.", marketItem[MARKET_NAME]);
 
 	return PLUGIN_HANDLED;
 }

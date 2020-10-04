@@ -193,7 +193,7 @@ public say_text(msgId, msgDest, msgEnt)
 
 		get_msg_arg_string(2, tempMessage, charsmax(tempMessage));
 
-		formatex(chatPrefix, charsmax(chatPrefix), "^x04[VIP]");
+		formatex(chatPrefix, charsmax(chatPrefix), "^4[VIP]");
 
 		if (!equal(tempMessage, "#Cstrike_Chat_All")) {
 			add(message, charsmax(message), chatPrefix);
@@ -206,9 +206,9 @@ public say_text(msgId, msgDest, msgEnt)
 	        set_msg_arg_string(4, "");
 
 	        add(message, charsmax(message), chatPrefix);
-	        add(message, charsmax(message), "^x03 ");
+	        add(message, charsmax(message), "^3 ");
 	        add(message, charsmax(message), playerName);
-	        add(message, charsmax(message), "^x01 :  ");
+	        add(message, charsmax(message), "^1 :  ");
 	        add(message, charsmax(message), tempMessage);
 		}
 

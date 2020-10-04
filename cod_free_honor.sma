@@ -28,14 +28,14 @@ public receive_honor(id)
 	if (!get_bit(id, loaded)) return PLUGIN_HANDLED;
 
 	if (!get_bit(id, received)) {
-		cod_print_chat(id, "Otrzymales za darmo^x03 %i honoru^x01, milej gry!", cvarFreeHonor);
+		cod_print_chat(id, "Otrzymales za darmo^3 %i honoru^1, milej gry!", cvarFreeHonor);
 
 		cod_add_user_honor(id, cvarFreeHonor);
 
 		set_bit(id, received);
 
 		save(id);
-	} else cod_print_chat(id, "Juz odebrales swoj^x03 darmowy honor^x01!");
+	} else cod_print_chat(id, "Juz odebrales swoj^3 darmowy honor^1!");
 
 	return PLUGIN_HANDLED;
 }

@@ -252,13 +252,13 @@ public show_clan_menu_handle(id, menu, item)
 			}
 
 			if (cvarCreateLevel && cod_get_user_highest_level(id) < cvarCreateLevel) {
-				cod_print_chat(id, "Nie masz wystarczajacego poziomu, aby zalozyc klan (Wymagany^x03 %i poziom^x01)!", cvarCreateLevel);
+				cod_print_chat(id, "Nie masz wystarczajacego poziomu, aby zalozyc klan (Wymagany^3 %i poziom^1)!", cvarCreateLevel);
 
 				return PLUGIN_HANDLED;
 			}
 
 			if (cvarCreateFee && cod_get_user_honor(id) < cvarCreateFee) {
-				cod_print_chat(id, "Nie masz wystarczajaco duzo honoru, aby zalozyc klan (Wymagane^x03 %i honoru^x01)!", cvarCreateFee);
+				cod_print_chat(id, "Nie masz wystarczajaco duzo honoru, aby zalozyc klan (Wymagane^3 %i honoru^1)!", cvarCreateFee);
 
 				return PLUGIN_HANDLED;
 			}
@@ -295,13 +295,13 @@ public create_clan_handle(id)
 	cod_play_sound(id, SOUND_EXIT);
 
 	if (cvarCreateFee && cod_get_user_highest_level(id) < cvarCreateLevel) {
-		cod_print_chat(id, "Nie masz wystarczajacego poziomu, aby zalozyc klan (Wymagany^x03 %i poziom^x01)!", cvarCreateLevel);
+		cod_print_chat(id, "Nie masz wystarczajacego poziomu, aby zalozyc klan (Wymagany^3 %i poziom^1)!", cvarCreateLevel);
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (cvarCreateFee && cod_get_user_honor(id) < cvarCreateFee) {
-		cod_print_chat(id, "Nie masz wystarczajaco duzo honoru, aby zalozyc klan (Wymagane^x03 %i honoru^x01)!", cvarCreateFee);
+		cod_print_chat(id, "Nie masz wystarczajaco duzo honoru, aby zalozyc klan (Wymagane^3 %i honoru^1)!", cvarCreateFee);
 
 		return PLUGIN_HANDLED;
 	}
@@ -336,7 +336,7 @@ public create_clan_handle(id)
 		return PLUGIN_HANDLED;
 	}
 
-	if (create_clan(id, clanName)) cod_print_chat(id, "Pomyslnie zalozyles klan^x03 %s^01.", clanName);
+	if (create_clan(id, clanName)) cod_print_chat(id, "Pomyslnie zalozyles klan^3 %s^01.", clanName);
 	else cod_print_chat(id, "Podczas tworzenia klanu wystapil nieoczekiwany blad.");
 
 	return PLUGIN_HANDLED;
@@ -690,7 +690,7 @@ public skills_menu_handle(id, menu, item)
 			codClan[CLAN_LEVEL]++;
 			codClan[CLAN_HONOR] = remainingHonor;
 
-			cod_print_chat(id, "Ulepszyles klan na^x03 %i Poziom^x01!", codClan[CLAN_LEVEL]);
+			cod_print_chat(id, "Ulepszyles klan na^3 %i Poziom^1!", codClan[CLAN_LEVEL]);
 		} case 1: {
 			if (codClan[CLAN_HEALTH] == cvarSkillMax) {
 				cod_print_chat(id, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
@@ -717,7 +717,7 @@ public skills_menu_handle(id, menu, item)
 
 			cod_add_user_bonus_health(id, cvarHealthPerLevel);
 
-			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Zycie^x01 na^x03 %i^x01 poziom!", codClan[CLAN_HEALTH]);
+			cod_print_chat(id, "Ulepszyles umiejetnosc^3 Zycie^1 na^3 %i^1 poziom!", codClan[CLAN_HEALTH]);
 		} case 2: {
 			if (codClan[CLAN_GRAVITY] == cvarSkillMax) {
 				cod_print_chat(id, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
@@ -742,7 +742,7 @@ public skills_menu_handle(id, menu, item)
 			codClan[CLAN_GRAVITY]++;
 			codClan[CLAN_HONOR] = remainingHonor;
 
-			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Grawitacja^x01 na^x03 %i^x01 poziom!", codClan[CLAN_GRAVITY]);
+			cod_print_chat(id, "Ulepszyles umiejetnosc^3 Grawitacja^1 na^3 %i^1 poziom!", codClan[CLAN_GRAVITY]);
 		} case 3: {
 			if (codClan[CLAN_DAMAGE] == cvarSkillMax) {
 				cod_print_chat(id, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
@@ -767,7 +767,7 @@ public skills_menu_handle(id, menu, item)
 			codClan[CLAN_DAMAGE]++;
 			codClan[CLAN_HONOR] = remainingHonor;
 
-			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Obrazenia^x01 na^x03 %i^x01 poziom!", codClan[CLAN_DAMAGE]);
+			cod_print_chat(id, "Ulepszyles umiejetnosc^3 Obrazenia^1 na^3 %i^1 poziom!", codClan[CLAN_DAMAGE]);
 		} case 4: {
 			if (codClan[CLAN_EXP] == cvarSkillMax) {
 				cod_print_chat(id, "Twoj klan ma juz maksymalny poziom tej umiejetnosci.");
@@ -792,7 +792,7 @@ public skills_menu_handle(id, menu, item)
 			codClan[CLAN_EXP]++;
 			codClan[CLAN_HONOR] = remainingHonor;
 
-			cod_print_chat(id, "Ulepszyles umiejetnosc^x03 Doswiadczenie^x01 na^x03 %i^x01 poziom!", codClan[CLAN_EXP]);
+			cod_print_chat(id, "Ulepszyles umiejetnosc^3 Doswiadczenie^1 na^3 %i^1 poziom!", codClan[CLAN_EXP]);
 		}
 	}
 
@@ -809,7 +809,7 @@ public skills_menu_handle(id, menu, item)
 
 		cod_add_user_bonus_health(player, cvarHealthPerLevel);
 
-		cod_print_chat(player, "^x03 %s^x01 ulepszyl klan na^x03 %i Poziom^x01!", name, codClan[upgradedSkill]);
+		cod_print_chat(player, "^3 %s^1 ulepszyl klan na^3 %i Poziom^1!", name, codClan[upgradedSkill]);
 	}
 
 	skills_menu(id);
@@ -873,7 +873,7 @@ public invite_menu_handle(id, menu, item)
 
 	invite_confirm_menu(id, player);
 
-	cod_print_chat(id, "Zaprosiles^x03 %s^x01 do do twojego klanu.", userName);
+	cod_print_chat(id, "Zaprosiles^3 %s^1 do do twojego klanu.", userName);
 
 	show_clan_menu(id, 1);
 
@@ -950,7 +950,7 @@ public invite_confirm_menu_handle(id, menu, item)
 
 	set_user_clan(id, clan[player]);
 
-	cod_print_chat(id, "Dolaczyles do klanu^x03 %s^01.", clanName);
+	cod_print_chat(id, "Dolaczyles do klanu^3 %s^01.", clanName);
 
 	return PLUGIN_HANDLED;
 }
@@ -992,7 +992,7 @@ public change_name_handle(id)
 	}
 
 	if (cvarNameChangeFee && get_clan_honor(clan[id]) < cvarNameChangeFee) {
-		cod_print_chat(id, "W banku klanu nie ma wystarczajaco honoru na oplate za zmiane nazwy (^x04Wymagane %i Honoru^x01).", cvarNameChangeFee);
+		cod_print_chat(id, "W banku klanu nie ma wystarczajaco honoru na oplate za zmiane nazwy (^4Wymagane %i Honoru^1).", cvarNameChangeFee);
 
 		show_clan_menu(id, 1);
 
@@ -1003,7 +1003,7 @@ public change_name_handle(id)
 
 	update_clan_name(clan[id], clanName, charsmax(clanName));
 
-	cod_print_chat(id, "Zmieniles nazwe klanu na^x03 %s^x01.", clanName);
+	cod_print_chat(id, "Zmieniles nazwe klanu na^3 %s^1.", clanName);
 
 	return PLUGIN_CONTINUE;
 }
@@ -1197,10 +1197,10 @@ public update_member(id, status)
 		}
 
 		switch (status) {
-			case STATUS_LEADER: cod_print_chat(player, "^x03 %s^01 zostal nowym przywodca klanu.", chosenName[id]);
-			case STATUS_DEPUTY: cod_print_chat(player, "^x03 %s^x01 zostal zastepca przywodcy klanu.", chosenName[id]);
-			case STATUS_MEMBER: cod_print_chat(player, "^x03 %s^x01 zostal zdegradowany do rangi czlonka klanu.", chosenName[id]);
-			case STATUS_NONE: cod_print_chat(player, "^x03 %s^01 zostal wyrzucony z klanu.", chosenName[id]);
+			case STATUS_LEADER: cod_print_chat(player, "^3 %s^01 zostal nowym przywodca klanu.", chosenName[id]);
+			case STATUS_DEPUTY: cod_print_chat(player, "^3 %s^1 zostal zastepca przywodcy klanu.", chosenName[id]);
+			case STATUS_MEMBER: cod_print_chat(player, "^3 %s^1 zostal zdegradowany do rangi czlonka klanu.", chosenName[id]);
+			case STATUS_NONE: cod_print_chat(player, "^3 %s^01 zostal wyrzucony z klanu.", chosenName[id]);
 		}
 	}
 
@@ -1342,7 +1342,7 @@ public applications_confirm_handle(id, menu, item)
 	if (item == 2) {
 		remove_application(id, userName);
 
-		cod_print_chat(id, "Odrzuciles podanie gracza^x03 %s^01 o dolaczenie do klanu.", userName);
+		cod_print_chat(id, "Odrzuciles podanie gracza^3 %s^01 o dolaczenie do klanu.", userName);
 
 		return PLUGIN_HANDLED;
 	}
@@ -1364,7 +1364,7 @@ public applications_confirm_handle(id, menu, item)
 	if (cvarJoinFee) {
 		if (!item) {
 			if (get_clan_honor(clan[id]) < cvarJoinFee) {
-				cod_print_chat(id, "W banku klanu nie ma wystarczajaco honoru na oplate wpisowa (^x04Wymagane %i Honoru^x01).", cvarJoinFee);
+				cod_print_chat(id, "W banku klanu nie ma wystarczajaco honoru na oplate wpisowa (^4Wymagane %i Honoru^1).", cvarJoinFee);
 
 				return PLUGIN_HANDLED;
 			}
@@ -1375,7 +1375,7 @@ public applications_confirm_handle(id, menu, item)
 
 			if (is_user_connected(userId)) {
 				if (cod_get_user_honor(id) < cvarJoinFee) {
-					cod_print_chat(id, "Gracz nie ma wystarczajaco honoru na oplate wpisowa (^x04Wymagane %i Honoru^x01).", cvarJoinFee);
+					cod_print_chat(id, "Gracz nie ma wystarczajaco honoru na oplate wpisowa (^4Wymagane %i Honoru^1).", cvarJoinFee);
 
 					return PLUGIN_HANDLED;
 				}
@@ -1401,7 +1401,7 @@ public applications_confirm_handle(id, menu, item)
 				SQL_FreeHandle(query);
 
 				if (honor < cvarJoinFee) {
-					cod_print_chat(id, "Gracz nie ma wystarczajaco honoru na oplate wpisowa (^x04Wymagane %i Honoru^x01).", cvarJoinFee);
+					cod_print_chat(id, "Gracz nie ma wystarczajaco honoru na oplate wpisowa (^4Wymagane %i Honoru^1).", cvarJoinFee);
 
 					return PLUGIN_HANDLED;
 				}
@@ -1423,7 +1423,7 @@ public applications_confirm_handle(id, menu, item)
 
 	accept_application(id, userName);
 
-	cod_print_chat(id, "Zaakceptowales podanie gracza^x03 %s^01 o dolaczenie do klanu.", userName);
+	cod_print_chat(id, "Zaakceptowales podanie gracza^3 %s^01 o dolaczenie do klanu.", userName);
 
 	return PLUGIN_HANDLED;
 }
@@ -1750,7 +1750,7 @@ public declare_war_confirm_handle(id, menu, item)
 
 	declare_war(id, str_to_num(tempClanId));
 
-	cod_print_chat(id, "Twoj klan wypowiedzial wojne klanowi^x03 %s^x01.", clanName);
+	cod_print_chat(id, "Twoj klan wypowiedzial wojne klanowi^3 %s^1.", clanName);
 
 	return PLUGIN_HANDLED;
 }
@@ -1890,7 +1890,7 @@ public accept_war_confirm_handle(id, menu, item)
 	new clanId = str_to_num(dataParts[1]), halfReward = str_to_num(dataParts[4]) / 2;
 
 	if (get_clan_honor(clan[id]) < halfReward) {
-		cod_print_chat(id, "W banku klanu nie ma wystarczajaco^x03 Honoru^x01, aby pokryc polowe^x04 nagrody^x01!");
+		cod_print_chat(id, "W banku klanu nie ma wystarczajaco^3 Honoru^1, aby pokryc polowe^4 nagrody^1!");
 
 		wars_menu(id);
 
@@ -1898,7 +1898,7 @@ public accept_war_confirm_handle(id, menu, item)
 	}
 
 	if (get_clan_honor(clanId) < halfReward) {
-		cod_print_chat(id, "W banku klanu^x03 %s^x01 nie ma wystarczajaco^x03 Honoru^x01, aby pokryc polowe^x04 nagrody^x01!", dataParts[0]);
+		cod_print_chat(id, "W banku klanu^3 %s^1 nie ma wystarczajaco^3 Honoru^1, aby pokryc polowe^4 nagrody^1!", dataParts[0]);
 
 		wars_menu(id);
 
@@ -2037,8 +2037,8 @@ public remove_war_confirm_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	if (remove_war(warId)) cod_print_chat(id, "Anulowales deklaracje wojny z klanem^x03 %s^x01.", dataParts[0]);
-	else cod_print_chat(id, "Wojna z klanem^x03 %s^x01 juz sie rozpoczela!", dataParts[0]);
+	if (remove_war(warId)) cod_print_chat(id, "Anulowales deklaracje wojny z klanem^3 %s^1.", dataParts[0]);
+	else cod_print_chat(id, "Wojna z klanem^3 %s^1 juz sie rozpoczela!", dataParts[0]);
 
 	return PLUGIN_HANDLED;
 }
@@ -2057,13 +2057,13 @@ public deposit_honor_handle(id)
 	honorAmount = str_to_num(honorData);
 
 	if (honorAmount <= 0) {
-		cod_print_chat(id, "Nie mozesz wplacic mniej niz^x03 1 honoru^x01!");
+		cod_print_chat(id, "Nie mozesz wplacic mniej niz^3 1 honoru^1!");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (cod_get_user_honor(id) < honorAmount) {
-		cod_print_chat(id, "Nie masz tyle^x03 honoru^x01!");
+		cod_print_chat(id, "Nie masz tyle^3 honoru^1!");
 
 		return PLUGIN_HANDLED;
 	}
@@ -2074,8 +2074,8 @@ public deposit_honor_handle(id)
 
 	add_deposited_honor(id, honorAmount);
 
-	cod_print_chat(id, "Wplaciles^x03 %i^x01 Honoru na rzecz klanu.", honorAmount);
-	cod_print_chat(id, "Aktualnie twoj klan ma^x03 %i^x01 Honoru.", get_clan_info(clan[id], CLAN_HONOR));
+	cod_print_chat(id, "Wplaciles^3 %i^1 Honoru na rzecz klanu.", honorAmount);
+	cod_print_chat(id, "Aktualnie twoj klan ma^3 %i^1 Honoru.", get_clan_info(clan[id], CLAN_HONOR));
 
 	return PLUGIN_HANDLED;
 }
@@ -2092,7 +2092,7 @@ public set_war_frags_handle(id)
 	frags = str_to_num(fragsData);
 
 	if (frags <= 0) {
-		cod_print_chat(id, "Liczba fragow w wojnie nie moze byc mniejsza od^x03 jednego^x01!");
+		cod_print_chat(id, "Liczba fragow w wojnie nie moze byc mniejsza od^3 jednego^1!");
 
 		return PLUGIN_HANDLED;
 	}
@@ -2116,13 +2116,13 @@ public set_war_reward_handle(id)
 	reward = str_to_num(rewardData);
 
 	if (reward <= 0) {
-		cod_print_chat(id, "Nagroda za wygrana nie moze byc mniejsza niz^x03 1 Honor^x01!");
+		cod_print_chat(id, "Nagroda za wygrana nie moze byc mniejsza niz^3 1 Honor^1!");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (reward % 2 != 0) {
-		cod_print_chat(id, "Nagroda musi byc^x03 liczba podzielna przez 2^x01.");
+		cod_print_chat(id, "Nagroda musi byc^3 liczba podzielna przez 2^1.");
 
 		return PLUGIN_HANDLED;
 	}
@@ -2269,7 +2269,7 @@ public say_text(msgId, msgDest, msgEnt)
 
 		get_clan_info(clan[id], CLAN_NAME, chatPrefix, charsmax(chatPrefix));
 
-		format(chatPrefix, charsmax(chatPrefix), "^x04[%s]", chatPrefix);
+		format(chatPrefix, charsmax(chatPrefix), "^4[%s]", chatPrefix);
 
 		if (!equal(tempMessage, "#Cstrike_Chat_All")) {
 			add(message, charsmax(message), chatPrefix);
@@ -2282,9 +2282,9 @@ public say_text(msgId, msgDest, msgEnt)
 	        set_msg_arg_string(4, "");
 
 	        add(message, charsmax(message), chatPrefix);
-	        add(message, charsmax(message), "^x03 ");
+	        add(message, charsmax(message), "^3 ");
 	        add(message, charsmax(message), playerName);
-	        add(message, charsmax(message), "^x01 :  ");
+	        add(message, charsmax(message), "^1 :  ");
 	        add(message, charsmax(message), tempMessage);
 		}
 
@@ -2458,7 +2458,7 @@ public application_confirm_handle(id, menu, item)
 
 	add_application(id, clanId);
 
-	cod_print_chat(id, "Zlozyles podanie do klanu^x03 %s^01.", clanName);
+	cod_print_chat(id, "Zlozyles podanie do klanu^3 %s^01.", clanName);
 
 	return PLUGIN_HANDLED;
 }
@@ -2679,9 +2679,9 @@ public show_clan_info(id)
 	if (get_user_status(id) > STATUS_MEMBER) {
 		new applications = get_applications_count(clan[id]), wars = get_wars_count(clan[id], 0);
 
-		if (applications > 0 && wars > 0) cod_print_chat(id, "Masz do rozpatrzenia^x03 %i podania o dolaczenie^x01 i^x03 %i deklaracje wojny^x01 w^x04 klanie^x01.", applications, wars);
-		else if(applications > 0) cod_print_chat(id, "Masz do rozpatrzenia^x03 %i podania o dolaczenie^x01 w^x04 klanie^x01.", applications);
-		else if(wars > 0) cod_print_chat(id, "Masz do rozpatrzenia^x03 %i deklaracje wojny^x01 w^x04 klanie^x01.", wars);
+		if (applications > 0 && wars > 0) cod_print_chat(id, "Masz do rozpatrzenia^3 %i podania o dolaczenie^1 i^3 %i deklaracje wojny^1 w^4 klanie^1.", applications, wars);
+		else if(applications > 0) cod_print_chat(id, "Masz do rozpatrzenia^3 %i podania o dolaczenie^1 w^4 klanie^1.", applications);
+		else if(wars > 0) cod_print_chat(id, "Masz do rozpatrzenia^3 %i deklaracje wojny^1 w^4 klanie^1.", wars);
 	}
 }
 
@@ -2754,7 +2754,7 @@ stock declare_war(id, clanId)
 	for (new i = 1; i <= MAX_PLAYERS; i++) {
 		if (!is_user_connected(i) || is_user_bot(i) || is_user_hltv(i) || clan[i] != clanId || get_user_status(i) <= STATUS_MEMBER) continue;
 
-		cod_print_chat(i, "Klan^x03 %s^x01 wypowiedzial^x04 wojne^x01 twojemu klanowi! Zaakceptuj lub odrzuc wojne.", clanName);
+		cod_print_chat(i, "Klan^3 %s^1 wypowiedzial^4 wojne^1 twojemu klanowi! Zaakceptuj lub odrzuc wojne.", clanName);
 	}
 }
 
@@ -2786,7 +2786,7 @@ stock accept_war(id, warId, clanId, duration, honor, const enemyClanName[])
 	for (new i = 1; i <= MAX_PLAYERS; i++) {
 		if (!is_user_connected(i) || is_user_bot(i) || is_user_hltv(i) || !clan[i] || (clan[i] != clan[id] && clan[i] != clanId)) continue;
 
-		cod_print_chat(i, "Twoj klan rozpoczal wojne z klanem^x03 %s^x01 (Fragi:^x04 %i^x01 | Nagroda:^x04 %i Honoru^x01).", clan[i] == clan[id] ? clanName : enemyClanName, codWar[WAR_DURATION], codWar[WAR_REWARD]);
+		cod_print_chat(i, "Twoj klan rozpoczal wojne z klanem^3 %s^1 (Fragi:^4 %i^1 | Nagroda:^4 %i Honoru^1).", clan[i] == clan[id] ? clanName : enemyClanName, codWar[WAR_DURATION], codWar[WAR_REWARD]);
 	}
 }
 
@@ -2839,7 +2839,7 @@ public remove_clan_wars(failState, Handle:query, error[], errorNum, tempId[], da
 			for (new i = 1; i <= MAX_PLAYERS; i++) {
 				if (!is_user_connected(i) || is_user_bot(i) || is_user_hltv(i) || clan[i] != enemyClan) continue;
 
-				cod_print_chat(i, "Klan^x03 %s^x01 zostal rozwiazany, a to konczy z nim wojne. Zwyciestwo!", clanName);
+				cod_print_chat(i, "Klan^3 %s^1 zostal rozwiazany, a to konczy z nim wojne. Zwyciestwo!", clanName);
 			}
 		} else {
 			formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET money = money + %i WHERE id = '%i'", reward, enemyClan);
@@ -2885,14 +2885,14 @@ stock check_war(killer, victim)
 			get_user_name(killer, killerName, charsmax(killerName));
 
 			if (codWar[progress] == codWar[WAR_DURATION]) {
-				cod_print_chat(killer, "Zabijajac^x03 %s^x01 zakonczyles wojne z klanem^x03 %s^x01. Zwyciestwo!", victimName, victimClan);
-				cod_print_chat(victim, "Ginac z rak^x03 %s^x01 zakonczyles wojne z klanem^x03 %s^x01. Porazka...", killerName, killerClan);
+				cod_print_chat(killer, "Zabijajac^3 %s^1 zakonczyles wojne z klanem^3 %s^1. Zwyciestwo!", victimName, victimClan);
+				cod_print_chat(victim, "Ginac z rak^3 %s^1 zakonczyles wojne z klanem^3 %s^1. Porazka...", killerName, killerClan);
 
 				for (new j = 0; j <= MAX_PLAYERS; j++) {
 					if (!is_user_connected(j) || is_user_bot(j) || is_user_hltv(j) || !clan[j] || j == killer || j == victim) continue;
 
-					if (clan[j] == clan[killer]) cod_print_chat(j, "^x03 %s^x01 zabijajac^x03 %s^x01 zakonczyl wojne z klanem^x03 %s^x01. Zwyciestwo!", killerName, victimName, victimClan);
-					if (clan[j] == clan[victim]) cod_print_chat(j, "^x03 %s^x01 ginac z rak^x03 %s^x01 zakonczyl wojne z klanem^x03 %s^x01. Porazka...", victimName, killerName, killerClan);
+					if (clan[j] == clan[killer]) cod_print_chat(j, "^3 %s^1 zabijajac^3 %s^1 zakonczyl wojne z klanem^3 %s^1. Zwyciestwo!", killerName, victimName, victimClan);
+					if (clan[j] == clan[victim]) cod_print_chat(j, "^3 %s^1 ginac z rak^3 %s^1 zakonczyl wojne z klanem^3 %s^1. Porazka...", victimName, killerName, killerClan);
 				}
 
 				set_clan_info(clan[killer], CLAN_HONOR, codWar[WAR_REWARD]);
@@ -2903,7 +2903,7 @@ stock check_war(killer, victim)
 				ArrayDeleteItem(codWars, i);
 
 			} else {
-				cod_print_chat(killer, "Zabijajac^x03 %s^x01 zdobyles fraga w wojnie z klanem^x03 %s^x01. Wynik:^x04 %i - %i / %i^x01.", victimName, victimClan, codWar[progress], codWar[progress == WAR_PROGRESS ? WAR_PROGRESS2 : WAR_PROGRESS], codWar[WAR_DURATION]);
+				cod_print_chat(killer, "Zabijajac^3 %s^1 zdobyles fraga w wojnie z klanem^3 %s^1. Wynik:^4 %i - %i / %i^1.", victimName, victimClan, codWar[progress], codWar[progress == WAR_PROGRESS ? WAR_PROGRESS2 : WAR_PROGRESS], codWar[WAR_DURATION]);
 
 				ArraySetArray(codWars, i, codWar);
 
@@ -2950,7 +2950,7 @@ stock add_application(id, clanId)
 	for (new i = 1; i <= MAX_PLAYERS; i++) {
 		if (!is_user_connected(i) || is_user_bot(i) || is_user_hltv(i) || clan[i] != clanId || get_user_status(i) <= STATUS_MEMBER) continue;
 
-		cod_print_chat(i, "^x03%s^x01 zlozyl podanie do klanu!", userName);
+		cod_print_chat(i, "^3%s^1 zlozyl podanie do klanu!", userName);
 	}
 }
 
@@ -2986,7 +2986,7 @@ stock accept_application(id, const userName[])
 
 		set_user_clan(player, clan[id]);
 
-		cod_print_chat(player, "Zostales przyjety do klanu^x03 %s^x01!", clanName);
+		cod_print_chat(player, "Zostales przyjety do klanu^3 %s^1!", clanName);
 	} else {
 		set_clan_info(clan[id], CLAN_MEMBERS, get_clan_info(clan[id], CLAN_MEMBERS) + 1);
 
@@ -3006,7 +3006,7 @@ stock remove_application(id, const name[] = "")
 		get_clan_info(clan[id], CLAN_NAME, clanName, charsmax(clanName));
 		get_user_name(id, userName, charsmax(userName));
 
-		cod_print_chat(player, "^x03%s^x01 odrzucil twoje podanie do klanu^x03 %s^x01!", userName, clanName);
+		cod_print_chat(player, "^3%s^1 odrzucil twoje podanie do klanu^3 %s^1!", userName, clanName);
 	}
 
 	new queryData[192], safeName[MAX_SAFE_NAME];

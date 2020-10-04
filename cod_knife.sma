@@ -120,7 +120,7 @@ public change_knife_handle(id, menu, item)
 
 	save_knife(id);
 
-	cod_print_chat(id, "Twoj nowy noz to:^x03 %s %s^x01.", knifeModels[playerKnife[id]][NAME], knifeModels[playerKnife[id]][BONUS]);
+	cod_print_chat(id, "Twoj nowy noz to:^3 %s %s^1.", knifeModels[playerKnife[id]][NAME], knifeModels[playerKnife[id]][BONUS]);
 
 	menu_destroy(menu);
 

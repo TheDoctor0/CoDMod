@@ -164,7 +164,7 @@ public dice_menu_handle(id, menu, item)
 	switch (item) {
 		case 0: {
 			if (cod_get_user_honor(id) < playerData[id][DICE][GAME_BID]) {
-				cod_print_chat(id, "Nie masz wystarczajaco^x03 honoru^x01, aby grac na tej stawce!");
+				cod_print_chat(id, "Nie masz wystarczajaco^3 honoru^1, aby grac na tej stawce!");
 
 				return PLUGIN_HANDLED;
 			}
@@ -185,7 +185,7 @@ public dice_menu_handle(id, menu, item)
 
 			dice_menu(id, 0);
 		} case 3: {
-			cod_print_chat(id, "Wpisz nowa^x04 stawke^x01.");
+			cod_print_chat(id, "Wpisz nowa^4 stawke^1.");
 
 			cod_show_hud(id, TYPE_HUD, 255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Wpisz nowa stawke.");
 
@@ -266,7 +266,7 @@ public roulette_menu_handle(id, menu, item)
 	switch (item) {
 		case 0:  {
 			if (cod_get_user_honor(id) < playerData[id][ROULETTE][GAME_BID]) {
-				cod_print_chat(id, "Nie masz wystarczajaco^x03 honoru^x01, aby grac na tej stawce!");
+				cod_print_chat(id, "Nie masz wystarczajaco^3 honoru^1, aby grac na tej stawce!");
 
 				return PLUGIN_HANDLED;
 			}
@@ -279,7 +279,7 @@ public roulette_menu_handle(id, menu, item)
 
 			roulette_menu(id, 0);
 		} case 2: {
-			cod_print_chat(id, "Wpisz nowa^x04 stawke^x01.");
+			cod_print_chat(id, "Wpisz nowa^4 stawke^1.");
 
 			cod_show_hud(id, TYPE_HUD, 255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Wpisz nowa stawke.");
 
@@ -356,7 +356,7 @@ public coinflip_menu_handle(id, menu, item)
 	switch (item) {
 		case 0: {
 			if (cod_get_user_honor(id) < playerData[id][COINFLIP][GAME_BID]) {
-				cod_print_chat(id, "Nie masz wystarczajaco^x03 honoru^x01, aby grac na tej stawce!");
+				cod_print_chat(id, "Nie masz wystarczajaco^3 honoru^1, aby grac na tej stawce!");
 
 				return PLUGIN_HANDLED;
 			}
@@ -370,7 +370,7 @@ public coinflip_menu_handle(id, menu, item)
 
 			coinflip_menu(id, 0);
 		} case 2: {
-			cod_print_chat(id, "Wpisz nowa^x04 stawke^x01.");
+			cod_print_chat(id, "Wpisz nowa^4 stawke^1.");
 
 			cod_show_hud(id, TYPE_HUD, 255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0, "Wpisz nowa stawke.");
 
@@ -395,13 +395,13 @@ public change_bid(id)
 	bid = str_to_num(bidData);
 
 	if (bid <= 0) {
-		cod_print_chat(id, "Nie mozesz ustawic stawki mniejszej niz^x03 1 honoru^x01!");
+		cod_print_chat(id, "Nie mozesz ustawic stawki mniejszej niz^3 1 honoru^1!");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (cod_get_user_honor(id) < bid) {
-		cod_print_chat(id, "Nie mozesz ustawic stawki wiekszej niz twoja ilosc^x03 honoru^x01!");
+		cod_print_chat(id, "Nie mozesz ustawic stawki wiekszej niz twoja ilosc^3 honoru^1!");
 
 		return PLUGIN_HANDLED;
 	}

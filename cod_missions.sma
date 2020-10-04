@@ -316,7 +316,7 @@ public select_mission_handle(id, menu, item)
 		case TYPE_CLASS: select_class(id);
 		case TYPE_ITEM: select_item(id);
 		default: {
-			cod_print_chat(id, "Rozpoczales wykonywac^x03 misje^x01. Powodzenia!");
+			cod_print_chat(id, "Rozpoczales wykonywac^3 misje^1. Powodzenia!");
 
 			save_mission(id);
 		}
@@ -397,7 +397,7 @@ public select_handle(id, menu, item)
 
 	playerData[id][PLAYER_ADDITIONAL] = str_to_num(missionData);
 
-	cod_print_chat(id, "Rozpoczales wykonywac^x03 misje^x01. Powodzenia!");
+	cod_print_chat(id, "Rozpoczales wykonywac^3 misje^1. Powodzenia!");
 
 	save_mission(id);
 
@@ -440,7 +440,7 @@ public give_reward(id)
 
 	reset_mission(id, 0, 1);
 
-	cod_print_chat(id, "Gratulacje! Ukonczyles swoja misje - otrzymujesz w nagrode^x03 %i^x01 doswiadczenia.", reward);
+	cod_print_chat(id, "Gratulacje! Ukonczyles swoja misje - otrzymujesz w nagrode^3 %i^1 doswiadczenia.", reward);
 
 	return PLUGIN_HANDLED;
 }
@@ -459,8 +459,8 @@ public check_mission(id)
 		if (additional[0]) formatex(message, charsmax(message), missionDescription[playerData[id][PLAYER_TYPE]], additional, (get_progress_need(id) - get_progress(id)));
 		else formatex(message, charsmax(message), missionDescription[playerData[id][PLAYER_TYPE]], (get_progress_need(id) - get_progress(id)));
 
-		cod_print_chat(id, "Rozdzial:^x03 %s^x01. Postep:^x03 %i/%i^x01.", codChapter[CHAPTER_NAME], get_progress(id), get_progress_need(id));
-		cod_print_chat(id, "Misja:^x03 %s^x01.", message);
+		cod_print_chat(id, "Rozdzial:^3 %s^1. Postep:^3 %i/%i^1.", codChapter[CHAPTER_NAME], get_progress(id), get_progress_need(id));
+		cod_print_chat(id, "Misja:^3 %s^1.", message);
 	}
 
 	return PLUGIN_HANDLED;
@@ -533,7 +533,7 @@ public reset_mission(id, data, silent)
 	playerData[id][PLAYER_PROGRESS] = 0;
 
 	if (!data) save_mission(id);
-	if (!silent) cod_print_chat(id, "Zrezygnowales z wykonywania wybranej wczesniej^x03 misji^x01.");
+	if (!silent) cod_print_chat(id, "Zrezygnowales z wykonywania wybranej wczesniej^3 misji^1.");
 }
 
 stock get_mission_info(mission, info)

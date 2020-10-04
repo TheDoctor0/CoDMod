@@ -111,7 +111,7 @@ public check_first_class(id)
 
 		check_second_class(TASK_CHECK_SECOND + id);
 	} else if (cod_get_user_class(id) == currentClass[id]) set_task(0.2, "check_first_class", TASK_CHECK_FIRST + id);
-	else if (!cod_get_user_class(id)) client_print_color(id, id,"^x04[SKLEP-SMS] ^x01Nie masz uprawnien, aby skorzystac z klasy z ktorej chcesz przeniesc exp.");
+	else if (!cod_get_user_class(id)) client_print_color(id, id,"^4[SKLEP-SMS] ^1Nie masz uprawnien, aby skorzystac z klasy z ktorej chcesz przeniesc exp.");
 }
 
 public check_second_class(id)
@@ -123,7 +123,7 @@ public check_second_class(id)
 
 		ss_show_sms_info(id);
 	} else if (cod_get_user_class(id) == fromClass[id]) set_task(0.2, "check_second_class", TASK_CHECK_SECOND + id);
-	else if (!cod_get_user_class(id)) client_print_color(id, id,"^x04[SKLEP-SMS] ^x01Nie masz uprawnien, aby skorzystac z klasy z ktorej chcesz przeniesc exp.");
+	else if (!cod_get_user_class(id)) client_print_color(id, id,"^4[SKLEP-SMS] ^1Nie masz uprawnien, aby skorzystac z klasy z ktorej chcesz przeniesc exp.");
 }
 
 public ss_service_bought(id, amount)

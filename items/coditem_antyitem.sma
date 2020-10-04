@@ -63,8 +63,8 @@ public cod_item_skill_used_handle(id, menu, item)
 	get_user_name(player, playerName, charsmax(playerName));
 	get_user_name(id, name, charsmax(name));
 
-	cod_print_chat(player, "^x03%s^x01 zniszczyl ci item!", name);
-	cod_print_chat(id, "Zniszczyles item graczowi^x03 %s^x01.", playerName);
+	cod_print_chat(player, "^3%s^1 zniszczyl ci item!", name);
+	cod_print_chat(id, "Zniszczyles item graczowi^3 %s^1.", playerName);
 
 	cod_set_user_item(player);
 	cod_set_user_item(id);

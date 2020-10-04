@@ -230,7 +230,7 @@ public shop_menu_handle(id, menu, item)
 	item = str_to_num(dataParts[1]);
 
 	if (cod_get_user_honor(id) < price) {
-		cod_print_chat(id, "Nie masz wystarczajaco duzo^x03 Honoru^x01!");
+		cod_print_chat(id, "Nie masz wystarczajaco duzo^3 Honoru^1!");
 
 		return PLUGIN_HANDLED;
 	}
@@ -238,18 +238,18 @@ public shop_menu_handle(id, menu, item)
 	switch (item) {
 		case REPAIR: {
 			if (!cod_get_user_item(id)) {
-				cod_print_chat(id, "Nie masz zadnego przedmiotu^x01!");
+				cod_print_chat(id, "Nie masz zadnego przedmiotu^1!");
 
 				return PLUGIN_HANDLED;
 			}
 
 			if (cod_get_item_durability(id) >= cod_max_item_durability()) {
-				cod_print_chat(id, "Twoj przedmiot jest juz w pelni^x03 naprawiony^x01!");
+				cod_print_chat(id, "Twoj przedmiot jest juz w pelni^3 naprawiony^1!");
 
 				return PLUGIN_HANDLED;
 			}
 
-			cod_print_chat(id, "Kupiles^x03 +%i^x01 wytrzymalosci przedmiotu!", cvarDurabilityAmount);
+			cod_print_chat(id, "Kupiles^3 +%i^1 wytrzymalosci przedmiotu!", cvarDurabilityAmount);
 
 			if (cod_get_item_durability(id) + cvarDurabilityAmount >= cod_max_item_durability()) {
 				cod_set_item_durability(id, cod_max_item_durability());
@@ -258,10 +258,10 @@ public shop_menu_handle(id, menu, item)
 			} else {
 				cod_set_item_durability(id, cod_get_item_durability(id) + cvarDurabilityAmount);
 
-				cod_print_chat(id, "Wytrzymalosc twojego przedmiotu wynosi^x03 %i^x01!", cod_get_item_durability(id));
+				cod_print_chat(id, "Wytrzymalosc twojego przedmiotu wynosi^3 %i^1!", cod_get_item_durability(id));
 			}
 		} case BUY: {
-			cod_print_chat(id, "Kupiles^x03 Losowy Przedmiot^x01!");
+			cod_print_chat(id, "Kupiles^3 Losowy Przedmiot^1!");
 
 			cod_set_user_item(id, RANDOM);
 		} case UPGRADE: {
@@ -277,147 +277,147 @@ public shop_menu_handle(id, menu, item)
 				return PLUGIN_HANDLED;
 			}
 
-			cod_print_chat(id, "Kupiles^x03 Ulepszenie Przedmiotu^x01!");
+			cod_print_chat(id, "Kupiles^3 Ulepszenie Przedmiotu^1!");
 
 			if (!cod_upgrade_user_item(id)) {
-				cod_print_chat(id, "Twoj przedmiot nie moze juz zostac^x03 ulepszony^x01. Honor nie zostal pobrany z konta.");
+				cod_print_chat(id, "Twoj przedmiot nie moze juz zostac^3 ulepszony^1. Honor nie zostal pobrany z konta.");
 
 				return PLUGIN_HANDLED;
 			}
 		} case SMALL_BANDAGE: {
 			if (cod_get_user_health(id, 1) >= cod_get_user_max_health(id)) {
-				cod_print_chat(id, "Jestes juz w pelni^x03 uzdrowiony^x01!");
+				cod_print_chat(id, "Jestes juz w pelni^3 uzdrowiony^1!");
 
 				return PLUGIN_HANDLED;
 			}
 
 			cod_set_user_health(id, cod_get_user_health(id, 1) + cvarSmallBandageHP);
 
-			cod_print_chat(id, "Kupiles^x03 Maly Bandaz^x01!");
+			cod_print_chat(id, "Kupiles^3 Maly Bandaz^1!");
 		} case BIG_BANDAGE: {
 			if (cod_get_user_health(id, 1) >= cod_get_user_max_health(id)) {
-				cod_print_chat(id, "Jestes juz w pelni^x03 uzdrowiony^x01!");
+				cod_print_chat(id, "Jestes juz w pelni^3 uzdrowiony^1!");
 
 				return PLUGIN_HANDLED;
 			}
 
 			cod_set_user_health(id, cod_get_user_health(id, 1) + cvarBigBandageHP);
 
-			cod_print_chat(id, "Kupiles^x03 Duzy Bandaz^x01!");
+			cod_print_chat(id, "Kupiles^3 Duzy Bandaz^1!");
 		} case SMALL_EXP: {
-			cod_print_chat(id, "Kupiles^x03 Male Doswiadczenie^x01!");
+			cod_print_chat(id, "Kupiles^3 Male Doswiadczenie^1!");
 
-			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", cvarSmallExp);
+			cod_print_chat(id, "Dostales^3 %i^1 expa!", cvarSmallExp);
 
 			cod_set_user_exp(id, cvarSmallExp);
 		} case MEDIUM_EXP: {
-			cod_print_chat(id, "Kupiles^x03 Srednie Doswiadczenie^x01!");
+			cod_print_chat(id, "Kupiles^3 Srednie Doswiadczenie^1!");
 
-			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", cvarMediumExp);
+			cod_print_chat(id, "Dostales^3 %i^1 expa!", cvarMediumExp);
 
 			cod_set_user_exp(id, cvarMediumExp);
 		} case BIG_EXP: {
-			cod_print_chat(id, "Kupiles^x03 Duze Doswiadczenie^x01!");
+			cod_print_chat(id, "Kupiles^3 Duze Doswiadczenie^1!");
 
-			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", cvarBigExp);
+			cod_print_chat(id, "Dostales^3 %i^1 expa!", cvarBigExp);
 
 			cod_set_user_exp(id, cvarBigExp);
 		} case RANDOM_EXP: {
 			new randomExp = random_num(cvarMinRandomExp, cvarMaxRandomExp);
 
-			cod_print_chat(id, "Kupiles^x03 Losowe Doswiadczenie^x01!");
+			cod_print_chat(id, "Kupiles^3 Losowe Doswiadczenie^1!");
 
-			cod_print_chat(id, "Dostales^x03 %i^x01 expa!", randomExp);
+			cod_print_chat(id, "Dostales^3 %i^1 expa!", randomExp);
 
 			cod_set_user_exp(id, randomExp);
 		} case ROCKET: {
-			cod_print_chat(id, "Kupiles^x03 Dodatkowa Rakiete^x01!");
+			cod_print_chat(id, "Kupiles^3 Dodatkowa Rakiete^1!");
 
 			cod_add_user_rockets(id, 1, DEATH);
 		} case MINE: {
-			cod_print_chat(id, "Kupiles^x03 Dodatkowa Mine^x01!");
+			cod_print_chat(id, "Kupiles^3 Dodatkowa Mine^1!");
 
 			cod_add_user_mines(id, 1, DEATH);
 		} case DYNAMITE: {
-			cod_print_chat(id, "Kupiles^x03 Dodatkowy Dynamit^x01!");
+			cod_print_chat(id, "Kupiles^3 Dodatkowy Dynamit^1!");
 
 			cod_add_user_dynamites(id, 1, DEATH);
 		} case MEDKIT: {
-			cod_print_chat(id, "Kupiles^x03 Dodatkowa Apteczke^x01!");
+			cod_print_chat(id, "Kupiles^3 Dodatkowa Apteczke^1!");
 
 			cod_add_user_medkits(id, 1, DEATH);
 		} case THUNDER: {
-			cod_print_chat(id, "Kupiles^x03 Dodatkowy Piorun^x01!");
+			cod_print_chat(id, "Kupiles^3 Dodatkowy Piorun^1!");
 
 			cod_add_user_thunders(id, 1, DEATH);
 		} case TELEPORT: {
 			if (cod_get_user_teleports(id) == FULL) {
-				cod_print_chat(id, "Masz juz nielimitowany^x03 Teleport^x01!");
+				cod_print_chat(id, "Masz juz nielimitowany^3 Teleport^1!");
 
 				return PLUGIN_HANDLED;
 			}
 
-			cod_print_chat(id, "Kupiles^x03 Dodatkowy Teleport^x01!");
+			cod_print_chat(id, "Kupiles^3 Dodatkowy Teleport^1!");
 
 			cod_add_user_teleports(id, 1, DEATH);
 		} case JUMP: {
 			if (cod_get_user_multijumps(id) >= 3) {
-				cod_print_chat(id, "Mozesz miec maksymalnie^x03 3 Dodatkowe Skoki^x01!");
+				cod_print_chat(id, "Mozesz miec maksymalnie^3 3 Dodatkowe Skoki^1!");
 
 				return PLUGIN_HANDLED;
 			}
 
-			cod_print_chat(id, "Kupiles^x03 Dodatkowy Skok^x01!");
+			cod_print_chat(id, "Kupiles^3 Dodatkowy Skok^1!");
 
 			cod_add_user_multijumps(id, 1, DEATH);
 		} case BUNNY_HOP: {
 			if (cod_get_user_bunnyhop(id)) {
-				cod_print_chat(id, "Masz juz ^x03 Bunny Hop^x01!");
+				cod_print_chat(id, "Masz juz ^3 Bunny Hop^1!");
 
 				return PLUGIN_HANDLED;
 			}
 
-			cod_print_chat(id, "Kupiles^x03 BunnyHop^x01!");
+			cod_print_chat(id, "Kupiles^3 BunnyHop^1!");
 
 			cod_set_user_bunnyhop(id, 1, DEATH);
 		} case SILENT: {
 			if (cod_get_user_footsteps(id)) {
-				cod_print_chat(id, "Masz juz ^x03 Ciche Chodzenie^x01!");
+				cod_print_chat(id, "Masz juz ^3 Ciche Chodzenie^1!");
 
 				return PLUGIN_HANDLED;
 			}
 
-			cod_print_chat(id, "Kupiles^x03 Ciche Chodzenie^x01!");
+			cod_print_chat(id, "Kupiles^3 Ciche Chodzenie^1!");
 
 			cod_set_user_footsteps(id, 1, DEATH);
 		} case ARMOR: {
 			if (cod_get_user_armor(id) >= 300) {
-				cod_print_chat(id, "Mozesz miec maksymalnie^x03 300 Pancerza^x01!");
+				cod_print_chat(id, "Mozesz miec maksymalnie^3 300 Pancerza^1!");
 
 				return PLUGIN_HANDLED;
 			}
 
-			cod_print_chat(id, "Kupiles^x03 Dodatkowy Pancerz^x01!");
+			cod_print_chat(id, "Kupiles^3 Dodatkowy Pancerz^1!");
 
 			cod_add_user_armor(id, cvarArmorAmount);
 		} case DAMAGE: {
 			if (get_bit(id, damageBonus)) {
-				cod_print_chat(id, "W tej rundzie juz kupiles^x03 Wieksze Obrazenia^x01!");
+				cod_print_chat(id, "W tej rundzie juz kupiles^3 Wieksze Obrazenia^1!");
 
 				return PLUGIN_HANDLED;
 			}
 
-			cod_print_chat(id, "Kupiles^x03 Wieksze Obrazenia^x01!");
+			cod_print_chat(id, "Kupiles^3 Wieksze Obrazenia^1!");
 
 			set_bit(id, damageBonus);
 		} case INVISIBLE: {
 			if (!cod_get_user_render(id)) {
-				cod_print_chat(id, "Masz juz^x03 Pelna Niewidzialnosc^x01!");
+				cod_print_chat(id, "Masz juz^3 Pelna Niewidzialnosc^1!");
 
 				return PLUGIN_HANDLED;
 			}
 
-			cod_print_chat(id, "Kupiles^x03 Peleryne Niewidke^x01!");
+			cod_print_chat(id, "Kupiles^3 Peleryne Niewidke^1!");
 
 			cod_set_user_render(id, 0, DEATH);
 		}

@@ -23,7 +23,7 @@ public plugin_cfg()
 public ss_service_chosen(id)
 {
 	if (!cod_get_user_class(id)) {
-		client_print_color(id, id, "^x03[SKLEPSMS]^x01 Musisz^x04 wybrac klase^x01, aby moc zakupic^x04 EXP^x01.");
+		client_print_color(id, id, "^3[SKLEPSMS]^1 Musisz^4 wybrac klase^1, aby moc zakupic^4 EXP^1.");
 
 		return SS_STOP;
 	}
