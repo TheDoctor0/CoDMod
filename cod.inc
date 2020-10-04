@@ -305,10 +305,11 @@ native cod_get_user_time(id);
  * @param id        Player index
  * @param data      Buffer to copy formatted time string to
  * @param lenth     Maximum buffer size
+ * @param lang     Language for translation
  *
  * @noreturn
  */
-native cod_get_user_time_text(id, data[], length);
+native cod_get_user_time_text(id, data[], length, lang = LANG_SERVER);
 
 /**
  * Returns player exp.

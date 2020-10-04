@@ -161,19 +161,19 @@ public get_box(id)
 
 			cod_print_chat(id, "Dostales^x04 %i Honoru^x01!", honor);
 		} case 7: {
-			cod_add_user_rockets(id, 1);
+			cod_add_user_rockets(id, 1, DEATH);
 
 			cod_print_chat(id, "Dostales^x04 Rakiete^x01!");
 		} case 8: {
-			cod_add_user_mines(id, 1);
+			cod_add_user_mines(id, 1, DEATH);
 
 			cod_print_chat(id, "Dostales^x04 Mine^x01!");
 		} case 9: {
-			cod_add_user_medkits(id, 1);
+			cod_add_user_medkits(id, 1, DEATH);
 
 			cod_print_chat(id, "Dostales^x04 Apteczke^x01!");
 		} case 10: {
-			cod_add_user_dynamites(id, 1);
+			cod_add_user_dynamites(id, 1, DEATH);
 
 			cod_print_chat(id, "Dostales^x04 Dynamit^x01!");
 		}

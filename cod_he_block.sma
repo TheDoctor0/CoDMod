@@ -4,7 +4,7 @@
 #include <cod>
 
 #define PLUGIN "CoD HE Block"
-#define VERSION "1.2.2"
+#define VERSION "1.2.3"
 #define AUTHOR "O'Zone"
 
 #define TASK_BLOCK 7526
@@ -60,7 +60,7 @@ public show_info(id)
 		return;
 	}
 
-	client_print(id, print_center, "Granaty zostana odblokowane za %0.1fs", currentTime);
+	client_print(id, print_center, "%L", id, "HE_BLOCK_TIME", currentTime);
 }
 
 public block_he(weapon)
