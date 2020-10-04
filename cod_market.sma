@@ -44,7 +44,7 @@ public market_menu(id)
 {
 	if (!cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new menu = menu_create("\yMenu \rRynku", "market_menu_handle"), callback = menu_makecallback("market_menu_callback");
 
@@ -63,10 +63,10 @@ public market_menu_handle(id, menu, item)
 {
 	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
@@ -97,7 +97,7 @@ public sell_item(id, sound)
 {
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!sound) cod_play_sound(id, SOUND_SELECT);
 
 	if (!cod_get_user_item(id)) {
 		cod_print_chat(id, "Nie masz zadnego itemu!");
@@ -124,7 +124,7 @@ public set_item_price(id)
 {
 	if (!cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+	cod_play_sound(id, SOUND_EXIT);
 
 	if (!cod_get_user_item(id)) {
 		cod_print_chat(id, "Nie masz zadnego itemu!");
@@ -174,7 +174,7 @@ public buy_item(id, sound)
 {
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!sound) cod_play_sound(id, SOUND_SELECT);
 
 	new marketItem[itemInfo], itemData[128], itemId[5], itemsCounts = 0, menu = menu_create("\yKup \rPrzedmiot", "buy_item_handle");
 
@@ -211,14 +211,14 @@ public buy_item_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new itemId[5], itemAccess, itemCallback;
 
@@ -272,14 +272,14 @@ public buy_question_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT || item) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new itemId[5], itemAccess, itemCallback;
 
@@ -324,7 +324,7 @@ public withdraw_item(id, sound)
 {
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!sound) cod_play_sound(id, SOUND_SELECT);
 
 	new marketItem[itemInfo], itemData[128], itemId[5], itemsCounts = 0, menu = menu_create("\yWycofaj \rPrzedmiot", "withdraw_item_handle");
 
@@ -360,14 +360,14 @@ public withdraw_item_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT || item) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new itemId[5], itemAccess, itemCallback;
 
@@ -413,14 +413,14 @@ public withdraw_question_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT || item) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new itemId[5], itemAccess, itemCallback;
 

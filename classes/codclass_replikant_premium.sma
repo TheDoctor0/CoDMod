@@ -6,7 +6,6 @@
 #include <cod>
 
 #define PLUGIN "CoD Class Replikant"
-#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME         "Replikant"
@@ -34,7 +33,9 @@ public plugin_init()
 }
 
 public client_disconnected(id)
+{
 	cod_remove_ents(id, "replica");
+}
 
 public cod_class_enabled(id, promotion)
 {
@@ -52,7 +53,9 @@ public cod_class_spawned(id, respawn)
 }
 
 public cod_new_round()
+{
 	cod_remove_ents(0, "replica");
+}
 
 public cod_class_skill_used(id)
 {
@@ -76,7 +79,7 @@ public cod_class_skill_used(id)
 
 	new Float:entOrigin[3];
 
-	if (!get_origin_in_distance(id, entOrigin, 45.0)) {
+	if (!origin_in_distance(id, entOrigin, 45.0)) {
 		cod_show_hud(id, TYPE_DHUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Musisz odsunac sie nieco dalej od przeszkody, aby postawic replike!");
 
 		return PLUGIN_CONTINUE;
@@ -120,7 +123,7 @@ public cod_class_skill_used(id)
 	itemLastUse[id] = floatround(get_gametime());
 	itemUse[id]--;
 
-	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	cod_emit_sound(id, SOUND_ACTIVATE, VOLUME_NORMAL, CHAN_WEAPON);
 
 	return PLUGIN_CONTINUE;
 }
@@ -160,7 +163,7 @@ public take_damage(victim, inflictor, attacker, Float:damage, damageBits)
 	return HAM_IGNORED;
 }
 
-stock get_origin_in_distance(id, Float:origin[3], Float:distance)
+stock origin_in_distance(id, Float:origin[3], Float:distance)
 {
 	new Float:playerAngle[3], Float:playerOrigin[3], trace;
 

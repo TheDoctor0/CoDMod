@@ -58,14 +58,14 @@ public admin_menu_handle(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	selectedOption[id] = item;
 
@@ -106,14 +106,14 @@ public player_menu_handle(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new itemData[6], itemAccess, itemCallback;
 
@@ -165,7 +165,7 @@ public select_item_menu(id)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (!is_user_connected(selectedPlayer[id])) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		cod_print_chat(id, "Wybranego gracza nie ma juz na serwerze.");
 
@@ -198,7 +198,7 @@ public select_class_menu(id)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (!is_user_connected(selectedPlayer[id])) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		cod_print_chat(id, "Wybranego gracza nie ma juz na serwerze.");
 
@@ -233,7 +233,7 @@ public select_menu_handle(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
@@ -241,14 +241,14 @@ public select_menu_handle(id, menu, item)
 	}
 
 	if (!is_user_connected(selectedPlayer[id])) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		cod_print_chat(id, "Wybranego gracza nie ma juz na serwerze.");
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new itemData[6], itemName[MAX_NAME], playerName[MAX_NAME], itemAccess, itemCallback;
 
@@ -264,7 +264,7 @@ public select_menu_handle(id, menu, item)
 		case GIVE_ITEM: {
 			cod_set_user_item(selectedPlayer[id], selected, RANDOM, true);
 
-			cod_print_chat(id, "Dales przedmiot^x04 %s^x01 graczowi^x03 %s^x01.", itemName, playerName);
+			cod_print_chat(id, "Dales przedmiot^4 %s^1 graczowi^3 %s^1.", itemName, playerName);
 		} case EXCHANGE_EXP: {
 			new firstClassName[MAX_NAME], secondClassName[MAX_NAME],
 				firstClassExp = cod_get_user_exp(selectedPlayer[id]),
@@ -285,7 +285,7 @@ public select_menu_handle(id, menu, item)
 				cod_set_user_class(selectedPlayer[id], selected, 1);
 			}
 
-			cod_print_chat(id, "Zamieniles doswiadczenie miedzy klasami^x04 %s^x01 i^x04 %s^x01 graczowi^x03 %s^x01.", firstClassName, secondClassName, playerName);
+			cod_print_chat(id, "Zamieniles doswiadczenie miedzy klasami^4 %s^1 i^4 %s^1 graczowi^3 %s^1.", firstClassName, secondClassName, playerName);
 		} case TRANSFER_EXP: {
 			new firstClassName[MAX_NAME], secondClassName[MAX_NAME],
 				firstClassExp = cod_get_user_exp(selectedPlayer[id]),
@@ -298,7 +298,7 @@ public select_menu_handle(id, menu, item)
 			cod_set_user_class(selectedPlayer[id], selected, 1);
 			cod_set_user_exp(selectedPlayer[id], firstClassExp);
 
-			cod_print_chat(id, "Przeniosles doswiadczenie z klasy^x04 %s^x01 na klase^x04 %s^x01 graczowi^x03 %s^x01.", firstClassName, secondClassName, playerName);
+			cod_print_chat(id, "Przeniosles doswiadczenie z klasy^4 %s^1 na klase^4 %s^1 graczowi^3 %s^1.", firstClassName, secondClassName, playerName);
 		}
 	}
 
@@ -315,7 +315,7 @@ public amount_handle(id)
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+	cod_play_sound(id, SOUND_EXIT);
 
 	new amountData[16], amount;
 
@@ -325,7 +325,7 @@ public amount_handle(id)
 	amount = str_to_num(amountData);
 
 	if (amount <= 0) {
-		cod_print_chat(id, "Ilosc nie moze byc mniejsza niz^x03 1^x01!");
+		cod_print_chat(id, "Ilosc nie moze byc mniejsza niz^3 1^1!");
 
 		return PLUGIN_HANDLED;
 	}
@@ -338,19 +338,19 @@ public amount_handle(id)
 		case SET_LEVEL: {
 			cod_set_user_exp(selectedPlayer[id], -cod_get_user_exp(selectedPlayer[id]) + cod_get_level_exp(amount - 1));
 
-			cod_print_chat(id, "Ustawiles^x04 %i^x01 poziom graczowi^x03 %s^x01.", amount, playerName);
+			cod_print_chat(id, "Ustawiles^4 %i^1 poziom graczowi^3 %s^1.", amount, playerName);
 		} case ADD_LEVEL: {
 			cod_set_user_exp(selectedPlayer[id], cod_get_level_exp(cod_get_user_level(selectedPlayer[id]) + amount - 1) - cod_get_user_exp(selectedPlayer[id]));
 
-			cod_print_chat(id, "Dodales^x04 %i^x01 poziomow graczowi^x03 %s^x01.", amount, playerName);
+			cod_print_chat(id, "Dodales^4 %i^1 poziomow graczowi^3 %s^1.", amount, playerName);
 		} case ADD_EXP: {
 			cod_set_user_exp(selectedPlayer[id], amount);
 
-			cod_print_chat(id, "Dodales^x04 %i^x01 doswiadczenia graczowi^x03 %s^x01.", amount, playerName);
+			cod_print_chat(id, "Dodales^4 %i^1 doswiadczenia graczowi^3 %s^1.", amount, playerName);
 		} case ADD_HONOR: {
 			cod_add_user_honor(selectedPlayer[id], amount);
 
-			cod_print_chat(id, "Dodales^x04 %i^x01 honoru graczowi^x03 %s^x01.", amount, playerName);
+			cod_print_chat(id, "Dodales^4 %i^1 honoru graczowi^3 %s^1.", amount, playerName);
 		}
 	}
 

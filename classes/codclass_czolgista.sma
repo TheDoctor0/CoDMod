@@ -5,7 +5,6 @@
 #include <cod>
 
 #define PLUGIN "CoD Class Czolgista"
-#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME         "Czolgista"
@@ -41,8 +40,13 @@ public plugin_init()
 
 public plugin_precache()
 {
-	for (new i = 0; i < sizeof(classModels); i++) precache_model(classModels[i]);
-	for (new i = 0; i < sizeof(classSprites); i++) sprite[i] = precache_model(classSprites[i]);
+	for (new i = 0; i < sizeof(classModels); i++) {
+		precache_model(classModels[i]);
+	}
+
+	for (new i = 0; i < sizeof(classSprites); i++) {
+		sprite[i] = precache_model(classSprites[i]);
+	}
 }
 
 public client_disconnected(id)
@@ -152,7 +156,7 @@ public shoot_missile(id)
 	write_byte(100);
 	message_end();
 
-	emit_sound(id, CHAN_ITEM, codSounds[SOUND_DEPLOY], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	cod_emit_sound(id, SOUND_DEPLOY, VOLUME_NORMAL, CHAN_ITEM);
 }
 
 public touch_missile(ent)

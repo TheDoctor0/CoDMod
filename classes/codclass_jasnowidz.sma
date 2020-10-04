@@ -30,7 +30,9 @@ public plugin_init()
 }
 
 public cod_class_enabled(id, promotion)
+{
 	classLastUsed[id] = 0;
+}
 
 public cod_class_skill_used(id)
 {
@@ -66,14 +68,14 @@ public cod_class_skill_used_handle(id, menu, item)
 	if (!is_user_alive(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new playerName[32], playerId[3], itemAccess, itemCallback;
 
@@ -111,7 +113,7 @@ public cod_class_skill_used_handle(id, menu, item)
 	data[1] = player;
 	data[2] = ent;
 
-	emit_sound(player, CHAN_VOICE, codSounds[SOUND_CHARGE], 0.6, ATTN_NORM, 0, PITCH_NORM);
+	cod_emit_sound(player, SOUND_CHARGE, VOLUME_QUIET, CHAN_VOICE);
 
 	set_task(3.0, "deactivate_class", .parameter = data, .len = sizeof(data));
 

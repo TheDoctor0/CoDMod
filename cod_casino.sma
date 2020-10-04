@@ -2,7 +2,6 @@
 #include <cod>
 
 #define PLUGIN "CoD Casino"
-#define VERSION "1.1.1"
 #define AUTHOR "O'Zone"
 
 new const commandCasino[][] = { "kasyno", "say /kasyno", "say_team /kasyno", "say /casino", "say_team /casino" };
@@ -46,7 +45,7 @@ public casino_menu(id, sound)
 {
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!sound) cod_play_sound(id, SOUND_SELECT);
 
 	new menu = menu_create("\yGry w \rKasynie\w:", "casino_menu_handle");
 
@@ -68,14 +67,14 @@ public casino_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	switch (item + 1) {
 		case DICE: dice_menu(id, 0);
@@ -112,8 +111,10 @@ public dice_menu(id, number)
 		if (win) {
 			cod_add_user_honor(id, amount);
 
-			client_cmd(id, "spk %s", codSounds[SOUND_APPLAUSE])
-		} else client_cmd(id, "spk %s", codSounds[SOUND_LAUGH]);
+			cod_play_sound(id, SOUND_APPLAUSE);
+		} else {
+			cod_play_sound(id, SOUND_LAUGH);
+		}
 
 		formatex(menuData, charsmax(menuData), "\yGra w \rKostke\w:^n\wWylosowano \y%i \w- \r%s %i Honoru!\w", number, win ? "Wygrales" : "Przegrales", amount);
 
@@ -149,14 +150,14 @@ public dice_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	if (item) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (item) cod_play_sound(id, SOUND_SELECT);
 
 	menu_destroy(menu);
 
@@ -219,8 +220,10 @@ public roulette_menu(id, number)
 		if (win) {
 			cod_add_user_honor(id, amount);
 
-			client_cmd(id, "spk %s", codSounds[SOUND_APPLAUSE])
-		} else client_cmd(id, "spk %s", codSounds[SOUND_LAUGH]);
+			cod_play_sound(id, SOUND_APPLAUSE);
+		} else {
+			cod_play_sound(id, SOUND_LAUGH);
+		}
 
 		formatex(menuData, charsmax(menuData), "\yGra w \rRuletke\w:^n\wWylosowano \y%i (%s) \w- \r%s %i Honoru!\w", number, number == 0 ? "Zielone" : (number > 7 ? "Czerwone" : "Czarne"), win ? "Wygrales" : "Przegrales", amount);
 
@@ -249,14 +252,14 @@ public roulette_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	if (item) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (item) cod_play_sound(id, SOUND_SELECT);
 
 	menu_destroy(menu);
 
@@ -307,8 +310,10 @@ public coinflip_menu(id, coinFlip)
 		if (win) {
 			cod_add_user_honor(id, amount);
 
-			client_cmd(id, "spk %s", codSounds[SOUND_APPLAUSE])
-		} else client_cmd(id, "spk %s", codSounds[SOUND_LAUGH]);
+			cod_play_sound(id, SOUND_APPLAUSE);
+		} else {
+			cod_play_sound(id, SOUND_LAUGH);
+		}
 
 		formatex(menuData, charsmax(menuData), "\yGra w \rMonete\w:^n\wWylosowano \y%s \w- \r%s %i Honoru!\w", coinFlip ? "Orzel" : "Reszka", win ? "Wygrales" : "Przegrales", amount);
 
@@ -337,14 +342,14 @@ public coinflip_menu_handle(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	if (item) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (item) cod_play_sound(id, SOUND_SELECT);
 
 	menu_destroy(menu);
 
@@ -380,7 +385,7 @@ public change_bid(id)
 {
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new bidData[16], bid;
 

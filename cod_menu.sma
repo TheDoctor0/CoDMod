@@ -62,7 +62,7 @@ public display_menu(id)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[64];
 
@@ -95,7 +95,7 @@ public display_menu_handle(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 

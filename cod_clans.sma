@@ -170,7 +170,7 @@ public show_clan_menu(id, sound)
 {
 	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
-	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!sound) cod_play_sound(id, SOUND_SELECT);
 
 	new codClan[clanInfo], menuData[128], menu, callback = menu_makecallback("show_clan_menu_callback");
 
@@ -230,14 +230,14 @@ public show_clan_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new itemData[2], itemAccess, menuCallback;
 
@@ -292,7 +292,7 @@ public create_clan_handle(id)
 {
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || clan[id]) return PLUGIN_HANDLED;
 
-	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+	cod_play_sound(id, SOUND_EXIT);
 
 	if (cvarCreateFee && cod_get_user_highest_level(id) < cvarCreateLevel) {
 		cod_print_chat(id, "Nie masz wystarczajacego poziomu, aby zalozyc klan (Wymagany^x03 %i poziom^x01)!", cvarCreateLevel);
@@ -363,14 +363,14 @@ public leave_confim_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	switch (item) {
 		case 0: {
@@ -432,7 +432,7 @@ public members_online_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		show_clan_menu(id, 1);
 
@@ -441,7 +441,7 @@ public members_online_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	menu_destroy(menu);
 
@@ -488,7 +488,7 @@ public leader_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		show_clan_menu(id, 1);
 
@@ -497,7 +497,7 @@ public leader_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	switch (item) {
 		case 0: disband_menu(id);
@@ -542,7 +542,7 @@ public change_name_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		show_clan_menu(id, 1);
 
@@ -551,7 +551,7 @@ public change_name_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	switch (item) {
 		case 0: client_cmd(id, "messagemode PODAJ_NOWA_NAZWE_KLANU");
@@ -582,14 +582,14 @@ public disband_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd || get_user_status(id) != STATUS_LEADER || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	switch (item) {
 		case 0: {
@@ -648,7 +648,7 @@ public skills_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
@@ -657,7 +657,7 @@ public skills_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new codClan[clanInfo], upgradedSkill;
 
@@ -848,7 +848,7 @@ public invite_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		show_clan_menu(id, 1);
 
@@ -857,7 +857,7 @@ public invite_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new userName[MAX_NAME], itemData[6], itemAccess, itemCallback;
 
@@ -884,7 +884,7 @@ public invite_confirm_menu(id, player)
 {
 	if (!is_user_connected(id) || !is_user_connected(player) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
-	client_cmd(player, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(player, SOUND_SELECT);
 
 	new menuData[128], clanName[MAX_NAME], userName[MAX_NAME], userId[6];
 
@@ -911,7 +911,7 @@ public invite_confirm_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT || item) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
@@ -930,7 +930,7 @@ public invite_confirm_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(player, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(player, SOUND_SELECT);
 
 	if (clan[id]) {
 		cod_print_chat(id, "Nie mozesz dolaczyc do klanu, jesli nalezysz do innego.");
@@ -959,7 +959,7 @@ public change_name_handle(id)
 {
 	if (!is_user_connected(id) || mapEnd || get_user_status(id) != STATUS_LEADER || !cod_check_account(id)) return PLUGIN_HANDLED;
 
-	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+	cod_play_sound(id, SOUND_EXIT);
 
 	new clanName[MAX_NAME];
 
@@ -1070,14 +1070,14 @@ public member_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new itemData[MAX_NAME], userName[MAX_NAME], tempFlag[6], itemAccess, itemCallback;
 
@@ -1133,7 +1133,7 @@ public member_options_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		show_clan_menu(id, 1);
 
@@ -1142,7 +1142,7 @@ public member_options_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new itemData[6], itemAccess, itemCallback;
 
@@ -1279,14 +1279,14 @@ public applications_confirm_menu(id, menu, item)
 	if (!is_user_connected(id) || mapEnd || get_user_status(id) < STATUS_DEPUTY || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[128], userName[MAX_NAME], itemAccess, itemCallback;
 
@@ -1324,7 +1324,7 @@ public applications_confirm_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
@@ -1337,7 +1337,7 @@ public applications_confirm_handle(id, menu, item)
 
 	menu_destroy(menu);
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	if (item == 2) {
 		remove_application(id, userName);
@@ -1462,14 +1462,14 @@ public wars_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	switch(item) {
 		case 0: war_list_menu(id);
@@ -1561,12 +1561,12 @@ public show_war_list_menu_handle(id, menu, item)
 	menu_destroy(menu);
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	wars_menu(id);
 
@@ -1603,12 +1603,12 @@ public declare_war_menu_handle(id, menu, item)
 	menu_destroy(menu);
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	switch (item) {
 		case 0: client_cmd(id, "messagemode PODAJ_LICZBE_FRAGOW");
@@ -1687,14 +1687,14 @@ public declare_war_confirm(id, menu, item)
 	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new tempData[192], itemData[MAX_NAME], clanName[MAX_NAME], tempClanId[6], itemAccess, menuCallback;
 
@@ -1723,7 +1723,7 @@ public declare_war_confirm_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
@@ -1738,7 +1738,7 @@ public declare_war_confirm_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new itemData[MAX_NAME], clanName[MAX_NAME], tempClanId[6], itemAccess, menuCallback;
 
@@ -1824,14 +1824,14 @@ public accept_war_confirm(id, menu, item)
 	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new dataParts[5][32], tempData[192], itemData[MAX_NAME], itemAccess, menuCallback;
 
@@ -1858,14 +1858,14 @@ public accept_war_confirm_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new dataParts[5][32], itemData[96], itemAccess, menuCallback, warId;
 
@@ -1978,14 +1978,14 @@ public remove_war_confirm(id, menu, item)
 	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new dataParts[4][32], tempData[192], itemData[MAX_NAME], itemAccess, menuCallback;
 
@@ -2012,14 +2012,14 @@ public remove_war_confirm_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new dataParts[4][32], itemData[64], itemAccess, menuCallback, warId;
 
@@ -2047,7 +2047,7 @@ public deposit_honor_handle(id)
 {
 	if (!is_user_connected(id) || mapEnd || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
 
-	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+	cod_play_sound(id, SOUND_EXIT);
 
 	new honorData[16], honorAmount;
 
@@ -2377,14 +2377,14 @@ public application_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	if (clan[id]) {
 		cod_print_chat(id, "Nie mozesz zlozyc podania, jesli jestes juz w klanie!");
@@ -2429,7 +2429,7 @@ public application_confirm_handle(id, menu, item)
 	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT || item) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
@@ -2446,7 +2446,7 @@ public application_confirm_handle(id, menu, item)
 
 	new clanId = str_to_num(tempClanId);
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	if (clan[id]) {
 		cod_print_chat(id, "Nie mozesz zlozyc podania, jesli jestes juz w klanie!");

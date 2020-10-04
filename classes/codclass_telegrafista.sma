@@ -63,7 +63,7 @@ public cod_class_skill_used(id)
 	set_task(1.0, "radar_scan", id + TASK_RADAR, _, _, "b");
 	set_task(30.0, "radar_stop", id + TASK_STOP);
 
-	emit_sound(id, CHAN_ITEM, codSounds[SOUND_CHARGE], 0.5, ATTN_NORM, 0, PITCH_NORM);
+	cod_emit_sound(id, SOUND_CHARGE, VOLUME_QUIET, CHAN_ITEM);
 
 	return PLUGIN_CONTINUE;
 }

@@ -26,7 +26,7 @@ public transfer_menu(id)
 {
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[256], playerName[MAX_NAME], playerId[3], players, menu = menu_create("\yWybierz \rGracza\y, ktoremu chcesz przelac \rHonor\w:", "transfer_menu_handle");
 
@@ -62,14 +62,14 @@ public transfer_menu_handle(id, menu, item)
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new playerId[3], itemAccess, itemCallback;
 
@@ -100,7 +100,7 @@ public transfer_honor_handle(id)
 {
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+	cod_play_sound(id, SOUND_EXIT);
 
 	if (!is_user_connected(transferPlayer[id])) {
 		cod_print_chat(id, "Gracza, ktoremu chcesz przelac^x03 honor^x01 nie ma juz na serwerze!");

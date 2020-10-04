@@ -44,7 +44,7 @@ public cod_new_round()
 public cod_item_skill_used(id)
 {
 	if (get_bit(id, itemUsed)) {
-		cod_show_hud(id, TYPE_HUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Elektromagnesu mozesz uzyc tylko raz na rundee!");
+		cod_show_hud(id, TYPE_HUD, 0, 255, 210, -1.0, 0.35, 0, 0.0, 1.25, 0.0, 0.0, "Elektromagnesu mozesz uzyc tylko raz na runde!");
 
 		return PLUGIN_CONTINUE;
 	}
@@ -64,8 +64,8 @@ public cod_item_skill_used(id)
 
 	drop_to_floor(ent);
 
-	emit_sound(ent, CHAN_VOICE, codSounds[SOUND_CHARGE], 0.5, ATTN_NORM, 0, PITCH_NORM);
-	emit_sound(ent, CHAN_ITEM, codSounds[SOUND_ACTIVATE], 0.5, ATTN_NORM, 0, PITCH_NORM);
+	cod_emit_sound(player, SOUND_CHARGE, VOLUME_QUIET, CHAN_VOICE);
+	cod_emit_sound(player, SOUND_ACTIVATE, VOLUME_QUIET, CHAN_ITEM);
 
 	entity_set_float(ent, EV_FL_nextthink, halflife_time() + 3.5);
 
@@ -77,7 +77,7 @@ public electromagnet_think(ent)
 	if (entity_get_int(ent, EV_INT_iuser2)) return PLUGIN_CONTINUE;
 
 	if (!entity_get_int(ent, EV_INT_iuser1)) {
-		emit_sound(ent, CHAN_VOICE, codSounds[SOUND_ACTIVATE], 0.5, ATTN_NORM, 0, PITCH_NORM);
+		cod_emit_sound(player, SOUND_ACTIVATE, VOLUME_QUIET, CHAN_VOICE);
 	}
 
 	entity_set_int(ent, EV_INT_iuser1, 1);

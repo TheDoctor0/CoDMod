@@ -4,7 +4,6 @@
 #include <cod>
 
 #define PLUGIN "CoD Class Lowca"
-#define VERSION "1.0"
 #define AUTHOR "O'Zone"
 
 #define NAME         "Lowca"
@@ -38,7 +37,11 @@ public plugin_init()
 }
 
 public plugin_precache()
-	for (new i = 0; i < sizeof(classModels); i++) precache_model(classModels[i]);
+{
+	for (new i = 0; i < sizeof(classModels); i++) {
+		precache_model(classModels[i]);
+	}
+}
 
 public client_disconnected(id)
 	cod_remove_ents(id, "belt");
@@ -150,7 +153,7 @@ public shoot_belt(id)
 
 	entity_set_vector(ent, EV_VEC_velocity, velocity);
 
-	emit_sound(id, CHAN_ITEM, codSounds[SOUND_DEPLOY], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	cod_emit_sound(id, SOUND_DEPLOY, VOLUME_NORMAL, CHAN_ITEM);
 }
 
 public touch_belt(ent)

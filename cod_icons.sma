@@ -309,7 +309,7 @@ public change_icons(id, sound)
 {
 	if (!cod_check_account(id)) return PLUGIN_HANDLED;
 
-	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!sound) cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[64], menu = menu_create("\yUstawienia \rIkon\w:", "change_icons_handle");
 
@@ -337,14 +337,14 @@ public change_icons_handle(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	switch (item) {
 		case 0: get_bit(id, iconBombSites) ? rem_bit(id, iconBombSites) : set_bit(id, iconBombSites);

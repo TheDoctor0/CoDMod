@@ -28,7 +28,7 @@ public exchange_menu(id)
 {
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[64], menu = menu_create("\yMenu \rWymiany", "exchange_menu_handle");
 
@@ -52,12 +52,12 @@ public exchange_menu_handle(id, menu, item)
 	if (item == MENU_EXIT) {
 		menu_destroy(menu);
 
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	switch (item) {
 		case 0: exchange_item(id, 1);
@@ -83,7 +83,7 @@ public exchange_item(id, sound)
 {
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!sound) cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[128], playerName[MAX_NAME], itemName[MAX_NAME], playerId[3], players, menu = menu_create("\yWymien \rPrzedmiot", "exchange_item_handle");
 
@@ -123,12 +123,12 @@ public exchange_item_handle(id, menu, item)
 	if (item == MENU_EXIT) {
 		menu_destroy(menu);
 
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new playerId[3], itemAccess, itemCallback;
 
@@ -206,14 +206,14 @@ public exchange_item_question(id, menu, item)
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new playerId[3], itemAccess, itemCallback;
 
@@ -292,7 +292,7 @@ public give_item(id)
 {
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new playerName[MAX_NAME], playerId[3], players, menu = menu_create("\yOddaj \rPrzedmiot", "give_item_handle");
 
@@ -326,14 +326,14 @@ public give_item_handle(id, menu, item)
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new playerId[3], itemAccess, itemCallback;
 

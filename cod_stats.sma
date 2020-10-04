@@ -8,7 +8,6 @@
 #include <nvault>
 
 #define PLUGIN "CoD Stats"
-#define VERSION "1.3.1"
 #define AUTHOR "O'Zone"
 
 #define TASK_TIME 9054
@@ -24,6 +23,39 @@ new const commandTopStats[][] = { "topstaty", "say /stop15", "say_team /stop15",
 new const commandMedals[][] = { "medale", "say /medal", "say_team /medal", "say /medale", "say_team /medale", "say /medals", "say_team /medals" };
 new const commandTopMedals[][] = { "medale", "topmedale", "say /mtop15", "say_team /mtop15", "say /topmedals", "say_team /topmedals", "say /topmedale", "say_team /topmedale" };
 new const commandSounds[][] = { "dzwieki", "say /dzwiek", "say_team /dzwiek", "say /dzwieki", "say_team /dzwieki", "say /sound", "say_team /sound" };
+
+stock const yearSeconds[2] = {
+	31536000,	// Normal year
+	31622400 	// Leap year
+};
+
+stock const monthSeconds[12] = {
+	2678400, // January   31
+	2419200, // February  28
+	2678400, // March     31
+	2592000, // April     30
+	2678400, // May       31
+	2592000, // June      30
+	2678400, // July      31
+	2678400, // August    31
+	2592000, // September 30
+	2678400, // October	  31
+	2592000, // November  30
+	2678400  // December  31
+};
+
+enum timeZones { UT_TIMEZONE_SERVER, UT_TIMEZONE_MIT, UT_TIMEZONE_HAST, UT_TIMEZONE_AKST, UT_TIMEZONE_AKDT, UT_TIMEZONE_PST, UT_TIMEZONE_PDT, UT_TIMEZONE_MST,
+	UT_TIMEZONE_MDT, UT_TIMEZONE_CST, UT_TIMEZONE_CDT, UT_TIMEZONE_EST, UT_TIMEZONE_EDT, UT_TIMEZONE_PRT, UT_TIMEZONE_CNT, UT_TIMEZONE_AGT, UT_TIMEZONE_BET,
+	UT_TIMEZONE_CAT, UT_TIMEZONE_UTC, UT_TIMEZONE_WET, UT_TIMEZONE_WEST, UT_TIMEZONE_CET, UT_TIMEZONE_CEST, UT_TIMEZONE_EET, UT_TIMEZONE_EEST, UT_TIMEZONE_ART,
+	UT_TIMEZONE_EAT, UT_TIMEZONE_MET, UT_TIMEZONE_NET, UT_TIMEZONE_PLT, UT_TIMEZONE_IST, UT_TIMEZONE_BST, UT_TIMEZONE_ICT, UT_TIMEZONE_CTT, UT_TIMEZONE_AWST,
+	UT_TIMEZONE_JST, UT_TIMEZONE_ACST, UT_TIMEZONE_AEST, UT_TIMEZONE_SST, UT_TIMEZONE_NZST, UT_TIMEZONE_NZDT };
+
+stock const timeZoneOffset[timeZones] = { -1, -39600, -36000, -32400, -28800, -28800, -25200, -25200, -21600, -21600, -18000, -18000, -14400, -14400, -12600, -10800,
+	-10800, -3600, 0, 0, 3600, 3600, 7200, 7200, 10800, 7200, 10800, 12600, 14400, 18000, 19800, 21600, 25200, 28800, 28800, 32400, 34200, 36000, 39600, 43200, 46800 };
+stock timeZones:timeZone;
+stock const daySeconds = 86400;
+stock const hourSeconds = 3600;
+stock const minuteSeconds = 60;
 
 enum _:statsInfo { ADMIN, REVENGE, TIME, FIRST_VISIT, LAST_VISIT, KILLS, BRONZE, SILVER, GOLD, MEDALS, BEST_STATS, BEST_KILLS,
 	BEST_HS_KILLS, BEST_DEATHS, CURRENT_STATS, CURRENT_KILLS, CURRENT_HS_KILLS, CURRENT_DEATHS, ROUND_KILLS, ROUND_HS_KILLS };
@@ -168,7 +200,7 @@ public stats_menu(id)
 {
 	if (!cod_check_account(id)) return PLUGIN_HANDLED;
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new menu = menu_create("\yMenu \yStatystyk\r", "stats_menu_handle");
 
@@ -194,14 +226,14 @@ public stats_menu_handle(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new itemData[3], itemAccess, itemCallback;
 
@@ -739,7 +771,9 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 		for (new i = 1; i <= MAX_PLAYERS; i++) {
 			if (!is_user_connected(i)) continue;
 
-			if ((pev(i, pev_iuser2) == victim || i == victim) && get_bit(i, soundHumiliation)) client_cmd(i, "spk %s", codSounds[SOUND_HUMILIATION]);
+			if ((pev(i, pev_iuser2) == victim || i == victim) && get_bit(i, soundHumiliation)) {
+				cod_play_sound(i, SOUND_HUMILIATION);
+			}
 		}
 	}
 
@@ -824,7 +858,9 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 		for (new i = 1; i <= MAX_PLAYERS; i++) {
 			if (!is_user_connected(i)) continue;
 
-			if ((pev(i, pev_iuser2) == lastT || pev(i, pev_iuser2) == lastCT || i == lastT || i == lastCT) && get_bit(i, soundMayTheForce)) client_cmd(i, "spk %s", codSounds[SOUND_FORCE]);
+			if ((pev(i, pev_iuser2) == lastT || pev(i, pev_iuser2) == lastCT || i == lastT || i == lastCT) && get_bit(i, soundMayTheForce)) {
+				cod_play_sound(i, SOUND_FORCE);
+			}
 		}
 
 		new lastTName[MAX_NAME], lastCTName[MAX_NAME];
@@ -840,9 +876,13 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 		for (new i = 1; i <= MAX_PLAYERS; i++) {
 			if (!is_user_connected(i)) continue;
 
-			if (((is_user_alive(i) && get_user_team(i) == 2) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 2)) && get_bit(i, soundOneAndOnly)) client_cmd(i, "spk %s", codSounds[SOUND_LAST]);
+			if (((is_user_alive(i) && get_user_team(i) == 2) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 2)) && get_bit(i, soundOneAndOnly)) {
+				cod_play_sound(i, SOUND_LAST);
+			}
 
-			if (pev(i, pev_iuser2) == lastT || i == lastT) client_cmd(i, "spk %s", codSounds[SOUND_ONE]);
+			if (pev(i, pev_iuser2) == lastT || i == lastT) {
+				cod_play_sound(i, SOUND_ONE);
+			}
 		}
 
 		cod_show_hud(0, TYPE_DHUD, 255, 128, 0, -1.0, 0.30, 0, 5.0, 5.0, 0.5, 0.15, "%i vs %i", tCount, ctCount);
@@ -853,9 +893,13 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 		for (new i = 1; i <= MAX_PLAYERS; i++) {
 			if (!is_user_connected(i)) continue;
 
-			if (((is_user_alive(i) && get_user_team(i) == 1) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 1)) && get_bit(i, soundOneAndOnly)) client_cmd(i, "spk %s", codSounds[SOUND_LAST]);
+			if (((is_user_alive(i) && get_user_team(i) == 1) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 1)) && get_bit(i, soundOneAndOnly)) {
+				cod_play_sound(i, SOUND_LAST);
+			}
 
-			if (pev(i, pev_iuser2) == lastCT || i == lastCT) client_cmd(i, "spk %s", codSounds[SOUND_ONE]);
+			if (pev(i, pev_iuser2) == lastCT || i == lastCT) {
+				cod_play_sound(i, SOUND_ONE);
+			}
 		}
 
 		cod_show_hud(0, TYPE_DHUD, 255, 128, 0, -1.0, 0.30, 0, 5.0, 5.0, 0.5, 0.15, "%i vs %i", ctCount, tCount);
@@ -867,7 +911,9 @@ public cod_bomb_planted(planter)
 	for (new i = 1; i <= MAX_PLAYERS; i++) {
 		if (!is_user_connected(i)) continue;
 
-		if (((is_user_alive(i) && get_user_team(i) == 2) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 2)) && get_bit(i, soundPrepare)) client_cmd(i, "spk %s", codSounds[SOUND_BOMB]);
+		if (((is_user_alive(i) && get_user_team(i) == 2) || (!is_user_alive(i) && get_user_team(pev(i, pev_iuser2)) == 2)) && get_bit(i, soundPrepare)) {
+			cod_play_sound(i, SOUND_BOMB);
+		}
 	}
 }
 

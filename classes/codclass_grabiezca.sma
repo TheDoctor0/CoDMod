@@ -53,14 +53,14 @@ public show_question(id, victim)
 public show_question_handle(id, menu, item)
 {
 	if (item) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new itemData[4], victim, itemAccess, menuCallback;
 
@@ -78,7 +78,7 @@ public show_question_handle(id, menu, item)
 
 	get_user_name(id, thiefName, charsmax(thiefName));
 
-	cod_print_chat(victim, "Twoj item zostal skradziony przez^x03 %s^x01.", thiefName);
+	cod_print_chat(victim, "Twoj item zostal skradziony przez^3 %s^1.", thiefName);
 
 	cod_set_user_item(victim);
 	cod_set_user_item(id, item, itemValue, true);
