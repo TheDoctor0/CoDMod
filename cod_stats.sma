@@ -5,7 +5,6 @@
 #include <fun>
 #include <cstrike>
 #include <fakemeta>
-#include <unixtime>
 #include <nvault>
 
 #define PLUGIN "CoD Stats"
@@ -633,13 +632,13 @@ public check_time(id)
 
 	new currentYear, lastYear, currentMonth, lastMonth, currentDay, lastDay, hour, minute, second, time = get_systime();
 
-	UnixToTime(time, currentYear, currentMonth, currentDay, hour, minute, second, UT_TIMEZONE_SERVER);
+	unix_to_time(time, currentYear, currentMonth, currentDay, hour, minute, second, UT_TIMEZONE_SERVER);
 
 	cod_print_chat(id, "Aktualnie jest godzina^x03 %02d:%02d:%02d (Data: %02d.%02d.%02d)^x01.", hour, minute, second, currentDay, currentMonth, currentYear);
 
 	if (playerStats[id][FIRST_VISIT] == playerStats[id][LAST_VISIT]) cod_print_chat(id, "To twoja^x03 pierwsza wizyta^x01 na serwerze. Zyczymy milej gry!" );
 	else {
-		UnixToTime(playerStats[id][LAST_VISIT], lastYear, lastMonth, lastDay, hour, minute, second, UT_TIMEZONE_SERVER);
+		unix_to_time(playerStats[id][LAST_VISIT], lastYear, lastMonth, lastDay, hour, minute, second, UT_TIMEZONE_SERVER);
 
 		if (currentYear == lastYear && currentMonth == lastMonth && currentDay == lastDay) {
 			cod_print_chat(id, "Twoja ostatnia wizyta miala miejsce^x04 dzisiaj^x01 o^x03 %02d:%02d:%02d^x01. Zyczymy milej gry!", hour, minute, second);
@@ -1176,6 +1175,117 @@ public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSiz
 	}
 
 	return PLUGIN_CONTINUE;
+}
+
+stock unix_to_time(timestamp, &year, &month, &day, &hour, &minute, &second, timeZones:tztimeZone=UT_TIMEZONE_UTC)
+{
+	new temp;
+
+	year = 1970;
+	month = 1;
+	day = 1;
+	hour = 0;
+
+	if (tztimeZone == UT_TIMEZONE_SERVER) {
+		tztimeZone = get_timezone();
+	}
+
+	timestamp += timeZoneOffset[tztimeZone];
+
+	while (timestamp > 0) {
+		temp = is_leap_year(year);
+
+		if ((timestamp - yearSeconds[temp]) >= 0) {
+			timestamp -= yearSeconds[temp];
+			year++;
+		} else {
+			break;
+		}
+	}
+
+	while (timestamp > 0) {
+		temp = seconds_in_month(year, month);
+
+		if ((timestamp - temp) >= 0) {
+			timestamp -= temp;
+			month++;
+		} else {
+			break;
+		}
+	}
+
+	while (timestamp > 0) {
+		if ((timestamp - daySeconds) >= 0) {
+			timestamp -= daySeconds;
+			day++;
+		} else {
+			break;
+		}
+	}
+
+	while (timestamp > 0) {
+		if ((timestamp - hourSeconds) >= 0) {
+			timestamp -= hourSeconds;
+			hour++;
+		} else {
+			break;
+		}
+	}
+
+	minute = (timestamp / 60);
+	second = (timestamp % 60);
+}
+
+stock time_to_unix(const year, const month, const day, const hour, const minute, const second, timeZones:tztimeZone=UT_TIMEZONE_UTC)
+{
+	new i, timestamp;
+
+	for (i = 1970; i < year; i++) {
+		timestamp += yearSeconds[is_leap_year(i)];
+	}
+
+	for (i = 1; i < month; i++) {
+		timestamp += seconds_in_month(year, i);
+	}
+
+	timestamp += ((day - 1) * daySeconds);
+	timestamp += (hour * hourSeconds);
+	timestamp += (minute * minuteSeconds);
+	timestamp += second;
+
+	if (tztimeZone == UT_TIMEZONE_SERVER) {
+		tztimeZone = get_timezone();
+	}
+
+	return (timestamp + timeZoneOffset[tztimeZone]);
+}
+
+stock timeZones:get_timezone()
+{
+	if (timeZone) return timeZone;
+
+	new timeZones:zone, offset, temp, year, month, day, hour, minute, second;
+	date(year, month, day);
+	time(hour, minute, second);
+
+	temp = time_to_unix(year, month, day, hour, minute, second, UT_TIMEZONE_UTC);
+	offset = temp - get_systime();
+
+	for (zone = timeZones:0; zone < timeZones; zone++) {
+		if (offset == timeZoneOffset[zone]) break;
+	}
+
+	return (timeZone = zone);
+}
+
+stock seconds_in_month(const year, const month)
+{
+	return ((is_leap_year(year) && (month == 2)) ? (monthSeconds[month - 1] + daySeconds) : monthSeconds[month - 1]);
+}
+
+stock is_leap_year(const year)
+{
+	return (((year % 4) == 0) && (((year % 100) != 0) || ((year % 400) == 0)));
 }
 
 public _cod_stats_add_kill(id)
