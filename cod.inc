@@ -14,6 +14,9 @@
 #define FL_WATERJUMP    (1<<11)
 #define FL_ONGROUND     (1<<9)
 
+#define VOLUME_NORMAL  1.0
+#define VOLUME_QUIET   0.5
+
 /**
  * User helpers
  */
@@ -2023,6 +2026,27 @@ native cod_cmd_execute(id, const command[], any:...);
  */
 native cod_sql_string(const source[], dest[], length);
 
+/**
+ * Plays one of available SOUND_* sounds.
+ *
+ * @param id        Entity index
+ * @param sound     Sound index
+ *
+ * @noreturn
+ */
+native cod_play_sound(id, sound);
+
+/**
+ * Emits one of available SOUND_* sounds.
+ *
+ * @param id        Entity index
+ * @param sound     Sound index
+ * @param volume    Volume (VOLUME_NORMAL and VOLUME_QUIET can be used)
+ * @param channel   Channel (CHAN_*)
+ *
+ * @noreturn
+ */
+native cod_emit_sound(ent, sound, Float:volume=VOLUME_NORMAL, channel=CHAN_WEAPON);
 
 /**
  * Diplays text in HUD / DHUD to players.

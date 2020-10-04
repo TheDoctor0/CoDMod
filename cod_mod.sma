@@ -10,7 +10,6 @@
 #include <cod>
 
 #define PLUGIN "CoD Mod"
-#define VERSION "1.5.1"
 #define AUTHOR "O'Zone"
 
 #pragma dynamic              65536
@@ -437,6 +436,8 @@ public plugin_natives()
 	register_native("cod_show_hud", "_cod_show_hud", 1);
 	register_native("cod_cmd_execute", "_cod_cmd_execute", 1);
 	register_native("cod_sql_string", "_cod_sql_string", 1);
+	register_native("cod_play_sound", "_cod_play_sound", 1);
+	register_native("cod_emit_sound", "_cod_emit_sound", 1);
 	register_native("cod_make_bartimer", "_cod_make_bartimer", 1);
 	register_native("cod_display_fade", "_cod_display_fade", 1);
 	register_native("cod_display_icon", "_cod_display_icon", 1);
@@ -689,7 +690,7 @@ public select_faction(id)
 	}
 
 	if (ArraySize(codFactions)) {
-		client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+		cod_play_sound(id, SOUND_SELECT);
 
 		new menuData[128], factionName[MAX_NAME];
 
@@ -723,14 +724,14 @@ public select_faction_handle(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[128], menuClassName[MAX_NAME], menuClassId[5], itemData[MAX_NAME], classId = codPlayer[id][PLAYER_CLASS], codClass[classInfo], itemAccess, itemCallback;
 
@@ -779,7 +780,7 @@ public select_class(id)
 {
 	if (!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[128], menuClassName[MAX_NAME], menuClassId[5], codClass[classInfo], classId = codPlayer[id][PLAYER_CLASS];
 
@@ -823,14 +824,14 @@ public select_class_confirm(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[512], codClass[classInfo], itemData[5], itemAccess, itemCallback, classId = codPlayer[id][PLAYER_CLASS];
 
@@ -895,7 +896,7 @@ public select_class_confirm_handle(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
@@ -904,7 +905,7 @@ public select_class_confirm_handle(id, menu, item)
 
 	if (item) select_faction(id);
 	else {
-		client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+		cod_play_sound(id, SOUND_SELECT);
 
 		new itemData[5], itemAccess, itemCallback;
 
@@ -927,7 +928,7 @@ public display_classes_description(id, class, sound)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	if (sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (sound) cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[128], className[MAX_NAME * 2], classId[5];
 
@@ -970,14 +971,14 @@ public display_classes_description_handle(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[512], codClass[classInfo], classId[5], promotionData[10], itemAccess, itemCallback;
 
@@ -1039,14 +1040,14 @@ public classes_description_handle(id, menu, item)
 	menu_item_getinfo(menu, item, itemAccess, itemData, charsmax(itemData), _, _, itemCallback);
 
 	if (!itemData[0]) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	menu_destroy(menu);
 
@@ -1121,7 +1122,7 @@ public display_items_description(id, page, sound)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	if (sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (sound) cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[128], itemName[MAX_NAME];
 
@@ -1154,14 +1155,14 @@ public display_items_description_handle(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	menu_destroy(menu);
 
@@ -1268,7 +1269,7 @@ public assign_points(id, sound)
 {
 	if (!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
 
-	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!sound) cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[128];
 
@@ -1311,14 +1312,14 @@ public assign_points_handler(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	if (!codPlayer[id][PLAYER_POINTS]) return PLUGIN_CONTINUE;
 
@@ -1384,7 +1385,7 @@ public change_hud(id, sound)
 {
 	if (!is_user_connected(id) || !cod_check_account(id)) return PLUGIN_HANDLED;
 
-	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!sound) cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[128];
 
@@ -1423,14 +1424,14 @@ public change_hud_handle(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
 		return PLUGIN_HANDLED;
 	}
 
-	client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	cod_play_sound(id, SOUND_SELECT);
 
 	switch (item) {
 		case 0: if ((codPlayer[id][PLAYER_HUD_RED] += 15) > 255) codPlayer[id][PLAYER_HUD_RED] = 0;
@@ -1475,7 +1476,7 @@ public show_binds(id, sound)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	if (!sound) client_cmd(id, "spk %s", codSounds[SOUND_SELECT]);
+	if (!sound) cod_play_sound(id, SOUND_SELECT);
 
 	new menuData[128];
 
@@ -1541,7 +1542,7 @@ public show_binds_handle(id, menu, item)
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
 	if (item == MENU_EXIT) {
-		client_cmd(id, "spk %s", codSounds[SOUND_EXIT]);
+		cod_play_sound(id, SOUND_EXIT);
 
 		menu_destroy(menu);
 
@@ -1677,7 +1678,7 @@ public use_rocket(id)
 
 	entity_set_vector(ent, EV_VEC_velocity, velocity);
 
-	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_DEPLOY], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	cod_emit_sound(id, SOUND_DEPLOY);
 
 	return PLUGIN_HANDLED;
 }
@@ -1755,7 +1756,7 @@ public use_mine(id)
 
 	set_rendering(ent, kRenderFxNone, 0, 0, 0, kRenderTransTexture, 50);
 
-	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	cod_emit_sound(id, SOUND_ACTIVATE);
 
 	return PLUGIN_HANDLED;
 }
@@ -1841,7 +1842,7 @@ public use_dynamite(id)
 
 	drop_to_floor(ent);
 
-	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	cod_emit_sound(id, SOUND_ACTIVATE);
 
 	return PLUGIN_HANDLED;
 }
@@ -1895,7 +1896,7 @@ public use_medkit(id)
 
 	entity_set_float(ent, EV_FL_nextthink, halflife_time() + 0.1);
 
-	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	cod_emit_sound(id, SOUND_ACTIVATE);
 
 	return PLUGIN_HANDLED;
 }
@@ -1986,7 +1987,7 @@ public use_poison(id)
 
 	entity_set_float(ent, EV_FL_nextthink, halflife_time() + 0.1);
 
-	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_ACTIVATE], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	cod_emit_sound(id, SOUND_ACTIVATE);
 
 	return PLUGIN_HANDLED;
 }
@@ -2090,8 +2091,8 @@ public use_thunder(id)
 	write_byte(10);
 	message_end();
 
-	emit_sound(id, CHAN_WEAPON, codSounds[SOUND_THUNDER], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-	emit_sound(victim, CHAN_WEAPON, codSounds[SOUND_THUNDER], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	cod_emit_sound(id, SOUND_THUNDER);
+	cod_emit_sound(victim, SOUND_THUNDER);
 
 	ExecuteForward(codForwards[THUNDER_REACH], ret, id, victim, 65.0 + get_intelligence(id) * 0.5);
 
@@ -2448,7 +2449,7 @@ public player_death(killer, victim, weapon, hitPlace)
 
 			get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
-			chat_print(killer, "Zabiles%s gracza^x03 %s^x04 (%s - %i)^x01, dostajesz^x03 %i^x01 doswiadczenia.", hitPlace == HIT_HEAD ? " z HS" : "", codPlayer[victim][PLAYER_NAME], className, codPlayer[victim][PLAYER_LEVEL], exp);
+			chat_print(killer, "Zabiles%s gracza^3 %s^4 (%s - %i)^1, dostajesz^3 %i^1 doswiadczenia.", hitPlace == HIT_HEAD ? " z HS" : "", codPlayer[victim][PLAYER_NAME], className, codPlayer[victim][PLAYER_LEVEL], exp);
 
 			set_dhudmessage(255, 206, 85, -1.0, 0.6, 0, 0.0, 2.0, 0.0, 0.0);
 			show_dhudmessage(killer, "+%i XP", exp);
@@ -2465,7 +2466,7 @@ public player_death(killer, victim, weapon, hitPlace)
 	} else {
 		get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
-		chat_print(killer, "Zabiles%s gracza^x03 %s^x04 (%s - %i)^x01.", hitPlace == HIT_HEAD ? " z HS" : "", codPlayer[victim][PLAYER_NAME], className, codPlayer[victim][PLAYER_LEVEL]);
+		chat_print(killer, "Zabiles%s gracza^3 %s^4 (%s - %i)^1.", hitPlace == HIT_HEAD ? " z HS" : "", codPlayer[victim][PLAYER_NAME], className, codPlayer[victim][PLAYER_LEVEL]);
 	}
 
 	get_user_class_info(killer, codPlayer[killer][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
@@ -2473,11 +2474,11 @@ public player_death(killer, victim, weapon, hitPlace)
 	if (!codPlayer[killer][PLAYER_ITEM]) {
 		set_item(killer, RANDOM, RANDOM);
 
-		chat_print(victim, "Zostales zabity przez^x03 %s^x04 (%s - %i)^x01, ktoremu zostalo^x04 %i^x01 HP.", codPlayer[killer][PLAYER_NAME], className, codPlayer[killer][PLAYER_LEVEL], get_user_health(killer));
+		chat_print(victim, "Zostales zabity przez^3 %s^4 (%s - %i)^1, ktoremu zostalo^4 %i^1 HP.", codPlayer[killer][PLAYER_NAME], className, codPlayer[killer][PLAYER_LEVEL], get_user_health(killer));
 	} else {
 		get_item_info(codPlayer[killer][PLAYER_ITEM], ITEM_NAME, itemName, charsmax(itemName));
 
-		chat_print(victim, "Zostales zabity przez^x03 %s^x04 (%s - %i - %s)^x01, ktoremu zostalo^x04 %i^x01 HP.", codPlayer[killer][PLAYER_NAME], className, codPlayer[killer][PLAYER_LEVEL], itemName, get_user_health(killer));
+		chat_print(victim, "Zostales zabity przez^3 %s^4 (%s - %i - %s)^1, ktoremu zostalo^4 %i^1 HP.", codPlayer[killer][PLAYER_NAME], className, codPlayer[killer][PLAYER_LEVEL], itemName, get_user_health(killer));
 	}
 
 	check_level(killer);
@@ -2496,7 +2497,7 @@ public player_death(killer, victim, weapon, hitPlace)
 				set_item(victim);
 
 				chat_print(victim, "Twoj przedmiot ulegl zniszczeniu.");
-			} else chat_print(victim, "Pozostala wytrzymalosc twojego przedmiotu to^x03 %i^x01/^x03%i^x01.", codPlayer[victim][PLAYER_ITEM_DURA], cvarMaxDurability);
+			} else chat_print(victim, "Pozostala wytrzymalosc twojego przedmiotu to^3 %i^1/^3%i^1.", codPlayer[victim][PLAYER_ITEM_DURA], cvarMaxDurability);
 		}
 	}
 
@@ -2642,7 +2643,7 @@ public start_round()
 
 		display_fade(id, 1<<9, 1<<9, 1<<12, 0, 255, 70, 100);
 
-		client_cmd(id, "spk %s", get_user_team(id) == 1 ? codSounds[SOUND_START2] : codSounds[SOUND_START]);
+		cod_play_sound(id, get_user_team(id) == 1 ? SOUND_START2 : SOUND_START);
 
 		if (cs_get_user_team(id) == CS_TEAM_CT) cs_set_user_defuse(id, 1);
 	}
@@ -2706,7 +2707,7 @@ public round_winner(team)
 
 		codPlayer[id][PLAYER_GAINED_EXP] += exp;
 
-		chat_print(id, "Dostales^x03 %i^x01 doswiadczenia za wygrana runde.", exp);
+		chat_print(id, "Dostales^3 %i^1 doswiadczenia za wygrana runde.", exp);
 
 		check_level(id);
 	}
@@ -2725,7 +2726,7 @@ public bomb_planted(id)
 
 	codPlayer[id][PLAYER_GAINED_EXP] += exp;
 
-	chat_print(id, "Dostales^x03 %i^x01 doswiadczenia za podlozenie bomby.", exp);
+	chat_print(id, "Dostales^3 %i^1 doswiadczenia za podlozenie bomby.", exp);
 
 	check_level(id);
 }
@@ -2743,7 +2744,7 @@ public bomb_defused(id)
 
 	codPlayer[id][PLAYER_GAINED_EXP] += exp;
 
-	chat_print(id, "Dostales^x03 %i^x01 doswiadczenia za rozbrojenie bomby.", exp);
+	chat_print(id, "Dostales^3 %i^1 doswiadczenia za rozbrojenie bomby.", exp);
 
 	check_level(id);
 }
@@ -2784,7 +2785,7 @@ public hostage_rescued()
 
 	codPlayer[id][PLAYER_GAINED_EXP] += exp;
 
-	chat_print(id, "Dostales^x03 %i^x01 doswiadczenia za uratowanie zakladnika.", exp);
+	chat_print(id, "Dostales^3 %i^1 doswiadczenia za uratowanie zakladnika.", exp);
 
 	check_level(id);
 }
@@ -2948,7 +2949,7 @@ public say_text(msgId, msgDest, msgEnt)
 
 		get_user_class_info(id, codPlayer[id][PLAYER_CLASS], CLASS_NAME, chatPrefix, charsmax(chatPrefix));
 
-		format(chatPrefix, charsmax(chatPrefix), "^x04[%s - %i]", chatPrefix, codPlayer[id][PLAYER_LEVEL]);
+		format(chatPrefix, charsmax(chatPrefix), "^4[%s - %i]", chatPrefix, codPlayer[id][PLAYER_LEVEL]);
 
 		if (!equal(tempMessage, "#Cstrike_Chat_All")) {
 			add(message, charsmax(message), chatPrefix);
@@ -2959,9 +2960,9 @@ public say_text(msgId, msgDest, msgEnt)
 			set_msg_arg_string(4, "");
 
 			add(message, charsmax(message), chatPrefix);
-			add(message, charsmax(message), "^x03 ");
+			add(message, charsmax(message), "^3 ");
 			add(message, charsmax(message), codPlayer[id][PLAYER_NAME]);
-			add(message, charsmax(message), "^x01 :  ");
+			add(message, charsmax(message), "^1 :  ");
 			add(message, charsmax(message), tempMessage);
 		}
 
@@ -3079,8 +3080,8 @@ public show_advertisement(id)
 {
 	id -= TASK_SHOW_AD;
 
-	chat_print(id, "Witaj na serwerze^x03 Call of Duty Mod^x01 stworzonym przez^x03 O'Zone^x01.");
-	chat_print(id, "W celu uzyskania informacji o komendach wpisz^x03 /menu^x01 (klawisz^x03 ^"v^"^x01).");
+	chat_print(id, "Witaj na serwerze^3 Call of Duty Mod^1 stworzonym przez^3 O'Zone^1.");
+	chat_print(id, "W celu uzyskania informacji o komendach wpisz^3 /menu^1 (klawisz^3 ^"v^"^1).");
 }
 
 public show_help(id)
@@ -3129,8 +3130,8 @@ public check_time()
 
 public night_exp_info()
 {
-	if (nightExp) chat_print(0, "Na serwerze^x03 aktywny^x01 jest nocny exp^x03 wiekszy o %i procent^x01!", cvarNightExpBonus);
-	else chat_print(0, "Od godziny^x03 %i:00^x01 do^x03 %i:00^x01 na serwerze exp jest^x03 wiekszy o %i procent^x01!", cvarNightExpFrom, cvarNightExpTo, cvarNightExpBonus);
+	if (nightExp) chat_print(0, "Na serwerze^3 aktywny^1 jest nocny exp^3 wiekszy o %i procent^1!", cvarNightExpBonus);
+	else chat_print(0, "Od godziny^3 %i:00^1 do^3 %i:00^1 na serwerze exp jest^3 wiekszy o %i procent^1!", cvarNightExpFrom, cvarNightExpTo, cvarNightExpBonus);
 }
 
 public set_speed_limit(id)
@@ -3258,7 +3259,7 @@ stock set_item(id, item = 0, value = 0, force = false)
 			format(itemDescription, charsmax(itemDescription), itemDescription, itemValue);
 		}
 
-		chat_print(id, "Zdobyles^x03 %s^x01 -^x04 %s^x01.", itemName, itemDescription);
+		chat_print(id, "Zdobyles^3 %s^1 -^4 %s^1.", itemName, itemDescription);
 	} else codPlayer[id][PLAYER_ITEM_DURA] = 0;
 
 	return PLUGIN_CONTINUE;
@@ -3287,9 +3288,9 @@ public check_level(id)
 		check_promotion(id, 1);
 
 		switch (random_num(1, 3)) {
-			case 1: client_cmd(id, "spk %s", codSounds[SOUND_LVLUP]);
-			case 2: client_cmd(id, "spk %s", codSounds[SOUND_LVLUP2]);
-			case 3: client_cmd(id, "spk %s", codSounds[SOUND_LVLUP3]);
+			case 1: cod_play_sound(id, SOUND_LVLUP);
+			case 2: cod_play_sound(id, SOUND_LVLUP2);
+			case 3: cod_play_sound(id, SOUND_LVLUP3);
 		}
 	}
 
@@ -3650,11 +3651,11 @@ stock remove_ents(id = 0, const className[] = "")
 public show_bonus_info()
 {
 	if (get_players_amount() > 0 && (lastInfo + 5.0 < get_gametime() || get_players_amount() == cvarMinBonusPlayers)) {
-		if (get_players_amount() == cvarMinBonusPlayers) chat_print(0, "Serwer jest pelny, a to oznacza^x03 EXP wiekszy o %i procent^x01!", cvarBonusPlayersPer * cvarMinBonusPlayers);
+		if (get_players_amount() == cvarMinBonusPlayers) chat_print(0, "Serwer jest pelny, a to oznacza^3 EXP wiekszy o %i procent^1!", cvarBonusPlayersPer * cvarMinBonusPlayers);
 		else {
 			new playersToFull = cvarMinBonusPlayers - get_players_amount();
 
-			chat_print(0, "Do pelnego serwera brakuj%s^x03 %i osob%s^x01. Exp jest^x03 wiekszy o %i procent^x01!", playersToFull > 1 ? (playersToFull < 5 ? "a" : "e") : "e", playersToFull, playersToFull == 1 ? "a" : (playersToFull < 5 ? "y" : ""), get_players_amount() * cvarBonusPlayersPer);
+			chat_print(0, "Do pelnego serwera brakuj%s^3 %i osob%s^1. Exp jest^3 wiekszy o %i procent^1!", playersToFull > 1 ? (playersToFull < 5 ? "a" : "e") : "e", playersToFull, playersToFull == 1 ? "a" : (playersToFull < 5 ? "y" : ""), get_players_amount() * cvarBonusPlayersPer);
 		}
 
 		lastInfo = floatround(get_gametime());
@@ -4082,7 +4083,7 @@ public _cod_upgrade_user_item(id, check)
 
 			codPlayer[id][PLAYER_ITEM_DURA] = cvarMaxDurability;
 
-			chat_print(id, "Twoj przedmiot zostal pomyslnie^x03 ulepszony^x01.");
+			chat_print(id, "Twoj przedmiot zostal pomyslnie^3 ulepszony^1.");
 		} case 7 .. 9: {
 			new durability = random_num(cvarMinDamageDurability, cvarMaxDamageDurability);
 
@@ -4091,12 +4092,12 @@ public _cod_upgrade_user_item(id, check)
 			if (codPlayer[id][PLAYER_ITEM_DURA] <= 0) {
 				set_item(id);
 
-				chat_print(id, "Ulepszenie^x03 nieudane^x01! Twoj przedmiot ulegl^x03 zniszczeniu^x01.");
-			} else chat_print(id, "Ulepszenie^x03 nieudane^x01! Straciles^x03 %i^x01 wytrzymalosci przedmiotu.", durability);
+				chat_print(id, "Ulepszenie^3 nieudane^1! Twoj przedmiot ulegl^3 zniszczeniu^1.");
+			} else chat_print(id, "Ulepszenie^3 nieudane^1! Straciles^3 %i^1 wytrzymalosci przedmiotu.", durability);
 		} case 10: {
 			set_item(id);
 
-			chat_print(id, "Ulepszenie^x03 nieudane^x01! Twoj przedmiot ulegl^x03 zniszczeniu^x01.");
+			chat_print(id, "Ulepszenie^3 nieudane^1! Twoj przedmiot ulegl^3 zniszczeniu^1.");
 		}
 	}
 
@@ -4145,7 +4146,7 @@ public _cod_set_item_durability(id, value)
 	if (!codPlayer[id][PLAYER_ITEM_DURA]) {
 		set_item(id);
 
-		chat_print(id, "Twoj przedmiot ulegl^x03 zniszczeniu^x01.");
+		chat_print(id, "Twoj przedmiot ulegl^3 zniszczeniu^1.");
 	}
 }
 
@@ -4891,6 +4892,20 @@ public _cod_sql_string(const source[], dest[], length)
 	param_convert(2);
 
 	sql_string(source, dest, length);
+}
+
+public _cod_play_sound(id, sound)
+{
+	if (!is_user_connected(id)) return;
+
+	client_cmd(id, "spk %s", codSounds[sound]);
+}
+
+public _cod_emit_sound(ent, sound, Float:volume, channel)
+{
+	if (!pev_valid(ent)) return;
+
+	emit_sound(ent, channel, codSounds[sound], volume, ATTN_NORM, 0, PITCH_NORM);
 }
 
 public _cod_screen_shake(id, amplitude, duration, frequency)
