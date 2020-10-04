@@ -9,6 +9,8 @@
 
 #pragma unused codSounds
 
+#define VERSION "2.0.0"
+
 #define FL_WATERJUMP    (1<<11)
 #define FL_ONGROUND     (1<<9)
 
