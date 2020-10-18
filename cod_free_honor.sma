@@ -3,10 +3,9 @@
 #include <cod>
 
 #define PLUGIN "CoD Free Honor"
-#define VERSION "1.1.0"
-#define AUTHOR "RevengeST & O'Zone"
+#define AUTHOR "O'Zone"
 
-new const commandHonor[][] = { "freehonor", "say /freehonor", "say_team /freehonor" };
+new const commandHonor[][] = { "freehonor", "say /freehonor", "say_team /freehonor", "say /darmowyhonor", "say_team /darmowyhonor" };
 
 new playerName[MAX_PLAYERS + 1][MAX_NAME], cvarFreeHonor, received, loaded, vault;
 
@@ -35,7 +34,9 @@ public receive_honor(id)
 		set_bit(id, received);
 
 		save(id);
-	} else cod_print_chat(id, "Juz odebrales swoj^3 darmowy honor^1!");
+	} else {
+		cod_print_chat(id, "Juz odebrales swoj^3 darmowy honor^1!");
+	}
 
 	return PLUGIN_HANDLED;
 }

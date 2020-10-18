@@ -4,7 +4,6 @@
 #include <cod>
 
 #define PLUGIN "CoD Clans"
-#define VERSION "1.3.2"
 #define AUTHOR "O'Zone"
 
 #define TASK_INFO 9843

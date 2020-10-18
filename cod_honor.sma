@@ -4,7 +4,6 @@
 #include <cod>
 
 #define PLUGIN	"CoD Honor System"
-#define AUTHOR	"O'Zone"
 #define VERSION	"1.3.1"
 
 #define set_user_money(%1,%2)	set_pdata_int(%1, OFFSET_CSMONEY, %2, OFFSET_LINUX)

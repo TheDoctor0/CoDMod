@@ -2,7 +2,6 @@
 #include <cod>
 
 #define PLUGIN  "CoD Admin Menu"
-#define VERSION "1.1.0"
 #define AUTHOR  "O'Zone"
 
 #define ACCESS_FLAG ADMIN_CVAR

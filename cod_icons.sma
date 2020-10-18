@@ -6,7 +6,6 @@
 #include <cod>
 
 #define PLUGIN  "CoD Icons"
-#define VERSION "1.3.1"
 #define AUTHOR  "O'Zone"
 
 // Uncomment to enable lite version of icons.

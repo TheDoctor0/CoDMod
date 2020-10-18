@@ -4,7 +4,6 @@
 #include <cod>
 
 #define PLUGIN "CoD Accounts"
-#define VERSION "1.3.1"
 #define AUTHOR "O'Zone"
 
 #define TASK_PASSWORD   1945
@@ -226,7 +225,7 @@ public account_menu_handle(id, menu, item)
 		return PLUGIN_HANDLED;
 	}
 
-	switch(item) {
+	switch (item) {
 		case 0: {
 			cod_print_chat(id, "Wprowadz swoje^4 haslo^1, aby sie^4 zalogowac.");
 
@@ -724,7 +723,7 @@ public account_query(id, type)
 
 	cod_sql_string(playerData[id][PASSWORD], password, charsmax(password));
 
-	switch(type) {
+	switch (type) {
 		case INSERT: formatex(queryData, charsmax(queryData), "INSERT INTO `cod_accounts` VALUES (^"%s^", '%s')", playerData[id][SAFE_NAME], password);
 		case UPDATE: formatex(queryData, charsmax(queryData), "UPDATE `cod_accounts` SET pass = '%s' WHERE name = ^"%s^"", password, playerData[id][SAFE_NAME]);
 		case DELETE: formatex(queryData, charsmax(queryData), "DELETE FROM `cod_accounts` WHERE name = ^"%s^"", playerData[id][SAFE_NAME]);

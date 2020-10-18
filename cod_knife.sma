@@ -4,7 +4,6 @@
 #include <cod>
 
 #define PLUGIN "CoD Knives"
-#define VERSION "1.3.0"
 #define AUTHOR "O'Zone"
 
 new const knifeModels[][][] =

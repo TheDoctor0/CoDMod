@@ -2,7 +2,6 @@
 #include <cod>
 
 #define PLUGIN "CoD VIP"
-#define VERSION "1.2.2"
 #define AUTHOR "O'Zone"
 
 #define VIP_FLAG ADMIN_LEVEL_H

@@ -3,7 +3,6 @@
 #include <cod>
 
 #define PLUGIN "CoD Missions"
-#define VERSION "1.3.1"
 #define AUTHOR "O'Zone"
 
 new const commandMission[][] = { "misje", "say /quest", "say_team /quest", "say /misja", "say_team /misja", "say /misje", "say_team /misje", "say /questy", "say_team /questy" };
