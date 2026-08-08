@@ -252,7 +252,7 @@ public shop_menu_handle(id, menu, item)
 			}
 
 			if (cod_get_item_durability(id) >= cod_max_item_durability()) {
-				cod_print_chat(id, "Twoj przedmiot jest juz w pelni^3 naprawiony^1!");
+				cod_print_chat(id, "%L", id, "SHOP_ALREADY_REPAIRED");
 
 				return PLUGIN_HANDLED;
 			}

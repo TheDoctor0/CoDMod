@@ -446,7 +446,7 @@ public register_confirmation_handle(id, menu, item)
 			set_hudmessage(0, 255, 0, -1.0, 0.9, 0, 0.0, 3.5, 0.0, 0.0);
 			show_hudmessage(id, "Zostales pomyslnie zarejestrowany i zalogowany.");
 
-			cod_print_chat(id, "Twoj nick zostal pomyslnie^4 zarejestrowany^1.");
+			cod_print_chat(id, "%L", id, "ACCOUNTS_REGISTERED");
 
 			if (cvarAutoLoginConfig) {
 				cod_print_chat(id, "Wpisz w konsoli komende^4 setinfo ^"_%s^" ^"%s^"^1, aby twoje haslo bylo ladowane automatycznie.", cvarSetinfo, playerData[id][PASSWORD]);

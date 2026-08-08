@@ -1445,7 +1445,7 @@ public applications_confirm_handle(id, menu, item)
 	}
 
 	if (check_user_clan(userName)) {
-		cod_print_chat(id, "Gracz dolaczyl juz do innego klanu!");
+		cod_print_chat(id, "%L", id, "CLANS_JOINED_OTHER");
 
 		show_clan_menu(id, 1);
 
@@ -3172,7 +3172,7 @@ stock remove_application(id, const name[] = "")
 		get_clan_info(clan[id], CLAN_NAME, clanName, charsmax(clanName));
 		get_user_name(id, userName, charsmax(userName));
 
-		cod_print_chat(player, "^3%s^1 odrzucil twoje podanie do klanu^3 %s^1!", userName, clanName);
+		cod_print_chat(player, "%L", player, "CLANS_YOUR_APPLICATION_REJECTED", userName, clanName);
 	}
 
 	new queryData[192], safeName[MAX_SAFE_NAME];
@@ -3365,7 +3365,7 @@ stock remove_clan(id)
 		if (clan[player] == clan[id]) {
 			clan[player] = 0;
 
-			cod_print_chat(player, "Twoj klan zostal rozwiazany.");
+			cod_print_chat(player, "%L", player, "CLANS_YOUR_CLAN_DISBANDED");
 		}
 	}
 
