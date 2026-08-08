@@ -4529,7 +4529,7 @@ public _cod_add_user_speed(id, Float:value, type)
 {
 	if (!valid_native_player(id) || !valid_native_type(type)) return;
 
-	codPlayer[id][PLAYER_SPEED][type] += _:value;
+	codPlayer[id][PLAYER_SPEED][type] = _:(Float:codPlayer[id][PLAYER_SPEED][type] + value);
 
 	set_speed(id);
 }
