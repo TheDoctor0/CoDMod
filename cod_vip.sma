@@ -155,7 +155,7 @@ public cod_spawned(id, respawn)
 
 public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
 {
-	if (!get_bit(attacker, vip)) return PLUGIN_CONTINUE;
+	if (!get_bit(attacker, vip) || damageBits & DMG_CODSKILL) return PLUGIN_CONTINUE;
 
 	cod_inflict_damage(attacker, victim, damage * 0.05, 0.0, damageBits);
 
