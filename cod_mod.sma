@@ -99,7 +99,7 @@ enum _:classInfo { CLASS_NAME[MAX_NAME], CLASS_DESC[MAX_DESC], CLASS_FRACTION[MA
 	CLASS_COND, CLASS_STAM, CLASS_WEAPONS, CLASS_PROMOTION, CLASS_DEGREE, CLASS_LEVEL, CLASS_FLAG, CLASS_PLUGIN, CLASS_ENABLED,
 	CLASS_DISABLED, CLASS_SPAWNED, CLASS_KILL, CLASS_KILLED, CLASS_SKILL_USED, CLASS_DAMAGE_VICTIM, CLASS_DAMAGE_ATTACKER };
 
-enum _:playerClassInfo { PCLASS_LEVEL, PCLASS_EXP, PCLASS_HEAL, PCLASS_INT, PCLASS_STAM, PCLASS_STR, PCLASS_COND, PCLASS_POINTS };
+enum _:playerClassInfo { PCLASS_LEVEL, PCLASS_EXP, PCLASS_HEAL, PCLASS_INT, PCLASS_STAM, PCLASS_STR, PCLASS_COND, PCLASS_POINTS, PCLASS_DB_ID };
 
 enum _:renderInfo { RENDER_TYPE, RENDER_VALUE, RENDER_STATUS, RENDER_WEAPON };
 
@@ -300,6 +300,7 @@ public plugin_natives()
 	register_native("cod_get_user_class_name", "_cod_get_user_class_name", 1);
 	register_native("cod_set_user_class", "_cod_set_user_class", 1);
 	register_native("cod_get_class_id", "_cod_get_class_id", 1);
+	register_native("cod_get_user_class_row", "_cod_get_user_class_row", 1);
 	register_native("cod_get_class_name", "_cod_get_class_name", 1);
 	register_native("cod_get_class_desc", "_cod_get_class_desc", 1);
 	register_native("cod_get_class_health", "_cod_get_class_health", 1);
@@ -535,8 +536,6 @@ public client_connect(id)
 	get_user_name(id, codPlayer[id][PLAYER_NAME], charsmax(codPlayer[][PLAYER_NAME]));
 
 	sql_string(codPlayer[id][PLAYER_NAME], codPlayer[id][PLAYER_SAFE_NAME], charsmax(codPlayer[][PLAYER_SAFE_NAME]));
-
-	set_task(0.1, "load_data", id);
 }
 
 public client_putinserver(id)
@@ -657,15 +656,8 @@ public reset_all_data(id)
 
 public clear_database(id)
 {
+	// The tables themselves are wiped by cod_database on the same forward.
 	for (new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, dataLoaded);
-
-	sqlConnected = false;
-
-	new tempData[32];
-
-	formatex(tempData, charsmax(tempData), "DROP TABLE `cod_mod`;");
-
-	SQL_ThreadQuery(sql, "ignore_handle", tempData);
 
 	set_task(10.0, "restart_map");
 }
@@ -1459,17 +1451,13 @@ public change_hud_handle(id, menu, item)
 
 public save_hud(id)
 {
-	new tempData[256];
+	cod_set_player_field(id, DB_PLAYER_HUD_RED, codPlayer[id][PLAYER_HUD_RED]);
+	cod_set_player_field(id, DB_PLAYER_HUD_GREEN, codPlayer[id][PLAYER_HUD_GREEN]);
+	cod_set_player_field(id, DB_PLAYER_HUD_BLUE, codPlayer[id][PLAYER_HUD_BLUE]);
+	cod_set_player_field(id, DB_PLAYER_HUD_POS_X, codPlayer[id][PLAYER_HUD_POSX]);
+	cod_set_player_field(id, DB_PLAYER_HUD_POS_Y, codPlayer[id][PLAYER_HUD_POSY]);
 
-	if (!get_bit(id, hudLoaded)) {
-		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`, `level`, `exp`, `intelligence`, `health`, `stamina`) VALUES (^"%s^", 'hud', '%i', '%i', '%i', '%i', '%i')",
-			codPlayer[id][PLAYER_NAME], codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], codPlayer[id][PLAYER_HUD_POSX], codPlayer[id][PLAYER_HUD_POSY]);
-	} else {
-		formatex(tempData, charsmax(tempData), "UPDATE `cod_mod` SET `level` = '%i', `exp` = '%i', `intelligence` = '%i', `health` = '%i', `stamina` = '%i' WHERE `class` = 'hud' AND `name` = ^"%s^"",
-			codPlayer[id][PLAYER_HUD_RED], codPlayer[id][PLAYER_HUD_GREEN], codPlayer[id][PLAYER_HUD_BLUE], codPlayer[id][PLAYER_HUD_POSX], codPlayer[id][PLAYER_HUD_POSY], codPlayer[id][PLAYER_NAME]);
-	}
-
-	SQL_ThreadQuery(sql, "ignore_handle", tempData);
+	set_bit(id, hudLoaded);
 }
 
 public show_binds(id, sound)
@@ -1564,7 +1552,9 @@ public level_top(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT name, class, level, exp FROM `cod_mod` ORDER BY exp DESC LIMIT 15");
+	formatex(queryData, charsmax(queryData), "SELECT p.`player_name` AS `name`, c.`class_name` AS `class`, c.`class_level` AS `level`, \
+		c.`class_experience` AS `exp` FROM `cod_classes` c JOIN `cod_players` p ON p.`player_id` = c.`player_id` \
+		ORDER BY c.`class_experience` DESC LIMIT 15");
 
 	SQL_ThreadQuery(sql, "show_level_top", queryData, tempId, sizeof tempId);
 
@@ -3723,7 +3713,7 @@ stock get_condition(id, class_condition = 1, stats_condition = 1, bonus_conditio
 
 public sql_init()
 {
-	new host[64], user[64], pass[64], db[64], queryData[512], error[128], errorNum;
+	new host[64], user[64], pass[64], db[64], error[128], errorNum;
 
 	get_cvar_string("cod_sql_host", host, charsmax(host));
 	get_cvar_string("cod_sql_user", user, charsmax(user));
@@ -3744,31 +3734,35 @@ public sql_init()
 		return;
 	}
 
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_mod` (`name` VARCHAR(%i) NOT NULL, `class` VARCHAR(64) NOT NULL, `exp` INT UNSIGNED NOT NULL DEFAULT 0, `level` INT UNSIGNED NOT NULL DEFAULT 1, `intelligence` INT UNSIGNED NOT NULL DEFAULT 0, ", MAX_SAFE_NAME);
-	add(queryData,  charsmax(queryData), "`health` INT UNSIGNED NOT NULL DEFAULT 0, `stamina` INT UNSIGNED NOT NULL DEFAULT 0, `condition` INT UNSIGNED NOT NULL DEFAULT 0, `strength` INT UNSIGNED NOT NULL DEFAULT 0, PRIMARY KEY(`name`, `class`));");
-
-	new Handle:query = SQL_PrepareQuery(connection, queryData);
-
-	SQL_Execute(query);
-
-	SQL_FreeHandle(query);
-
+	// The schema itself belongs to cod_database, this connection only reads and
+	// writes the tables it created.
 	sqlConnected = true;
 }
 
+public cod_player_loaded(id, playerId)
+	load_data(id);
+
 public load_data(id)
 {
-	if (!sqlConnected) {
+	if (!sqlConnected || !cod_db_ready()) {
 		set_task(1.0, "load_data", id);
 
 		return;
 	}
 
-	new playerId[1], queryData[128];
+	new playerId[1], queryData[192];
 
 	playerId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_mod` WHERE name = ^"%s^"", codPlayer[id][PLAYER_SAFE_NAME]);
+	codPlayer[id][PLAYER_HUD_RED] = cod_get_player_field(id, DB_PLAYER_HUD_RED);
+	codPlayer[id][PLAYER_HUD_GREEN] = cod_get_player_field(id, DB_PLAYER_HUD_GREEN);
+	codPlayer[id][PLAYER_HUD_BLUE] = cod_get_player_field(id, DB_PLAYER_HUD_BLUE);
+	codPlayer[id][PLAYER_HUD_POSX] = cod_get_player_field(id, DB_PLAYER_HUD_POS_X);
+	codPlayer[id][PLAYER_HUD_POSY] = cod_get_player_field(id, DB_PLAYER_HUD_POS_Y);
+
+	set_bit(id, hudLoaded);
+
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_classes` WHERE `player_id` = '%d'", cod_get_user_db_id(id));
 
 	SQL_ThreadQuery(sql, "load_data_handle", queryData, playerId, sizeof playerId);
 }
@@ -3785,30 +3779,21 @@ public load_data_handle(failState, Handle:query, error[], errorNum, playerId[], 
 	new id = playerId[0], className[MAX_NAME], codClass[playerClassInfo], classId;
 
 	while (SQL_MoreResults(query)) {
-		SQL_ReadResult(query, SQL_FieldNameToNum(query, "class"), className, charsmax(className));
+		SQL_ReadResult(query, SQL_FieldNameToNum(query, "class_name"), className, charsmax(className));
 
-		if (equal(className, "hud")) {
-			codPlayer[id][PLAYER_HUD_RED] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "level"));
-			codPlayer[id][PLAYER_HUD_GREEN] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "exp"));
-			codPlayer[id][PLAYER_HUD_BLUE] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "intelligence"));
-			codPlayer[id][PLAYER_HUD_POSX] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "health"));
-			codPlayer[id][PLAYER_HUD_POSY] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stamina"));
+		classId = get_class_id(className);
 
-			set_bit(id, hudLoaded);
-		} else {
-			classId = get_class_id(className);
+		if (classId) {
+			codClass[PCLASS_DB_ID] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "class_id"));
+			codClass[PCLASS_LEVEL] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "class_level"));
+			codClass[PCLASS_EXP] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "class_experience"));
+			codClass[PCLASS_INT] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "class_intelligence"));
+			codClass[PCLASS_HEAL] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "class_health"));
+			codClass[PCLASS_STAM] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "class_stamina"));
+			codClass[PCLASS_STR] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "class_strength"));
+			codClass[PCLASS_COND] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "class_condition"));
 
-			if (classId) {
-				codClass[PCLASS_LEVEL] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "level"));
-				codClass[PCLASS_EXP] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "exp"));
-				codClass[PCLASS_INT] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "intelligence"));
-				codClass[PCLASS_HEAL] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "health"));
-				codClass[PCLASS_STAM] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stamina"));
-				codClass[PCLASS_STR] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "strength"));
-				codClass[PCLASS_COND] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "condition"));
-
-				ArraySetArray(codPlayerClasses[id], classId, codClass);
-			}
+			ArraySetArray(codPlayerClasses[id], classId, codClass);
 		}
 
 		SQL_NextRow(query);
@@ -3827,8 +3812,10 @@ public save_data(id, end)
 
 	get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
-	formatex(queryData, charsmax(queryData), "UPDATE `cod_mod` SET `exp` = (`exp` + %d), `level` = (`level` + %d), `intelligence` = '%d', `health` = '%d', `stamina` = '%d', `strength` = '%d', `condition` = '%d' WHERE `name` = ^"%s^" AND `class` = '%s'",
-	codPlayer[id][PLAYER_GAINED_EXP], codPlayer[id][PLAYER_GAINED_LEVEL], codPlayer[id][PLAYER_INT], codPlayer[id][PLAYER_HEAL], codPlayer[id][PLAYER_STAM], codPlayer[id][PLAYER_STR], codPlayer[id][PLAYER_COND], codPlayer[id][PLAYER_SAFE_NAME], className);
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_classes` SET `class_experience` = (`class_experience` + %d), `class_level` = (`class_level` + %d), \
+		`class_intelligence` = '%d', `class_health` = '%d', `class_stamina` = '%d', `class_strength` = '%d', `class_condition` = '%d' \
+		WHERE `player_id` = '%d' AND `class_name` = '%s'",
+	codPlayer[id][PLAYER_GAINED_EXP], codPlayer[id][PLAYER_GAINED_LEVEL], codPlayer[id][PLAYER_INT], codPlayer[id][PLAYER_HEAL], codPlayer[id][PLAYER_STAM], codPlayer[id][PLAYER_STR], codPlayer[id][PLAYER_COND], cod_get_user_db_id(id), className);
 
 	if (end == MAP_END) {
 		new error[128], errorNum, Handle:query;
@@ -3892,13 +3879,21 @@ public load_class(id, class)
 
 		ArraySetArray(codPlayerClasses[id], class, codClass);
 
-		new tempData[256], className[MAX_NAME];
+		new tempData[256], className[MAX_NAME], classData[2];
 
 		get_class_info(class, CLASS_NAME, className, charsmax(className));
 
-		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_mod` (`name`, `class`) VALUES (^"%s^", '%s')", codPlayer[id][PLAYER_SAFE_NAME], className);
+		formatex(tempData, charsmax(tempData), "INSERT IGNORE INTO `cod_classes` (`player_id`, `class_name`) VALUES ('%d', '%s')", cod_get_user_db_id(id), className);
 
 		SQL_ThreadQuery(sql, "ignore_handle", tempData);
+
+		// The row id is needed by cod_missions, so read it back once it exists.
+		classData[0] = id;
+		classData[1] = class;
+
+		formatex(tempData, charsmax(tempData), "SELECT `class_id` FROM `cod_classes` WHERE `player_id` = '%d' AND `class_name` = '%s'", cod_get_user_db_id(id), className);
+
+		SQL_ThreadQuery(sql, "load_class_id_handle", tempData, classData, sizeof classData);
 	}
 
 	codPlayer[id][PLAYER_POINTS] = (codPlayer[id][PLAYER_LEVEL] - 1) * cvarPointsPerLevel - codPlayer[id][PLAYER_INT] - codPlayer[id][PLAYER_HEAL] - codPlayer[id][PLAYER_STAM] - codPlayer[id][PLAYER_STR] - codPlayer[id][PLAYER_COND];
@@ -3925,6 +3920,28 @@ public load_class(id, class)
 	}
 }
 
+public load_class_id_handle(failState, Handle:query, error[], errorNum, classData[], dataSize)
+{
+	if (failState) {
+		if (failState == TQUERY_CONNECT_FAILED) log_to_file(LOG_FILE, "[%s] Could not connect to SQL database. Error: %s (%d)", PLUGIN, error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) log_to_file(LOG_FILE, "[%s] Threaded query failed. Error: %s (%d)", PLUGIN, error, errorNum);
+
+		return PLUGIN_CONTINUE;
+	}
+
+	new id = classData[0], class = classData[1], codClass[playerClassInfo];
+
+	if (!is_user_connected(id) || !SQL_MoreResults(query)) return PLUGIN_CONTINUE;
+
+	ArrayGetArray(codPlayerClasses[id], class, codClass);
+
+	codClass[PCLASS_DB_ID] = SQL_ReadResult(query, 0);
+
+	ArraySetArray(codPlayerClasses[id], class, codClass);
+
+	return PLUGIN_CONTINUE;
+}
+
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
 {
 	if (failState) {
@@ -3933,6 +3950,17 @@ public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSiz
 	}
 
 	return PLUGIN_CONTINUE;
+}
+
+public _cod_get_user_class_row(id)
+{
+	if (!is_user_valid(id) || !get_bit(id, dataLoaded) || !codPlayer[id][PLAYER_CLASS]) return 0;
+
+	new codClass[playerClassInfo];
+
+	ArrayGetArray(codPlayerClasses[id], codPlayer[id][PLAYER_CLASS], codClass);
+
+	return codClass[PCLASS_DB_ID];
 }
 
 public _cod_get_user_exp(id)

@@ -33,16 +33,15 @@ public plugin_init()
 
 	for (new i; i < sizeof commandKnives; i++) register_clcmd(commandKnives[i], "change_knife");
 
+	// Only kept around to import servers that ran on the vault based version.
 	knives = nvault_open("cod_knives");
-
-	if (knives == INVALID_HANDLE) set_fail_state("[COD] Nie mozna otworzyc pliku cod_knives.vault");
 }
 
 public plugin_precache()
 	for (new i = 1; i < sizeof(knifeModels); i++) precache_model(knifeModels[i][MODEL]);
 
 public plugin_end()
-	nvault_close(knives);
+	if (knives != INVALID_HANDLE) nvault_close(knives);
 
 public client_putinserver(id)
 {
@@ -51,9 +50,10 @@ public client_putinserver(id)
 	if (is_user_bot(id) || is_user_hltv(id)) return;
 
 	playerKnife[id] = DEFAULT;
-
-	load_knife(id);
 }
+
+public cod_player_loaded(id, playerId)
+	load_knife(id);
 
 public cod_end_map()
 	mapEnd = true;
@@ -63,8 +63,6 @@ public cod_reset_all_data()
 	for (new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, dataLoaded);
 
 	mapEnd = true;
-
-	nvault_prune(knives, 0, get_systime() + 1);
 }
 
 public change_knife(id)
@@ -204,12 +202,7 @@ public save_knife(id)
 {
 	if (!get_bit(id, dataLoaded) || mapEnd) return PLUGIN_CONTINUE;
 
-	new vaultKey[MAX_NAME], vaultData[3];
-
-	formatex(vaultKey, charsmax(vaultKey), "%s-cod_knife", playerName[id]);
-	formatex(vaultData, charsmax(vaultData), "%d", playerKnife[id]);
-
-	nvault_set(knives, vaultKey, vaultData);
+	cod_set_player_field(id, DB_PLAYER_KNIFE, playerKnife[id]);
 
 	return PLUGIN_CONTINUE;
 }
@@ -218,19 +211,36 @@ public load_knife(id)
 {
 	if (mapEnd) return PLUGIN_CONTINUE;
 
-	new vaultKey[MAX_NAME], vaultData[3];
-
 	get_user_name(id, playerName[id], charsmax(playerName[]));
 
-	formatex(vaultKey, charsmax(vaultKey), "%s-cod_knife", playerName[id]);
+	new knife = cod_get_player_field(id, DB_PLAYER_KNIFE);
 
-	if (nvault_get(knives, vaultKey, vaultData, charsmax(vaultData))) {
-		playerKnife[id] = str_to_num(vaultData);
+	if (!knife) knife = import_vault(id);
+	if (!(0 <= knife < sizeof knifeModels)) knife = DEFAULT;
 
-		set_bonus(id, NONE, playerKnife[id]);
-	} else set_bonus(id, NONE, DEFAULT);
+	set_bonus(id, NONE, knife);
 
 	set_bit(id, dataLoaded);
 
+	// Writes the imported value back, and is a no-op for the default knife.
+	if (knife != DEFAULT) save_knife(id);
+
 	return PLUGIN_CONTINUE;
+}
+
+/**
+ * One time move of the pre database knife choice. The vault entry is left alone
+ * so the import stays repeatable if the database is reset.
+ */
+stock import_vault(id)
+{
+	if (knives == INVALID_HANDLE) return DEFAULT;
+
+	new vaultKey[MAX_NAME + 16], vaultData[3];
+
+	formatex(vaultKey, charsmax(vaultKey), "%s-cod_knife", playerName[id]);
+
+	if (!nvault_get(knives, vaultKey, vaultData, charsmax(vaultData))) return DEFAULT;
+
+	return str_to_num(vaultData);
 }

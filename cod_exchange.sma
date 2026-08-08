@@ -20,6 +20,15 @@ public plugin_init()
 public cod_end_map()
 	mapEnd = true;
 
+public client_connect(id)
+	rem_bit(id, blockExchange);
+
+public cod_player_loaded(id, playerId)
+{
+	if (cod_get_player_field(id, DB_PLAYER_EXCHANGE)) rem_bit(id, blockExchange);
+	else set_bit(id, blockExchange);
+}
+
 public cod_new_round()
 	for (new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, cooldown);
 
@@ -70,6 +79,8 @@ public exchange_menu_handle(id, menu, item)
 
 				cod_print_chat(id, "^3Zablokowales^1 mozliwosc wysylania ci propozycji wymiany przedmiotu!");
 			}
+
+			cod_set_player_field(id, DB_PLAYER_EXCHANGE, get_bit(id, blockExchange) ? 0 : 1);
 		}
 	}
 

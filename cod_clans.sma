@@ -94,15 +94,11 @@ public cod_reset_all_data()
 
 public clear_database()
 {
+	// The tables themselves are wiped by cod_database on the same forward.
 	for (new i = 1; i <= MAX_PLAYERS; i++) clan[i] = 0;
 
-	sqlConnected = false;
-
-	new tempData[256];
-
-	formatex(tempData, charsmax(tempData), "DROP TABLE `cod_clans`; DROP TABLE `cod_clans_applications`; DROP TABLE `cod_clans_members`; DROP TABLE `cod_clans_wars`;");
-
-	SQL_ThreadQuery(sql, "ignore_handle", tempData);
+	ArrayClear(codClans);
+	ArrayClear(codWars);
 }
 
 public client_putinserver(id)
@@ -1015,7 +1011,8 @@ public members_menu(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_members` WHERE clan = '%i' ORDER BY flag DESC", clan[id]);
+	formatex(queryData, charsmax(queryData), "SELECT p.`player_name` AS `name`, m.`member_flag` AS `flag`, m.`member_donations` AS `honor` FROM `cod_clans_members` m \
+		JOIN `cod_players` p ON p.`player_id` = m.`player_id` WHERE m.`member_clan_id` = '%i' ORDER BY m.`member_flag` DESC", clan[id]);
 
 	SQL_ThreadQuery(sql, "members_menu_handle", queryData, tempId, sizeof(tempId));
 
@@ -1223,7 +1220,8 @@ public applications_menu(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT a.name, (SELECT level FROM `cod_mod` WHERE name = a.name ORDER BY level DESC LIMIT 1) as level, (SELECT honor FROM `cod_honor` WHERE name = a.name) as honor FROM `cod_clans_applications` a WHERE clan = '%i'", clan[id]);
+	formatex(queryData, charsmax(queryData), "SELECT p.`player_name` AS `name`, (SELECT MAX(c.`class_level`) FROM `cod_classes` c WHERE c.`player_id` = p.`player_id`) as level, \
+		p.`player_honor` as honor FROM `cod_clans_applications` a JOIN `cod_players` p ON p.`player_id` = a.`player_id` WHERE a.`clan_id` = '%i'", clan[id]);
 
 	SQL_ThreadQuery(sql, "applications_menu_handle", queryData, tempId, sizeof(tempId));
 
@@ -1385,7 +1383,7 @@ public applications_confirm_handle(id, menu, item)
 
 				cod_sql_string(userName, safeName, charsmax(safeName));
 
-				formatex(queryData, charsmax(queryData), "SELECT honor FROM `cod_honor` WHERE `name` = ^"%s^"", safeName);
+				formatex(queryData, charsmax(queryData), "SELECT `player_honor` AS `honor` FROM `cod_players` WHERE `player_name` = ^"%s^"", safeName);
 
 				query = SQL_PrepareQuery(connection, queryData);
 
@@ -1405,7 +1403,7 @@ public applications_confirm_handle(id, menu, item)
 					return PLUGIN_HANDLED;
 				}
 
-				formatex(queryData, charsmax(queryData), "UPDATE `cod_honor` SET honor = honor - %i WHERE `name` = ^"%s^"", cvarJoinFee, safeName);
+				formatex(queryData, charsmax(queryData), "UPDATE `cod_players` SET `player_honor` = `player_honor` - %i WHERE `player_name` = ^"%s^"", cvarJoinFee, safeName);
 
 				query = SQL_PrepareQuery(connection, queryData);
 
@@ -1488,7 +1486,11 @@ public war_list_menu(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT a.*, (SELECT name FROM `cod_clans` WHERE id = a.clan) as name, (SELECT name FROM `cod_clans` WHERE id = a.clan2) as name2 FROM `cod_clans_wars` a WHERE (clan = '%i' OR clan2 = '%i') AND started = '1'", clan[id], clan[id]);
+	formatex(queryData, charsmax(queryData), "SELECT a.`war_id` AS `id`, a.`war_attacker_clan_id` AS `clan`, a.`war_defender_clan_id` AS `clan2`, a.`war_attacker_progress` AS `progress`, \
+		a.`war_defender_progress` AS `progress2`, a.`war_duration` AS `duration`, a.`war_reward` AS `reward`, a.`war_started` AS `started`, \
+		(SELECT `clan_name` FROM `cod_clans` WHERE `clan_id` = a.`war_attacker_clan_id`) as name, \
+		(SELECT `clan_name` FROM `cod_clans` WHERE `clan_id` = a.`war_defender_clan_id`) as name2 FROM `cod_clans_wars` a \
+		WHERE (a.`war_attacker_clan_id` = '%i' OR a.`war_defender_clan_id` = '%i') AND a.`war_started` = '1'", clan[id], clan[id]);
 
 	SQL_ThreadQuery(sql, "show_war_list_menu", queryData, tempId, sizeof(tempId));
 
@@ -1617,9 +1619,10 @@ public declare_war_menu_handle(id, menu, item)
 
 			tempId[0] = id;
 
-			formatex(queryData, charsmax(queryData), "SELECT a.id, a.name, a.honor, (SELECT COUNT(clan) FROM `cod_clans_members` \
-				WHERE clan = a.id) as members FROM `cod_clans` a WHERE id != '%i' AND NOT EXISTS (SELECT id FROM `cod_clans_wars` \
-				WHERE (clan = '%i' AND clan2 = a.id) OR (clan2 = '%i' AND clan = a.id)) ORDER BY a.name ASC", clan[id], clan[id], clan[id]);
+			formatex(queryData, charsmax(queryData), "SELECT a.`clan_id` AS `id`, a.`clan_name` AS `name`, a.`clan_honor` AS `honor`, (SELECT COUNT(*) FROM `cod_clans_members` \
+				WHERE `member_clan_id` = a.`clan_id`) as members FROM `cod_clans` a WHERE a.`clan_id` != '%i' AND NOT EXISTS (SELECT `war_id` FROM `cod_clans_wars` \
+				WHERE (`war_attacker_clan_id` = '%i' AND `war_defender_clan_id` = a.`clan_id`) OR (`war_defender_clan_id` = '%i' AND `war_attacker_clan_id` = a.`clan_id`)) \
+				ORDER BY a.`clan_name` ASC", clan[id], clan[id], clan[id]);
 
 			SQL_ThreadQuery(sql, "declare_war_select", queryData, tempId, sizeof(tempId));
 		}
@@ -1762,7 +1765,10 @@ public accept_war_menu(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT id, clan, duration, reward, (SELECT name FROM `cod_clans` WHERE id = a.clan2) as name, (SELECT name FROM `cod_clans` WHERE id = a.clan) as name2 FROM `cod_clans_wars` a WHERE clan2 = '%i' AND started = '0'", clan[id]);
+	formatex(queryData, charsmax(queryData), "SELECT a.`war_id` AS `id`, a.`war_attacker_clan_id` AS `clan`, a.`war_duration` AS `duration`, a.`war_reward` AS `reward`, \
+		(SELECT `clan_name` FROM `cod_clans` WHERE `clan_id` = a.`war_defender_clan_id`) as name, \
+		(SELECT `clan_name` FROM `cod_clans` WHERE `clan_id` = a.`war_attacker_clan_id`) as name2 FROM `cod_clans_wars` a \
+		WHERE a.`war_defender_clan_id` = '%i' AND a.`war_started` = '0'", clan[id]);
 
 	SQL_ThreadQuery(sql, "accept_war_menu_handle", queryData, tempId, sizeof(tempId));
 
@@ -1917,7 +1923,10 @@ public remove_war_menu(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT id, duration, reward, (SELECT name FROM `cod_clans` WHERE id = a.clan) as name, (SELECT name FROM `cod_clans` WHERE id = a.clan2) as name2 FROM `cod_clans_wars` a WHERE clan = '%i' AND started = '0'", clan[id]);
+	formatex(queryData, charsmax(queryData), "SELECT a.`war_id` AS `id`, a.`war_duration` AS `duration`, a.`war_reward` AS `reward`, \
+		(SELECT `clan_name` FROM `cod_clans` WHERE `clan_id` = a.`war_attacker_clan_id`) as name, \
+		(SELECT `clan_name` FROM `cod_clans` WHERE `clan_id` = a.`war_defender_clan_id`) as name2 FROM `cod_clans_wars` a \
+		WHERE a.`war_attacker_clan_id` = '%i' AND a.`war_started` = '0'", clan[id]);
 
 	SQL_ThreadQuery(sql, "remove_war_menu_handle", queryData, tempId, sizeof(tempId));
 
@@ -2141,7 +2150,9 @@ public depositors_list(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT name, honor FROM `cod_clans_members` WHERE clan = '%i' AND honor > 0 ORDER BY honor DESC", clan[id]);
+	formatex(queryData, charsmax(queryData), "SELECT p.`player_name` AS `name`, m.`member_donations` AS `honor` FROM `cod_clans_members` m \
+		JOIN `cod_players` p ON p.`player_id` = m.`player_id` WHERE m.`member_clan_id` = '%i' AND m.`member_donations` > 0 \
+		ORDER BY m.`member_donations` DESC", clan[id]);
 
 	SQL_ThreadQuery(sql, "show_depositors_list", queryData, tempId, sizeof(tempId));
 
@@ -2196,7 +2207,9 @@ public clans_top15(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT a.id, a.name, a.honor, a.kills, a.level, a.wins, (SELECT COUNT(clan) FROM `cod_clans_members` WHERE clan = a.id) as members FROM `cod_clans` a ORDER BY kills DESC LIMIT 15");
+	formatex(queryData, charsmax(queryData), "SELECT a.`clan_id` AS `id`, a.`clan_name` AS `name`, a.`clan_honor` AS `honor`, a.`clan_kills` AS `kills`, a.`clan_level` AS `level`, \
+		a.`clan_wins` AS `wins`, (SELECT COUNT(*) FROM `cod_clans_members` WHERE `member_clan_id` = a.`clan_id`) as members \
+		FROM `cod_clans` a ORDER BY a.`clan_kills` DESC LIMIT 15");
 
 	SQL_ThreadQuery(sql, "show_clans_top15", queryData, tempId, sizeof(tempId));
 
@@ -2319,7 +2332,9 @@ public application_menu(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT a.id, a.name as 'clan', b.name FROM `cod_clans` a JOIN `cod_clans_members` b ON a.id = b.clan WHERE flag = '%i' ORDER BY a.kills DESC", STATUS_LEADER);
+	formatex(queryData, charsmax(queryData), "SELECT a.`clan_id` AS `id`, a.`clan_name` as 'clan', p.`player_name` AS `name` FROM `cod_clans` a \
+		JOIN `cod_clans_members` b ON a.`clan_id` = b.`member_clan_id` JOIN `cod_players` p ON p.`player_id` = b.`player_id` \
+		WHERE b.`member_flag` = '%i' ORDER BY a.`clan_kills` DESC", STATUS_LEADER);
 
 	SQL_ThreadQuery(sql, "application_menu_handle", queryData, tempId, sizeof(tempId));
 
@@ -2511,7 +2526,7 @@ stock get_user_status(id)
 
 public sql_init()
 {
-	new host[64], user[64], pass[64], db[64], queryData[512], error[128], errorNum;
+	new host[64], user[64], pass[64], db[64], error[128], errorNum;
 
 	get_cvar_string("cod_sql_host", host, charsmax(host));
 	get_cvar_string("cod_sql_user", user, charsmax(user));
@@ -2532,36 +2547,8 @@ public sql_init()
 		return;
 	}
 
+	// The schema itself belongs to cod_database.
 	sqlConnected = true;
-
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans` (`id` INT NOT NULL AUTO_INCREMENT, `name` varchar(%i) NOT NULL, ", MAX_SAFE_NAME);
-	add(queryData, charsmax(queryData), "`honor` INT NOT NULL, `kills` INT NOT NULL, `level` INT NOT NULL, `wins` INT NOT NULL, `health` INT NOT NULL, ");
-	add(queryData, charsmax(queryData), "`gravity` INT NOT NULL, `damage` INT NOT NULL, `exp` INT NOT NULL, PRIMARY KEY (`id`));");
-
-	new Handle:query = SQL_PrepareQuery(connection, queryData);
-
-	SQL_Execute(query);
-
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_members` (`name` varchar(%i) NOT NULL, `clan` INT NOT NULL, `flag` INT NOT NULL, `honor` INT NOT NULL, PRIMARY KEY (`name`));", MAX_SAFE_NAME);
-
-	query = SQL_PrepareQuery(connection, queryData);
-
-	SQL_Execute(query);
-
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_applications` (`name` varchar(%i) NOT NULL, `clan` INT NOT NULL, PRIMARY KEY (`name`, `clan`));", MAX_SAFE_NAME);
-
-	query = SQL_PrepareQuery(connection, queryData);
-
-	SQL_Execute(query);
-
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_clans_wars` (`id` INT NOT NULL AUTO_INCREMENT, `clan` INT NOT NULL, `clan2` INT NOT NULL, ");
-	add(queryData, charsmax(queryData), "`progress` INT NOT NULL, `progress2` INT NOT NULL, `duration` INT NOT NULL, `reward` INT NOT NULL, `started` INT NOT NULL, PRIMARY KEY (`id`));");
-
-	query = SQL_PrepareQuery(connection, queryData);
-
-	SQL_Execute(query);
-
-	SQL_FreeHandle(query);
 }
 
 public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
@@ -2582,7 +2569,8 @@ public save_clan(clan)
 
 	cod_sql_string(codClan[CLAN_NAME], safeClanName, charsmax(safeClanName));
 
-	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET level = '%i', honor = '%i', kills = '%i', wins = '%i', health = '%i', gravity = '%i', exp = '%i', damage = '%i' WHERE name = ^"%s^"",
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET `clan_level` = '%i', `clan_honor` = '%i', `clan_kills` = '%i', `clan_wins` = '%i', `clan_health` = '%i', \
+		`clan_gravity` = '%i', `clan_experience` = '%i', `clan_damage` = '%i' WHERE `clan_name` = ^"%s^"",
 		codClan[CLAN_LEVEL], codClan[CLAN_HONOR], codClan[CLAN_KILLS], codClan[CLAN_WINS], codClan[CLAN_HEALTH], codClan[CLAN_GRAVITY], codClan[CLAN_EXP], codClan[CLAN_DAMAGE], safeClanName);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
@@ -2590,7 +2578,7 @@ public save_clan(clan)
 
 public load_data(id)
 {
-	if (!sqlConnected) {
+	if (!sqlConnected || !cod_db_ready()) {
 		set_task(1.0, "load_data", id);
 
 		return;
@@ -2600,7 +2588,11 @@ public load_data(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT a.flag, b.*, (SELECT COUNT(clan) FROM `cod_clans_members` WHERE clan = a.clan) AS members FROM `cod_clans_members` a JOIN `cod_clans` b ON a.clan = b.id WHERE a.name = ^"%s^"", playerName[id]);
+	formatex(queryData, charsmax(queryData), "SELECT a.`member_flag` AS `flag`, b.`clan_id` AS `id`, b.`clan_name` AS `name`, b.`clan_honor` AS `honor`, b.`clan_kills` AS `kills`, \
+		b.`clan_level` AS `level`, b.`clan_wins` AS `wins`, b.`clan_health` AS `health`, b.`clan_gravity` AS `gravity`, b.`clan_damage` AS `damage`, \
+		b.`clan_experience` AS `exp`, (SELECT COUNT(*) FROM `cod_clans_members` WHERE `member_clan_id` = a.`member_clan_id`) AS members \
+		FROM `cod_clans_members` a JOIN `cod_clans` b ON a.`member_clan_id` = b.`clan_id` \
+		JOIN `cod_players` p ON p.`player_id` = a.`player_id` WHERE p.`player_name` = ^"%s^"", playerName[id]);
 	SQL_ThreadQuery(sql, "load_data_handle", queryData, tempId, sizeof(tempId));
 }
 
@@ -2638,7 +2630,9 @@ public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], da
 
 			new queryData[128];
 
-			formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_wars` WHERE clan = '%i' AND started = '1'", codClan[CLAN_ID]);
+			formatex(queryData, charsmax(queryData), "SELECT `war_id` AS `id`, `war_attacker_clan_id` AS `clan`, `war_defender_clan_id` AS `clan2`, `war_attacker_progress` AS `progress`, \
+				`war_defender_progress` AS `progress2`, `war_duration` AS `duration`, `war_reward` AS `reward`, `war_started` AS `started` \
+				FROM `cod_clans_wars` WHERE `war_attacker_clan_id` = '%i' AND `war_started` = '1'", codClan[CLAN_ID]);
 
 			SQL_ThreadQuery(sql, "load_wars_data_handle", queryData);
 		}
@@ -2650,12 +2644,6 @@ public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], da
 		cod_add_user_bonus_health(id, get_clan_info(clan[id], CLAN_HEALTH) * cvarHealthPerLevel);
 
 		TrieSetCell(Trie:get_clan_info(clan[id], CLAN_STATUS), playerName[id], status);
-	} else {
-		new queryData[128];
-
-		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_clans_members` (`name`) VALUES (^"%s^");", playerName[id]);
-
-		SQL_ThreadQuery(sql, "ignore_handle", queryData);
 	}
 
 	set_bit(id, loaded);
@@ -2731,9 +2719,13 @@ stock save_member(id, status = 0, change = 0, const name[] = "")
 	else copy(safeName, charsmax(safeName), playerName[id]);
 
 	if (status) {
-		if (change) formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '%i', flag = '%i' WHERE name = ^"%s^"", clan[id], status, safeName);
-		else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET flag = '%i' WHERE name = ^"%s^"", status, safeName);
-	} else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET clan = '0', flag = '0', honor = '0' WHERE name = ^"%s^"", safeName);
+		if (change) formatex(queryData, charsmax(queryData), "INSERT INTO `cod_clans_members` (`player_id`, `member_clan_id`, `member_flag`) \
+			VALUES ((SELECT `player_id` FROM `cod_players` WHERE `player_name` = ^"%s^"), '%i', '%i') \
+			ON DUPLICATE KEY UPDATE `member_clan_id` = '%i', `member_flag` = '%i'", safeName, clan[id], status, clan[id], status);
+		else formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET `member_flag` = '%i' \
+			WHERE `player_id` = (SELECT `player_id` FROM `cod_players` WHERE `player_name` = ^"%s^")", status, safeName);
+	} else formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_members` \
+		WHERE `player_id` = (SELECT `player_id` FROM `cod_players` WHERE `player_name` = ^"%s^")", safeName);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
@@ -2744,7 +2736,7 @@ stock declare_war(id, clanId)
 {
 	new queryData[192], clanName[32];
 
-	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_clans_wars` (`clan`, `clan2`, `duration`, `reward`) VALUES ('%i', '%i', '%i', '%i')", clan[id], clanId, warFrags[id], warReward[id]);
+	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_clans_wars` (`war_attacker_clan_id`, `war_defender_clan_id`, `war_duration`, `war_reward`) VALUES ('%i', '%i', '%i', '%i')", clan[id], clanId, warFrags[id], warReward[id]);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
@@ -2761,12 +2753,12 @@ stock accept_war(id, warId, clanId, duration, honor, const enemyClanName[])
 {
 	new queryData[192], codWar[warInfo], clanName[MAX_NAME];
 
-	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_wars` SET started = '1' WHERE id = '%i'", warId);
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_wars` SET `war_started` = '1' WHERE `war_id` = '%i'", warId);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
 	if (!get_clan_id(clanId)) {
-		formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET honor = honor - %i WHERE id = '%i'", honor, clanId);
+		formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET `clan_honor` = `clan_honor` - %i WHERE `clan_id` = '%i'", honor, clanId);
 
 		SQL_ThreadQuery(sql, "ignore_handle", queryData);
 	} else set_clan_info(clanId, CLAN_HONOR, -honor);
@@ -2793,7 +2785,7 @@ stock remove_war(warId, started = 0)
 {
 	new queryData[128], error[128], Handle:query, bool:result, errorNum;
 
-	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_wars` WHERE id = '%i' AND started = '%i'", warId, started);
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_wars` WHERE `war_id` = '%i' AND `war_started` = '%i'", warId, started);
 
 	query = SQL_PrepareQuery(connection, queryData);
 
@@ -2841,7 +2833,7 @@ public remove_clan_wars(failState, Handle:query, error[], errorNum, tempId[], da
 				cod_print_chat(i, "Klan^3 %s^1 zostal rozwiazany, a to konczy z nim wojne. Zwyciestwo!", clanName);
 			}
 		} else {
-			formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET money = money + %i WHERE id = '%i'", reward, enemyClan);
+			formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET `clan_honor` = `clan_honor` + %i WHERE `clan_id` = '%i'", reward, enemyClan);
 
 			SQL_ThreadQuery(sql, "ignore_handle", queryData);
 		}
@@ -2849,7 +2841,7 @@ public remove_clan_wars(failState, Handle:query, error[], errorNum, tempId[], da
 		SQL_NextRow(query);
 	}
 
-	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_wars` WHERE clan = '%i' OR clan2 = '%i'", id, id);
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_wars` WHERE `war_attacker_clan_id` = '%i' OR `war_defender_clan_id` = '%i'", id, id);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
@@ -2860,7 +2852,7 @@ public save_war(warId)
 
 	ArrayGetArray(codWars, warId, codWar);
 
-	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_wars` SET progress = '%i', progress2 = '%i' WHERE id = '%i'", codWar[WAR_PROGRESS], codWar[WAR_PROGRESS2], codWar[WAR_ID]);
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_wars` SET `war_attacker_progress` = '%i', `war_defender_progress` = '%i' WHERE `war_id` = '%i'", codWar[WAR_PROGRESS], codWar[WAR_PROGRESS2], codWar[WAR_ID]);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
@@ -2931,7 +2923,8 @@ stock add_deposited_honor(id, honor)
 {
 	new queryData[192];
 
-	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET honor = honor + %d WHERE name = ^"%s^"", honor, playerName[id]);
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET `member_donations` = `member_donations` + %d \
+		WHERE `player_id` = (SELECT `player_id` FROM `cod_players` WHERE `player_name` = ^"%s^")", honor, playerName[id]);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
@@ -2940,7 +2933,8 @@ stock add_application(id, clanId)
 {
 	new queryData[192], userName[MAX_NAME];
 
-	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_clans_applications` (`name`, `clan`) VALUES (^"%s^", '%i');", playerName[id], clanId);
+	formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_clans_applications` (`player_id`, `clan_id`) \
+		VALUES ((SELECT `player_id` FROM `cod_players` WHERE `player_name` = ^"%s^"), '%i');", playerName[id], clanId);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
@@ -2957,7 +2951,8 @@ stock check_applications(id, clanId)
 {
 	new queryData[192], error[128], errorNum, Handle:query, bool:foundApplication;
 
-	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_applications` WHERE `name` = ^"%s^" AND clan = '%i'", playerName[id], clanId);
+	formatex(queryData, charsmax(queryData), "SELECT a.`clan_id` AS `clan` FROM `cod_clans_applications` a JOIN `cod_players` p ON p.`player_id` = a.`player_id` \
+		WHERE p.`player_name` = ^"%s^" AND a.`clan_id` = '%i'", playerName[id], clanId);
 
 	query = SQL_PrepareQuery(connection, queryData);
 
@@ -3013,7 +3008,7 @@ stock remove_application(id, const name[] = "")
 	if (strlen(name)) cod_sql_string(name, safeName, charsmax(safeName));
 	else copy(safeName, charsmax(safeName), playerName[id]);
 
-	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_applications` WHERE name = ^"%s^" AND clan = '%i'", safeName, clan[id]);
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_applications` WHERE `player_id` = (SELECT `player_id` FROM `cod_players` WHERE `player_name` = ^"%s^") AND `clan_id` = '%i'", safeName, clan[id]);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
@@ -3025,7 +3020,7 @@ stock remove_applications(id, const name[] = "")
 	if (strlen(name)) cod_sql_string(name, safeName, charsmax(safeName));
 	else copy(safeName, charsmax(safeName), playerName[id]);
 
-	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_applications` WHERE name = ^"%s^"", safeName);
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_applications` WHERE `player_id` = (SELECT `player_id` FROM `cod_players` WHERE `player_name` = ^"%s^")", safeName);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
@@ -3034,7 +3029,8 @@ stock get_applications_count(clan)
 {
 	new queryData[128], error[128], errorNum, Handle:query, applicationsCount = 0;
 
-	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_applications` WHERE `clan` = '%i'", clan);
+	formatex(queryData, charsmax(queryData), "SELECT p.`player_name` AS `name`, a.`clan_id` AS `clan` FROM `cod_clans_applications` a \
+		JOIN `cod_players` p ON p.`player_id` = a.`player_id` WHERE a.`clan_id` = '%i'", clan);
 
 	query = SQL_PrepareQuery(connection, queryData);
 
@@ -3059,8 +3055,12 @@ stock get_wars_count(clanId, started = 1, initiated = 0)
 {
 	new queryData[128], error[128], Handle:query, warsCount = 0, errorNum;
 
-	if(started) formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_wars` WHERE (clan = '%i' OR clan2 = '%i') AND started = '1'", clanId, clanId);
-	else formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_wars` WHERE %s = '%i' AND started = '0'", initiated ? "clan" : "clan2", clanId);
+	if(started) formatex(queryData, charsmax(queryData), "SELECT `war_id` AS `id`, `war_attacker_clan_id` AS `clan`, `war_defender_clan_id` AS `clan2`, `war_attacker_progress` AS `progress`, \
+		`war_defender_progress` AS `progress2`, `war_duration` AS `duration`, `war_reward` AS `reward`, `war_started` AS `started` \
+		FROM `cod_clans_wars` WHERE (`war_attacker_clan_id` = '%i' OR `war_defender_clan_id` = '%i') AND `war_started` = '1'", clanId, clanId);
+	else formatex(queryData, charsmax(queryData), "SELECT `war_id` AS `id`, `war_attacker_clan_id` AS `clan`, `war_defender_clan_id` AS `clan2`, `war_attacker_progress` AS `progress`, \
+		`war_defender_progress` AS `progress2`, `war_duration` AS `duration`, `war_reward` AS `reward`, `war_started` AS `started` \
+		FROM `cod_clans_wars` WHERE %s = '%i' AND `war_started` = '0'", initiated ? "`war_attacker_clan_id`" : "`war_defender_clan_id`", clanId);
 
 	query = SQL_PrepareQuery(connection, queryData);
 
@@ -3087,7 +3087,7 @@ stock check_clan_name(const clanName[])
 
 	cod_sql_string(clanName, safeClanName, charsmax(safeClanName));
 
-	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans` WHERE `name` = ^"%s^"", safeClanName);
+	formatex(queryData, charsmax(queryData), "SELECT `clan_id` AS `id`, `clan_name` AS `name` FROM `cod_clans` WHERE `clan_name` = ^"%s^"", safeClanName);
 
 	query = SQL_PrepareQuery(connection, queryData);
 
@@ -3114,7 +3114,7 @@ public update_clan_name(clan, clanName[], clanNameLength)
 	cod_sql_string(oldClanName, safeOldClanName, charsmax(safeOldClanName));
 	cod_sql_string(clanName, safeClanName, charsmax(safeClanName));
 
-	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET `name` = ^"%s^" WHERE `name` = ^"%s^"", safeClanName, safeOldClanName);
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans` SET `clan_name` = ^"%s^" WHERE `clan_name` = ^"%s^"", safeClanName, safeOldClanName);
 
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 }
@@ -3125,7 +3125,8 @@ stock check_user_clan(const userName[])
 
 	cod_sql_string(userName, safeUserName, charsmax(safeUserName));
 
-	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_clans_members` WHERE `name` = ^"%s^" AND clan > 0", userName);
+	formatex(queryData, charsmax(queryData), "SELECT m.`member_clan_id` AS `clan` FROM `cod_clans_members` m JOIN `cod_players` p ON p.`player_id` = m.`player_id` \
+		WHERE p.`player_name` = ^"%s^" AND m.`member_clan_id` > 0", userName);
 
 	query = SQL_PrepareQuery(connection, queryData);
 
@@ -3148,7 +3149,7 @@ stock create_clan(id, const clanName[])
 
 	cod_sql_string(clanName, safeClanName, charsmax(safeClanName));
 
-	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_clans` (`name`) VALUES (^"%s^");", safeClanName);
+	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_clans` (`clan_name`) VALUES (^"%s^");", safeClanName);
 
 	query = SQL_PrepareQuery(connection, queryData);
 
@@ -3158,7 +3159,7 @@ stock create_clan(id, const clanName[])
 		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
 	}
 
-	formatex(queryData, charsmax(queryData), "SELECT id FROM `cod_clans` WHERE name = ^"%s^";", safeClanName);
+	formatex(queryData, charsmax(queryData), "SELECT `clan_id` AS `id` FROM `cod_clans` WHERE `clan_name` = ^"%s^";", safeClanName);
 
 	query = SQL_PrepareQuery(connection, queryData);
 
@@ -3208,16 +3209,18 @@ stock remove_clan(id)
 
 	tempId[0] = clan[id];
 
-	formatex(queryData, charsmax(queryData), "SELECT a.*, (SELECT name FROM `cod_clans` WHERE id = '%i') as name FROM `cod_clans_wars` a WHERE (clan = '%i' OR clan2 = '%i') AND started = '1'", clan[id], clan[id], clan[id]);
+	formatex(queryData, charsmax(queryData), "SELECT a.`war_id` AS `id`, a.`war_attacker_clan_id` AS `clan`, a.`war_defender_clan_id` AS `clan2`, a.`war_reward` AS `reward`, \
+		(SELECT `clan_name` FROM `cod_clans` WHERE `clan_id` = '%i') as name FROM `cod_clans_wars` a \
+		WHERE (a.`war_attacker_clan_id` = '%i' OR a.`war_defender_clan_id` = '%i') AND a.`war_started` = '1'", clan[id], clan[id], clan[id]);
 	SQL_ThreadQuery(sql, "remove_clan_wars", queryData, tempId, sizeof(tempId));
 
-	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans` WHERE id = '%i'", clan[id]);
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans` WHERE `clan_id` = '%i'", clan[id]);
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
-	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_applications` WHERE clan = '%i'", clan[id]);
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_applications` WHERE `clan_id` = '%i'", clan[id]);
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
-	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET flag = '%i', clan = '0' WHERE clan = '%i'", STATUS_NONE, clan[id]);
+	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_members` WHERE `member_clan_id` = '%i'", STATUS_NONE, clan[id]);
 	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
 	clan[id] = 0;
@@ -3261,7 +3264,7 @@ stock get_clan_honor(clanId)
 
 	new queryData[128], error[128], Handle:query, honor, errorNum;
 
-	formatex(queryData, charsmax(queryData), "SELECT honor FROM `cod_clans` WHERE id = '%i'", clanId);
+	formatex(queryData, charsmax(queryData), "SELECT `clan_honor` AS `honor` FROM `cod_clans` WHERE `clan_id` = '%i'", clanId);
 
 	query = SQL_PrepareQuery(connection, queryData);
 

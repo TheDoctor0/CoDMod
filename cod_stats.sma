@@ -150,9 +150,10 @@ public client_putinserver(id)
 	cod_sql_string(playerName[id], playerName[id], charsmax(playerName[]));
 
 	load_sounds(id);
-
-	set_task(0.1, "load_stats", id);
 }
+
+public cod_player_loaded(id, playerId)
+	load_stats(id);
 
 public client_disconnected(id)
 {
@@ -164,6 +165,8 @@ public client_disconnected(id)
 public cod_flags_changed(id, flags)
 {
 	playerStats[id][ADMIN] = (flags & ADMIN_FLAG) ? 1 : 0;
+
+	cod_set_player_field(id, DB_PLAYER_ADMIN, playerStats[id][ADMIN]);
 
 	save_stats(id);
 }
@@ -185,15 +188,8 @@ public cod_reset_all_data()
 
 public clear_database()
 {
+	// The table itself is wiped by cod_database on the same forward.
 	for (new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, dataLoaded);
-
-	sqlConnected = false;
-
-	new tempData[32];
-
-	formatex(tempData, charsmax(tempData), "DROP TABLE `cod_stats`;");
-
-	SQL_ThreadQuery(sql, "ignore_handle", tempData);
 }
 
 public stats_menu(id)
@@ -264,7 +260,7 @@ public command_time(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `time` > '%i' ORDER BY `time` DESC) b",
+	formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `stats_time` > '%i' ORDER BY `stats_time` DESC) b",
 		playerStats[id][TIME] + get_user_time(id));
 
 	SQL_ThreadQuery(sql, "show_time", queryData, tempId, sizeof(tempId));
@@ -315,7 +311,7 @@ public command_time_admin(id)
 	tempData[0] = id;
 	tempData[1] = 1;
 
-	formatex(queryData, charsmax(queryData), "SELECT name, time FROM `cod_stats` WHERE admin = '1' ORDER BY time DESC");
+	formatex(queryData, charsmax(queryData), "SELECT p.`player_name` AS `name`, s.`stats_time` AS `time` FROM `cod_stats` s JOIN `cod_players` p ON p.`player_id` = s.`player_id` WHERE p.`player_admin` = '1' ORDER BY s.`stats_time` DESC");
 
 	SQL_ThreadQuery(sql, "show_top_time", queryData, tempData, sizeof(tempData));
 
@@ -331,7 +327,7 @@ public command_time_top(id)
 	tempId[0] = id;
 	tempId[1] = 0;
 
-	formatex(queryData, charsmax(queryData), "SELECT name, time FROM `cod_stats` ORDER BY time DESC LIMIT 15");
+	formatex(queryData, charsmax(queryData), "SELECT p.`player_name` AS `name`, s.`stats_time` AS `time` FROM `cod_stats` s JOIN `cod_players` p ON p.`player_id` = s.`player_id` ORDER BY s.`stats_time` DESC LIMIT 15");
 
 	SQL_ThreadQuery(sql, "show_top_time", queryData, tempId, sizeof(tempId));
 
@@ -402,10 +398,10 @@ public command_best_stats(id)
 	playerStats[id][CURRENT_STATS] = playerStats[id][CURRENT_KILLS] * 2 + playerStats[id][CURRENT_HS_KILLS] - playerStats[id][CURRENT_DEATHS] * 2;
 
 	if (playerStats[id][CURRENT_STATS] > playerStats[id][BEST_STATS]) {
-		formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `beststats` > '%i' ORDER BY `beststats` DESC) b",
+		formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `stats_best_stats` > '%i' ORDER BY `stats_best_stats` DESC) b",
 			playerStats[id][BEST_STATS]);
 	} else {
-		formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `beststats` > '%i' ORDER BY `beststats` DESC) b",
+		formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `stats_best_stats` > '%i' ORDER BY `stats_best_stats` DESC) b",
 			playerStats[id][CURRENT_STATS]);
 	}
 
@@ -450,7 +446,7 @@ public command_top_stats(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT name, bestkills, besths, bestdeaths FROM `cod_stats` ORDER BY beststats DESC LIMIT 15");
+	formatex(queryData, charsmax(queryData), "SELECT p.`player_name`, s.`stats_best_kills`, s.`stats_best_hs`, s.`stats_best_deaths` FROM `cod_stats` s JOIN `cod_players` p ON p.`player_id` = s.`player_id` ORDER BY s.`stats_best_stats` DESC LIMIT 15");
 	SQL_ThreadQuery(sql, "show_top_stats", queryData, tempId, sizeof(tempId));
 
 	return PLUGIN_HANDLED;
@@ -507,7 +503,7 @@ public command_medals(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `medals` > '%i' ORDER BY `medals` DESC) b",
+	formatex(queryData, charsmax(queryData), "SELECT rank, count FROM (SELECT COUNT(*) as count FROM `cod_stats`) a CROSS JOIN (SELECT COUNT(*) as rank FROM `cod_stats` WHERE `stats_medals` > '%i' ORDER BY `stats_medals` DESC) b",
 		playerStats[id][MEDALS]);
 
 	SQL_ThreadQuery(sql, "show_medals", queryData, tempId, sizeof(tempId));
@@ -544,7 +540,7 @@ public command_top_medals(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT name, gold, silver, bronze, medals FROM `cod_stats` ORDER BY medals DESC LIMIT 15");
+	formatex(queryData, charsmax(queryData), "SELECT p.`player_name`, s.`stats_medals_gold`, s.`stats_medals_silver`, s.`stats_medals_bronze`, s.`stats_medals` FROM `cod_stats` s JOIN `cod_players` p ON p.`player_id` = s.`player_id` ORDER BY s.`stats_medals` DESC LIMIT 15");
 	SQL_ThreadQuery(sql, "show_top_medals", queryData, tempId, sizeof(tempId));
 
 	return PLUGIN_HANDLED;
@@ -1050,7 +1046,7 @@ public say_text(msgId, msgDest, msgEnt)
 
 public sql_init()
 {
-	new host[64], user[64], pass[64], db[64], queryData[512], error[128], errorNum;
+	new host[64], user[64], pass[64], db[64], error[128], errorNum;
 
 	get_cvar_string("cod_sql_host", host, charsmax(host));
 	get_cvar_string("cod_sql_user", user, charsmax(user));
@@ -1071,22 +1067,13 @@ public sql_init()
 		return;
 	}
 
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_stats` (`name` varchar(%i) NOT NULL, `admin` INT NOT NULL, `kills` INT NOT NULL, `time` INT NOT NULL, ", MAX_SAFE_NAME);
-	add(queryData, charsmax(queryData), "`firstvisit` INT NOT NULL, `lastvisit` INT NOT NULL, `bestkills` INT NOT NULL, `bestdeaths` INT NOT NULL, `besths` INT NOT NULL, ");
-	add(queryData, charsmax(queryData), "`beststats` INT NOT NULL, `bronze` INT NOT NULL, `silver` INT NOT NULL, `gold` INT NOT NULL, `medals` INT NOT NULL, PRIMARY KEY (`name`));");
-
-	new Handle:query = SQL_PrepareQuery(connection, queryData);
-
-	SQL_Execute(query);
-
-	SQL_FreeHandle(query);
-
+	// The schema itself belongs to cod_database.
 	sqlConnected = true;
 }
 
 public load_stats(id)
 {
-	if (!sqlConnected) {
+	if (!sqlConnected || !cod_db_ready() || !cod_get_user_db_id(id)) {
 		set_task(1.0, "load_stats", id);
 
 		return;
@@ -1096,7 +1083,9 @@ public load_stats(id)
 
 	tempId[0] = id;
 
-	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_stats` WHERE name = ^"%s^"", playerName[id]);
+	playerStats[id][ADMIN] = cod_get_player_field(id, DB_PLAYER_ADMIN);
+
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_stats` WHERE `player_id` = '%d'", cod_get_user_db_id(id));
 	SQL_ThreadQuery(sql, "load_stats_handle", queryData, tempId, sizeof(tempId));
 }
 
@@ -1112,22 +1101,22 @@ public load_stats_handle(failState, Handle:query, error[], errorNum, tempId[], d
 	new id = tempId[0];
 
 	if (SQL_NumRows(query)) {
-		playerStats[id][KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "kills"));
-		playerStats[id][TIME] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "time"));
-		playerStats[id][FIRST_VISIT] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "firstvisit"));
-		playerStats[id][LAST_VISIT] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "lastvisit"));
-		playerStats[id][BRONZE] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "bronze"));
-		playerStats[id][SILVER] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "silver"));
-		playerStats[id][GOLD] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "gold"));
-		playerStats[id][MEDALS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "medals"));
-		playerStats[id][BEST_STATS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "beststats"));
-		playerStats[id][BEST_KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "bestkills"));
-		playerStats[id][BEST_HS_KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "besths"));
-		playerStats[id][BEST_DEATHS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "bestdeaths"));
+		playerStats[id][KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stats_kills"));
+		playerStats[id][TIME] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stats_time"));
+		playerStats[id][FIRST_VISIT] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stats_first_visit"));
+		playerStats[id][LAST_VISIT] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stats_last_visit"));
+		playerStats[id][BRONZE] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stats_medals_bronze"));
+		playerStats[id][SILVER] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stats_medals_silver"));
+		playerStats[id][GOLD] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stats_medals_gold"));
+		playerStats[id][MEDALS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stats_medals"));
+		playerStats[id][BEST_STATS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stats_best_stats"));
+		playerStats[id][BEST_KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stats_best_kills"));
+		playerStats[id][BEST_HS_KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stats_best_hs"));
+		playerStats[id][BEST_DEATHS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stats_best_deaths"));
 	} else {
-		new queryData[128];
+		new queryData[160];
 
-		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_stats` (`name`, `firstvisit`) VALUES (^"%s^", '%i');", playerName[id], get_systime());
+		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_stats` (`player_id`, `stats_first_visit`) VALUES ('%d', '%i');", cod_get_user_db_id(id), get_systime());
 
 		SQL_ThreadQuery(sql, "ignore_handle", queryData);
 	}
@@ -1144,19 +1133,19 @@ stock save_stats(id, end = 0)
 	playerStats[id][CURRENT_STATS] = playerStats[id][CURRENT_KILLS] * 2 + playerStats[id][CURRENT_HS_KILLS] - playerStats[id][CURRENT_DEATHS] * 2;
 
 	if (playerStats[id][CURRENT_STATS] > playerStats[id][BEST_STATS]) {
-		formatex(queryStats, charsmax(queryStats), ", `bestkills` = %d, `besths` = %d, `bestdeaths` = %d, `beststats` = %d",
+		formatex(queryStats, charsmax(queryStats), ", `stats_best_kills` = %d, `stats_best_hs` = %d, `stats_best_deaths` = %d, `stats_best_stats` = %d",
 		playerStats[id][CURRENT_KILLS], playerStats[id][CURRENT_HS_KILLS], playerStats[id][CURRENT_DEATHS], playerStats[id][CURRENT_STATS]);
 	}
 
 	medals = playerStats[id][GOLD] * 3 + playerStats[id][SILVER] * 2 + playerStats[id][BRONZE];
 
 	if (medals > playerStats[id][MEDALS]) {
-		formatex(queryStats, charsmax(queryStats), ", `gold` = %d, `silver` = %d, `bronze` = %d, `medals` = %d",
+		formatex(queryMedals, charsmax(queryMedals), ", `stats_medals_gold` = %d, `stats_medals_silver` = %d, `stats_medals_bronze` = %d, `stats_medals` = %d",
 		playerStats[id][GOLD], playerStats[id][SILVER], playerStats[id][BRONZE], medals);
 	}
 
-	formatex(queryData, charsmax(queryData), "UPDATE `cod_stats` SET `admin` = %i, `kills` = %i, `time` = %i, `lastvisit` = %i%s%s WHERE `name` = ^"%s^" AND `time` <= %i",
-	playerStats[id][ADMIN], playerStats[id][KILLS], playerStats[id][TIME] + get_user_time(id), get_systime(), queryStats, queryMedals, playerName[id], playerStats[id][TIME] + get_user_time(id));
+	formatex(queryData, charsmax(queryData), "UPDATE `cod_stats` SET `stats_kills` = %i, `stats_time` = %i, `stats_last_visit` = %i%s%s WHERE `player_id` = '%d' AND `stats_time` <= %i",
+	playerStats[id][KILLS], playerStats[id][TIME] + get_user_time(id), get_systime(), queryStats, queryMedals, cod_get_user_db_id(id), playerStats[id][TIME] + get_user_time(id));
 
 	switch (end) {
 		case 0: SQL_ThreadQuery(sql, "ignore_handle", queryData);
