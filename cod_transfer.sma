@@ -27,14 +27,18 @@ public transfer_menu(id)
 
 	cod_play_sound(id, SOUND_SELECT);
 
-	new menuData[256], playerName[MAX_NAME], playerId[3], players, menu = menu_create("\yWybierz \rGracza\y, ktoremu chcesz przelac \rHonor\w:", "transfer_menu_handle");
+	new menuData[256], menuTitle[128], playerName[MAX_NAME], playerId[3], players;
+
+	formatex(menuTitle, charsmax(menuTitle), "%L", id, "TRANSFER_MENU_TITLE");
+
+	new menu = menu_create(menuTitle, "transfer_menu_handle");
 
 	for (new player = 1; player <= MAX_PLAYERS; player++) {
 		if (!is_user_connected(player) || !cod_get_user_class(player) || player == id) continue;
 
 		get_user_name(player, playerName, charsmax(playerName));
 
-		formatex(menuData, charsmax(menuData), "%s \y[%d Honoru]", playerName, cod_get_user_honor(player));
+		formatex(menuData, charsmax(menuData), "%L", id, "TRANSFER_MENU_ITEM", playerName, cod_get_user_honor(player));
 
 		num_to_str(player, playerId, charsmax(playerId));
 
@@ -43,14 +47,19 @@ public transfer_menu(id)
 		players++;
 	}
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
-	menu_setprop(menu, MPROP_BACKNAME, "Poprzednie");
-	menu_setprop(menu, MPROP_NEXTNAME, "Nastepne");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
+	menu_setprop(menu, MPROP_EXITNAME, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_PREVIOUS");
+	menu_setprop(menu, MPROP_BACKNAME, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_NEXT");
+	menu_setprop(menu, MPROP_NEXTNAME, menuData);
 
 	if (!players) {
 		menu_destroy(menu);
 
-		cod_print_chat(id, "Na serwerze nie ma gracza, ktoremu moglbys przelac^3 honor^1!");
+		cod_print_chat(id, "%L", id, "TRANSFER_NO_PLAYERS");
 	} else menu_display(id, menu);
 
 	return PLUGIN_HANDLED;
@@ -79,7 +88,7 @@ public transfer_menu_handle(id, menu, item)
 	menu_destroy(menu);
 
 	if (!is_user_connected(player)) {
-		cod_print_chat(id, "Tego gracza nie ma juz na serwerze!");
+		cod_print_chat(id, "%L", id, "TRANSFER_PLAYER_LEFT");
 
 		return PLUGIN_HANDLED;
 	}
@@ -88,9 +97,9 @@ public transfer_menu_handle(id, menu, item)
 
 	client_cmd(id, "messagemode ILOSC_HONORU");
 
-	cod_print_chat(id, "Wpisz ilosc^3 honoru^1, ktora chcesz przelac!");
+	cod_print_chat(id, "%L", id, "TRANSFER_ENTER_AMOUNT");
 
-	client_print(id, print_center, "Wpisz ilosc honoru, ktora chcesz przelac!");
+	client_print(id, print_center, "%L", id, "TRANSFER_ENTER_AMOUNT_CENTER");
 
 	return PLUGIN_HANDLED;
 }
@@ -102,7 +111,7 @@ public transfer_honor_handle(id)
 	cod_play_sound(id, SOUND_EXIT);
 
 	if (!is_user_connected(transferPlayer[id])) {
-		cod_print_chat(id, "Gracza, ktoremu chcesz przelac^3 honor^1 nie ma juz na serwerze!");
+		cod_print_chat(id, "%L", id, "TRANSFER_TARGET_LEFT");
 
 		return PLUGIN_HANDLED;
 	}
@@ -115,13 +124,13 @@ public transfer_honor_handle(id)
 	honorAmount = str_to_num(honorData);
 
 	if (honorAmount <= 0) {
-		cod_print_chat(id, "Nie mozesz przelac mniej niz^3 1 honoru^1!");
+		cod_print_chat(id, "%L", id, "TRANSFER_MIN_AMOUNT");
 
 		return PLUGIN_HANDLED;
 	}
 
 	if (cod_get_user_honor(id) < honorAmount) {
-		cod_print_chat(id, "Nie masz tyle^3 honoru^1!");
+		cod_print_chat(id, "%L", id, "TRANSFER_NOT_ENOUGH");
 
 		return PLUGIN_HANDLED;
 	}
@@ -134,7 +143,7 @@ public transfer_honor_handle(id)
 	cod_set_user_honor(transferPlayer[id], cod_get_user_honor(transferPlayer[id]) + honorAmount);
 	cod_set_user_honor(id, cod_get_user_honor(id) - honorAmount);
 
-	cod_print_chat(0, "^3%s^1 przelal^4 %i honoru^1 na konto^3 %s^1.", playerName, honorAmount, playerIdName);
+	cod_print_chat(0, "%L", LANG_SERVER, "TRANSFER_DONE", playerName, honorAmount, playerIdName);
 
 	return PLUGIN_HANDLED;
 }

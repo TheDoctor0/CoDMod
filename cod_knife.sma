@@ -8,13 +8,13 @@
 
 new const knifeModels[][][] =
 {
-	{ "Standardowy", "(+2 Kazdej Statystyki)", "models/v_knife.mdl" },
-	{ "Mysliwski", "(+10 Zdrowia)", "models/CoDMod/hunting.mdl" },
-	{ "Kieszonkowy", "(+10 Inteligencji)", "models/CoDMod/pocket.mdl" },
-	{ "Tasak", "(+10 Wytrzymalosci)", "models/CoDMod/chopper.mdl" },
-	{ "Maczeta", "(+10 Sily)", "models/CoDMod/machete.mdl" },
-	{ "Katana", "(+10 Kondycji)", "models/CoDMod/katana.mdl" },
-	{ "Siekiera", "(+4 Kazdej Statystyki)", "models/CoDMod/axe.mdl" }
+	{ "KNIFE_NAME_STANDARD", "KNIFE_BONUS_STANDARD", "models/v_knife.mdl" },
+	{ "KNIFE_NAME_HUNTING", "KNIFE_BONUS_HUNTING", "models/CoDMod/hunting.mdl" },
+	{ "KNIFE_NAME_POCKET", "KNIFE_BONUS_POCKET", "models/CoDMod/pocket.mdl" },
+	{ "KNIFE_NAME_CHOPPER", "KNIFE_BONUS_CHOPPER", "models/CoDMod/chopper.mdl" },
+	{ "KNIFE_NAME_MACHETE", "KNIFE_BONUS_MACHETE", "models/CoDMod/machete.mdl" },
+	{ "KNIFE_NAME_KATANA", "KNIFE_BONUS_KATANA", "models/CoDMod/katana.mdl" },
+	{ "KNIFE_NAME_AXE", "KNIFE_BONUS_AXE", "models/CoDMod/axe.mdl" }
 };
 
 new const commandKnives[][] = { "noze", "say /noz", "say_team /noz", "say /noze", "say_team /noze", "say /knife", "say_team /knife",
@@ -73,21 +73,30 @@ public change_knife(id)
 
 	cod_play_sound(id, SOUND_SELECT);
 
-	new knifeData[64], knifeId[3], menu = menu_create("\yWybierz \rModel Noza\w:", "change_knife_handle"), callback = menu_makecallback("change_knife_callback");
+	new knifeData[96], knifeId[3], menuTitle[64];
+
+	formatex(menuTitle, charsmax(menuTitle), "%L", id, "KNIFE_MENU_TITLE");
+
+	new menu = menu_create(menuTitle, "change_knife_handle"), callback = menu_makecallback("change_knife_callback");
 
 	for (new i = 0; i < sizeof(knifeModels); i++) {
 		if (i == VIP && !cvarKnifeVIP) continue;
 
-		formatex(knifeData, charsmax(knifeData), "%s \y%s%s", knifeModels[i][NAME], knifeModels[i][BONUS], i == VIP ? " \r(VIP)": "");
+		formatex(knifeData, charsmax(knifeData), "%L \y%L%s", id, knifeModels[i][NAME], id, knifeModels[i][BONUS], i == VIP ? " \r(VIP)": "");
 
 		num_to_str(i, knifeId, charsmax(knifeId));
 
 		menu_additem(menu, knifeData, knifeId, _, callback);
 	}
 
-	menu_setprop(menu, MPROP_BACKNAME, "Wroc");
-	menu_setprop(menu, MPROP_NEXTNAME, "Dalej");
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	formatex(knifeData, charsmax(knifeData), "%L", id, "CORE_MENU_PREVIOUS");
+	menu_setprop(menu, MPROP_BACKNAME, knifeData);
+
+	formatex(knifeData, charsmax(knifeData), "%L", id, "CORE_MENU_NEXT");
+	menu_setprop(menu, MPROP_NEXTNAME, knifeData);
+
+	formatex(knifeData, charsmax(knifeData), "%L", id, "CORE_MENU_EXIT");
+	menu_setprop(menu, MPROP_EXITNAME, knifeData);
 
 	menu_display(id, menu);
 
@@ -119,7 +128,12 @@ public change_knife_handle(id, menu, item)
 
 	save_knife(id);
 
-	cod_print_chat(id, "Twoj nowy noz to:^3 %s %s^1.", knifeModels[playerKnife[id]][NAME], knifeModels[playerKnife[id]][BONUS]);
+	new knifeName[32], knifeBonus[64];
+
+	formatex(knifeName, charsmax(knifeName), "%L", id, knifeModels[playerKnife[id]][NAME]);
+	formatex(knifeBonus, charsmax(knifeBonus), "%L", id, knifeModels[playerKnife[id]][BONUS]);
+
+	cod_print_chat(id, "%L", id, "KNIFE_SELECTED", knifeName, knifeBonus);
 
 	menu_destroy(menu);
 
