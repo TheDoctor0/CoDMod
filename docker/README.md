@@ -47,6 +47,25 @@ The migration run is printed on startup:
 
 A second start prints `Nothing to migrate.`
 
+## Validate the queries
+
+The plugins build SQL with `formatex()`, so a wrong column name or an undersized
+buffer only surfaces when a player triggers that exact code path. This pulls
+every statement out of the sources and runs it against the database inside a
+transaction that is rolled back:
+
+```sh
+docker compose up -d db
+python3 validate-queries.py
+```
+
+```
+68/68 queries execute cleanly
+```
+
+Worth running after touching any query, and after adding a migration that
+changes a column name.
+
 ## Inspect the database
 
 ```sh
