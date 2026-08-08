@@ -1007,7 +1007,7 @@ public members_menu(id)
 {
 	if (!is_user_connected(id) || !clan[id]) return PLUGIN_HANDLED;
 
-	new queryData[128], tempId[1];
+	new queryData[512], tempId[1];
 
 	tempId[0] = id;
 
@@ -1216,7 +1216,7 @@ public applications_menu(id)
 {
 	if (!is_user_connected(id) || mapEnd || !clan[id] || !cod_check_account(id)) return PLUGIN_HANDLED;
 
-	new queryData[256], tempId[1];
+	new queryData[512], tempId[1];
 
 	tempId[0] = id;
 
@@ -1379,7 +1379,7 @@ public applications_confirm_handle(id, menu, item)
 
 				cod_add_user_honor(id, -cvarJoinFee);
 			} else {
-				new queryData[128], error[128], safeName[64], Handle:query, honor, errorNum;
+				new queryData[384], error[128], safeName[64], Handle:query, honor, errorNum;
 
 				cod_sql_string(userName, safeName, charsmax(safeName));
 
@@ -1482,7 +1482,7 @@ public war_list_menu(id)
 {
 	if (!is_user_connected(id) || !clan[id] || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	new queryData[256], tempId[1];
+	new queryData[896], tempId[1];
 
 	tempId[0] = id;
 
@@ -1615,7 +1615,7 @@ public declare_war_menu_handle(id, menu, item)
 		case 0: client_cmd(id, "messagemode PODAJ_LICZBE_FRAGOW");
 		case 1: client_cmd(id, "messagemode PODAJ_WYSOKOSC_NAGRODY");
 		case 2: {
-			new queryData[512], tempId[1];
+			new queryData[768], tempId[1];
 
 			tempId[0] = id;
 
@@ -1761,7 +1761,7 @@ public accept_war_menu(id)
 {
 	if (!is_user_connected(id) || !clan[id] || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	new queryData[256], tempId[1];
+	new queryData[640], tempId[1];
 
 	tempId[0] = id;
 
@@ -1919,7 +1919,7 @@ public remove_war_menu(id)
 {
 	if (!is_user_connected(id) || !clan[id] || !cod_check_account(id) || mapEnd) return PLUGIN_HANDLED;
 
-	new queryData[256], tempId[1];
+	new queryData[640], tempId[1];
 
 	tempId[0] = id;
 
@@ -2146,7 +2146,7 @@ public depositors_list(id)
 {
 	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
-	new queryData[128], tempId[1];
+	new queryData[512], tempId[1];
 
 	tempId[0] = id;
 
@@ -2203,7 +2203,7 @@ public clans_top15(id)
 {
 	if (!is_user_connected(id) || mapEnd || !cod_check_account(id)) return PLUGIN_HANDLED;
 
-	new queryData[256], tempId[1];
+	new queryData[512], tempId[1];
 
 	tempId[0] = id;
 
@@ -2328,7 +2328,7 @@ public application_menu(id)
 {
 	if (!is_user_connected(id) || !cod_check_account(id) || mapEnd || clan[id]) return PLUGIN_HANDLED;
 
-	new queryData[256], tempId[1];
+	new queryData[512], tempId[1];
 
 	tempId[0] = id;
 
@@ -2584,7 +2584,7 @@ public load_data(id)
 		return;
 	}
 
-	new queryData[256], tempId[1];
+	new queryData[768], tempId[1];
 
 	tempId[0] = id;
 
@@ -2628,7 +2628,7 @@ public load_data_handle(failState, Handle:query, error[], errorNum, tempId[], da
 
 			ArrayPushArray(codClans, codClan);
 
-			new queryData[128];
+			new queryData[640];
 
 			formatex(queryData, charsmax(queryData), "SELECT `war_id` AS `id`, `war_attacker_clan_id` AS `clan`, `war_defender_clan_id` AS `clan2`, `war_attacker_progress` AS `progress`, \
 				`war_defender_progress` AS `progress2`, `war_duration` AS `duration`, `war_reward` AS `reward`, `war_started` AS `started` \
@@ -2713,7 +2713,7 @@ public _cod_get_clan_name(clanId, dataReturn[], dataLength)
 
 stock save_member(id, status = 0, change = 0, const name[] = "")
 {
-	new queryData[192], safeName[MAX_SAFE_NAME];
+	new queryData[512], safeName[MAX_SAFE_NAME];
 
 	if (strlen(name)) cod_sql_string(name, safeName, charsmax(safeName));
 	else copy(safeName, charsmax(safeName), playerName[id]);
@@ -2734,7 +2734,7 @@ stock save_member(id, status = 0, change = 0, const name[] = "")
 
 stock declare_war(id, clanId)
 {
-	new queryData[192], clanName[32];
+	new queryData[384], clanName[32];
 
 	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_clans_wars` (`war_attacker_clan_id`, `war_defender_clan_id`, `war_duration`, `war_reward`) VALUES ('%i', '%i', '%i', '%i')", clan[id], clanId, warFrags[id], warReward[id]);
 
@@ -2751,7 +2751,7 @@ stock declare_war(id, clanId)
 
 stock accept_war(id, warId, clanId, duration, honor, const enemyClanName[])
 {
-	new queryData[192], codWar[warInfo], clanName[MAX_NAME];
+	new queryData[384], codWar[warInfo], clanName[MAX_NAME];
 
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_wars` SET `war_started` = '1' WHERE `war_id` = '%i'", warId);
 
@@ -2783,7 +2783,7 @@ stock accept_war(id, warId, clanId, duration, honor, const enemyClanName[])
 
 stock remove_war(warId, started = 0)
 {
-	new queryData[128], error[128], Handle:query, bool:result, errorNum;
+	new queryData[384], error[128], Handle:query, bool:result, errorNum;
 
 	formatex(queryData, charsmax(queryData), "DELETE FROM `cod_clans_wars` WHERE `war_id` = '%i' AND `war_started` = '%i'", warId, started);
 
@@ -2811,7 +2811,7 @@ public remove_clan_wars(failState, Handle:query, error[], errorNum, tempId[], da
 		return;
 	}
 
-	new id = tempId[0], queryData[128], clanName[32], clanId[2], reward, enemyClan;
+	new id = tempId[0], queryData[384], clanName[32], clanId[2], reward, enemyClan;
 
 	while (SQL_MoreResults(query)) {
 		SQL_ReadResult(query, SQL_FieldNameToNum(query, "name"), clanName, charsmax(clanName));
@@ -2848,7 +2848,7 @@ public remove_clan_wars(failState, Handle:query, error[], errorNum, tempId[], da
 
 public save_war(warId)
 {
-	static queryData[128], codWar[warInfo];
+	static queryData[384], codWar[warInfo];
 
 	ArrayGetArray(codWars, warId, codWar);
 
@@ -2921,7 +2921,7 @@ stock check_war_enemy(id, enemy)
 
 stock add_deposited_honor(id, honor)
 {
-	new queryData[192];
+	new queryData[384];
 
 	formatex(queryData, charsmax(queryData), "UPDATE `cod_clans_members` SET `member_donations` = `member_donations` + %d \
 		WHERE `player_id` = (SELECT `player_id` FROM `cod_players` WHERE `player_name` = ^"%s^")", honor, playerName[id]);
@@ -2931,7 +2931,7 @@ stock add_deposited_honor(id, honor)
 
 stock add_application(id, clanId)
 {
-	new queryData[192], userName[MAX_NAME];
+	new queryData[384], userName[MAX_NAME];
 
 	formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_clans_applications` (`player_id`, `clan_id`) \
 		VALUES ((SELECT `player_id` FROM `cod_players` WHERE `player_name` = ^"%s^"), '%i');", playerName[id], clanId);
@@ -2949,7 +2949,7 @@ stock add_application(id, clanId)
 
 stock check_applications(id, clanId)
 {
-	new queryData[192], error[128], errorNum, Handle:query, bool:foundApplication;
+	new queryData[384], error[128], errorNum, Handle:query, bool:foundApplication;
 
 	formatex(queryData, charsmax(queryData), "SELECT a.`clan_id` AS `clan` FROM `cod_clans_applications` a JOIN `cod_players` p ON p.`player_id` = a.`player_id` \
 		WHERE p.`player_name` = ^"%s^" AND a.`clan_id` = '%i'", playerName[id], clanId);
@@ -3003,7 +3003,7 @@ stock remove_application(id, const name[] = "")
 		cod_print_chat(player, "^3%s^1 odrzucil twoje podanie do klanu^3 %s^1!", userName, clanName);
 	}
 
-	new queryData[192], safeName[MAX_SAFE_NAME];
+	new queryData[384], safeName[MAX_SAFE_NAME];
 
 	if (strlen(name)) cod_sql_string(name, safeName, charsmax(safeName));
 	else copy(safeName, charsmax(safeName), playerName[id]);
@@ -3015,7 +3015,7 @@ stock remove_application(id, const name[] = "")
 
 stock remove_applications(id, const name[] = "")
 {
-	new queryData[192], safeName[MAX_SAFE_NAME];
+	new queryData[384], safeName[MAX_SAFE_NAME];
 
 	if (strlen(name)) cod_sql_string(name, safeName, charsmax(safeName));
 	else copy(safeName, charsmax(safeName), playerName[id]);
@@ -3027,7 +3027,7 @@ stock remove_applications(id, const name[] = "")
 
 stock get_applications_count(clan)
 {
-	new queryData[128], error[128], errorNum, Handle:query, applicationsCount = 0;
+	new queryData[384], error[128], errorNum, Handle:query, applicationsCount = 0;
 
 	formatex(queryData, charsmax(queryData), "SELECT p.`player_name` AS `name`, a.`clan_id` AS `clan` FROM `cod_clans_applications` a \
 		JOIN `cod_players` p ON p.`player_id` = a.`player_id` WHERE a.`clan_id` = '%i'", clan);
@@ -3053,7 +3053,7 @@ stock get_applications_count(clan)
 
 stock get_wars_count(clanId, started = 1, initiated = 0)
 {
-	new queryData[128], error[128], Handle:query, warsCount = 0, errorNum;
+	new queryData[640], error[128], Handle:query, warsCount = 0, errorNum;
 
 	if(started) formatex(queryData, charsmax(queryData), "SELECT `war_id` AS `id`, `war_attacker_clan_id` AS `clan`, `war_defender_clan_id` AS `clan2`, `war_attacker_progress` AS `progress`, \
 		`war_defender_progress` AS `progress2`, `war_duration` AS `duration`, `war_reward` AS `reward`, `war_started` AS `started` \
@@ -3083,7 +3083,7 @@ stock get_wars_count(clanId, started = 1, initiated = 0)
 
 stock check_clan_name(const clanName[])
 {
-	new queryData[192], safeClanName[MAX_SAFE_NAME], error[128], errorNum, Handle:query, bool:foundClan;
+	new queryData[384], safeClanName[MAX_SAFE_NAME], error[128], errorNum, Handle:query, bool:foundClan;
 
 	cod_sql_string(clanName, safeClanName, charsmax(safeClanName));
 
@@ -3121,7 +3121,7 @@ public update_clan_name(clan, clanName[], clanNameLength)
 
 stock check_user_clan(const userName[])
 {
-	new queryData[192], safeUserName[MAX_SAFE_NAME], error[128], errorNum, Handle:query, bool:foundClan;
+	new queryData[384], safeUserName[MAX_SAFE_NAME], error[128], errorNum, Handle:query, bool:foundClan;
 
 	cod_sql_string(userName, safeUserName, charsmax(safeUserName));
 
@@ -3145,7 +3145,7 @@ stock check_user_clan(const userName[])
 
 stock create_clan(id, const clanName[])
 {
-	new codClan[clanInfo], queryData[192], safeClanName[MAX_SAFE_NAME], error[128], errorNum, Handle:query, bool:success;
+	new codClan[clanInfo], queryData[256], safeClanName[MAX_SAFE_NAME], error[128], errorNum, Handle:query, bool:success;
 
 	cod_sql_string(clanName, safeClanName, charsmax(safeClanName));
 
@@ -3205,7 +3205,7 @@ stock remove_clan(id)
 
 	ArrayDeleteItem(codClans, get_clan_id(clan[id]));
 
-	new queryData[192], tempId[1];
+	new queryData[640], tempId[1];
 
 	tempId[0] = clan[id];
 
@@ -3262,7 +3262,7 @@ stock get_clan_honor(clanId)
 		return codClan[CLAN_HONOR];
 	}
 
-	new queryData[128], error[128], Handle:query, honor, errorNum;
+	new queryData[384], error[128], Handle:query, honor, errorNum;
 
 	formatex(queryData, charsmax(queryData), "SELECT `clan_honor` AS `honor` FROM `cod_clans` WHERE `clan_id` = '%i'", clanId);
 

@@ -256,7 +256,7 @@ public command_time(id)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new queryData[256], tempId[1];
+	new queryData[384], tempId[1];
 
 	tempId[0] = id;
 
@@ -306,7 +306,7 @@ public command_time_admin(id)
 {
 	if (!is_user_connected(id) || !playerStats[id][ADMIN]) return PLUGIN_HANDLED;
 
-	new queryData[128], tempData[2];
+	new queryData[384], tempData[2];
 
 	tempData[0] = id;
 	tempData[1] = 1;
@@ -322,7 +322,7 @@ public command_time_top(id)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new queryData[128], tempId[2];
+	new queryData[384], tempId[2];
 
 	tempId[0] = id;
 	tempId[1] = 0;
@@ -391,7 +391,7 @@ public command_best_stats(id)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new queryData[256], tempId[1];
+	new queryData[384], tempId[1];
 
 	tempId[0] = id;
 
@@ -442,7 +442,7 @@ public command_top_stats(id)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new queryData[128], tempId[1];
+	new queryData[512], tempId[1];
 
 	tempId[0] = id;
 
@@ -499,7 +499,7 @@ public command_medals(id)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new queryData[256], tempId[1];
+	new queryData[384], tempId[1];
 
 	tempId[0] = id;
 
@@ -536,7 +536,7 @@ public command_top_medals(id)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new queryData[128], tempId[1];
+	new queryData[512], tempId[1];
 
 	tempId[0] = id;
 
@@ -1079,7 +1079,7 @@ public load_stats(id)
 		return;
 	}
 
-	new queryData[128], tempId[1];
+	new queryData[256], tempId[1];
 
 	tempId[0] = id;
 
@@ -1114,7 +1114,7 @@ public load_stats_handle(failState, Handle:query, error[], errorNum, tempId[], d
 		playerStats[id][BEST_HS_KILLS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stats_best_hs"));
 		playerStats[id][BEST_DEATHS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "stats_best_deaths"));
 	} else {
-		new queryData[160];
+		new queryData[384];
 
 		formatex(queryData, charsmax(queryData), "INSERT IGNORE INTO `cod_stats` (`player_id`, `stats_first_visit`) VALUES ('%d', '%i');", cod_get_user_db_id(id), get_systime());
 
@@ -1128,7 +1128,7 @@ stock save_stats(id, end = 0)
 {
 	if (!get_bit(id, dataLoaded)) return;
 
-	static queryData[256], queryStats[128], queryMedals[128], medals;
+	static queryData[384], queryStats[128], queryMedals[128], medals;
 
 	playerStats[id][CURRENT_STATS] = playerStats[id][CURRENT_KILLS] * 2 + playerStats[id][CURRENT_HS_KILLS] - playerStats[id][CURRENT_DEATHS] * 2;
 

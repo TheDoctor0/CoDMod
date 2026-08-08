@@ -518,7 +518,7 @@ public save_mission(id)
 
 	if (!sqlConnected || !playerId || !classId) return PLUGIN_HANDLED;
 
-	new queryData[512];
+	new queryData[768];
 
 	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_missions` (`player_id`, `class_id`, `mission_id`, `mission_type`, `mission_additional`, \
 		`mission_progress`, `mission_chapter`) VALUES ('%d', '%d', '%d', '%d', '%d', '%d', '%d') ON DUPLICATE KEY UPDATE \
@@ -542,7 +542,7 @@ public load_mission(id)
 
 	if (!sqlConnected || !playerId || !classId) return PLUGIN_HANDLED;
 
-	new queryData[192], tempId[1];
+	new queryData[384], tempId[1];
 
 	tempId[0] = id;
 

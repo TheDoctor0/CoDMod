@@ -1548,7 +1548,7 @@ public level_top(id)
 {
 	if (!is_user_connected(id)) return PLUGIN_HANDLED;
 
-	new queryData[128], tempId[1];
+	new queryData[512], tempId[1];
 
 	tempId[0] = id;
 
@@ -3750,7 +3750,7 @@ public load_data(id)
 		return;
 	}
 
-	new playerId[1], queryData[192];
+	new playerId[1], queryData[256];
 
 	playerId[0] = id;
 
@@ -3879,7 +3879,7 @@ public load_class(id, class)
 
 		ArraySetArray(codPlayerClasses[id], class, codClass);
 
-		new tempData[256], className[MAX_NAME], classData[2];
+		new tempData[384], className[MAX_NAME], classData[2];
 
 		get_class_info(class, CLASS_NAME, className, charsmax(className));
 
