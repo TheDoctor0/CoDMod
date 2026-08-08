@@ -2271,7 +2271,7 @@ public player_take_damage_pre(victim, inflictor, attacker, Float:damage, damageB
 {
 	if (!is_user_connected(attacker) || !is_user_connected(victim) || get_user_team(attacker) == get_user_team(victim)) return HAM_IGNORED;
 
-	static function, weapon, hitPlace, Float:baseDamage;
+	new function, weapon, hitPlace, Float:baseDamage;
 
 	weapon = codPlayer[attacker][PLAYER_WEAPON];
 
@@ -2393,7 +2393,7 @@ public player_take_damage_post(victim, inflictor, attacker, Float:damage, damage
 {
 	if (!is_user_connected(attacker) || !is_user_connected(victim) || !codPlayer[attacker][PLAYER_CLASS] || !codPlayer[victim][PLAYER_ALIVE] || get_user_team(victim) == get_user_team(attacker) || damage <= 0.0) return HAM_IGNORED;
 
-	static ret, weapon, hitPlace;
+	new ret, weapon, hitPlace;
 
 	weapon = codPlayer[attacker][PLAYER_WEAPON];
 
