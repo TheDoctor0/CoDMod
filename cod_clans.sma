@@ -147,7 +147,7 @@ public cod_spawned(id, respawn)
 
 public cod_damage_post(attacker, victim, weapon, Float:damage, damageBits, hitPlace)
 {
-	if (!clan[attacker]) return PLUGIN_CONTINUE;
+	if (!clan[attacker] || damageBits & DMG_CODSKILL) return PLUGIN_CONTINUE;
 
 	cod_inflict_damage(attacker, victim, damage * cvarDamagePerLevel * get_clan_info(clan[attacker], CLAN_DAMAGE) / 100.0, 0.0, damageBits);
 
