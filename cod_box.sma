@@ -129,7 +129,7 @@ public get_box(id)
 
 			set_user_frags(id, get_user_frags(id) + frags);
 
-			cod_print_chat(id, "Dostales^4 %i frag%s^1!", frags, frags == 1 ? "a" : "i");
+			cod_print_chat(id, "%L", id, frags == 1 ? "BOX_FRAG" : "BOX_FRAGS", frags);
 		} case 2: {
 			new deaths = random_num(1, 2), frags = deaths - cs_get_user_deaths(id);
 
@@ -137,45 +137,45 @@ public get_box(id)
 
 			cs_set_user_deaths(id, max(0, cs_get_user_deaths(id) - deaths));
 
-			cod_print_chat(id, "Masz o^4 %i zgon%s^1 mniej!", deaths, deaths == 1 ? "" : "y");
+			cod_print_chat(id, "%L", id, deaths == 1 ? "BOX_DEATH" : "BOX_DEATHS", deaths);
 		} case 3: {
 			new health = random_num(15, 75);
 
 			cod_set_user_health(id, cod_get_user_health(id, 1) + health);
 
-			cod_print_chat(id, "Dostales^4 +%i HP^1!", health);
+			cod_print_chat(id, "%L", id, "BOX_HEALTH", health);
 		} case 4: {
 			new exp = random_num(25, 75);
 
 			cod_set_user_exp(id, exp);
 
-			cod_print_chat(id, "Dostales^4 %i doswiadczenia^1!", exp);
+			cod_print_chat(id, "%L", id, "BOX_EXP", exp);
 		} case 5: {
 			new honor = random_num(5, 25);
 
 			cod_add_user_honor(id, honor);
 
-			cod_print_chat(id, "Dostales^4 %i Honoru^1!", honor);
+			cod_print_chat(id, "%L", id, "BOX_HONOR", honor);
 		} case 6: {
 			cod_add_user_rockets(id, 1);
 
-			cod_print_chat(id, "Dostales^4 Rakiete^1!");
+			cod_print_chat(id, "%L", id, "BOX_ROCKET");
 		} case 7: {
 			cod_add_user_mines(id, 1);
 
-			cod_print_chat(id, "Dostales^4 Mine^1!");
+			cod_print_chat(id, "%L", id, "BOX_MINE");
 		} case 8: {
 			cod_add_user_medkits(id, 1);
 
-			cod_print_chat(id, "Dostales^4 Apteczke^1!");
+			cod_print_chat(id, "%L", id, "BOX_MEDKIT");
 		} case 9: {
 			cod_add_user_dynamites(id, 1);
 
-			cod_print_chat(id, "Dostales^4 Dynamit^1!");
+			cod_print_chat(id, "%L", id, "BOX_DYNAMITE");
 		} case 10: {
 			cod_set_user_item(id, RANDOM);
 
-			cod_print_chat(id, "Trafiles na^4 losowy item^1!");
+			cod_print_chat(id, "%L", id, "BOX_RANDOM_ITEM");
 		}
 	}
 

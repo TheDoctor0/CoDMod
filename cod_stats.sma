@@ -202,19 +202,37 @@ public stats_menu(id)
 
 	cod_play_sound(id, SOUND_SELECT);
 
-	new menu = menu_create("\yMenu \yStatystyk\r", "stats_menu_handle");
+	new menuData[64];
 
-	menu_additem(menu, "\wMoj \rCzas \y(/czas)", "1");
+	formatex(menuData, charsmax(menuData), "%L", id, "STATS_MENU_TITLE");
 
-	if (playerStats[id][ADMIN]) menu_additem(menu, "\wCzas \rAdminow \y(/adminczas)", "2");
+	new menu = menu_create(menuData, "stats_menu_handle");
 
-	menu_additem(menu, "\wTop \rCzasu \y(/ctop15)", "3");
-	menu_additem(menu, "\wNajlepsze \rStaty \y(/staty)", "4");
-	menu_additem(menu, "\wTop \rStatow \y(/stop15)", "5");
-	menu_additem(menu, "\wMoje \rMedale \y(/medale)", "6");
-	menu_additem(menu, "\wTop \rMedali \y(/mtop15)", "7");
+	formatex(menuData, charsmax(menuData), "%L", id, "STATS_MENU_MY_TIME");
+	menu_additem(menu, menuData, "1");
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	if (playerStats[id][ADMIN]) {
+		formatex(menuData, charsmax(menuData), "%L", id, "STATS_MENU_ADMIN_TIME");
+		menu_additem(menu, menuData, "2");
+	}
+
+	formatex(menuData, charsmax(menuData), "%L", id, "STATS_MENU_TOP_TIME");
+	menu_additem(menu, menuData, "3");
+
+	formatex(menuData, charsmax(menuData), "%L", id, "STATS_MENU_BEST_STATS");
+	menu_additem(menu, menuData, "4");
+
+	formatex(menuData, charsmax(menuData), "%L", id, "STATS_MENU_TOP_STATS");
+	menu_additem(menu, menuData, "5");
+
+	formatex(menuData, charsmax(menuData), "%L", id, "STATS_MENU_MY_MEDALS");
+	menu_additem(menu, menuData, "6");
+
+	formatex(menuData, charsmax(menuData), "%L", id, "STATS_MENU_TOP_MEDALS");
+	menu_additem(menu, menuData, "7");
+
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
+	menu_setprop(menu, MPROP_EXITNAME, menuData);
 
 	menu_display(id, menu);
 
@@ -300,8 +318,8 @@ public show_time(failState, Handle:query, error[], errorNum, tempId[], dataSize)
 		hours++;
 	}
 
-	cod_print_chat(id, "Spedziles na serwerze lacznie^4 %i h %i min %i s^1.", hours, minutes, seconds);
-	cod_print_chat(id, "Zajmujesz^4 %i/%i^1 miejsce w rankingu czasu gry.", rank, count);
+	cod_print_chat(id, "%L", id, "STATS_MY_TIME", hours, minutes, seconds);
+	cod_print_chat(id, "%L", id, "STATS_TIME_RANK", rank, count);
 
 	return PLUGIN_HANDLED;
 }
@@ -356,7 +374,11 @@ public show_top_time(failState, Handle:query, error[], errorNum, tempData[], dat
 	rank = 0;
 
 	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
-	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %13s^n", "#", "Nick", "Czas Gry");
+	new timeHeader[32];
+
+	formatex(timeHeader, charsmax(timeHeader), "%L", id, "STATS_MOTD_TIME_HEADER");
+
+	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %13s^n", "#", "Nick", timeHeader);
 
 	while (SQL_MoreResults(query)) {
 		rank++;
@@ -386,7 +408,11 @@ public show_top_time(failState, Handle:query, error[], errorNum, tempData[], dat
 		SQL_NextRow(query);
 	}
 
-	tempData[1] ? show_motd(id, motdData, "Czas Gry Adminow") : show_motd(id, motdData, "Top15 Czasu Gry");
+	new motdTitle[48];
+
+	formatex(motdTitle, charsmax(motdTitle), "%L", id, tempData[1] ? "STATS_MOTD_ADMIN_TIME_TITLE" : "STATS_MOTD_TOP_TIME_TITLE");
+
+	show_motd(id, motdData, motdTitle);
 
 	return PLUGIN_HANDLED;
 }
@@ -430,14 +456,14 @@ public show_best_stats(failState, Handle:query, error[], errorNum, tempId[], dat
 	new rank = SQL_ReadResult(query, 0) + 1, players = SQL_ReadResult(query, 1);
 
 	if (playerStats[id][CURRENT_STATS] > playerStats[id][BEST_STATS]) {
-		cod_print_chat(id, "Twoje najlepsze staty to^4 %i^1 zabic (w tym^4 %i^1 z HS) i^4 %i^1 zgonow^1.",
+		cod_print_chat(id, "%L", id, "STATS_MY_BEST",
 			playerStats[id][CURRENT_KILLS], playerStats[id][CURRENT_HS_KILLS], playerStats[id][CURRENT_DEATHS]);
 	} else {
-		cod_print_chat(id, "Twoje najlepsze staty to^4 %i^1 zabic (w tym^4 %i^1 z HS) i^4 %i^1 zgonow^1.",
+		cod_print_chat(id, "%L", id, "STATS_MY_BEST",
 			playerStats[id][BEST_KILLS], playerStats[id][BEST_HS_KILLS], playerStats[id][BEST_DEATHS]);
 	}
 
-	cod_print_chat(id, "Zajmujesz^4 %i/%i^1 miejsce w rankingu najlepszych statystyk.", rank, players);
+	cod_print_chat(id, "%L", id, "STATS_STATS_RANK", rank, players);
 
 	return PLUGIN_HANDLED;
 }
@@ -474,7 +500,12 @@ public show_top_stats(failState, Handle:query, error[], errorNum, tempId[], data
 	rank = 0;
 
 	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
-	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %19s %4s^n", "#", "Nick", "Zabojstwa", "Zgony");
+	new killsHeader[32], deathsHeader[32];
+
+	formatex(killsHeader, charsmax(killsHeader), "%L", id, "STATS_MOTD_KILLS_HEADER");
+	formatex(deathsHeader, charsmax(deathsHeader), "%L", id, "STATS_MOTD_DEATHS_HEADER");
+
+	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %19s %4s^n", "#", "Nick", killsHeader, deathsHeader);
 
 	while (SQL_MoreResults(query)) {
 		rank++;
@@ -494,7 +525,11 @@ public show_top_stats(failState, Handle:query, error[], errorNum, tempId[], data
 		SQL_NextRow(query);
 	}
 
-	show_motd(id, motdData, "Top15 Statystyk");
+	new motdTitle[48];
+
+	formatex(motdTitle, charsmax(motdTitle), "%L", id, "STATS_MOTD_TOP_STATS_TITLE");
+
+	show_motd(id, motdData, motdTitle);
 
 	return PLUGIN_HANDLED;
 }
@@ -530,8 +565,8 @@ public show_medals(failState, Handle:query, error[], errorNum, tempId[], dataSiz
 
 	new rank = SQL_ReadResult(query, 0) + 1, players = SQL_ReadResult(query, 1);
 
-	cod_print_chat(id, "Twoje medale:^4 %i Zlote^1,^4 %i Srebre^1,^4 %i Brazowe^1.", playerStats[id][GOLD], playerStats[id][SILVER], playerStats[id][BRONZE]);
-	cod_print_chat(id, "Zajmujesz^4 %i/%i^1 miejsce w rankingu medalowym.", rank, players);
+	cod_print_chat(id, "%L", id, "STATS_MY_MEDALS", playerStats[id][GOLD], playerStats[id][SILVER], playerStats[id][BRONZE]);
+	cod_print_chat(id, "%L", id, "STATS_MEDALS_RANK", rank, players);
 
 	return PLUGIN_HANDLED;
 }
@@ -568,7 +603,14 @@ public show_top_medals(failState, Handle:query, error[], errorNum, tempId[], dat
 	rank = 0;
 
 	motdLength = format(motdData, charsmax(motdData), "<body bgcolor=#000000><font color=#FFB000><pre>");
-	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %6s %8s %8s %5s^n", "#", "Nick", "Zlote", "Srebrne", "Brazowe", "Suma");
+	new goldHeader[24], silverHeader[24], bronzeHeader[24], sumHeader[24];
+
+	formatex(goldHeader, charsmax(goldHeader), "%L", id, "STATS_MOTD_GOLD_HEADER");
+	formatex(silverHeader, charsmax(silverHeader), "%L", id, "STATS_MOTD_SILVER_HEADER");
+	formatex(bronzeHeader, charsmax(bronzeHeader), "%L", id, "STATS_MOTD_BRONZE_HEADER");
+	formatex(sumHeader, charsmax(sumHeader), "%L", id, "STATS_MOTD_SUM_HEADER");
+
+	motdLength += format(motdData[motdLength], charsmax(motdData) - motdLength, "%1s %-22.22s %6s %8s %8s %5s^n", "#", "Nick", goldHeader, silverHeader, bronzeHeader, sumHeader);
 
 	while (SQL_MoreResults(query)) {
 		rank++;
@@ -589,31 +631,40 @@ public show_top_medals(failState, Handle:query, error[], errorNum, tempId[], dat
 		SQL_NextRow(query);
 	}
 
-	show_motd(id, motdData, "Top15 Medali");
+	new motdTitle[48];
+
+	formatex(motdTitle, charsmax(motdTitle), "%L", id, "STATS_MOTD_TOP_MEDALS_TITLE");
+
+	show_motd(id, motdData, motdTitle);
 
 	return PLUGIN_HANDLED;
 }
 
 public command_sounds(id)
 {
-	new menuData[64], menu = menu_create("\yUstawienia \rDzwiekow\w:", "command_sounds_handle");
+	new menuData[96], menuTitle[64];
 
-	formatex(menuData, charsmax(menuData), "\wThe Force Will Be With You \w[\r%s\w]", get_bit(id, soundMayTheForce) ? "Wlaczony" : "Wylaczony");
+	formatex(menuTitle, charsmax(menuTitle), "%L", id, "STATS_SOUNDS_TITLE");
+
+	new menu = menu_create(menuTitle, "command_sounds_handle");
+
+	formatex(menuData, charsmax(menuData), "\wThe Force Will Be With You \w[\r%L\w]", id, get_bit(id, soundMayTheForce) ? "STATS_SOUND_ON" : "STATS_SOUND_OFF");
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "\wI Am The One And Only \w[\r%s\w]", get_bit(id, soundOneAndOnly) ? "Wlaczony" : "Wylaczony");
+	formatex(menuData, charsmax(menuData), "\wI Am The One And Only \w[\r%L\w]", id, get_bit(id, soundOneAndOnly) ? "STATS_SOUND_ON" : "STATS_SOUND_OFF");
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "\wDziabnal Mnie \w[\r%s\w]", get_bit(id, soundHumiliation) ? "Wlaczony" : "Wylaczony");
+	formatex(menuData, charsmax(menuData), "\wDziabnal Mnie \w[\r%L\w]", id, get_bit(id, soundHumiliation) ? "STATS_SOUND_ON" : "STATS_SOUND_OFF");
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "\wKici Kici Tas Tas \w[\r%s\w]", get_bit(id, soundLastLeft) ? "Wlaczony" : "Wylaczony");
+	formatex(menuData, charsmax(menuData), "\wKici Kici Tas Tas \w[\r%L\w]", id, get_bit(id, soundLastLeft) ? "STATS_SOUND_ON" : "STATS_SOUND_OFF");
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "\wNie Obijac Sie \w[\r%s\w]", get_bit(id, soundPrepare) ? "Wlaczony" : "Wylaczony");
+	formatex(menuData, charsmax(menuData), "\wNie Obijac Sie \w[\r%L\w]", id, get_bit(id, soundPrepare) ? "STATS_SOUND_ON" : "STATS_SOUND_OFF");
 	menu_additem(menu, menuData);
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
+	menu_setprop(menu, MPROP_EXITNAME, menuData);
 
 	menu_display(id, menu);
 
@@ -666,18 +717,18 @@ public check_time(id)
 
 	unix_to_time(time, currentYear, currentMonth, currentDay, hour, minute, second, UT_TIMEZONE_SERVER);
 
-	cod_print_chat(id, "Aktualnie jest godzina^3 %02d:%02d:%02d (Data: %02d.%02d.%02d)^1.", hour, minute, second, currentDay, currentMonth, currentYear);
+	cod_print_chat(id, "%L", id, "STATS_CURRENT_TIME", hour, minute, second, currentDay, currentMonth, currentYear);
 
-	if (playerStats[id][FIRST_VISIT] == playerStats[id][LAST_VISIT]) cod_print_chat(id, "To twoja^3 pierwsza wizyta^1 na serwerze. Zyczymy milej gry!" );
+	if (playerStats[id][FIRST_VISIT] == playerStats[id][LAST_VISIT]) cod_print_chat(id, "%L", id, "STATS_FIRST_VISIT");
 	else {
 		unix_to_time(playerStats[id][LAST_VISIT], lastYear, lastMonth, lastDay, hour, minute, second, UT_TIMEZONE_SERVER);
 
 		if (currentYear == lastYear && currentMonth == lastMonth && currentDay == lastDay) {
-			cod_print_chat(id, "Twoja ostatnia wizyta miala miejsce^4 dzisiaj^1 o^3 %02d:%02d:%02d^1. Zyczymy milej gry!", hour, minute, second);
+			cod_print_chat(id, "%L", id, "STATS_LAST_VISIT_TODAY", hour, minute, second);
 		} else if (currentYear == lastYear && currentMonth == lastMonth && (currentDay - 1) == lastDay) {
-			cod_print_chat(id, "Twoja ostatnia wizyta miala miejsce^4 wczoraj^1 o^3 %02d:%02d:%02d^1. Zyczymy milej gry!", hour, minute, second);
+			cod_print_chat(id, "%L", id, "STATS_LAST_VISIT_YESTERDAY", hour, minute, second);
 		} else {
-			cod_print_chat(id, "Twoja ostatnia wizyta:^3 %02d:%02d:%02d (Data: %02d.%02d.%02d)^1. Zyczymy milej gry!", hour, minute, second, lastDay, lastMonth, lastYear);
+			cod_print_chat(id, "%L", id, "STATS_LAST_VISIT", hour, minute, second, lastDay, lastMonth, lastYear);
 		}
 	}
 }
@@ -738,7 +789,7 @@ public cod_new_round()
 
 		get_user_name(bestRoundId, bestRoundName, charsmax(bestRoundName));
 
-		cod_print_chat(0, "^3%s^1 byl najlepszym graczem rundy. Ustrzelil^4 %i^1 frag%s, w tym^4 %i^1 z HeadShotem.", bestRoundName, bestRoundFrags, bestRoundFrags > 1 ? "i" : "a", bestRoundHS);
+		cod_print_chat(0, "%L", LANG_SERVER, bestRoundFrags > 1 ? "STATS_BEST_ROUND_PLAYER" : "STATS_BEST_ROUND_PLAYER_ONE", bestRoundName, bestRoundFrags, bestRoundHS);
 	}
 
 	if (is_user_connected(bestId)) {
@@ -746,7 +797,7 @@ public cod_new_round()
 
 		get_user_name(bestId, bestName, charsmax(bestName));
 
-		cod_print_chat(0, "^3%s^1 prowadzi w grze z^4 %i^1 fragami i^4 %i^1 zgonami.", bestName, bestFrags, bestDeaths);
+		cod_print_chat(0, "%L", LANG_SERVER, "STATS_BEST_PLAYER", bestName, bestFrags, bestDeaths);
 	}
 }
 
@@ -795,8 +846,8 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 			cod_set_user_exp(killer, exp);
 
-			cod_print_chat(killer, "Zemsciles sie na^3 %s^1. Dostajesz fraga i^3 %i^1 expa!", nameVictim, exp);
-		} else cod_print_chat(killer, "Zemsciles sie na^3 %s^1. Dostajesz fraga!", nameVictim);
+			cod_print_chat(killer, "%L", killer, "STATS_REVENGE_EXP", nameVictim, exp);
+		} else cod_print_chat(killer, "%L", killer, "STATS_REVENGE", nameVictim);
 	}
 
 	if (cvarAssistEnabled) {
@@ -830,8 +881,8 @@ public cod_killed(killer, victim, weaponId, hitPlace)
 
 				cod_set_user_exp(assist, exp);
 
-				cod_print_chat(assist, "Pomogles^3 %s^1 w zabiciu^3 %s^1. Dostajesz fraga i^3 %i^1 expa!", nameKiller, nameVictim, exp);
-			} else cod_print_chat(assist, "Pomogles^3 %s^1 w zabiciu^3 %s^1. Dostajesz fraga!", nameKiller, nameVictim);
+				cod_print_chat(assist, "%L", assist, "STATS_ASSIST_EXP", nameKiller, nameVictim, exp);
+			} else cod_print_chat(assist, "%L", assist, "STATS_ASSIST", nameKiller, nameVictim);
 		}
 	}
 
@@ -964,9 +1015,9 @@ public cod_end_map()
 
 		if (!winnersId[FIRST]) return PLUGIN_CONTINUE;
 
-		new const medals[][] = { "Brazowy", "Srebrny", "Zloty" };
+		new const medals[][] = { "STATS_MEDAL_BRONZE", "STATS_MEDAL_SILVER", "STATS_MEDAL_GOLD" };
 
-		cod_print_chat(0, "Gratulacje dla^3 Najlepszych Graczy^1!");
+		cod_print_chat(0, "%L", LANG_SERVER, "STATS_CONGRATS");
 
 		for (new i = 2; i >= 0; i--) {
 			if (!is_user_connected(winnersId[i])) continue;
@@ -991,9 +1042,17 @@ public cod_end_map()
 			if (get_playersnum() >= cvarMinPlayers && exp) {
 				cod_set_user_exp(winnersId[i], exp);
 
-				cod_print_chat(0, "^3 %s^1 -^3 %i^1 Zabojstw - %s Medal (+^3%i^1 Doswiadczenia).", playerName, winnersFrags[i], medals[i], exp);
+				new medalName[32];
+
+				formatex(medalName, charsmax(medalName), "%L", LANG_SERVER, medals[i]);
+
+				cod_print_chat(0, "%L", LANG_SERVER, "STATS_WINNER_EXP", playerName, winnersFrags[i], medalName, exp);
 			} else {
-				cod_print_chat(0, "^3 %s^1 -^3 %i^1 Zabojstw - %s Medal.", playerName, winnersFrags[i], medals[i]);
+				new medalName[32];
+
+				formatex(medalName, charsmax(medalName), "%L", LANG_SERVER, medals[i]);
+
+				cod_print_chat(0, "%L", LANG_SERVER, "STATS_WINNER", playerName, winnersFrags[i], medalName);
 			}
 		}
 	}

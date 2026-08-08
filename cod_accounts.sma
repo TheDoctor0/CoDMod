@@ -15,7 +15,7 @@ enum _:playerInfo { STATUS, FAILS, PASSWORD[MAX_PASSWORD], TEMP_PASSWORD[MAX_PAS
 enum _:status { NOT_REGISTERED, NOT_LOGGED, LOGGED, GUEST };
 enum _:queries { UPDATE, INSERT, DELETE };
 
-new const accountStatus[status][] = { "Niezarejestrowany", "Niezalogowany", "Zalogowany", "Gosc" };
+new const accountStatus[status][] = { "ACCOUNTS_STATUS_UNREGISTERED", "ACCOUNTS_STATUS_NOT_LOGGED", "ACCOUNTS_STATUS_LOGGED", "ACCOUNTS_STATUS_GUEST" };
 
 new const commandAccount[][] = { "konto", "say /haslo", "say_team /haslo", "say /password", "say_team /password",
 	"say /konto", "say_team /konto", "say /account", "say_team /account" };
@@ -149,7 +149,13 @@ public kick_player(id)
 {
 	id -= TASK_PASSWORD;
 
-	if (is_user_connected(id)) server_cmd("kick #%d ^"Nie zalogowales sie w ciagu %is!^"", get_user_userid(id), cvarLoginMaxTime);
+	if (is_user_connected(id)) {
+		new kickReason[64];
+
+		formatex(kickReason, charsmax(kickReason), "%L", id, "ACCOUNTS_KICK_TIMEOUT", cvarLoginMaxTime);
+
+		server_cmd("kick #%d ^"%s^"", get_user_userid(id), kickReason);
+	}
 }
 
 public account_menu(id, sound)
@@ -179,7 +185,11 @@ public account_menu(id, sound)
 
 	static menuData[256];
 
-	formatex(menuData, charsmax(menuData), "\rSYSTEM REJESTRACJI^n^n\rNick: \w[\y%s\w]^n\rStatus: \w[\y%s\w]", playerData[id][NAME], accountStatus[playerData[id][STATUS]]);
+	new statusText[48];
+
+	formatex(statusText, charsmax(statusText), "%L", id, accountStatus[playerData[id][STATUS]]);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "ACCOUNTS_MENU_TITLE", playerData[id][NAME], statusText);
 
 	if ((playerData[id][STATUS] == NOT_LOGGED || playerData[id][STATUS] == LOGGED) && !get_bit(id, autoLogin)) {
 		if (cvarAutoLoginConfig) format(menuData, charsmax(menuData),"%s^n\wWpisz w konsoli \ysetinfo ^"_%s^" ^"twojehaslo^"^n\wSprawi to, ze twoje haslo bedzie ladowane \rautomatycznie\w.", menuData, cvarSetinfo);
@@ -188,13 +198,25 @@ public account_menu(id, sound)
 
 	new menu = menu_create(menuData, "account_menu_handle"), callback = menu_makecallback("account_menu_callback");
 
-	menu_additem(menu, "\yLogowanie", _, _, callback);
-	menu_additem(menu, "\yRejestracja^n", _, _, callback);
-	menu_additem(menu, "\yZmien \wHaslo", _, _, callback);
-	menu_additem(menu, "\ySkasuj \wKonto^n", _, _, callback);
-	menu_additem(menu, "\yZaloguj jako \wGosc \r(NIEZALECANE)^n", _, _, callback);
+	formatex(menuData, charsmax(menuData), "%L", id, "ACCOUNTS_MENU_LOGIN");
+	menu_additem(menu, menuData, _, _, callback);
 
-	if (playerData[id][STATUS] == LOGGED) menu_additem(menu, "\wWyjdz", _, _, callback);
+	formatex(menuData, charsmax(menuData), "%L", id, "ACCOUNTS_MENU_REGISTER");
+	menu_additem(menu, menuData, _, _, callback);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "ACCOUNTS_MENU_CHANGE_PASSWORD");
+	menu_additem(menu, menuData, _, _, callback);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "ACCOUNTS_MENU_DELETE");
+	menu_additem(menu, menuData, _, _, callback);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "ACCOUNTS_MENU_GUEST");
+	menu_additem(menu, menuData, _, _, callback);
+
+	if (playerData[id][STATUS] == LOGGED) {
+		formatex(menuData, charsmax(menuData), "%L", id, "ACCOUNTS_MENU_EXIT");
+		menu_additem(menu, menuData, _, _, callback);
+	}
 
 	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
 
@@ -227,40 +249,40 @@ public account_menu_handle(id, menu, item)
 
 	switch (item) {
 		case 0: {
-			cod_print_chat(id, "Wprowadz swoje^4 haslo^1, aby sie^4 zalogowac.");
+			cod_print_chat(id, "%L", id, "ACCOUNTS_ENTER_PASSWORD_LOGIN");
 
 			set_hudmessage(255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-			show_hudmessage(id, "Wprowadz swoje haslo.");
+			show_hudmessage(id, "%L", id, "ACCOUNTS_ENTER_PASSWORD_HUD");
 
 			client_cmd(id, "messagemode WPROWADZ_SWOJE_HASLO");
 		} case 1: {
-			cod_print_chat(id, "Rozpoczales proces^4 rejestracji^1. Wprowadz wybrane^4 haslo^1.");
+			cod_print_chat(id, "%L", id, "ACCOUNTS_REGISTER_START");
 
 			set_hudmessage(255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-			show_hudmessage(id, "Wprowadz swoje haslo.");
+			show_hudmessage(id, "%L", id, "ACCOUNTS_ENTER_PASSWORD_HUD");
 
 			client_cmd(id, "messagemode WPROWADZ_WYBRANE_HASLO");
 
 			remove_task(id + TASK_PASSWORD);
 		} case 2: {
-			cod_print_chat(id, "Wprowadz swoje^4 aktualne haslo^1 w celu potwierdzenia tozsamosci.");
+			cod_print_chat(id, "%L", id, "ACCOUNTS_ENTER_CURRENT_PASSWORD");
 
 			set_hudmessage(255, 128, 0, 0.22, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-			show_hudmessage(id, "Wprowadz swoje aktualne haslo.");
+			show_hudmessage(id, "%L", id, "ACCOUNTS_ENTER_CURRENT_PASSWORD_HUD");
 
 			client_cmd(id, "messagemode WPROWADZ_AKTUALNE_HASLO");
 		} case 3: {
-			cod_print_chat(id, "Wprowadz swoje^4 aktualne haslo^1 w celu potwierdzenia tozsamosci.");
+			cod_print_chat(id, "%L", id, "ACCOUNTS_ENTER_CURRENT_PASSWORD");
 
 			set_hudmessage(255, 128, 0, 0.22, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-			show_hudmessage(id, "Wprowadz swoje aktualne haslo.");
+			show_hudmessage(id, "%L", id, "ACCOUNTS_ENTER_CURRENT_PASSWORD_HUD");
 
 			client_cmd(id, "messagemode WPROWADZ_SWOJE_AKTUALNE_HASLO");
 		} case 4: {
-			cod_print_chat(id, "Zalogowales sie jako^4 Gosc^1. By zabezpieczyc swoj nick^4 zarejestruj sie^1.");
+			cod_print_chat(id, "%L", id, "ACCOUNTS_GUEST_LOGGED");
 
 			set_hudmessage(0, 255, 0, -1.0, 0.9, 0, 0.0, 3.5, 0.0, 0.0);
-			show_hudmessage(id, "Zostales pomyslnie zalogowany jako Gosc.");
+			show_hudmessage(id, "%L", id, "ACCOUNTS_GUEST_LOGGED_HUD");
 
 			remove_task(id + TASK_PASSWORD);
 
@@ -289,14 +311,20 @@ public login_account(id)
 
 	if (!equal(playerData[id][PASSWORD], password)) {
 		if (cvarPasswordMaxFails) {
-			if (++playerData[id][FAILS] >= cvarPasswordMaxFails) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
+			if (++playerData[id][FAILS] >= cvarPasswordMaxFails) {
+				new kickReason[48];
 
-			cod_print_chat(id, "Podane haslo jest^4 nieprawidlowe^1. (Bledne haslo^4 %i/%i^1)", playerData[id][FAILS], cvarPasswordMaxFails);
-		} else cod_print_chat(id, "Podane haslo jest^4 nieprawidlowe^1.");
+				formatex(kickReason, charsmax(kickReason), "%L", id, "ACCOUNTS_KICK_WRONG_PASSWORD");
+
+				server_cmd("kick #%d ^"%s^"", get_user_userid(id), kickReason);
+			}
+
+			cod_print_chat(id, "%L", id, "ACCOUNTS_WRONG_PASSWORD_FAILS", playerData[id][FAILS], cvarPasswordMaxFails);
+		} else cod_print_chat(id, "%L", id, "ACCOUNTS_WRONG_PASSWORD");
 
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
 
-		show_hudmessage(id, "Podane haslo jest nieprawidlowe.");
+		show_hudmessage(id, "%L", id, "ACCOUNTS_WRONG_PASSWORD_HUD");
 
 		account_menu(id, true);
 
@@ -310,10 +338,10 @@ public login_account(id)
 
 	cod_display_fade(id, 0, 0, 0x0000, 0, 0, 0, 255);
 
-	cod_print_chat(id, "Zostales pomyslnie^4 zalogowany^1. Zyczymy milej gry.");
+	cod_print_chat(id, "%L", id, "ACCOUNTS_LOGGED_IN");
 
 	set_hudmessage(0, 255, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-	show_hudmessage(id, "Zostales pomyslnie zalogowany.");
+	show_hudmessage(id, "%L", id, "ACCOUNTS_LOGGED_IN_HUD");
 
 	client_cmd(id, "chooseteam");
 	engclient_cmd(id, "chooseteam");
@@ -331,10 +359,10 @@ public register_step_one(id)
 	remove_quotes(password);
 
 	if (strlen(password) < cvarPasswordMinLength) {
-		cod_print_chat(id, "Haslo musi miec co najmniej^4 %i znakow^1.", cvarPasswordMinLength);
+		cod_print_chat(id, "%L", id, "ACCOUNTS_PASSWORD_TOO_SHORT", cvarPasswordMinLength);
 
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		show_hudmessage(id, "Haslo musi miec co najmniej %i znakow.", cvarPasswordMinLength);
+		show_hudmessage(id, "%L", id, "ACCOUNTS_PASSWORD_TOO_SHORT_HUD", cvarPasswordMinLength);
 
 		account_menu(id, true);
 
@@ -343,10 +371,10 @@ public register_step_one(id)
 
 	copy(playerData[id][TEMP_PASSWORD], charsmax(playerData[][TEMP_PASSWORD]), password);
 
-	cod_print_chat(id, "Teraz powtorz wybrane^4 haslo^1.");
+	cod_print_chat(id, "%L", id, "ACCOUNTS_REPEAT_PASSWORD");
 
 	set_hudmessage(255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-	show_hudmessage(id, "Powtorz wybrane haslo.");
+	show_hudmessage(id, "%L", id, "ACCOUNTS_REPEAT_PASSWORD_HUD");
 
 	client_cmd(id, "messagemode POWTORZ_WYBRANE_HASLO");
 
@@ -363,10 +391,10 @@ public register_step_two(id)
 	remove_quotes(password);
 
 	if (!equal(password, playerData[id][TEMP_PASSWORD])) {
-		cod_print_chat(id, "Podane hasla^4 roznia sie^1 od siebie.");
+		cod_print_chat(id, "%L", id, "ACCOUNTS_PASSWORDS_DIFFER");
 
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		show_hudmessage(id, "Podane hasla roznia sie od siebie.");
+		show_hudmessage(id, "%L", id, "ACCOUNTS_PASSWORDS_DIFFER_HUD");
 
 		account_menu(id, true);
 
@@ -375,12 +403,15 @@ public register_step_two(id)
 
 	new menuData[192];
 
-	formatex(menuData, charsmax(menuData), "\rPOTWIERDZENIE REJESTRACJI^n^n\wTwoj Nick: \y[\r%s\y]^n\wTwoje Haslo: \y[\r%s\y]", playerData[id][NAME], playerData[id][TEMP_PASSWORD]);
+	formatex(menuData, charsmax(menuData), "%L", id, "ACCOUNTS_REGISTER_CONFIRM", playerData[id][NAME], playerData[id][TEMP_PASSWORD]);
 
 	new menu = menu_create(menuData, "register_confirmation_handle");
 
-	menu_additem(menu, "\rPotwierdz \wRejestracje");
-	menu_additem(menu, "\yZmien \wHaslo^n");
+	formatex(menuData, charsmax(menuData), "%L", id, "ACCOUNTS_CONFIRM_REGISTER");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "ACCOUNTS_CHANGE_PASSWORD_ITEM");
+	menu_additem(menu, menuData);
 	menu_additem(menu, "\wAnuluj \wRejestracje");
 
 	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
@@ -415,7 +446,7 @@ public register_confirmation_handle(id, menu, item)
 			set_hudmessage(0, 255, 0, -1.0, 0.9, 0, 0.0, 3.5, 0.0, 0.0);
 			show_hudmessage(id, "Zostales pomyslnie zarejestrowany i zalogowany.");
 
-			cod_print_chat(id, "Twoj nick zostal pomyslnie^4 zarejestrowany^1.");
+			cod_print_chat(id, "%L", id, "ACCOUNTS_REGISTERED");
 
 			if (cvarAutoLoginConfig) {
 				cod_print_chat(id, "Wpisz w konsoli komende^4 setinfo ^"_%s^" ^"%s^"^1, aby twoje haslo bylo ladowane automatycznie.", cvarSetinfo, playerData[id][PASSWORD]);
@@ -429,10 +460,10 @@ public register_confirmation_handle(id, menu, item)
 			client_cmd(id, "chooseteam");
 			engclient_cmd(id, "chooseteam");
 		} case 1: {
-			cod_print_chat(id, "Rozpoczales proces^4 rejestracji^1. Wprowadz wybrane^4 haslo^1.");
+			cod_print_chat(id, "%L", id, "ACCOUNTS_REGISTER_START");
 
 			set_hudmessage(255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-			show_hudmessage(id, "Wprowadz wybrane haslo.");
+			show_hudmessage(id, "%L", id, "ACCOUNTS_ENTER_CHOSEN_PASSWORD_HUD");
 
 			client_cmd(id, "messagemode WPROWADZ_WYBRANE_HASLO");
 		} case 2: account_menu(id, false);
@@ -452,23 +483,29 @@ public change_step_one(id)
 
 	if (!equal(playerData[id][PASSWORD], password)) {
 		if (cvarPasswordMaxFails) {
-			if (++playerData[id][FAILS] >= cvarPasswordMaxFails) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
+			if (++playerData[id][FAILS] >= cvarPasswordMaxFails) {
+				new kickReason[48];
 
-			cod_print_chat(id, "Podane haslo jest^4 nieprawidlowe^1. (Bledne haslo^4 %i/%i^1)", playerData[id][FAILS], cvarPasswordMaxFails);
-		} else cod_print_chat(id, "Podane haslo jest^4 nieprawidlowe^1.");
+				formatex(kickReason, charsmax(kickReason), "%L", id, "ACCOUNTS_KICK_WRONG_PASSWORD");
+
+				server_cmd("kick #%d ^"%s^"", get_user_userid(id), kickReason);
+			}
+
+			cod_print_chat(id, "%L", id, "ACCOUNTS_WRONG_PASSWORD_FAILS", playerData[id][FAILS], cvarPasswordMaxFails);
+		} else cod_print_chat(id, "%L", id, "ACCOUNTS_WRONG_PASSWORD");
 
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		show_hudmessage(id, "Podane haslo jest nieprawidlowe.");
+		show_hudmessage(id, "%L", id, "ACCOUNTS_WRONG_PASSWORD_HUD");
 
 		account_menu(id, true);
 
 		return PLUGIN_HANDLED;
 	}
 
-	cod_print_chat(id, "Wprowadz swoje^4 nowe haslo^1.");
+	cod_print_chat(id, "%L", id, "ACCOUNTS_ENTER_NEW_PASSWORD");
 
 	set_hudmessage(255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-	show_hudmessage(id, "Wprowadz swoje nowe haslo.");
+	show_hudmessage(id, "%L", id, "ACCOUNTS_ENTER_NEW_PASSWORD_HUD");
 
 	client_cmd(id, "messagemode WPROWADZ_NOWE_HASLO");
 
@@ -485,10 +522,10 @@ public change_step_two(id)
 	remove_quotes(password);
 
 	if (equal(playerData[id][PASSWORD], password)) {
-		cod_print_chat(id, "Nowe haslo jest^4 takie samo^1 jak aktualne.");
+		cod_print_chat(id, "%L", id, "ACCOUNTS_SAME_PASSWORD");
 
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		show_hudmessage(id, "Nowe haslo jest takie samo jak aktualne.");
+		show_hudmessage(id, "%L", id, "ACCOUNTS_SAME_PASSWORD_HUD");
 
 		account_menu(id, true);
 
@@ -496,10 +533,10 @@ public change_step_two(id)
 	}
 
 	if (strlen(password) < cvarPasswordMinLength) {
-		cod_print_chat(id, "Nowe haslo musi miec co najmniej^4 %i znakow^1.", cvarPasswordMinLength);
+		cod_print_chat(id, "%L", id, "ACCOUNTS_NEW_PASSWORD_TOO_SHORT", cvarPasswordMinLength);
 
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		show_hudmessage(id, "Nowe haslo musi miec co najmniej %i znakow.", cvarPasswordMinLength);
+		show_hudmessage(id, "%L", id, "ACCOUNTS_NEW_PASSWORD_TOO_SHORT_HUD", cvarPasswordMinLength);
 
 		account_menu(id, true);
 
@@ -508,10 +545,10 @@ public change_step_two(id)
 
 	copy(playerData[id][TEMP_PASSWORD], charsmax(playerData[][TEMP_PASSWORD]), password);
 
-	cod_print_chat(id, "Powtorz swoje nowe^4 haslo^1.");
+	cod_print_chat(id, "%L", id, "ACCOUNTS_REPEAT_NEW_PASSWORD");
 
 	set_hudmessage(255, 128, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-	show_hudmessage(id, "Powtorz swoje nowe haslo.");
+	show_hudmessage(id, "%L", id, "ACCOUNTS_REPEAT_NEW_PASSWORD_HUD");
 
 	client_cmd(id, "messagemode POWTORZ_NOWE_HASLO");
 
@@ -528,10 +565,10 @@ public change_step_three(id)
 	remove_quotes(password);
 
 	if (!equal(password, playerData[id][TEMP_PASSWORD])) {
-		cod_print_chat(id, "Podane hasla^4 roznia sie^1 od siebie.");
+		cod_print_chat(id, "%L", id, "ACCOUNTS_PASSWORDS_DIFFER");
 
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		show_hudmessage(id, "Podane hasla roznia sie od siebie.");
+		show_hudmessage(id, "%L", id, "ACCOUNTS_PASSWORDS_DIFFER_HUD");
 
 		account_menu(id, true);
 
@@ -543,9 +580,9 @@ public change_step_three(id)
 	account_query(id, UPDATE);
 
 	set_hudmessage(0, 255, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-	show_hudmessage(id, "Twoje haslo zostalo pomyslnie zmienione.");
+	show_hudmessage(id, "%L", id, "ACCOUNTS_PASSWORD_CHANGED_HUD");
 
-	cod_print_chat(id, "Twoje haslo zostalo pomyslnie^4 zmienione^1.");
+	cod_print_chat(id, "%L", id, "ACCOUNTS_PASSWORD_CHANGED");
 
 	if (cvarAutoLoginConfig) {
 		cod_print_chat(id, "Wpisz w konsoli komende^4 setinfo ^"_%s^" ^"%s^"^1, aby twoje haslo bylo ladowane automatycznie.", cvarSetinfo, playerData[id][PASSWORD]);
@@ -570,13 +607,19 @@ public delete_account(id)
 
 	if (!equal(playerData[id][PASSWORD], password)) {
 		if (cvarPasswordMaxFails) {
-			if (++playerData[id][FAILS] >= cvarPasswordMaxFails) server_cmd("kick #%d ^"Nieprawidlowe haslo!^"", get_user_userid(id));
+			if (++playerData[id][FAILS] >= cvarPasswordMaxFails) {
+				new kickReason[48];
 
-			cod_print_chat(id, "Podane haslo jest^4 nieprawidlowe^1. (Bledne haslo^4 %i/%i^1)", playerData[id][FAILS], cvarPasswordMaxFails);
-		} else cod_print_chat(id, "Podane haslo jest^4 nieprawidlowe^1.");
+				formatex(kickReason, charsmax(kickReason), "%L", id, "ACCOUNTS_KICK_WRONG_PASSWORD");
+
+				server_cmd("kick #%d ^"%s^"", get_user_userid(id), kickReason);
+			}
+
+			cod_print_chat(id, "%L", id, "ACCOUNTS_WRONG_PASSWORD_FAILS", playerData[id][FAILS], cvarPasswordMaxFails);
+		} else cod_print_chat(id, "%L", id, "ACCOUNTS_WRONG_PASSWORD");
 
 		set_hudmessage(255, 0, 0, 0.24, 0.07, 0, 0.0, 3.5, 0.0, 0.0);
-		show_hudmessage(id, "Podane haslo jest nieprawidlowe.");
+		show_hudmessage(id, "%L", id, "ACCOUNTS_WRONG_PASSWORD_HUD");
 
 		account_menu(id, true);
 
@@ -585,13 +628,18 @@ public delete_account(id)
 
 	new menuData[128];
 
-	formatex(menuData, charsmax(menuData), "\wCzy na pewno chcesz \rusunac \wswoje konto?");
+	formatex(menuData, charsmax(menuData), "%L", id, "ACCOUNTS_DELETE_CONFIRM");
 
 	new menu = menu_create(menuData, "delete_account_handle");
 
-	menu_additem(menu, "\rTak");
-	menu_additem(menu, "\wNie^n");
-	menu_additem(menu, "\wWyjdz");
+	formatex(menuData, charsmax(menuData), "%L", id, "ACCOUNTS_DELETE_YES");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "ACCOUNTS_DELETE_NO");
+	menu_additem(menu, menuData);
+
+	formatex(menuData, charsmax(menuData), "%L", id, "ACCOUNTS_MENU_EXIT_PLAIN");
+	menu_additem(menu, menuData);
 
 	menu_setprop(menu, MPROP_EXIT, MEXIT_NEVER);
 
@@ -606,11 +654,15 @@ public delete_account_handle(id, menu, item)
 		account_query(id, DELETE);
 
 		console_print(id, "==================================");
-		console_print(id, "==========SYSTEM REJESTRACJI==========");
-		console_print(id, "              Skasowales konto o nicku: %s", playerData[id][NAME]);
+		console_print(id, "%L", id, "ACCOUNTS_CONSOLE_HEADER");
+		console_print(id, "%L", id, "ACCOUNTS_CONSOLE_DELETED", playerData[id][NAME]);
 		console_print(id, "==================================");
 
-		server_cmd("kick #%d ^"Konto zostalo usuniete!^"", get_user_userid(id));
+		new kickReason[48];
+
+		formatex(kickReason, charsmax(kickReason), "%L", id, "ACCOUNTS_KICK_DELETED");
+
+		server_cmd("kick #%d ^"%s^"", get_user_userid(id), kickReason);
 	}
 
 	menu_destroy(menu);
@@ -703,7 +755,7 @@ public load_account_handle(failState, Handle:query, error[], errorNum, tempId[],
 			} else {
 				playerData[id][STATUS] = NOT_LOGGED;
 
-				cod_print_chat(id, "Musisz sie^3 zalogowac^1, aby miec dostep do glownych funkcji!");
+				cod_print_chat(id, "%L", id, "ACCOUNTS_MUST_LOGIN");
 
 				account_menu(id, true);
 			}
@@ -755,7 +807,7 @@ public _cod_check_account(plugin_id, num_params)
 	}
 
 	if (playerData[id][STATUS] < LOGGED) {
-		cod_print_chat(id, "Musisz sie^3 zalogowac^1, aby miec dostep do glownych funkcji!");
+		cod_print_chat(id, "%L", id, "ACCOUNTS_MUST_LOGIN");
 
 		account_menu(id, true);
 

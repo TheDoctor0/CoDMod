@@ -310,21 +310,26 @@ public change_icons(id, sound)
 
 	if (!sound) cod_play_sound(id, SOUND_SELECT);
 
-	new menuData[64], menu = menu_create("\yUstawienia \rIkon\w:", "change_icons_handle");
+	new menuData[96], menuTitle[64];
 
-	formatex(menuData, charsmax(menuData), "\wBomb \ySite \w[\r%s\w]", get_bit(id, iconBombSites) ? "Wlaczona" : "Wylaczona");
+	formatex(menuTitle, charsmax(menuTitle), "%L", id, "ICONS_MENU_TITLE");
+
+	new menu = menu_create(menuTitle, "change_icons_handle");
+
+	formatex(menuData, charsmax(menuData), "%L", id, "ICONS_MENU_BOMB_SITE", get_bit(id, iconBombSites) ? enabled_text(id) : disabled_text(id));
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "\wWyrzucona \yBomba \w[\r%s\w]", get_bit(id, iconDropped) ? "Wlaczona" : "Wylaczona");
+	formatex(menuData, charsmax(menuData), "%L", id, "ICONS_MENU_BOMB_DROPPED", get_bit(id, iconDropped) ? enabled_text(id) : disabled_text(id));
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "\wPodlozona \yBomba \w[\r%s\w]", get_bit(id, iconPlanted) ? "Wlaczona" : "Wylaczona");
+	formatex(menuData, charsmax(menuData), "%L", id, "ICONS_MENU_BOMB_PLANTED", get_bit(id, iconPlanted) ? enabled_text(id) : disabled_text(id));
 	menu_additem(menu, menuData);
 
-	formatex(menuData, charsmax(menuData), "\wBonusowa \ySkrzynka \w[\r%s\w]", get_bit(id, iconBox) ? "Wlaczona" : "Wylaczona");
+	formatex(menuData, charsmax(menuData), "%L", id, "ICONS_MENU_BOX", get_bit(id, iconBox) ? enabled_text(id) : disabled_text(id));
 	menu_additem(menu, menuData);
 
-	menu_setprop(menu, MPROP_EXITNAME, "Wyjscie");
+	formatex(menuData, charsmax(menuData), "%L", id, "CORE_MENU_EXIT");
+	menu_setprop(menu, MPROP_EXITNAME, menuData);
 
 	menu_display(id, menu);
 
@@ -433,4 +438,22 @@ stock remove_icon(ent, sprite)
 
 		iconEntity[sprite] = 0;
 	}
+}
+
+stock enabled_text(id)
+{
+	static text[32];
+
+	formatex(text, charsmax(text), "%L", id, "ICONS_ENABLED");
+
+	return text;
+}
+
+stock disabled_text(id)
+{
+	static text[32];
+
+	formatex(text, charsmax(text), "%L", id, "ICONS_DISABLED");
+
+	return text;
 }
