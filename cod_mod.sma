@@ -2449,7 +2449,7 @@ public player_death(killer, victim, weapon, hitPlace)
 
 			get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
-			chat_print(killer, "Zabiles%s gracza^3 %s^4 (%s - %i)^1, dostajesz^3 %i^1 doswiadczenia.", hitPlace == HIT_HEAD ? " z HS" : "", codPlayer[victim][PLAYER_NAME], className, codPlayer[victim][PLAYER_LEVEL], exp);
+			chat_print(killer, "%L", killer, hitPlace == HIT_HEAD ? "CORE_KILLED_HS_EXP" : "CORE_KILLED_EXP", codPlayer[victim][PLAYER_NAME], className, codPlayer[victim][PLAYER_LEVEL], exp);
 
 			set_dhudmessage(255, 206, 85, -1.0, 0.6, 0, 0.0, 2.0, 0.0, 0.0);
 			show_dhudmessage(killer, "+%i XP", exp);
@@ -2466,7 +2466,7 @@ public player_death(killer, victim, weapon, hitPlace)
 	} else {
 		get_user_class_info(victim, codPlayer[victim][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
-		chat_print(killer, "Zabiles%s gracza^3 %s^4 (%s - %i)^1.", hitPlace == HIT_HEAD ? " z HS" : "", codPlayer[victim][PLAYER_NAME], className, codPlayer[victim][PLAYER_LEVEL]);
+		chat_print(killer, "%L", killer, hitPlace == HIT_HEAD ? "CORE_KILLED_HS" : "CORE_KILLED", codPlayer[victim][PLAYER_NAME], className, codPlayer[victim][PLAYER_LEVEL]);
 	}
 
 	get_user_class_info(killer, codPlayer[killer][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
@@ -2474,11 +2474,11 @@ public player_death(killer, victim, weapon, hitPlace)
 	if (!codPlayer[killer][PLAYER_ITEM]) {
 		set_item(killer, RANDOM, RANDOM);
 
-		chat_print(victim, "Zostales zabity przez^3 %s^4 (%s - %i)^1, ktoremu zostalo^4 %i^1 HP.", codPlayer[killer][PLAYER_NAME], className, codPlayer[killer][PLAYER_LEVEL], get_user_health(killer));
+		chat_print(victim, "%L", victim, "CORE_KILLED_BY", codPlayer[killer][PLAYER_NAME], className, codPlayer[killer][PLAYER_LEVEL], get_user_health(killer));
 	} else {
 		get_item_info(codPlayer[killer][PLAYER_ITEM], ITEM_NAME, itemName, charsmax(itemName));
 
-		chat_print(victim, "Zostales zabity przez^3 %s^4 (%s - %i - %s)^1, ktoremu zostalo^4 %i^1 HP.", codPlayer[killer][PLAYER_NAME], className, codPlayer[killer][PLAYER_LEVEL], itemName, get_user_health(killer));
+		chat_print(victim, "%L", victim, "CORE_KILLED_BY_ITEM", codPlayer[killer][PLAYER_NAME], className, codPlayer[killer][PLAYER_LEVEL], itemName, get_user_health(killer));
 	}
 
 	check_level(killer);
@@ -2496,8 +2496,8 @@ public player_death(killer, victim, weapon, hitPlace)
 			if (codPlayer[victim][PLAYER_ITEM_DURA] <= 0) {
 				set_item(victim);
 
-				chat_print(victim, "Twoj przedmiot ulegl zniszczeniu.");
-			} else chat_print(victim, "Pozostala wytrzymalosc twojego przedmiotu to^3 %i^1/^3%i^1.", codPlayer[victim][PLAYER_ITEM_DURA], cvarMaxDurability);
+				chat_print(victim, "%L", victim, "CORE_ITEM_DESTROYED");
+			} else chat_print(victim, "%L", victim, "CORE_ITEM_DURABILITY_LEFT", codPlayer[victim][PLAYER_ITEM_DURA], cvarMaxDurability);
 		}
 	}
 
@@ -2707,7 +2707,7 @@ public round_winner(team)
 
 		codPlayer[id][PLAYER_GAINED_EXP] += exp;
 
-		chat_print(id, "Dostales^3 %i^1 doswiadczenia za wygrana runde.", exp);
+		chat_print(id, "%L", id, "CORE_EXP_WIN_ROUND", exp);
 
 		check_level(id);
 	}
@@ -2726,7 +2726,7 @@ public bomb_planted(id)
 
 	codPlayer[id][PLAYER_GAINED_EXP] += exp;
 
-	chat_print(id, "Dostales^3 %i^1 doswiadczenia za podlozenie bomby.", exp);
+	chat_print(id, "%L", id, "CORE_EXP_PLANT", exp);
 
 	check_level(id);
 }
@@ -2744,7 +2744,7 @@ public bomb_defused(id)
 
 	codPlayer[id][PLAYER_GAINED_EXP] += exp;
 
-	chat_print(id, "Dostales^3 %i^1 doswiadczenia za rozbrojenie bomby.", exp);
+	chat_print(id, "%L", id, "CORE_EXP_DEFUSE", exp);
 
 	check_level(id);
 }
@@ -2785,7 +2785,7 @@ public hostage_rescued()
 
 	codPlayer[id][PLAYER_GAINED_EXP] += exp;
 
-	chat_print(id, "Dostales^3 %i^1 doswiadczenia za uratowanie zakladnika.", exp);
+	chat_print(id, "%L", id, "CORE_EXP_RESCUE", exp);
 
 	check_level(id);
 }
@@ -3080,8 +3080,8 @@ public show_advertisement(id)
 {
 	id -= TASK_SHOW_AD;
 
-	chat_print(id, "Witaj na serwerze^3 Call of Duty Mod^1 stworzonym przez^3 O'Zone^1.");
-	chat_print(id, "W celu uzyskania informacji o komendach wpisz^3 /menu^1 (klawisz^3 ^"v^"^1).");
+	chat_print(id, "%L", id, "CORE_WELCOME");
+	chat_print(id, "%L", id, "CORE_WELCOME_MENU");
 }
 
 public show_help(id)
@@ -3091,21 +3091,21 @@ public show_help(id)
 	set_dhudmessage(0, 255, 0, -1.0, 0.7, 0, 5.0, 5.0, 0.1, 0.5);
 
 	switch (random_num(1, cvarMinPlayers ? 17 : 16)) {
-		case 1: show_dhudmessage(id, "Aby uzyc umiejetnosci klasy wcisnij klawisz E. Przedmiotow uzywa sie klawiszem F.");
-		case 2: show_dhudmessage(id, "Chcialbys zalozyc klan lub do niego dolaczyc? Wpisz komende /klan.");
-		case 3: show_dhudmessage(id, "Sposobem na zdobywanie wiekszej ilosci doswiadczenia sa /misje.");
-		case 4: show_dhudmessage(id, "Wpisz komende /bind, aby sprawdzic bindy wszystkich umiejetnosci.");
-		case 5: show_dhudmessage(id, "Sprzedaj niechciany przedmiot zamiast go wyrzucac. Zajrzyj na /rynek.");
-		case 6: show_dhudmessage(id, "Mozesz dowolnie konfigurowac wyswietlanie HUD uzywajac komendy /hud.");
-		case 7: show_dhudmessage(id, "Chcesz sprobowac swojego szczescia? Sprawdz /kasyno.");
-		case 8: show_dhudmessage(id, "Zajrzyj do /sklep, aby kupic dodatki, exp, jak i wymienic kase na honor.");
-		case 9: show_dhudmessage(id, "Aby wylaczyc/wlaczyc pokazujace sie znaczniki uzyj komendy /ikony.");
-		case 10: show_dhudmessage(id, "Noze dodaja bonusy do statystyk, mozesz zmienic swoj wpisujac /noz.");
-		case 11: show_dhudmessage(id, "Jesli chcesz przelac komus kase lub honor uzyj komendy /przelew.");
-		case 12: show_dhudmessage(id, "Oddaj przedmiot komenda /daj lub uzyj /wymien do wymiany z innym graczem.");
-		case 13: show_dhudmessage(id, "Aby zarzadzac swoim kontem - w tym zmienic haslo, wpisz komende /konto.");
-		case 14: show_dhudmessage(id, "Glowne menu serwera znajdziesz pod komenda /menu lub klawiszem V.");
-		case 15: show_dhudmessage(id, "Jest wiele dodatkowych statystyk, ktore znajdziesz pod komenda /statymenu.");
+		case 1: show_dhudmessage(id, "%L", id, "CORE_TIP_1");
+		case 2: show_dhudmessage(id, "%L", id, "CORE_TIP_2");
+		case 3: show_dhudmessage(id, "%L", id, "CORE_TIP_3");
+		case 4: show_dhudmessage(id, "%L", id, "CORE_TIP_4");
+		case 5: show_dhudmessage(id, "%L", id, "CORE_TIP_5");
+		case 6: show_dhudmessage(id, "%L", id, "CORE_TIP_6");
+		case 7: show_dhudmessage(id, "%L", id, "CORE_TIP_7");
+		case 8: show_dhudmessage(id, "%L", id, "CORE_TIP_8");
+		case 9: show_dhudmessage(id, "%L", id, "CORE_TIP_9");
+		case 10: show_dhudmessage(id, "%L", id, "CORE_TIP_10");
+		case 11: show_dhudmessage(id, "%L", id, "CORE_TIP_11");
+		case 12: show_dhudmessage(id, "%L", id, "CORE_TIP_12");
+		case 13: show_dhudmessage(id, "%L", id, "CORE_TIP_13");
+		case 14: show_dhudmessage(id, "%L", id, "CORE_TIP_14");
+		case 15: show_dhudmessage(id, "%L", id, "CORE_TIP_15");
 		case 16: {
 			static info[128];
 
@@ -3130,8 +3130,8 @@ public check_time()
 
 public night_exp_info()
 {
-	if (nightExp) chat_print(0, "Na serwerze^3 aktywny^1 jest nocny exp^3 wiekszy o %i procent^1!", cvarNightExpBonus);
-	else chat_print(0, "Od godziny^3 %i:00^1 do^3 %i:00^1 na serwerze exp jest^3 wiekszy o %i procent^1!", cvarNightExpFrom, cvarNightExpTo, cvarNightExpBonus);
+	if (nightExp) chat_print(0, "%L", LANG_SERVER, "CORE_NIGHT_EXP_ACTIVE", cvarNightExpBonus);
+	else chat_print(0, "%L", LANG_SERVER, "CORE_NIGHT_EXP_INFO", cvarNightExpFrom, cvarNightExpTo, cvarNightExpBonus);
 }
 
 public set_speed_limit(id)
@@ -3259,7 +3259,7 @@ stock set_item(id, item = 0, value = 0, force = false)
 			format(itemDescription, charsmax(itemDescription), itemDescription, itemValue);
 		}
 
-		chat_print(id, "Zdobyles^3 %s^1 -^4 %s^1.", itemName, itemDescription);
+		chat_print(id, "%L", id, "CORE_ITEM_FOUND", itemName, itemDescription);
 	} else codPlayer[id][PLAYER_ITEM_DURA] = 0;
 
 	return PLUGIN_CONTINUE;
@@ -3283,7 +3283,7 @@ public check_level(id)
 		codPlayer[id][PLAYER_POINTS] = (codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL] - 1) * cvarPointsPerLevel - codPlayer[id][PLAYER_INT] - codPlayer[id][PLAYER_HEAL] - codPlayer[id][PLAYER_STAM] - codPlayer[id][PLAYER_STR] - codPlayer[id][PLAYER_COND];
 
 		set_dhudmessage(212, 255, 85, -1.0, 0.24, 0, 0.0, 2.5, 0.0, 0.0);
-		show_dhudmessage(id, "Awansowales do %i poziomu!", codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL]);
+		show_dhudmessage(id, "%L", id, "CORE_LEVEL_UP", codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL]);
 
 		check_promotion(id, 1);
 
@@ -3305,7 +3305,7 @@ public check_level(id)
 		if (codPlayer[id][PLAYER_POINTS]) assign_points(id, 0);
 
 		set_dhudmessage(212, 255, 85, -1.0, 0.24, 0, 0.0, 2.5, 0.0, 0.0);
-		show_dhudmessage(id, "Spadles do %i poziomu!", codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL]);
+		show_dhudmessage(id, "%L", id, "CORE_LEVEL_DOWN", codPlayer[id][PLAYER_LEVEL] + codPlayer[id][PLAYER_GAINED_LEVEL]);
 	}
 
 	save_data(id, NORMAL);
@@ -3651,11 +3651,11 @@ stock remove_ents(id = 0, const className[] = "")
 public show_bonus_info()
 {
 	if (get_players_amount() > 0 && (lastInfo + 5.0 < get_gametime() || get_players_amount() == cvarMinBonusPlayers)) {
-		if (get_players_amount() == cvarMinBonusPlayers) chat_print(0, "Serwer jest pelny, a to oznacza^3 EXP wiekszy o %i procent^1!", cvarBonusPlayersPer * cvarMinBonusPlayers);
+		if (get_players_amount() == cvarMinBonusPlayers) chat_print(0, "%L", LANG_SERVER, "CORE_FULL_SERVER_EXP", cvarBonusPlayersPer * cvarMinBonusPlayers);
 		else {
 			new playersToFull = cvarMinBonusPlayers - get_players_amount();
 
-			chat_print(0, "Do pelnego serwera brakuj%s^3 %i osob%s^1. Exp jest^3 wiekszy o %i procent^1!", playersToFull > 1 ? (playersToFull < 5 ? "a" : "e") : "e", playersToFull, playersToFull == 1 ? "a" : (playersToFull < 5 ? "y" : ""), get_players_amount() * cvarBonusPlayersPer);
+			chat_print(0, "%L", LANG_SERVER, "CORE_PLAYERS_TO_FULL", playersToFull, get_players_amount() * cvarBonusPlayersPer);
 		}
 
 		lastInfo = floatround(get_gametime());
@@ -4083,7 +4083,7 @@ public _cod_upgrade_user_item(id, check)
 
 			codPlayer[id][PLAYER_ITEM_DURA] = cvarMaxDurability;
 
-			chat_print(id, "Twoj przedmiot zostal pomyslnie^3 ulepszony^1.");
+			chat_print(id, "%L", id, "CORE_UPGRADE_SUCCESS");
 		} case 7 .. 9: {
 			new durability = random_num(cvarMinDamageDurability, cvarMaxDamageDurability);
 
@@ -4092,12 +4092,12 @@ public _cod_upgrade_user_item(id, check)
 			if (codPlayer[id][PLAYER_ITEM_DURA] <= 0) {
 				set_item(id);
 
-				chat_print(id, "Ulepszenie^3 nieudane^1! Twoj przedmiot ulegl^3 zniszczeniu^1.");
-			} else chat_print(id, "Ulepszenie^3 nieudane^1! Straciles^3 %i^1 wytrzymalosci przedmiotu.", durability);
+				chat_print(id, "%L", id, "CORE_UPGRADE_FAIL_DESTROYED");
+			} else chat_print(id, "%L", id, "CORE_UPGRADE_FAIL_DURABILITY", durability);
 		} case 10: {
 			set_item(id);
 
-			chat_print(id, "Ulepszenie^3 nieudane^1! Twoj przedmiot ulegl^3 zniszczeniu^1.");
+			chat_print(id, "%L", id, "CORE_UPGRADE_FAIL_DESTROYED");
 		}
 	}
 
@@ -4146,7 +4146,7 @@ public _cod_set_item_durability(id, value)
 	if (!codPlayer[id][PLAYER_ITEM_DURA]) {
 		set_item(id);
 
-		chat_print(id, "Twoj przedmiot ulegl^3 zniszczeniu^1.");
+		chat_print(id, "%L", id, "CORE_ITEM_DESTROYED_COLOR");
 	}
 }
 
@@ -4944,7 +4944,7 @@ public update_user_flags(id, flags)
 	new flag = get_class_info(codPlayer[id][PLAYER_CLASS], CLASS_FLAG);
 
 	if (flag != NONE && !(flags & flag)) {
-		chat_print(id, "Nie posiadasz uprawnien do korzystania z tej klasy i zostanie ona zmieniona w nastepnej rundzie!");
+		chat_print(id, "%L", id, "CORE_CLASS_NO_PERMISSION");
 
 		codPlayer[id][PLAYER_NEW_CLASS] = 0;
 
@@ -5415,7 +5415,7 @@ stock check_promotion(id, info = 0, class = 0)
 			get_user_class_info(id, codPlayer[id][PLAYER_CLASS], CLASS_NAME, className, charsmax(className));
 
 			set_dhudmessage(0, 255, 34, -1.0, 0.45, 0, 0.0, 2.5, 0.0, 0.0);
-			show_dhudmessage(id, "Awansowales! Twoja klasa to teraz %s!", className);
+			show_dhudmessage(id, "%L", id, "CORE_PROMOTED", className);
 		}
 	}
 
