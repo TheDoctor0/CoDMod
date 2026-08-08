@@ -4232,6 +4232,8 @@ public _cod_add_user_health(id, value, maximum)
 
 public _cod_get_user_rockets(id, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	if (type == ALL) {
 		return codPlayer[id][PLAYER_ROCKETS][ALL] + codPlayer[id][PLAYER_ROCKETS][USED];
 	} else if (type == USED) {
@@ -4243,6 +4245,8 @@ public _cod_get_user_rockets(id, type)
 
 public _cod_get_user_mines(id, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	if (type == ALL) {
 		return codPlayer[id][PLAYER_MINES][ALL] + codPlayer[id][PLAYER_MINES][USED];
 	} else if (type == USED) {
@@ -4254,6 +4258,8 @@ public _cod_get_user_mines(id, type)
 
 public _cod_get_user_dynamites(id, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	if (type == ALL) {
 		return codPlayer[id][PLAYER_DYNAMITES][ALL] + codPlayer[id][PLAYER_DYNAMITES][USED];
 	} else if (type == USED) {
@@ -4265,6 +4271,8 @@ public _cod_get_user_dynamites(id, type)
 
 public _cod_get_user_thunders(id, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	if (type == ALL) {
 		return codPlayer[id][PLAYER_THUNDERS][ALL] + codPlayer[id][PLAYER_THUNDERS][USED];
 	} else if (type == USED) {
@@ -4276,6 +4284,8 @@ public _cod_get_user_thunders(id, type)
 
 public _cod_get_user_medkits(id, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	if (type == ALL) {
 		return codPlayer[id][PLAYER_MEDKITS][ALL] + codPlayer[id][PLAYER_MEDKITS][USED];
 	} else if (type == USED) {
@@ -4287,6 +4297,8 @@ public _cod_get_user_medkits(id, type)
 
 public _cod_get_user_poisons(id, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	if (type == ALL) {
 		return codPlayer[id][PLAYER_POISONS][ALL] + codPlayer[id][PLAYER_POISONS][USED];
 	} else if (type == USED) {
@@ -4298,6 +4310,8 @@ public _cod_get_user_poisons(id, type)
 
 public _cod_get_user_teleports(id, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	if (type == ALL) {
 		return codPlayer[id][PLAYER_TELEPORTS][ALL] + codPlayer[id][PLAYER_TELEPORTS][USED];
 	} else if (type == USED) {
@@ -4308,19 +4322,33 @@ public _cod_get_user_teleports(id, type)
 }
 
 public _cod_get_user_multijumps(id, type)
+{
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	return codPlayer[id][PLAYER_JUMPS][type];
+}
 
 public Float:_cod_get_user_gravity(id, type)
+{
+	if (!valid_native_player(id) || !valid_native_type(type)) return 1.0;
+
 	return Float:codPlayer[id][PLAYER_GRAVITY][type];
+}
 
 public Float:_cod_get_user_speed(id, type)
+{
+	if (!valid_native_player(id) || (type != FULL && !valid_native_type(type))) return 0.0;
+
 	return type == FULL? get_user_maxspeed(id) : Float:codPlayer[id][PLAYER_SPEED][type];
+}
 
 public _cod_get_user_armor(id, value)
 	return cs_get_user_armor(id);
 
 public _cod_set_user_rockets(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_ROCKETS][type] = max(0, value);
 
 	calculate_rockets_left(id);
@@ -4328,6 +4356,8 @@ public _cod_set_user_rockets(id, value, type)
 
 public _cod_set_user_mines(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_MINES][type] = max(0, value);
 
 	calculate_mines_left(id);
@@ -4335,6 +4365,8 @@ public _cod_set_user_mines(id, value, type)
 
 public _cod_set_user_dynamites(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_DYNAMITES][type] = max(0, value);
 
 	calculate_dynamites_left(id);
@@ -4342,6 +4374,8 @@ public _cod_set_user_dynamites(id, value, type)
 
 public _cod_set_user_thunders(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_THUNDERS][type] = max(0, value);
 
 	calculate_thunders_left(id);
@@ -4349,6 +4383,8 @@ public _cod_set_user_thunders(id, value, type)
 
 public _cod_set_user_medkits(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_MEDKITS][type] = max(0, value);
 
 	calculate_medkits_left(id);
@@ -4356,6 +4392,8 @@ public _cod_set_user_medkits(id, value, type)
 
 public _cod_set_user_poisons(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_POISONS][type] = max(0, value);
 
 	calculate_poisons_left(id);
@@ -4363,6 +4401,8 @@ public _cod_set_user_poisons(id, value, type)
 
 public _cod_set_user_teleports(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_TELEPORTS][type] = codPlayer[id][PLAYER_TELEPORTS][type] == FULL ? FULL : value;
 
 	calculate_teleports_left(id);
@@ -4370,6 +4410,8 @@ public _cod_set_user_teleports(id, value, type)
 
 public _cod_set_user_multijumps(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_JUMPS][type] = max(0, value);
 	codPlayer[id][PLAYER_JUMPS][ALL] = 0;
 
@@ -4380,6 +4422,8 @@ public _cod_set_user_multijumps(id, value, type)
 
 public _cod_set_user_gravity(id, Float:value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_GRAVITY][type] = _:(type == ALL ? floatmax(0.01, value) : value);
 
 	set_gravity(id);
@@ -4387,6 +4431,8 @@ public _cod_set_user_gravity(id, Float:value, type)
 
 public _cod_set_user_speed(id, Float:value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_SPEED][type] = _:value;
 
 	set_speed(id);
@@ -4397,6 +4443,8 @@ public _cod_set_user_armor(id, value)
 
 public _cod_add_user_rockets(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_ROCKETS][type] = max(0, codPlayer[id][PLAYER_ROCKETS][type] + value);
 
 	calculate_rockets_left(id);
@@ -4404,6 +4452,8 @@ public _cod_add_user_rockets(id, value, type)
 
 public _cod_add_user_mines(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_MINES][type] = max(0, codPlayer[id][PLAYER_MINES][type] + value);
 
 	calculate_mines_left(id);
@@ -4411,6 +4461,8 @@ public _cod_add_user_mines(id, value, type)
 
 public _cod_add_user_dynamites(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_DYNAMITES][type] = max(0, codPlayer[id][PLAYER_DYNAMITES][type] + value);
 
 	calculate_dynamites_left(id);
@@ -4418,6 +4470,8 @@ public _cod_add_user_dynamites(id, value, type)
 
 public _cod_add_user_thunders(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_THUNDERS][type] = max(0, codPlayer[id][PLAYER_THUNDERS][type] + value);
 
 	calculate_thunders_left(id);
@@ -4425,6 +4479,8 @@ public _cod_add_user_thunders(id, value, type)
 
 public _cod_add_user_medkits(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_MEDKITS][type] = max(0, codPlayer[id][PLAYER_MEDKITS][type] + value);
 
 	calculate_medkits_left(id);
@@ -4432,6 +4488,8 @@ public _cod_add_user_medkits(id, value, type)
 
 public _cod_add_user_poisons(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_POISONS][type] = max(0, codPlayer[id][PLAYER_POISONS][type] + value);
 
 	calculate_poisons_left(id);
@@ -4439,6 +4497,8 @@ public _cod_add_user_poisons(id, value, type)
 
 public _cod_add_user_teleports(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_TELEPORTS][type] = codPlayer[id][PLAYER_TELEPORTS][type] == FULL ? FULL : max(0, codPlayer[id][PLAYER_TELEPORTS][type] + value);
 
 	calculate_teleports_left(id);
@@ -4446,6 +4506,8 @@ public _cod_add_user_teleports(id, value, type)
 
 public _cod_add_user_multijumps(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_JUMPS][type] = max(0, codPlayer[id][PLAYER_JUMPS][type] + value);
 	codPlayer[id][PLAYER_JUMPS][ALL] = 0;
 
@@ -4456,6 +4518,8 @@ public _cod_add_user_multijumps(id, value, type)
 
 public _cod_add_user_gravity(id, Float:value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_GRAVITY][type] = _:(type == ALL ? floatmax(0.01, codPlayer[id][PLAYER_GRAVITY][type] + value) : codPlayer[id][PLAYER_GRAVITY][type] + value);
 
 	set_gravity(id);
@@ -4463,6 +4527,8 @@ public _cod_add_user_gravity(id, Float:value, type)
 
 public _cod_add_user_speed(id, Float:value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_SPEED][type] += _:value;
 
 	set_speed(id);
@@ -4493,43 +4559,75 @@ public _cod_use_user_teleport(id)
 	use_teleport(id);
 
 public _cod_get_user_resistance(id, type)
+{
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	return codPlayer[id][PLAYER_RESISTANCE][type];
+}
 
 public _cod_get_user_bunnyhop(id, type)
+{
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	return codPlayer[id][PLAYER_BUNNYHOP][type];
+}
 
 public _cod_get_user_footsteps(id, type)
+{
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	return codPlayer[id][PLAYER_FOOTSTEPS][type];
+}
 
 public _cod_get_user_model(id, type)
+{
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	return codPlayer[id][PLAYER_MODEL][type];
+}
 
 public _cod_get_user_godmode(id, type)
+{
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	return codPlayer[id][PLAYER_GODMODE][type];
+}
 
 public _cod_get_user_noclip(id, type)
+{
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	return codPlayer[id][PLAYER_NOCLIP][type];
+}
 
 public _cod_get_user_unlimited_ammo(id, type, weapon)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	if (weapon) return (codPlayer[id][PLAYER_UNLIMITED_AMMO][type] && (codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] == FULL || 1<<weapon & codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type]));
 	else return codPlayer[id][PLAYER_UNLIMITED_AMMO][type];
 }
 
 public _cod_get_user_recoil_eliminator(id, type, weapon)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	if (weapon) return (codPlayer[id][PLAYER_ELIMINATOR][type] && (codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] == FULL || 1<<weapon & codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type]));
 	return codPlayer[id][PLAYER_ELIMINATOR][type];
 }
 
 public _cod_get_user_recoil_reducer(id, type, weapon)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return 0;
+
 	if (weapon) return (codPlayer[id][PLAYER_REDUCER][type] && (codPlayer[id][PLAYER_REDUCER_WEAPONS][type] == FULL || 1<<weapon & codPlayer[id][PLAYER_REDUCER_WEAPONS][type]));
 	return codPlayer[id][PLAYER_REDUCER][type];
 }
 
 public _cod_set_user_resistance(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_RESISTANCE][type] = value;
 
 	new bool:enabled;
@@ -4543,6 +4641,8 @@ public _cod_set_user_resistance(id, value, type)
 
 public _cod_set_user_godmode(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_GODMODE][type] = value;
 
 	new bool:enabled;
@@ -4558,6 +4658,8 @@ public _cod_set_user_godmode(id, value, type)
 
 public _cod_set_user_noclip(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_NOCLIP][type] = value;
 
 	new bool:enabled;
@@ -4575,6 +4677,8 @@ public _cod_set_user_noclip(id, value, type)
 
 public _cod_set_user_bunnyhop(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_BUNNYHOP][type] = value;
 
 	new bool:enabled;
@@ -4588,6 +4692,8 @@ public _cod_set_user_bunnyhop(id, value, type)
 
 public _cod_set_user_footsteps(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_FOOTSTEPS][type] = value;
 
 	new bool:enabled;
@@ -4603,6 +4709,8 @@ public _cod_set_user_footsteps(id, value, type)
 
 public _cod_set_user_model(id, value, type)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_MODEL][type] = value;
 
 	new bool:enabled;
@@ -4618,6 +4726,8 @@ public _cod_set_user_model(id, value, type)
 
 public _cod_set_user_unlimited_ammo(id, value, type, weapon)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_UNLIMITED_AMMO][type] = value;
 
 	if (weapon > 0 && codPlayer[id][PLAYER_UNLIMITED_AMMO_WEAPONS][type] != FULL) {
@@ -4641,6 +4751,8 @@ public _cod_set_user_unlimited_ammo(id, value, type, weapon)
 
 public _cod_set_user_recoil_eliminator(id, value, type, weapon)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_ELIMINATOR][type] = value;
 
 	if (weapon > 0 && codPlayer[id][PLAYER_ELIMINATOR_WEAPONS][type] != FULL) {
@@ -4664,6 +4776,8 @@ public _cod_set_user_recoil_eliminator(id, value, type, weapon)
 
 public _cod_set_user_recoil_reducer(id, value, type, weapon)
 {
+	if (!valid_native_player(id) || !valid_native_type(type)) return;
+
 	codPlayer[id][PLAYER_REDUCER][type] = value;
 
 	if (weapon > 0 && codPlayer[id][PLAYER_REDUCER_WEAPONS][type] != FULL) {
@@ -5023,6 +5137,8 @@ public repeat_damage(data[])
 
 public _cod_inflict_damage(attacker, victim, Float:damage, Float:factor, flags)
 {
+	if (!(0 <= attacker <= MAX_PLAYERS)) attacker = 0;
+
 	if (!is_user_alive(victim) || !codPlayer[victim][PLAYER_ALIVE] || get_user_health(victim) <= 0 || codPlayer[victim][PLAYER_GODMODE][ALL]) {
 		return;
 	}
@@ -5727,6 +5843,28 @@ stock cmd_execute(id, const text[], any:...)
 	write_byte(10);
 	write_string(message);
 	message_end();
+}
+
+stock bool:valid_native_player(id)
+{
+	if (!(0 < id <= MAX_PLAYERS)) {
+		log_error(AMX_ERR_NATIVE, "Player index out of range (%d)", id);
+
+		return false;
+	}
+
+	return true;
+}
+
+stock bool:valid_native_type(type)
+{
+	if (!(CLASS <= type <= ALL)) {
+		log_error(AMX_ERR_NATIVE, "Attribute type out of range (%d)", type);
+
+		return false;
+	}
+
+	return true;
 }
 
 stock sql_string(const source[], dest[], length)
