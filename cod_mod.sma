@@ -5010,14 +5010,14 @@ public _cod_sql_string(const source[], dest[], length)
 
 public _cod_play_sound(id, sound)
 {
-	if (!is_user_connected(id)) return;
+	if (!is_user_connected(id) || !valid_native_sound(sound)) return;
 
 	client_cmd(id, "spk %s", codSounds[sound]);
 }
 
 public _cod_emit_sound(ent, sound, Float:volume, channel)
 {
-	if (!pev_valid(ent)) return;
+	if (!pev_valid(ent) || !valid_native_sound(sound)) return;
 
 	emit_sound(ent, channel, codSounds[sound], volume, ATTN_NORM, 0, PITCH_NORM);
 }
@@ -5849,6 +5849,17 @@ stock bool:valid_native_player(id)
 {
 	if (!(0 < id <= MAX_PLAYERS)) {
 		log_error(AMX_ERR_NATIVE, "Player index out of range (%d)", id);
+
+		return false;
+	}
+
+	return true;
+}
+
+stock bool:valid_native_sound(sound)
+{
+	if (!(0 <= sound < sizeof codSounds)) {
+		log_error(AMX_ERR_NATIVE, "Sound index out of range (%d)", sound);
 
 		return false;
 	}
