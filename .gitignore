@@ -58,3 +58,6 @@ codmod.sublime-workspace
 include
 source
 !resources/addons/amxmodx/scripting/include
+# Python caches
+__pycache__/
+*.pyc

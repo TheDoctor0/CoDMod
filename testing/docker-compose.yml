@@ -1,0 +1,52 @@
+name: codmod
+
+services:
+  db:
+    # MariaDB, because the MySQL client bundled with AMX Mod X cannot speak
+    # MySQL 8's caching_sha2_password.
+    image: mariadb:10.11
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: codmod
+      MYSQL_USER: codmod
+      MYSQL_PASSWORD: codmod
+    ports:
+      - "13306:3306"
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d:ro
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-ucodmod", "-pcodmod"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+
+  # One-shot: compiles every .sma into ../compiled.
+  compiler:
+    build:
+      context: .
+      dockerfile: Dockerfile.compiler
+    volumes:
+      - ..:/src
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      COD_SQL_HOST: db
+      COD_SQL_USER: codmod
+      COD_SQL_PASS: codmod
+      COD_SQL_DB: codmod
+    volumes:
+      - ..:/src:ro
+    ports:
+      - "27015:27015/udp"
+      - "27015:27015/tcp"
+
+volumes:
+  db:

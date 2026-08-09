@@ -32,6 +32,24 @@ Missions configuration is stored in [cod_missions.ini](https://github.com/TheDoc
 
 Available skins are stored in [cod_skins.ini](https://github.com/TheDoctor0/CoDMod/blob/master/resources/addons/amxmodx/configs/cod_skins.ini).
 
+## Database
+`cod_database.amxx` owns the whole schema. It has to be loaded first in [plugins-cod.ini](https://github.com/TheDoctor0/CoDMod/blob/master/resources/addons/amxmodx/configs/plugins-cod.ini) - the other plugins wait for its `cod_database_ready()` forward before they touch a table.
+
+Tables: `cod_players`, `cod_classes`, `cod_stats`, `cod_missions`, `cod_clans`, `cod_clans_members`, `cod_clans_applications`, `cod_clans_wars`. Everything is keyed by `cod_players`.`player_id`.
+
+### Migrations
+Schema changes are applied as migrations, the same way Laravel does it. Applied migrations are recorded in `cod_migrations` (`id`, `migration`, `batch`, `ran_at`) and are never run twice, so a server can be updated by dropping in new plugins and restarting.
+
+To add one, append a name to the `migrations` list in [cod_database.sma](https://github.com/TheDoctor0/CoDMod/blob/master/cod_database.sma) and a matching `case` to `run_migration()`. Never edit a migration that has already shipped - servers that ran it will not run it again.
+
+### Upgrading an existing server
+The first start moves the old tables aside (`cod_accounts` becomes `cod_legacy_accounts` and so on) and imports accounts, honor, classes, HUD settings, stats and clans into the new schema. The legacy tables are kept, so nothing is lost if the import needs to be repeated - drop the reworked tables together with the `cod_migrations` rows and restart.
+
+Knife choices, free honor flags and mission progress lived in nvaults. They are imported the first time each player connects, so keep the `.vault` files in place for a while after the update.
+
+## Testing
+A docker environment for compiling the plugins and running them against a real database and game server lives in [testing](https://github.com/TheDoctor0/CoDMod/tree/master/testing), together with a SQL checker and a script that walks a real client through the menus.
+
 ## Additional
 
 ### Class promotion

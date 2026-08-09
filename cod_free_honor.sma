@@ -17,10 +17,12 @@ public plugin_init()
 
 	for (new i; i < sizeof commandHonor; i++) register_clcmd(commandHonor[i], "receive_honor");
 
+	// Only kept around to import servers that ran on the vault based version.
 	vault = nvault_open("cod_free_honor");
-
-	if (vault == INVALID_HANDLE) set_fail_state("[COD] Nie mozna otworzyc pliku cod_free_honor.vault");
 }
+
+public plugin_end()
+	if (vault != INVALID_HANDLE) nvault_close(vault);
 
 public receive_honor(id)
 {
@@ -45,35 +47,38 @@ public client_connect(id)
 {
 	rem_bit(id, received);
 	rem_bit(id, loaded);
-
-	if (is_user_bot(id) || is_user_hltv(id)) return;
-
-	load(id);
 }
 
-public load(id)
+public cod_player_loaded(id, playerId)
 {
-	new vaultKey[MAX_NAME], vaultData[2];
-
 	get_user_name(id, playerName[id], charsmax(playerName[]));
+
+	if (cod_get_player_field(id, DB_PLAYER_BONUS)) set_bit(id, received);
+	else if (import_vault(id)) set_bit(id, received);
+
+	set_bit(id, loaded);
+
+	if (get_bit(id, received)) save(id);
+}
+
+/**
+ * One time move of the pre database bonus flag. The vault entry is left alone
+ * so the import stays repeatable if the database is reset.
+ */
+stock bool:import_vault(id)
+{
+	if (vault == INVALID_HANDLE) return false;
+
+	new vaultKey[MAX_NAME + 16], vaultData[2];
 
 	formatex(vaultKey, charsmax(vaultKey), "%s-cod_honor", playerName[id]);
 
-	if (nvault_get(vault, vaultKey, vaultData, charsmax(vaultData)) && str_to_num(vaultData) > 0) {
-		set_bit(id, received);
-	}
-
-	set_bit(id, loaded);
+	return nvault_get(vault, vaultKey, vaultData, charsmax(vaultData)) && str_to_num(vaultData) > 0;
 }
 
 public save(id)
 {
 	if (!get_bit(id, loaded)) return;
 
-	new vaultKey[MAX_NAME], vaultData[2];
-
-	formatex(vaultKey, charsmax(vaultKey), "%s-cod_honor", playerName[id]);
-	formatex(vaultData, charsmax(vaultData), "%d", get_bit(id, received));
-
-	nvault_set(vault, vaultKey, vaultData);
+	cod_set_player_field(id, DB_PLAYER_BONUS, get_bit(id, received) ? 1 : 0);
 }

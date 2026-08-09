@@ -1,0 +1,50 @@
+#syntax=docker/dockerfile:1
+
+# Counter-Strike 1.6 dedicated server with Metamod, AMX Mod X and the MySQL
+# module, used to run the CoD Mod plugins against a real database.
+FROM cm2network/steamcmd:latest
+
+ARG AMXX_VERSION=1.10.0-git5479
+ARG AMXX_BASE_URL=https://www.amxmodx.org/amxxdrop/1.10
+ARG METAMOD_URL=https://www.amxmodx.org/release/metamod-1.21.1-am.zip
+
+USER root
+
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends ca-certificates curl unzip \
+	&& rm -rf /var/lib/apt/lists/*
+
+USER steam
+
+ENV HLDS_DIR=/home/steam/hlds
+ENV CSTRIKE_DIR=/home/steam/hlds/cstrike
+
+# app 90 regularly needs more than one pass before it reports a full install.
+RUN set -eu; \
+	for attempt in 1 2 3 4 5; do \
+		/home/steam/steamcmd/steamcmd.sh +force_install_dir "$HLDS_DIR" +login anonymous \
+			+app_set_config 90 mod cstrike +app_update 90 validate +quit > /tmp/steamcmd.log 2>&1 || true; \
+		if grep -q "Success! App '90' fully installed." /tmp/steamcmd.log; then break; fi; \
+	done; \
+	grep -q "Success! App '90' fully installed." /tmp/steamcmd.log
+
+# Metamod loads in place of the game dll, AMX Mod X loads on top of Metamod.
+RUN set -eu; \
+	curl -fsSL "$METAMOD_URL" -o /tmp/metamod.zip; \
+	mkdir -p "$CSTRIKE_DIR/addons/metamod/dlls"; \
+	unzip -j -o /tmp/metamod.zip 'addons/metamod/dlls/metamod.so' -d "$CSTRIKE_DIR/addons/metamod/dlls"; \
+	rm /tmp/metamod.zip; \
+	sed -i 's|gamedll_linux .*|gamedll_linux "addons/metamod/dlls/metamod.so"|' "$CSTRIKE_DIR/liblist.gam"; \
+	printf 'linux addons/amxmodx/dlls/amxmodx_mm_i386.so\n' > "$CSTRIKE_DIR/addons/metamod/plugins.ini"
+
+RUN set -eu; \
+	cd "$CSTRIKE_DIR"; \
+	curl -fsSL "${AMXX_BASE_URL}/amxmodx-${AMXX_VERSION}-base-linux.tar.gz" | tar xz; \
+	curl -fsSL "${AMXX_BASE_URL}/amxmodx-${AMXX_VERSION}-cstrike-linux.tar.gz" | tar xz
+
+COPY --chown=steam:steam server/ /home/steam/config/
+COPY --chown=steam:steam entrypoint.sh /home/steam/entrypoint.sh
+
+WORKDIR /home/steam/hlds
+
+ENTRYPOINT ["/home/steam/entrypoint.sh"]

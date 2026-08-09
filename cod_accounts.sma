@@ -1,5 +1,4 @@
 #include <amxmodx>
-#include <sqlx>
 #include <fakemeta>
 #include <cod>
 
@@ -9,18 +8,15 @@
 #define TASK_PASSWORD   1945
 #define TASK_LOAD       2491
 
-#define MAX_PASSWORD    32
-
 enum _:playerInfo { STATUS, FAILS, PASSWORD[MAX_PASSWORD], TEMP_PASSWORD[MAX_PASSWORD], NAME[MAX_NAME], SAFE_NAME[MAX_SAFE_NAME] };
 enum _:status { NOT_REGISTERED, NOT_LOGGED, LOGGED, GUEST };
 enum _:queries { UPDATE, INSERT, DELETE };
-
 new const accountStatus[status][] = { "Niezarejestrowany", "Niezalogowany", "Zalogowany", "Gosc" };
 
 new const commandAccount[][] = { "konto", "say /haslo", "say_team /haslo", "say /password", "say_team /password",
 	"say /konto", "say_team /konto", "say /account", "say_team /account" };
 
-new playerData[MAX_PLAYERS + 1][playerInfo], Handle:sql, bool:sqlConnected, dataLoaded, autoLogin,
+new playerData[MAX_PLAYERS + 1][playerInfo], dataLoaded, autoLogin,
 	cvarAccountsEnabled, cvarLoginMaxTime, cvarPasswordMaxFails, cvarPasswordMinLength, cvarAutoLoginConfig, cvarSetinfo[32];
 
 public plugin_init()
@@ -55,12 +51,6 @@ public plugin_init()
 public plugin_natives()
 	register_native("cod_check_account", "_cod_check_account");
 
-public plugin_cfg()
-	sql_init();
-
-public plugin_end()
-	if (sql != Empty_Handle) SQL_FreeHandle(sql);
-
 public cod_reset_all_data()
 {
 	for (new i = 1; i <= MAX_PLAYERS; i++) {
@@ -68,14 +58,6 @@ public cod_reset_all_data()
 
 		playerData[i][STATUS] = NOT_REGISTERED;
 	}
-
-	sqlConnected = false;
-
-	new tempData[32];
-
-	formatex(tempData, charsmax(tempData), "DROP TABLE `cod_accounts`;");
-
-	SQL_ThreadQuery(sql, "ignore_handle", tempData);
 }
 
 public client_connect(id)
@@ -90,11 +72,10 @@ public client_connect(id)
 	if (is_user_bot(id) || is_user_hltv(id) || !cvarAccountsEnabled) return;
 
 	get_user_name(id, playerData[id][NAME], charsmax(playerData[][NAME]));
-
-	cod_sql_string(playerData[id][NAME], playerData[id][SAFE_NAME], charsmax(playerData[][SAFE_NAME]));
-
-	set_task(0.1, "load_account", id + TASK_LOAD);
 }
+
+public cod_player_loaded(id, playerId)
+	load_account(id);
 
 public client_disconnected(id)
 {
@@ -112,7 +93,7 @@ public message_show_menu(msgId, dest, id)
 
 	get_msg_arg_string(4, menuData, charsmax(menuData));
 
-	if (equal(menuData, Team_Select) && get_bit(id, dataLoaded) && playerData[id][STATUS] < LOGGED && sql != Empty_Handle) {
+	if (equal(menuData, Team_Select) && get_bit(id, dataLoaded) && playerData[id][STATUS] < LOGGED ) {
 		set_pdata_int(id, 205, 0, 5);
 
 		set_task(0.1, "account_menu", id);
@@ -125,7 +106,7 @@ public message_show_menu(msgId, dest, id)
 
 public message_vgui_menu(msgId, dest, id)
 {
-	if (get_msg_arg_int(1) == 2 && cvarAccountsEnabled && get_bit(id, dataLoaded) && playerData[id][STATUS] < LOGGED && sql != Empty_Handle) {
+	if (get_msg_arg_int(1) == 2 && cvarAccountsEnabled && get_bit(id, dataLoaded) && playerData[id][STATUS] < LOGGED ) {
 		set_task(0.1, "account_menu", id);
 
 		return PLUGIN_HANDLED;
@@ -618,98 +599,34 @@ public delete_account_handle(id, menu, item)
 	return PLUGIN_CONTINUE;
 }
 
-public sql_init()
-{
-	new host[64], user[64], pass[64], db[64], queryData[128], error[128], errorNum;
-
-	get_cvar_string("cod_sql_host", host, charsmax(host));
-	get_cvar_string("cod_sql_user", user, charsmax(user));
-	get_cvar_string("cod_sql_pass", pass, charsmax(pass));
-	get_cvar_string("cod_sql_db", db, charsmax(db));
-
-	sql = SQL_MakeDbTuple(host, user, pass, db);
-
-	new Handle:connection = SQL_Connect(sql, errorNum, error, charsmax(error));
-
-	if (errorNum) {
-		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
-
-		sql = Empty_Handle;
-
-		set_task(5.0, "sql_init");
-
-		return;
-	}
-
-	formatex(queryData, charsmax(queryData), "CREATE TABLE IF NOT EXISTS `cod_accounts` (`name` VARCHAR(%i), `pass` VARCHAR(%i), PRIMARY KEY(`name`));", MAX_SAFE_NAME, MAX_PASSWORD * 2);
-
-	new Handle:query = SQL_PrepareQuery(connection, queryData);
-
-	SQL_Execute(query);
-
-	SQL_FreeHandle(query);
-	SQL_FreeHandle(connection);
-
-	sqlConnected = true;
-}
-
 public load_account(id)
 {
-	id -= TASK_LOAD;
+	cod_get_player_password(id, playerData[id][PASSWORD], charsmax(playerData[][PASSWORD]));
 
-	if (!sqlConnected) {
-		set_task(1.0, "load_account", id + TASK_LOAD);
+	if (playerData[id][PASSWORD][0]) {
+		new password[MAX_PASSWORD], info[32];
 
-		return;
-	}
+		formatex(info, charsmax(info), "_%s", cvarSetinfo);
 
-	new queryData[128], tempId[1];
+		if (cvarAutoLoginConfig) cod_cmd_execute(id, "exec %s.cfg", cvarSetinfo);
 
-	tempId[0] = id;
+		get_user_info(id, info, password, charsmax(password));
 
-	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_accounts` WHERE name = ^"%s^"", playerData[id][SAFE_NAME]);
-	SQL_ThreadQuery(sql, "load_account_handle", queryData, tempId, sizeof(tempId));
-}
+		if (equal(playerData[id][PASSWORD], password)) {
+			playerData[id][STATUS] = LOGGED;
 
-public load_account_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
-{
-	new id = tempId[0];
+			cod_display_fade(id, 0, 0, 0x0000, 0, 0, 0, 255);
 
-	if (failState)  {
-		if (failState == TQUERY_CONNECT_FAILED) cod_log_error(PLUGIN, "Could not connect to SQL database. Error: %s (%d)", error, errorNum);
-		else if (failState == TQUERY_QUERY_FAILED) cod_log_error(PLUGIN, "Threaded query failed. Error: %s (%d)", error, errorNum);
+			set_bit(id, autoLogin);
+		} else {
+			playerData[id][STATUS] = NOT_LOGGED;
 
-		return;
-	}
+			cod_print_chat(id, "Musisz sie^3 zalogowac^1, aby miec dostep do glownych funkcji!");
 
-	if (SQL_MoreResults(query)) {
-		SQL_ReadResult(query, SQL_FieldNameToNum(query, "pass"), playerData[id][PASSWORD], charsmax(playerData[][PASSWORD]));
-
-		if (playerData[id][PASSWORD][0]) {
-			new password[MAX_PASSWORD], info[32];
-
-			formatex(info, charsmax(info), "_%s", cvarSetinfo);
-
-			if (cvarAutoLoginConfig) cod_cmd_execute(id, "exec %s.cfg", cvarSetinfo);
-
-			get_user_info(id, info, password, charsmax(password));
-
-			if (equal(playerData[id][PASSWORD], password)) {
-				playerData[id][STATUS] = LOGGED;
-
-				cod_display_fade(id, 0, 0, 0x0000, 0, 0, 0, 255);
-
-				set_bit(id, autoLogin);
-			} else {
-				playerData[id][STATUS] = NOT_LOGGED;
-
-				cod_print_chat(id, "Musisz sie^3 zalogowac^1, aby miec dostep do glownych funkcji!");
-
-				account_menu(id, true);
-			}
-
-			if (cvarAutoLoginConfig) cod_cmd_execute(id, "exec config.cfg");
+			account_menu(id, true);
 		}
+
+		if (cvarAutoLoginConfig) cod_cmd_execute(id, "exec config.cfg");
 	}
 
 	set_bit(id, dataLoaded);
@@ -719,27 +636,10 @@ public account_query(id, type)
 {
 	if (!is_user_connected(id)) return;
 
-	new queryData[256], password[MAX_PASSWORD * 2];
-
-	cod_sql_string(playerData[id][PASSWORD], password, charsmax(password));
-
 	switch (type) {
-		case INSERT: formatex(queryData, charsmax(queryData), "INSERT INTO `cod_accounts` VALUES (^"%s^", '%s')", playerData[id][SAFE_NAME], password);
-		case UPDATE: formatex(queryData, charsmax(queryData), "UPDATE `cod_accounts` SET pass = '%s' WHERE name = ^"%s^"", password, playerData[id][SAFE_NAME]);
-		case DELETE: formatex(queryData, charsmax(queryData), "DELETE FROM `cod_accounts` WHERE name = ^"%s^"", playerData[id][SAFE_NAME]);
+		case INSERT, UPDATE: cod_set_player_password(id, playerData[id][PASSWORD]);
+		case DELETE: cod_delete_player(id);
 	}
-
-	SQL_ThreadQuery(sql, "ignore_handle", queryData);
-}
-
-public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
-{
-	if (failState)  {
-		if (failState == TQUERY_CONNECT_FAILED) cod_log_error(PLUGIN, "Could not connect to SQL database. Error: %s (%d)", error, errorNum);
-		else if (failState == TQUERY_QUERY_FAILED) cod_log_error(PLUGIN, "Threaded query failed. Error: %s (%d)", error, errorNum);
-	}
-
-	return PLUGIN_CONTINUE;
 }
 
 public _cod_check_account(plugin_id, num_params)

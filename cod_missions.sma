@@ -1,5 +1,6 @@
 #include <amxmodx>
 #include <nvault>
+#include <sqlx>
 #include <cod>
 
 #define PLUGIN "CoD Missions"
@@ -26,7 +27,7 @@ enum _:chapterInfo { CHAPTER_NAME[MAX_NAME], CHAPTER_START, CHAPTER_END };
 enum _:missionInfo { MISSION_CHAPTER, MISSION_AMOUNT, MISSION_TYPE, MISSION_REWARD };
 
 new playerClass[MAX_PLAYERS + 1][MAX_NAME], playerName[MAX_PLAYERS + 1][MAX_NAME], playerData[MAX_PLAYERS + 1][playerInfo],
-	Array:codChapters, Array:codMissions, bool:mapEnd, cvarMinPlayers, missions, dataLoaded;
+	Array:codChapters, Array:codMissions, Handle:sql, bool:sqlConnected, bool:mapEnd, cvarMinPlayers, missions, dataLoaded;
 
 public plugin_init()
 {
@@ -38,9 +39,8 @@ public plugin_init()
 	for (new i; i < sizeof commandProgress; i++) register_clcmd(commandProgress[i], "check_mission");
 	for (new i; i < sizeof commandEnd; i++) register_clcmd(commandEnd[i], "reset_mission");
 
+	// Only kept around to import servers that ran on the vault based version.
 	missions = nvault_open("cod_missions");
-
-	if (missions == INVALID_HANDLE) set_fail_state("Nie mozna otworzyc pliku cod_missions.vault");
 
 	codChapters = ArrayCreate(chapterInfo);
 	codMissions = ArrayCreate(missionInfo);
@@ -114,7 +114,38 @@ public plugin_cfg()
 }
 
 public plugin_end()
-	nvault_close(missions);
+{
+	if (missions != INVALID_HANDLE) nvault_close(missions);
+	if (sql != Empty_Handle) SQL_FreeHandle(sql);
+}
+
+public cod_database_ready()
+{
+	new host[64], user[64], pass[64], db[64], error[128], errorNum;
+
+	get_cvar_string("cod_sql_host", host, charsmax(host));
+	get_cvar_string("cod_sql_user", user, charsmax(user));
+	get_cvar_string("cod_sql_pass", pass, charsmax(pass));
+	get_cvar_string("cod_sql_db", db, charsmax(db));
+
+	sql = SQL_MakeDbTuple(host, user, pass, db);
+
+	new Handle:connection = SQL_Connect(sql, errorNum, error, charsmax(error));
+
+	if (errorNum) {
+		cod_log_error(PLUGIN, "SQL Query Error. [%d] %s", errorNum, error);
+
+		SQL_FreeHandle(sql);
+
+		sql = Empty_Handle;
+
+		return;
+	}
+
+	SQL_FreeHandle(connection);
+
+	sqlConnected = true;
+}
 
 public client_disconnected(id)
 	rem_bit(id, dataLoaded);
@@ -130,18 +161,17 @@ public cod_end_map()
 	mapEnd = true;
 
 public cod_reset_data()
-	clear_nvault();
+	clear_data();
 
 public cod_reset_all_data()
-	clear_nvault();
+	clear_data();
 
-public clear_nvault()
+public clear_data()
 {
+	// The table itself is wiped by cod_database on the same forward.
 	for (new i = 1; i <= MAX_PLAYERS; i++) rem_bit(i, dataLoaded);
 
 	mapEnd = true;
-
-	nvault_prune(missions, 0, get_systime() + 1);
 }
 
 public mission_menu(id)
@@ -484,12 +514,20 @@ public save_mission(id)
 {
 	if (is_user_bot(id) || is_user_hltv(id) || !get_bit(id, dataLoaded)) return PLUGIN_HANDLED;
 
-	new vaultKey[MAX_NAME * 2], vaultData[64];
+	new playerId = cod_get_user_db_id(id), classId = cod_get_user_class_row(id);
 
-	formatex(vaultKey, charsmax(vaultKey), "%s-%s", playerName[id], playerClass[id]);
-	formatex(vaultData, charsmax(vaultData), "%i %i %i %i %i", playerData[id][PLAYER_ID], playerData[id][PLAYER_TYPE], playerData[id][PLAYER_ADDITIONAL], playerData[id][PLAYER_PROGRESS], playerData[id][PLAYER_CHAPTER]);
+	if (!sqlConnected || !playerId || !classId) return PLUGIN_HANDLED;
 
-	nvault_set(missions, vaultKey, vaultData);
+	new queryData[768];
+
+	formatex(queryData, charsmax(queryData), "INSERT INTO `cod_missions` (`player_id`, `class_id`, `mission_id`, `mission_type`, `mission_additional`, \
+		`mission_progress`, `mission_chapter`) VALUES ('%d', '%d', '%d', '%d', '%d', '%d', '%d') ON DUPLICATE KEY UPDATE \
+		`mission_id` = VALUES(`mission_id`), `mission_type` = VALUES(`mission_type`), `mission_additional` = VALUES(`mission_additional`), \
+		`mission_progress` = VALUES(`mission_progress`), `mission_chapter` = VALUES(`mission_chapter`)",
+		playerId, classId, playerData[id][PLAYER_ID], playerData[id][PLAYER_TYPE], playerData[id][PLAYER_ADDITIONAL],
+		playerData[id][PLAYER_PROGRESS], playerData[id][PLAYER_CHAPTER]);
+
+	SQL_ThreadQuery(sql, "ignore_handle", queryData);
 
 	return PLUGIN_HANDLED;
 }
@@ -498,31 +536,95 @@ public load_mission(id)
 {
 	if (is_user_bot(id) || is_user_hltv(id) || mapEnd) return PLUGIN_HANDLED;
 
+	new playerId = cod_get_user_db_id(id), classId = cod_get_user_class_row(id);
+
+	set_bit(id, dataLoaded);
+
+	if (!sqlConnected || !playerId || !classId) return PLUGIN_HANDLED;
+
+	new queryData[384], tempId[1];
+
+	tempId[0] = id;
+
+	formatex(queryData, charsmax(queryData), "SELECT * FROM `cod_missions` WHERE `player_id` = '%d' AND `class_id` = '%d'", playerId, classId);
+
+	SQL_ThreadQuery(sql, "load_mission_handle", queryData, tempId, sizeof tempId);
+
+	return PLUGIN_HANDLED;
+}
+
+public load_mission_handle(failState, Handle:query, error[], errorNum, tempId[], dataSize)
+{
+	if (failState) {
+		if (failState == TQUERY_CONNECT_FAILED) cod_log_error(PLUGIN, "Could not connect to SQL database. Error: %s (%d)", error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) cod_log_error(PLUGIN, "Threaded query failed. Error: %s (%d)", error, errorNum);
+
+		return PLUGIN_CONTINUE;
+	}
+
+	new id = tempId[0];
+
+	if (!is_user_connected(id)) return PLUGIN_CONTINUE;
+
+	if (!SQL_MoreResults(query)) {
+		if (import_vault(id)) save_mission(id);
+
+		return PLUGIN_CONTINUE;
+	}
+
+	playerData[id][PLAYER_ID] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "mission_id"));
+	playerData[id][PLAYER_TYPE] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "mission_type"));
+	playerData[id][PLAYER_ADDITIONAL] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "mission_additional"));
+	playerData[id][PLAYER_PROGRESS] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "mission_progress"));
+	playerData[id][PLAYER_CHAPTER] = SQL_ReadResult(query, SQL_FieldNameToNum(query, "mission_chapter"));
+
+	if (!playerData[id][PLAYER_TYPE]) return PLUGIN_CONTINUE;
+
+	if (playerData[id][PLAYER_ID] >= ArraySize(codMissions) || playerData[id][PLAYER_CHAPTER] >= ArraySize(codChapters)) {
+		reset_mission(id, 0, 1);
+	}
+
+	return PLUGIN_CONTINUE;
+}
+
+/**
+ * One time move of the pre database mission progress. The vault entry is left
+ * alone so the import stays repeatable if the database is reset.
+ */
+stock bool:import_vault(id)
+{
+	if (missions == INVALID_HANDLE) return false;
+
 	new vaultKey[MAX_NAME * 2], vaultData[64], missionData[5][16], missionParam[5];
 
 	formatex(vaultKey, charsmax(vaultKey), "%s-%s", playerName[id], playerClass[id]);
 
-	set_bit(id, dataLoaded);
+	if (!nvault_get(missions, vaultKey, vaultData, charsmax(vaultData))) return false;
 
-	if (nvault_get(missions, vaultKey, vaultData, charsmax(vaultData))) {
-		parse(vaultData, missionData[0], charsmax(missionData[]), missionData[1], charsmax(missionData[]), missionData[2], charsmax(missionData[]), missionData[3], charsmax(missionData[]), missionData[4], charsmax(missionData[]));
+	parse(vaultData, missionData[0], charsmax(missionData[]), missionData[1], charsmax(missionData[]), missionData[2], charsmax(missionData[]), missionData[3], charsmax(missionData[]), missionData[4], charsmax(missionData[]));
 
-		for (new i = 0; i < sizeof missionParam; i++) missionParam[i] = str_to_num(missionData[i]);
+	for (new i = 0; i < sizeof missionParam; i++) missionParam[i] = str_to_num(missionData[i]);
 
-		if (!missionParam[1]) return PLUGIN_HANDLED;
+	if (!missionParam[1]) return false;
+	if (missionParam[0] >= ArraySize(codMissions) || missionParam[4] >= ArraySize(codChapters)) return false;
 
-		playerData[id][PLAYER_ID] = missionParam[0];
-		playerData[id][PLAYER_TYPE] = missionParam[1];
-		playerData[id][PLAYER_ADDITIONAL] = missionParam[2];
-		playerData[id][PLAYER_PROGRESS] = missionParam[3];
-		playerData[id][PLAYER_CHAPTER] = missionParam[4];
+	playerData[id][PLAYER_ID] = missionParam[0];
+	playerData[id][PLAYER_TYPE] = missionParam[1];
+	playerData[id][PLAYER_ADDITIONAL] = missionParam[2];
+	playerData[id][PLAYER_PROGRESS] = missionParam[3];
+	playerData[id][PLAYER_CHAPTER] = missionParam[4];
 
-		if (missionParam[0] >= ArraySize(codMissions) || missionParam[4] >= ArraySize(codChapters)) {
-			reset_mission(id, 0, 1);
-		}
+	return true;
+}
+
+public ignore_handle(failState, Handle:query, error[], errorNum, data[], dataSize)
+{
+	if (failState) {
+		if (failState == TQUERY_CONNECT_FAILED) cod_log_error(PLUGIN, "Could not connect to SQL database. Error: %s (%d)", error, errorNum);
+		else if (failState == TQUERY_QUERY_FAILED) cod_log_error(PLUGIN, "Threaded query failed. Error: %s (%d)", error, errorNum);
 	}
 
-	return PLUGIN_HANDLED;
+	return PLUGIN_CONTINUE;
 }
 
 public reset_mission(id, data, silent)

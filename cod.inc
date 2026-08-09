@@ -35,6 +35,24 @@
 #define MAX_NAME        MAX_NAME_LENGTH
 #define MAX_SAFE_NAME   MAX_NAME * 2
 #define MAX_DESC        256
+#define MAX_PASSWORD    32
+
+/**
+ * Columns of the `cod_players` table exposed through cod_get_player_field()
+ * and cod_set_player_field().
+ */
+enum _:codPlayerField {
+	DB_PLAYER_ADMIN,
+	DB_PLAYER_HONOR,
+	DB_PLAYER_KNIFE,
+	DB_PLAYER_BONUS,
+	DB_PLAYER_EXCHANGE,
+	DB_PLAYER_HUD_RED,
+	DB_PLAYER_HUD_GREEN,
+	DB_PLAYER_HUD_BLUE,
+	DB_PLAYER_HUD_POS_X,
+	DB_PLAYER_HUD_POS_Y
+};
 
 /**
  * Return values
@@ -424,6 +442,15 @@ native cod_set_user_class(id, class, force = false);
  * @return          Class index
  */
 native cod_get_class_id(class[]);
+
+/**
+ * Returns the `cod_classes`.`class_id` of the class a player currently uses.
+ *
+ * @param id        Player index
+ *
+ * @return          Database id of the class row, or 0 when it is not known yet
+ */
+native cod_get_user_class_row(id);
 
 /**
  * Returns class name.
@@ -2027,6 +2054,107 @@ native cod_cmd_execute(id, const command[], any:...);
 native cod_sql_string(const source[], dest[], length);
 
 /**
+ * Checks whether the database is connected and all migrations have been applied.
+ *
+ * @note Plugins must not touch any `cod_*` table before this returns true.
+ *
+ * @return          1 if the database is ready, 0 otherwise
+ */
+native cod_db_ready();
+
+/**
+ * Runs a query that has no result set through the threaded queue.
+ *
+ * @param query     Query to run
+ *
+ * @noreturn
+ */
+native cod_db_execute(const query[]);
+
+/**
+ * Runs a query that has no result set on the blocking connection.
+ *
+ * @note Only for map end saves, where a threaded query would not finish in time.
+ *
+ * @param query     Query to run
+ *
+ * @noreturn
+ */
+native cod_db_execute_now(const query[]);
+
+/**
+ * Returns the `cod_players`.`player_id` of a player.
+ *
+ * @param id        Player index
+ *
+ * @return          Database id, or 0 when the player row is not loaded yet
+ */
+native cod_get_user_db_id(id);
+
+/**
+ * Returns the escaped player name used as the `cod_players` lookup key.
+ *
+ * @param id        Player index
+ * @param data      Buffer to copy the name to
+ * @param length    Maximum buffer size
+ *
+ * @noreturn
+ */
+native cod_get_user_safe_name(id, data[], length);
+
+/**
+ * Reads a cached `cod_players` column.
+ *
+ * @param id        Player index
+ * @param field     One of the DB_PLAYER_* fields
+ *
+ * @return          Column value, or 0 when the player row is not loaded yet
+ */
+native cod_get_player_field(id, field);
+
+/**
+ * Writes a `cod_players` column and updates the cache.
+ *
+ * @param id        Player index
+ * @param field     One of the DB_PLAYER_* fields
+ * @param value     Value to store
+ * @param now       Run the query on the blocking connection (map end saves)
+ *
+ * @noreturn
+ */
+native cod_set_player_field(id, field, value, now = 0);
+
+/**
+ * Reads the stored account password of a player.
+ *
+ * @param id        Player index
+ * @param data      Buffer to copy the password to
+ * @param length    Maximum buffer size
+ *
+ * @noreturn
+ */
+native cod_get_player_password(id, data[], length);
+
+/**
+ * Stores the account password of a player. An empty password clears it.
+ *
+ * @param id        Player index
+ * @param password  Password to store
+ *
+ * @noreturn
+ */
+native cod_set_player_password(id, const password[]);
+
+/**
+ * Removes the player row along with everything referencing it.
+ *
+ * @param id        Player index
+ *
+ * @noreturn
+ */
+native cod_delete_player(id);
+
+/**
  * Plays one of available SOUND_* sounds.
  *
  * @param id        Entity index
@@ -2686,6 +2814,23 @@ forward cod_win_round(team);
  * @noreturn
  */
 forward cod_end_map();
+
+/**
+ * Multiforward called once the database is connected and migrated.
+ *
+ * @noreturn
+ */
+forward cod_database_ready();
+
+/**
+ * Multiforward called once the `cod_players` row of a player is available.
+ *
+ * @param id        Player index
+ * @param playerId  Database id of the player
+ *
+ * @noreturn
+ */
+forward cod_player_loaded(id, playerId);
 
 /**
  * Multiforward called on data reset.
