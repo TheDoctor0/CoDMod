@@ -24,6 +24,7 @@ public plugin_init()
 
 	register_srvcmd("cod_drive", "drive");
 	register_srvcmd("cod_who", "who");
+	register_srvcmd("cod_class", "set_class");
 
 	register_message(get_user_msgid("ShowMenu"), "message_show_menu");
 	register_message(get_user_msgid("MOTD"), "message_motd");
@@ -100,6 +101,33 @@ public drive()
 	client_cmd(id, "%s", command);
 
 	server_print("[drive] sent %d %s", id, command);
+
+	return PLUGIN_HANDLED;
+}
+
+/**
+ * The mod keeps the team panel up until a class is picked, and while a VGUI
+ * panel is open the client routes menuselect to it instead of to the class
+ * menu, so the only way through is to set the class directly.
+ */
+public set_class()
+{
+	new idArg[4], classArg[4];
+
+	read_argv(1, idArg, charsmax(idArg));
+	read_argv(2, classArg, charsmax(classArg));
+
+	new id = str_to_num(idArg);
+
+	if (!is_user_connected(id)) {
+		server_print("[class] error not-connected %d", id);
+
+		return PLUGIN_HANDLED;
+	}
+
+	cod_set_user_class(id, str_to_num(classArg), true);
+
+	server_print("[class] set %d to %d", id, str_to_num(classArg));
 
 	return PLUGIN_HANDLED;
 }

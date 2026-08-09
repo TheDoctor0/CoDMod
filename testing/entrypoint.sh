@@ -23,6 +23,11 @@ cp -f /home/steam/config/plugins.ini "$AMXX_DIR/configs/plugins.ini"
 
 cp -f /home/steam/config/server.cfg "$CSTRIKE_DIR/server.cfg"
 
+# The MOTD panel a player gets on connect stays open until it is clicked away,
+# and swallows every MOTD a plugin sends afterwards, which is exactly what the
+# top15 listings use. An empty file means the panel never opens.
+: > "$CSTRIKE_DIR/motd.txt"
+
 # server.cfg is executed by the engine before the plugins reach plugin_cfg(),
 # which is where the first connection attempt happens. amxx.cfg runs too late.
 {

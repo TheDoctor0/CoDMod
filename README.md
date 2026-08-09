@@ -47,6 +47,9 @@ The first start moves the old tables aside (`cod_accounts` becomes `cod_legacy_a
 
 Knife choices, free honor flags and mission progress lived in nvaults. They are imported the first time each player connects, so keep the `.vault` files in place for a while after the update.
 
+## Testing
+A docker environment for compiling the plugins and running them against a real database and game server lives in [testing](https://github.com/TheDoctor0/CoDMod/tree/master/testing), together with a SQL checker and a script that walks a real client through the menus.
+
 ## Additional
 
 ### Class promotion

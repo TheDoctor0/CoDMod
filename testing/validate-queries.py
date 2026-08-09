@@ -7,7 +7,7 @@ code path. This pulls the literals straight out of the sources, fills the
 format specifiers with sample values, and executes each one inside a
 transaction that is rolled back, so nothing is written.
 
-Usage: docker compose up -d db && python3 docker/validate-queries.py
+Usage: docker compose up -d db && python3 testing/validate-queries.py
 """
 
 import re

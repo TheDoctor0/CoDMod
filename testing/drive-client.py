@@ -13,7 +13,7 @@ end, which is what makes this a pass/fail check rather than a slideshow.
 
 Usage:
     docker compose up -d server
-    python3 docker/drive-client.py [--out DIR] [--keep-client]
+    python3 testing/drive-client.py [--out DIR] [--keep-client]
 """
 
 import argparse
@@ -43,35 +43,156 @@ CONTAINER = "codmod-server-1"
 COMPOSE = Path(__file__).resolve().parent / "docker-compose.yml"
 LOG = "/home/steam/hlds/cstrike/addons/amxmodx/logs/cod_mod.log"
 
-# label, client commands to stuff, seconds to settle before the screenshot
+# Each action is one of:
+#   cmd:<client command>  stuffed into the player from the server
+#   srv:<server command>   run on the server, {id} is the player index
+#   key:<digit>            keypress, only while the game window has focus
+#   ok                     click the MOTD OK button
+#
+# Keys are needed for the team and class panels: while a VGUI panel is open the
+# client routes menuselect to it rather than to the plugin menu behind it, so
+# the only way through is the number keys a player would press.
+#
+# The fourth field runs straight after the screenshot. Anything that opens a
+# MOTD closes it again there: a MOTD left open covers the screen and swallows
+# every MOTD sent after it.
 STEPS = [
-    ("account-login", [f"WPROWADZ_SWOJE_HASLO {PLAYER_PASSWORD}"], 2.0),
-    ("team-join", ["jointeam 1"], 2.0),
-    ("class-menu", ["klasa"], 1.5),
-    ("class-selected", ["menuselect 1"], 2.5),
-    ("classes-motd", ["cancelselect", "klasy"], 2.5),
-    ("level-top15", ["cancelselect", "top"], 3.5),
-    ("knife-menu", ["cancelselect", "noze"], 1.5),
-    ("knife-selected", ["menuselect 5"], 2.0),
-    ("hud-menu", ["cancelselect", "hud"], 1.5),
-    ("mission-menu", ["cancelselect", "misje"], 1.5),
-    ("exchange-menu", ["cancelselect", "wymien"], 1.5),
-    ("clan-menu", ["cancelselect", "klan"], 2.5),
-    ("clan-members", ["menuselect 1"], 3.0),
-    ("clan-top15", ["cancelselect", "klan", "menuselect 6"], 3.5),
-    ("stats-menu", ["cancelselect", "menustaty"], 1.5),
-    ("time-top15", ["cancelselect", "topczas"], 3.5),
-    ("stats-top15", ["cancelselect", "topstaty"], 3.5),
-    ("medals-top15", ["cancelselect", "medale"], 3.5),
-    ("free-honor", ["cancelselect", "freehonor"], 2.0),
-    ("done", ["cancelselect"], 1.0),
+    ("account-login", [f"cmd:WPROWADZ_SWOJE_HASLO {PLAYER_PASSWORD}"], 2.0, []),
+    ("team-select", ["key:1"], 2.0, []),
+    ("faction-select", ["key:1"], 2.0, []),
+    ("class-select", ["key:1"], 2.5, []),
+    ("class-menu", ["cmd:klasa"], 1.5, ["cmd:cancelselect"]),
+    ("classes-motd", ["cmd:klasy"], 2.5, ["ok"]),
+    ("level-top15", ["cmd:top"], 3.5, ["ok"]),
+    ("knife-menu", ["cmd:noze"], 1.5, ["cmd:cancelselect"]),
+    ("hud-menu", ["cmd:hud"], 1.5, ["cmd:cancelselect"]),
+    ("mission-menu", ["cmd:misje"], 1.5, ["cmd:cancelselect"]),
+    ("exchange-menu", ["cmd:wymien"], 1.5, ["cmd:cancelselect"]),
+    ("clan-menu", ["cmd:klan"], 2.5, []),
+    ("clan-members", ["cmd:menuselect 1"], 3.0, ["cmd:cancelselect"]),
+    ("clan-top15", ["cmd:klan", "cmd:menuselect 6"], 3.5, ["ok"]),
+    ("stats-menu", ["cmd:menustaty"], 1.5, ["cmd:cancelselect"]),
+    ("time-top15", ["cmd:topczas"], 3.5, ["ok"]),
+    ("stats-top15", ["cmd:topstaty"], 3.5, ["ok"]),
+    ("medals-top15", ["cmd:medale"], 3.5, ["ok"]),
+    ("free-honor", ["cmd:freehonor"], 2.0, ["cmd:cancelselect"]),
 ]
+
+# MOTD "OK" button, relative to the 1280x720 game window
+OK_BUTTON = (370, 561)
 
 WHO = re.compile(r"id=(\d+) name=(.+?) db_id=(\d+) honor=(-?\d+) account=(\d+)")
 
 
 def sh(*command, check=False):
     return subprocess.run(command, capture_output=True, text=True, check=check).stdout
+
+
+ALLOWED_KEYS = set("0123456789")
+
+
+def pointer():
+    values = {}
+
+    for line in sh("xdotool", "getmouselocation", "--shell").splitlines():
+        if "=" in line:
+            key, value = line.split("=", 1)
+            values[key] = value
+
+    return values
+
+
+def key_in_game(key):
+    """Sends one key, and only while X reports the game window focused.
+
+    Digits only, so even a press that somehow lands elsewhere cannot enter text.
+    """
+    if key not in ALLOWED_KEYS:
+        raise ValueError(f"key {key} is not allowed")
+
+    window = game_window()
+
+    if not window:
+        return False
+
+    subprocess.run(["wmctrl", "-ia", window], check=False)
+    time.sleep(0.6)
+
+    if sh("xdotool", "getwindowfocus").strip() != str(int(window, 16)):
+        print(f"       game window is not focused, skipping key {key}")
+
+        return False
+
+    subprocess.run(["xdotool", "key", "--clearmodifiers", key], check=False)
+    time.sleep(0.5)
+
+    return True
+
+
+def click_in_game(rel_x, rel_y):
+    """Clicks inside the game window, and only there.
+
+    The pointer is placed relative to the window rather than in root
+    coordinates, because xdotool's getwindowgeometry counts the frame
+    decoration twice and every click then lands ~30px low. The click only
+    happens once X confirms the window under the pointer is the game, and the
+    pointer goes back where it was afterwards.
+    """
+    window = game_window()
+
+    if not window:
+        return False
+
+    subprocess.run(["wmctrl", "-ia", window], check=False)
+    time.sleep(0.5)
+
+    before = pointer()
+
+    subprocess.run(
+        ["xdotool", "mousemove", "--window", window, str(rel_x), str(rel_y)], check=False
+    )
+    time.sleep(0.3)
+
+    on_target = pointer().get("WINDOW") == str(int(window, 16))
+
+    if on_target:
+        subprocess.run(["xdotool", "click", "1"], check=False)
+        time.sleep(0.4)
+    else:
+        print("       pointer is not over the game, skipping click")
+
+    subprocess.run(["xdotool", "mousemove", before["X"], before["Y"]], check=False)
+
+    return on_target
+
+
+def close_motd(window, out):
+    """Clicks OK and checks the screen actually changed, because a MOTD left
+    open covers everything and swallows the next one."""
+    for attempt in range(2):
+        before = out / ".motd-before.png"
+        after = out / ".motd-after.png"
+
+        subprocess.run(["import", "-window", window, str(before)], check=False)
+        click_in_game(*OK_BUTTON)
+        time.sleep(1.0)
+        subprocess.run(["import", "-window", window, str(after)], check=False)
+
+        difference = subprocess.run(
+            ["compare", "-metric", "AE", str(before), str(after), "null:"],
+            capture_output=True,
+            text=True,
+        ).stderr.strip()
+
+        before.unlink(missing_ok=True)
+        after.unlink(missing_ok=True)
+
+        if difference and difference.isdigit() and int(difference) > 10000:
+            return True
+
+    print("       MOTD did not close")
+
+    return False
 
 
 def game_window():
@@ -235,15 +356,32 @@ def main():
     if name != PLAYER_NAME:
         print(f"warning: connected as '{name}', expected '{PLAYER_NAME}'")
 
-    for index, (label, commands, settle) in enumerate(STEPS, start=1):
-        for command in commands:
-            rcon.command(f"cod_drive {player_id} {command}")
+    def run(actions):
+        for action in actions:
+            if action == "ok":
+                close_motd(game_window(), out)
+            elif action.startswith("key:"):
+                key_in_game(action[4:])
+            elif action.startswith("srv:"):
+                rcon.command(action[4:].replace("{id}", player_id))
+            else:
+                rcon.command(f"cod_drive {player_id} {action[4:]}")
+
             time.sleep(0.4)
+
+    # a MOTD left over from an earlier run would cover the first screenshots
+    click_in_game(*OK_BUTTON)
+
+    for index, (label, before, settle, after) in enumerate(STEPS, start=1):
+        run(before)
 
         time.sleep(settle)
 
         window = game_window() or window
         path = screenshot(window, out, label, index)
+
+        # never leave a MOTD or menu sitting on the screen
+        run(after)
 
         print(f"  {index:02d} {label:<16} {path.name}")
 
